@@ -7,19 +7,11 @@ class Graph:
 		
 	def addEdge(self, edge):
 		if edge not in self.edges:
-			if edge.source in self.elements:
-				if edge.sink not in self.elements:
-					self.elements.add(edge.sink)
-				self.edges.add(edge)
+			self.edges.add(edge)
 		
 	def addConstraint(self, edge):
 		if edge not in self.constraints:
-			if edge.source in self.elements:
-				if edge.sink not in self.elements:
-					self.elements.add(edge.sink)
-				self.constraints.add(edge)
-			else:
-				print('constraint source not in graph')
+			self.constraints.add(edge)
 	
 			
 	def getIncidentEdges(self, element):
