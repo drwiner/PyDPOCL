@@ -356,8 +356,9 @@ class Subplan(Element):
 		self.steps = {step.source for step in self.causal_links}.union({self.sink for step in self.causal_links})
 
 class Motivation(Literal):
-	def __init__(self, id, type, name=None, num_args = 1, truth = True, goal):
+	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender, goal):
 		super(Motivation,self).__init__(id,type,name,num_args,truth)
+		self.actor = intender
 		self.goal = goal
 		
 class IntentionFrame(Element):
@@ -368,12 +369,12 @@ class IntentionFrame(Element):
 		self.goal = goal
 		self.sat = sat
 		self.subplan = subplan
-		self.motivation = Motivation(id,type='motivation',name='intends', truth=True, self.goal)
+		self.motivation = Motivation(id, intender=self.actor, goal = self.goal)
 		
 		
 	def isInternallyConsistent(self):
 		for effect in self.sat.getEffects():
-			if not self.goal.isEquivalent(effect):
+			if not self.goal.isConsistent(effect):
 				return False
 		for step in self.subplan.steps:
 			if not step.isAntecedent(self.sat,self.subplan.causal_links):
@@ -382,7 +383,10 @@ class IntentionFrame(Element):
 				return False
 		if not self.actor in self.sat.getActors():
 			return False
-		if not self.ms.getEffects()
-			
+		for effect in self.ms.getEffects():
+			if not self.motivation.isConsistent(effect)
+		if not self.motivation in self.ms.getEffects()
+			return False
+		
 		return True
 		
