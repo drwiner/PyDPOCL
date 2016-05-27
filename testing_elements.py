@@ -42,7 +42,7 @@ edge20 = Edge(e1, place, 'sec-arg')
 excavate_elements = {excavate, p1, p2, p3, p4, e1, e2, consent, item, place}
 excavate_edges = {edge0, edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8, edge9, edge10, edge11, edge12, edge13, edge14,edge15, edge16,edge17, edge18, edge19, edge20}
 
-Excavate_graph = Graph(excavate_elements, excavate_edges)
+Excavate_graph = Graph(id = 0,type = 'step', excavate_elements, excavate_edges)
 
 example = Operator(id = 1, type= 'op')
 example_p1 = Literal(id=2, type='precondition', name='alive', truth = True)
@@ -66,6 +66,6 @@ example_elements = {example, example_p1, example_e1, example_actor, example_item
 example_edges = {example_edge0, example_edge1, example_edge2, example_edge3, example_edge4}
 example_constraints = {example_constraint_edge0, example_constraint_edge1}
 
-Example_graph = Graph(example_elements,example_edges, example_constraints)
+Example_graph = Graph(id = 1, type='step', example_elements,example_edges, example_constraints)
 
 print(Excavate_graph.isConsistent(Example_graph))
