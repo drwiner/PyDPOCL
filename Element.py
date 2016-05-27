@@ -1,6 +1,123 @@
 
-class Graph:
-	def __init__(self, Elements = set(), Edges = set(), Constraints = set()):
+		
+class Element:
+	def __init__(self, id, type = None, name = None):
+		self.id = id
+		self.type = type
+		self.name = name
+		
+	def isConsistent(self, other):
+		#""" Returns True if self and other have same name or unassigned"""
+		if not other.type is None:
+			if self.type != other.type:
+				return False
+		return True
+		
+	def isIdentical(self, other):
+		if self.id == other.id:
+			if self.isEquivalent(other):
+				return True
+		return False
+		
+	def isEquivalent(self, other):
+		if self.type == other.type:
+			return True
+		return False
+	
+	def isProperty(self, other, property):
+		return self.property(other)
+		
+			
+		
+class InternalElement(Element):
+	def __init__(self, id, type, name = None, num_args = 0):
+		super(InternalElement,self).__init__(id,type,name)
+		self.num_args = num_args
+		
+	# def isEquivalent(self, other):
+		# if self.type == other.type and self.name == other.name and self.num_args == other.num_args:
+			# return True
+		# return False
+	
+	def isEquivalent(self, other):
+		# for each incident edge of other, there is a unique equivalent edge of self
+		# and for each constraint of other, there is no uniqe equivalent edge of self
+		if not (super(InternalElement,self).isEquivalent(other) \
+			and self.name == other.name \
+			and self.num_args == other.num_args):
+			return False
+			
+		#out_incident_edges = {edge for edge in }
+	
+	def isConsistent(self, other):
+	
+		#If other has a type, then return False if they are not the same
+		if not super(InternalElement,self).isConsistent(other):
+			return False
+				
+		#If other has an argument number, then return False if they are not the same
+		if other.num_args > 0:
+			if self.num_args != other.num_args:
+				return False
+	
+		#If other has a predicate name, then return False if they are not the same
+		if not other.name is None:
+			if self.name != other.name:
+				return False
+				
+		return True
+		
+				
+		
+class Operator(InternalElement):
+	def __init__(self, id, type, name = None, num_args = 0, executed = None):
+		super(Operator,self).__init__(id,type,name, num_args)
+		self.executed = executed
+		
+		
+class Literal(InternalElement):
+	def __init__(self, id, type, name = None, num_args = 0, truth = None):
+		super(Literal,self).__init__(id,type,name, num_args)
+		self.truth = truth
+
+	def isConsistent(self, other):
+		if not super(Literal,self).isConsistent(other):
+			return False
+				
+		if not other.truth is None:
+			if self.truth != other.truth:
+				return False
+				
+		return True
+
+	def isEquivalent(self,other):
+		if self.name == other.name:
+			return True
+		return False
+		
+
+		
+class Argument(Element):
+	def __init__(self, id, type, name= None, position = 0):
+		super(Argument,self).__init__(id,type,name)
+		self.position = position
+		
+	def isConsistent(self, other):
+		if not super(Argument,self).isConsistent(other):
+			return False
+		if other.position > 0 and other.position != self.position:
+			return False
+		return True
+	
+	def isEquivalent(self, other):
+		if super(Argument,self).isEquivalent(other) and self.position == other.position:
+			return True
+		return False
+		
+
+class Graph(Element):
+	def __init__(self, id, type, name = None, Elements = set(), Edges = set(), Constraints = set()):
+		super(Graph,self).__init__(id,type,name)
 		self.elements = Elements
 		self.edges = Edges;
 		self.constraints = Constraints
@@ -176,6 +293,42 @@ def rDetectEquivalentEdgeGraph(Remaining = set(), Available = set()):
 				return True
 	return False
 
+class Belief(Element):
+	def __init__(self, id, type, name=None, story_element):
+		super(Belief, self).__init__(id,type,name)
+		self.story_element = story_element
+	
+	def isEquivalent(other_belief):
+		if self.story_element.isEquivalent(other_belief.story_element) \
+		and other_belief.story_element.isEquivalent(self.story_element):
+			return True:
+		return False
+		
+class Action(Element):
+	def __init__(self, id, type, name=None):
+		super(Action,self).__init__(id,type,name)
+		
+class CausalLink(Edge):
+	def __init__(self, action1, action2, belief):
+		super(CausalLink,self).__init__(action1,action2,belief)
+		
+class Binding(Element):
+	def __init__(self,id,type,name=None,element1, element2):
+		super(Binding,self).__init__(id,type,name)
+		self.X = element1
+		self.Y = element2
+		
+	def isBinding(self, element_A, element_B):
+		if self.X.isIdentical(element_A) and self.Y.isIdentical(element_B):
+			return True
+		if self.Y.isIdentical(element_B) and self.X.isIdentical(element_A):
+			return True
+		return False
+		
+class Ordering(Binding):
+	def __init__(self,id,type,name=None,action1,action2):
+		super(Ordering, self).__init__(id, type,name,action1,action2)
+		
 		
 class Edge:
 	def __init__(self, source, sink, label):
@@ -195,118 +348,41 @@ class Edge:
 		if self.source.isEquivalent(other.source) and self.sink.isEquivalent(other.sink) and self.label == other.label:
 			return True
 		return False
+
+class Subplan(Element):
+	def __init__(self,id,type,name=None,causal_links):
+		super(Subplan,self).__init__(id,type,name)
+		self.causal_links
+		self.steps = {step.source for step in self.causal_links}.union({self.sink for step in self.causal_links})
+
+class Motivation(Literal):
+	def __init__(self, id, type, name=None, num_args = 1, truth = True, goal):
+		super(Motivation,self).__init__(id,type,name,num_args,truth)
+		self.goal = goal
 		
-class Element:
-	def __init__(self, id, type = None, name = None):
-		self.id = id
-		self.type = type
-		self.name = name
+class IntentionFrame(Element):
+	def __init__(self, id, type, name=None, actor, ms, goal, sat, subplan):
+		super(IntentionFrame,self).__init__(id,type,name)
+		self.ms = ms
+		self.actor = actor
+		self.goal = goal
+		self.sat = sat
+		self.subplan = subplan
+		self.motivation = Motivation(id,type='motivation',name='intends', truth=True, self.goal)
 		
-	def isConsistent(self, other):
-		#""" Returns True if self and other have same name or unassigned"""
-		if not other.type is None:
-			if self.type != other.type:
+		
+	def isInternallyConsistent(self):
+		for effect in self.sat.getEffects():
+			if not self.goal.isEquivalent(effect):
 				return False
-		return True
-		
-	def isIdentical(self, other):
-		if self.id == other.id:
-			if self.isEquivalent(other):
-				return True
-		return False
-		
-	def isEquivalent(self, other):
-		if self.type == other.type:
-			return True
-		return False
-	
-	def isProperty(self, other, property):
-		return self.property(other)
-		
+		for step in self.subplan.steps:
+			if not step.isAntecedent(self.sat,self.subplan.causal_links):
+				return False
+			if not self.actor in step.getActors():
+				return False
+		if not self.actor in self.sat.getActors():
+			return False
+		if not self.ms.getEffects()
 			
-		
-class InternalElement(Element):
-	def __init__(self, id, type, name = None, num_args = 0):
-		super(InternalElement,self).__init__(id,type,name)
-		self.num_args = num_args
-		
-	# def isEquivalent(self, other):
-		# if self.type == other.type and self.name == other.name and self.num_args == other.num_args:
-			# return True
-		# return False
-	
-	def isEquivalent(self, other):
-		# for each incident edge of other, there is a unique equivalent edge of self
-		# and for each constraint of other, there is no uniqe equivalent edge of self
-		if not (super(InternalElement,self).isEquivalent(other) \
-			and self.name == other.name \
-			and self.num_args == other.num_args):
-			return False
-			
-		#out_incident_edges = {edge for edge in }
-	
-	def isConsistent(self, other):
-	
-		#If other has a type, then return False if they are not the same
-		if not super(InternalElement,self).isConsistent(other):
-			return False
-				
-		#If other has an argument number, then return False if they are not the same
-		if other.num_args > 0:
-			if self.num_args != other.num_args:
-				return False
-	
-		#If other has a predicate name, then return False if they are not the same
-		if not other.name is None:
-			if self.name != other.name:
-				return False
-				
 		return True
 		
-				
-		
-class Operator(InternalElement):
-	def __init__(self, id, type, name = None, num_args = 0, executed = None):
-		super(Operator,self).__init__(id,type,name, num_args)
-		self.executed = executed
-		
-		
-class Literal(InternalElement):
-	def __init__(self, id, type, name = None, num_args = 0, truth = None):
-		super(Literal,self).__init__(id,type,name, num_args)
-		self.truth = truth
-
-	def isConsistent(self, other):
-		if not super(Literal,self).isConsistent(other):
-			return False
-				
-		if not other.truth is None:
-			if self.truth != other.truth:
-				return False
-				
-		return True
-
-	def isEquivalent(self,other):
-		if self.name == other.name:
-			return True
-		return False
-		
-
-		
-class Argument(Element):
-	def __init__(self, id, type, name= None, position = 0):
-		super(Argument,self).__init__(id,type,name)
-		self.position = position
-		
-	def isConsistent(self, other):
-		if not super(Argument,self).isConsistent(other):
-			return False
-		if other.position > 0 and other.position != self.position:
-			return False
-		return True
-	
-	def isEquivalent(self, other):
-		if super(Argument,self).isEquivalent(other) and self.position == other.position:
-			return True
-		return False
-	
