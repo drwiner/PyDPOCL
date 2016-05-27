@@ -98,15 +98,17 @@ class Literal(InternalElement):
 
 		
 class Argument(Element):
-	def __init__(self, id, type, name= None, position = 0):
+	def __init__(self, id, type, name= None, arg_pos_dict = {}):
 		super(Argument,self).__init__(id,type,name)
+		self.arg_pos_dict = arg_pos_dict
 		self.position = position
 		
 	def isConsistent(self, other):
 		if not super(Argument,self).isConsistent(other):
 			return False
-		if other.position > 0 and other.position != self.position:
-			return False
+		if other.id in other.arg_pos_dict:
+			if other.arg_pos_dict[other.id] != self.arg_pos_dict[self.id]:
+				return False
 		return True
 	
 	def isEquivalent(self, other):
@@ -309,26 +311,33 @@ class Action(Element):
 		super(Action,self).__init__(id,type,name)
 		
 class CausalLink(Edge):
-	def __init__(self, action1, action2, belief):
-		super(CausalLink,self).__init__(action1,action2,belief)
+	def __init__(self, id, type, name=None, action1, action2, condition):
+		super(CausalLink,self).__init__(source=action1,sink=action2,label=condition)
+		self.id = id
+		self.type = type
+		self.name = name
+	
+	#def possiblyThreatenedBy(self,action):
+	
+	def threatenedBy(self,action):
+		action_orderings = getOrderingsWith(action)
 		
-class Binding(Element):
-	def __init__(self,id,type,name=None,element1, element2):
-		super(Binding,self).__init__(id,type,name)
+class Binding(Edge):
+	def __init__(element1, element2, binding_type):
+		super(Binding,self).__init__(element1,element2,binding_type)
 		self.X = element1
 		self.Y = element2
 		
-	def isBinding(self, element_A, element_B):
+	def isInternallyConsistent(self, element_A, element_B):
 		if self.X.isIdentical(element_A) and self.Y.isIdentical(element_B):
 			return True
 		if self.Y.isIdentical(element_B) and self.X.isIdentical(element_A):
 			return True
 		return False
 		
-class Ordering(Binding):
-	def __init__(self,id,type,name=None,action1,action2):
-		super(Ordering, self).__init__(id, type,name,action1,action2)
-		
+class Ordering(Edge):
+	def __init__(self,action1,action2):
+		super(Ordering, self).__init__(action1,action2,'<')
 		
 class Edge:
 	def __init__(self, source, sink, label):
