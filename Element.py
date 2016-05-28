@@ -125,6 +125,9 @@ class Argument(Element):
 			return True
 		return False
 		
+	def merge(self, other):
+		self.arg_pos_dict = {**self.arg_pos_dict, **other.arg_pos_dict}
+		#self.arg_pos_dict.update(other.arg_pos_dict)
 
 class Graph(Element):
 	def __init__(self, id, type, name = None, Elements = set(), Edges = set(), Constraints = set()):
@@ -141,12 +144,6 @@ class Graph(Element):
 		if edge not in self.constraints:
 			self.constraints.add(edge)
 			
-	def merge(self, other):
-		#Danger of a union is that we'll represent consistent elements twice.
-		#check if two steps with nonempty intersection can be merged
-		#For just literals first:
-		if 
-			
 	def getIncidentEdges(self, element):
 		return {edge for edge in self.edges if edge.source is element}
 	def getNeighbors(self, element):
@@ -156,7 +153,7 @@ class Graph(Element):
 	def getNeighborsByLabel(self, element, label):
 		return set(edge.sink for edge in self.edges if edge.source is element and edge.label is label)
 	def getIncidentEdgesByLabel(self, element, label):
-		return set(edge for edge in self.edges if edge.source is element and edge.label is label)
+		return {edge for edge in self.edges if edge.source is element and edge.label is label}
 	def getParentsByLabel(self, element, label):
 		return set(edge.source for edge in self.edges if edge.sink is element and edge.label is label)
 	def getConstraints(self, element):
@@ -203,8 +200,7 @@ class Graph(Element):
 		for edge in incident_Edges:
 			Descendant_Edges = self.rGetDescendantEdges(edge.sink, Descendant_Edges)
 			
-		return Descendant_Edges
-			
+		return Descendant_Edges	
 		
 	def equivalentWithConstraints(self, other):
 		for c in other.constraints:
@@ -214,8 +210,7 @@ class Graph(Element):
 				print('suspect id: ', suspect.id)
 				if self.constraintEquivalentWithElement(other, suspect, c.source):
 					return True
-		return False
-		
+		return False	
 		
 	def constraintEquivalentWithElement(self, other, self_element, constraint_element):
 		""" Returns True if element and constraint have equivalent descendant edge graphs"""
@@ -226,7 +221,6 @@ class Graph(Element):
 		descendant_edges = self.rGetDescendantEdges(self_element)
 		constraints = other.rGetDescendantConstraints(constraint_element)
 		return rDetectEquivalentEdgeGraph(constraints, descendant_edges)
-		
 		
 	def rGetDescendantConstraints(self, constraint_source, Descendant_Constraints = set()):
 		#Base Case
@@ -249,6 +243,11 @@ class Graph(Element):
 			if not self.equivalentWithConstraints(other):
 				print('consistent with constraints')
 				return True
+		return False
+		
+	def isCoConsistent(self,other):
+		if self.isConsistent(other) and other.isConsistent(self):
+			return True
 		return False
 	###############################################################
 		
@@ -309,11 +308,7 @@ def rDetectEquivalentEdgeGraph(Remaining = set(), Available = set()):
 				return True
 	return False
 	
-def extractSubgraphFromElement(G, element, Type):
-	Edges = G.rGetDescendantEdges(element)
-	Elements = G.rGetDescendants(element)
-	Constraints = G.rGetDescendantConstraints(element)
-	return Type(element.id,type = 'subgraph',Elements,Edges,Constraints)
+
 
 class Belief(Graph):
 	def __init__(self, id, type, name=None, Elements=set(), Edges = set(), Constraints = set()):
@@ -352,48 +347,54 @@ class Action(Graph):
 		
 class Condition(Graph):
 	""" A Literal used in causal link"""
-	def __init__(self,id,type,name=None,Elements=set(), Edges = set(), Constraints = set()):
+	def __init__(self,id,type,name=None,Elements=set(), literal_root, Edges = set(), Constraints = set()):
 		super(Condition,self).__init__(Elements,Edges,Constraints)
 		self.id = id
+		self.root = literal_root#
 		self.type = type
-		self.name  name
+		self.name = name
+		self.literal = 
 		
 	def merge(self, other):
-		#Do not assume equivalent, assume only consistency
-		if not self.isEqual(other):
-			if not self.isConsistent(other) and other.isConsistent(self):
-				print('could not merge conditions')
-				return False
+		if self.root.name is None:
+			if other.root.name is None:
+				print('literalsToCondition needs a name')
+				return None
 			else:
-				
+				self.root.name = other.root.name	
+	
+		if self.root.num_args is None:
+			if other.root.num_args is None:
+				print('need to put num_args in literals')
+				return None
+			else:
+				self.root.num_args = other.root.num_args
 		
-def literalsToCondition(G1, G2, literal_1, literal_2, checked=False):
-	if not checked and not literal_1.isCoConsistent(literal_2):
-		return False
-	
-	if literal_1.name is None:
-		name = literal_2.name
-	else:
-		name = literal_1.name
+		if not self.isCoConsistent(other):
+			print('Condition Merge literals not consistent')
+			return None
+
+		labels = ['first-arg','second-arg','third-arg','fourth-arg']
+		for i in range(num_args):
+			#L1 edges for 'i'th argument
+			self_edge_to_args = self.getIncidentEdgesByLabel(self.root, labels[i]).pop()
+				if len(self_edge_to_args) == 0:
+					other_edge_to_args = other.getIncidentEdgesByLabel(other.root, labels[i]).pop()
+					if len(other_edge_to_args) == 0:
+						self.edges.add(Edge(self.root,Element(id=0,type=None, name = None),labels[i]))
+					else:
+						self.edges.add(Edge(self.root,other_edge_to_args.sink,other_edge_to_args.label))
 		
 	
-	if literal_1.num_args is None:
-		if literal_2.num_args is None:
-			print('need to put num_args in literals')
-		else:
-			num_args = literal_2
-	else:
-		num_args = literal_1.num_args
-	
-	#get elements and edges recursively from literal_1 in G_1
-	L1 = extractSubgraphFromElement(G1,literal_1,Literal)
-	L2 = extractSubgraphFromElement(G2,literal_2,Literal)
-	
-	edge 
-	{edge for edge in L1.edges if edge.label is 'first-arg'}
-	L1.merge(L2)
-	return Condition(id=literal_1.id, type='condition')
-	
+def extractSubgraphFromElement(G, element, Type):
+	Edges = G.rGetDescendantEdges(element)
+	Elements = G.rGetDescendants(element)
+	Constraints = G.rGetDescendantConstraints(element)
+	return Type(element.id,type = element.type, name=element.name, Elements, Edges, Constraints)		
+		
+def literalToCondition(G,literal):
+	return extractSubgraphFromElement(G,literal,Condition)
+		
 	
 		
 class CausalLink(Edge):
@@ -501,7 +502,7 @@ class IntentionFrame(Element):
 		
 		
 def DomainOperator(Graph):
-	def __init__(self,id,type,name=None, Elements, Operator_Element, Edges,Constraints):
+	def __init__(self,id,type,name=None, Elements, Operator_Element, Edges, Constraints):
 		super(DomainOperator,self).__init__(id,type,name,Elements,Edges,Constraints)
 		self.Operator = Operator_Element
 		Args = {i:arg for i in range(self.Operator.num_args) for arg in self.Elements if type(arg) is Argument and arg.arg_pos_dic[i]}
