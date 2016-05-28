@@ -110,7 +110,6 @@ class Argument(Element):
 	def __init__(self, id, type, name= None, arg_pos_dict = {}):
 		super(Argument,self).__init__(id,type,name)
 		self.arg_pos_dict = arg_pos_dict
-		self.position = position
 		
 	def isConsistent(self, other):
 		if not super(Argument,self).isConsistent(other):
@@ -120,8 +119,8 @@ class Argument(Element):
 				return False
 		return True
 	
-	def isEquivalent(self, other):
-		if super(Argument,self).isEquivalent(other) and self.position == other.position:
+	def isEquivalent(self, other):###Equivalent if for every shared key, share the same value?
+		if super(Argument,self).isEquivalent(other) and self.isConsistent(other):
 			return True
 		return False
 		
@@ -308,14 +307,56 @@ def rDetectEquivalentEdgeGraph(Remaining = set(), Available = set()):
 				return True
 	return False
 	
-
-
-class Belief(Graph):
-	def __init__(self, id, type, name=None, Elements=set(), Edges = set(), Constraints = set()):
-		super(Belief, self).__init__(Elements, Edges, Constraints)
+class ElementGraph(Graph):
+	def __init__(self,id,type,name=None, Elements = set(), root_element = None, Edges = set(), Constraints = set()):
+		super(ElementGraph,self).__init__(Elements,Edges,Constraints)
 		self.id = id
-		self.type= type
+		self.type = root_element.type
 		self.name = name
+		self.root = root
+		
+		
+def isConsistentElementGraphMerge(one,other):
+	
+	if not one.isCoConsistent(other):
+		return set()
+		
+	if one.root.name is None:
+		if other.root.name is None:
+			print('if this were a literal, needs a name')
+		else:
+			one.root.name = other.root.name	
+
+	if type(one.root) == 'Literal':
+		if one.root.num_args is None:
+			if other.root.num_args is None:
+				print('need to put num_args in literals')
+				return None
+			else:
+				self.root.num_args = other.root.num_args
+				
+	if type(one.root) == 'Operator':
+		preconditions = {edge for edge in }
+		#For each pair of co-consistent preconditions (one.precondition, other.precondition), 
+			#If they both have the same name,
+				#Create new ElementGraphs EG1,EG2, where EG1 makes them the same precondition, and EG2 keeps them separated
+		#Do same for each pair of effects.
+			#Don't need to do this for consenting actor
+	#Action, Condition, 
+		""" BUT, then there will be a combinatorial explosion of different ElementGraphs for each permuation,
+			especially more complex ElementGraphs.
+			What if, for each element in an ElementGraph, we store a set of possible mergers?"""
+				
+				
+		"""TODO: with literals, there are no edges with same label. With steps, there are. 
+			With steps, consider the unnamed step which contains two same-named literals. (e.g. to preconditions (at x loc) and (at y loc))
+			Where self has (at arg1 loc) and other has (at None loc). 
+			Two options, combine the literals or let there be two preconditions in merged Condition.
+			Ought we store a list of alternatives? Ought this method not be a class method?"""
+
+class Belief(ElementGraph):
+	def __init__(self, id, type, name=None, Elements = set(), root_element=None, Edges = set(), Constraints = set()):
+		super(Belief, self).__init__(id,type,name,Elements, root_element, Edges, Constraints)
 	
 	# def isEquivalent(other_belief):
 		# if self.story_element.isEquivalent(other_belief.story_element) \
@@ -323,13 +364,10 @@ class Belief(Graph):
 			# return True:
 		# return False
 		
-class Action(Graph):
+class Action(ElementGraph):
 	""" Action Graph: for step graph"""
-	def __init__(self, id, type, name=None, Elements=set(), Edges=set(), Constraints = set()):
-		super(Action,self).__init__(Elements,Edges,Constraints)
-		self.id = id
-		self.type = type
-		self.name = name
+	def __init__(self, id, type, name=None, Elements=set(), root_element = None, Edges=set(), Constraints = set()):
+		super(Action,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 		
 	"""Determine if two Actions can be joined by a causal link"""
 	def isConsistentAntecedentFor(self, action):
@@ -345,45 +383,21 @@ class Action(Graph):
 		return prospects
 	
 		
-class Condition(Graph):
+class Condition(ElementGraph):
 	""" A Literal used in causal link"""
-	def __init__(self,id,type,name=None,Elements=set(), literal_root, Edges = set(), Constraints = set()):
-		super(Condition,self).__init__(Elements,Edges,Constraints)
-		self.id = id
-		self.root = literal_root#
-		self.type = type
-		self.name = name
-		self.literal = 
+	def __init__(self,id,type,name=None,Elements=set(), literal_root = None, Edges = set(), Constraints = set()):
+		super(Condition,self).__init__(id,type,name,Elements,literal_root,Edges,Constraints)
+		self.labels = labels = ['first-arg','second-arg','third-arg','fourth-arg']
 		
-	def merge(self, other):
-		if self.root.name is None:
-			if other.root.name is None:
-				print('literalsToCondition needs a name')
-				return None
-			else:
-				self.root.name = other.root.name	
-	
-		if self.root.num_args is None:
-			if other.root.num_args is None:
-				print('need to put num_args in literals')
-				return None
-			else:
-				self.root.num_args = other.root.num_args
+	def mergeFrom(self, other):
+		super(Condition,self).mergeFrom(other)
 		
-		if not self.isCoConsistent(other):
-			print('Condition Merge literals not consistent')
-			return None
-
-		labels = ['first-arg','second-arg','third-arg','fourth-arg']
 		for i in range(num_args):
-			#L1 edges for 'i'th argument
-			self_edge_to_args = self.getIncidentEdgesByLabel(self.root, labels[i]).pop()
+			self_edge_to_args = self.getIncidentEdgesByLabel(self.root, self.labels[i]).pop()
 				if len(self_edge_to_args) == 0:
-					other_edge_to_args = other.getIncidentEdgesByLabel(other.root, labels[i]).pop()
-					if len(other_edge_to_args) == 0:
-						self.edges.add(Edge(self.root,Element(id=0,type=None, name = None),labels[i]))
-					else:
-						self.edges.add(Edge(self.root,other_edge_to_args.sink,other_edge_to_args.label))
+					other_edge_to_args = other.getIncidentEdgesByLabel(other.root, self.labels[i]).pop()
+					if len(other_edge_to_args) > 0:
+						self.edges.add(Edge(self.root,other_edge_to_args.sink, other_edge_to_args.label))
 		
 	
 def extractSubgraphFromElement(G, element, Type):
@@ -459,23 +473,24 @@ class Edge:
 			return True
 		return False
 
-class Subplan(Element):
-	def __init__(self,id,type,name=None,causal_links):
-		super(Subplan,self).__init__(id,type,name)
-		self.causal_links
-		self.steps = {step.source for step in self.causal_links}.union({self.sink for step in self.causal_links})
+class Subplan(ElementGraph):
+	def __init__(self,id,type,name=None, Elements = set(), source = None, initial = None, sink = None, goal=None, Edges = set(), Constraints = set(),  Rhetorical_charge = None):
+		super(Subplan,self).__init__(id,type,name, Elements, sink, Edges, Constraints)
+		#self.causal_links
+		#self.steps = {step.source for step in self.causal_links}.union({self.sink for step in self.causal_links})
 
 class Motivation(Literal):
-	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender, goal):
+	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender=None, goal=None):
 		super(Motivation,self).__init__(id,type,name,num_args,truth)
 		self.actor = intender
-		self.goal = goal
+		self.goal = goal #Goal is a literal. THIS is a case where... a Literal has-a Literal
 		
-class IntentionFrame(Element):
-	def __init__(self, id, type, name=None, actor, ms, goal, sat, subplan):
-		super(IntentionFrame,self).__init__(id,type,name)
+class IntentionFrame(Subplan):
+	def __init__(self,id,type,name=None, Elements=set(),source=None,initial=None,sink=None,goal=None,Edges=set(),Constraints=set(),Rhetorical_charge=None, intender=None):
+		super(IntentionFrame,self).__init__(id,type,name, Elements, source, initial,sink, goal, Edges, Constraints, Rhetorical_charge)
+
 		self.ms = ms
-		self.actor = actor
+		self.intender = actor
 		self.goal = goal
 		self.sat = sat
 		self.subplan = subplan
@@ -486,8 +501,9 @@ class IntentionFrame(Element):
 		for effect in self.sat.getEffects():
 			if not self.goal.isConsistent(effect):
 				return False
-		for step in self.subplan.steps:
-			if not step.isAntecedent(self.sat,self.subplan.causal_links):
+		for step in self.subplan.elements:
+			#All steps must be isTransitiveClosure_isAntecedent
+			if not step.isTransitiveClosure_isAntecedent(self.sat):
 				return False
 			if not self.actor in step.getActors():
 				return False
@@ -528,4 +544,3 @@ def Prerequisite(Graph):
 		"""For every causal link Qi --Condition()--> Qj, find steps di = c-map[Qi.id] and dj = c-map[Qj.id] s.t. 
 			Condition().Args[di.id] == Condition().Args[dj.id]
 			For e"""
-		{cl.id: {}}
