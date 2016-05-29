@@ -191,9 +191,7 @@ class Subplan(ElementGraph):
 			}
 		#self.causal_links
 		#self.steps = {step.source for step in self.causal_links}.union({self.sink for step in self.causal_links})
-
-
-		
+	
 class IntentionFrame(Subplan):
 	def __init__(self,id,type,name=None, \
 		Elements=set(),source=None,initial=None,sink=None,goal=None,\
@@ -273,7 +271,7 @@ class PlanElementGraph(ElementGraph):
 			1) Go through steps and determine consistent operators
 				- To instantiate a step as an operator, copy operator and operator.rMerge(step)
 				- In plan, step.mergeAt(copyoperator) ('take its family')
-				- What to do about arguments? Will need special merge overload
+				- Successfully instantiated argument adopter
 			
 			2) For each causal link (source,sink,condition), 
 				narrow down consistent mappings to just those which are consistent 
