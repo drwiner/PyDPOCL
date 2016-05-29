@@ -203,8 +203,7 @@ def rDetectConsistentEdgeGraph(Remaining = set(), Available = set()):
 	print('remaining ', len(Remaining))
 	for prospect in Available:
 		if prospect.isConsistent(other_edge):
-			A = {item for item in Available if not (item is prospect)}
-			if (rDetectConsistentEdgeGraph(Remaining, A)):
+			if (rDetectConsistentEdgeGraph(Remaining, (item for item in Available if not (item is prospect)))):
 				return True
 	return False
 	
@@ -221,8 +220,7 @@ def rDetectEquivalentEdgeGraph(Remaining = set(), Available = set()):
 	print('constraints remaining ', len(Remaining))
 	for prospect in Available:
 		if prospect.isEquivalent(other_edge):
-			A = {item for item in Available if not (item is prospect)}
-			if (rDetectEquivalentEdgeGraph(Remaining, A)):
+			if (rDetectEquivalentEdgeGraph(Remaining, (item for item in Available if not (item is prospect)))):
 				return True
 	return False
 	
