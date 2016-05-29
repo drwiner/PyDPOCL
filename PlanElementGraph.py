@@ -165,17 +165,33 @@ class IntentionFrame(Subplan):
 		
 class PlanElementGraph(ElementGraph):
 
-	def __init__(self,id,type,name=None, Elements, Edges, Constraints):
-	
-		Causal_Links = {edge for edge in Edges if type(edge) is CausalLink}
-		Orderings = {edge for edge in Edges if type(edge) is Ordering}
-		Steps = {element for element in Elements if type(element) is Operator}
-		Bindings = {edge for edge in Edges if type(edge) is Binding}
-		IntentionFrames = {}
+	def __init__(self,id,type,name=None, Elements = set(), planElement = None, Edges = set(), Constraints = set()):
 		
+		self.Steps = {element for element in Elements if type(element) is Operator}
+		self.Bindings = {edge for edge in Edges if type(edge) is Binding}
+		self.Orderings = {edge for edge in Edges if type(edge) is Ordering}
+		self.Causal_Links = {edge for edge in Edges if type(edge) is CausalLink}
+		self.IntentionFrames = {element for element in Elements if type(element) is IntentionFrameElement}
 		
-		super(PlanElementGraph,self).__init__(id,type,name,Elements,Edges,Constraints)
-		#Bindings = something to track possibly equivalent steps, or reverse
+		if planElement is None:
+			planElement = PlanElement(\
+										id =self.id, \
+										type='plan element', \
+										name=self.name,\
+										Steps, \
+										Bindings,\
+										Orderings,\
+										CausalLinks,\
+										IntentionFrames\
+									)
+		super(PlanElementGraph,self).__init__(\
+												id,\
+												type,\
+												name,\
+												Elements,planElement,\
+												Edges,\
+												Constraints\
+											)
 	
 	def evaluateOperators(self,Operators):
 		self.consistent_mappings = {step.id : {D.id for D in Operators if D.isConsistent(step)} for step in Steps}

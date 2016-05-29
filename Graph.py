@@ -126,7 +126,9 @@ class Graph(Element):
 		#Induction
 		Descendant_Edges=Descendant_Edges.union(incident_Edges)
 		for edge in incident_Edges:
-			Descendant_Edges = self.rGetDescendantEdges(edge.sink, Descendant_Edges)
+			Descendant_Edges = self.rGetDescendantEdges(edge.sink, \
+														Descendant_Edges\
+														)
 			
 		return Descendant_Edges
 		
@@ -139,7 +141,9 @@ class Graph(Element):
 		#Induction
 		Descendant_Constraints=Descendant_Constraints.union(incident_constraints)
 		for c in incident_constraints:
-			Descendant_Constraints = self.rGetDescendantConstraints(c.sink, Descendant_Constraints)
+			Descendant_Constraints = self.rGetDescendantConstraints(c.sink, \
+																	Descendant_Constraints\
+																	)
 			
 		return Descendant_Constraints
 	
@@ -185,10 +189,16 @@ class Graph(Element):
 	def equivalentWithConstraints(self, other):
 		for c in other.constraints:
 			#First, narrow down edges to just those which are equivalent with constraint source
-			suspects = {edge.source for edge in self.edges if edge.source.isEquivalent(c.source)}
+			suspects = {edge.source \
+							for edge in self.edges \
+							if edge.source.isEquivalent(c.source)\
+						}
 			for suspect in suspects:
 				print('suspect id: ', suspect.id)
-				if self.constraintEquivalentWithElement(other, suspect, c.source):
+				if self.constraintEquivalentWithElement(other, \
+														suspect, \
+														c.source\
+														):
 					return True
 		return False	
 		

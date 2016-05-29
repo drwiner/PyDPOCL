@@ -214,7 +214,14 @@ class Argument(Element):
 class PlanElement(Element):
 
 	def __init__(self,id,type, name=None,\
-		Steps=set(), Orderings=set(), Bindings = set(), CausalLinks=set(), IntentionFrames=set()):
+				Steps=set(), \
+				Bindings = set(),\
+				Orderings=set(),  \
+				CausalLinks=set(), \
+				IntentionFrames=set()\
+				):
+		
+		super(PlanElement,self).__init__(id,type,name)
 		
 		self.Steps = Steps
 		self.Bindings = Bindings
@@ -225,6 +232,7 @@ class PlanElement(Element):
 class IntentionFrameElement(Element):
 	def __init__(self, id, type, name= None, ms, motivation, intender, goal, sat, steps):
 		super(IntentionFrameElement,self).__init__(id,type,name)
+		
 		self.ms = ms
 		self.motivation = motivation
 		self.intender = intender
@@ -237,3 +245,4 @@ class Motivation(Literal):
 		super(Motivation,self).__init__(id,type,name,num_args,truth)
 		self.actor = intender
 		self.goal = goal #Goal is a literal. THIS is a case where... a Literal has-a Literal
+		
