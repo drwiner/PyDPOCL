@@ -104,6 +104,18 @@ class Graph(Element):
 			Descendants.add(element)
 			Descendants = self.rGetDescendants(edge.sink, Descendants)
 		return Descendants
+		
+	def rGetDescendantsGenerator(self, element, Descendants = set()):
+		""" TODO: test this generator"""
+		#Base Case
+		incidentEdges = self.getIncidentEdges(element)
+		if len(incidentEdges) == 0:
+			yield element
+			
+		#Induction
+		for edge in incidentEdges:
+			yield element
+			return self.rGetDescendants(edge.sink, Descendants)
 	
 	def rGetDescendantEdges(self, element, Descendant_Edges = set()):
 		#Base Case
@@ -116,7 +128,7 @@ class Graph(Element):
 		for edge in incident_Edges:
 			Descendant_Edges = self.rGetDescendantEdges(edge.sink, Descendant_Edges)
 			
-		return Descendant_Edges	
+		return Descendant_Edges
 		
 	def rGetDescendantConstraints(self, constraint_source, Descendant_Constraints = set()):
 		#Base Case
