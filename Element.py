@@ -26,18 +26,12 @@ class Element:
 	
 	def isProperty(self, other, property):
 		return self.property(other)
-		
 			
 		
 class InternalElement(Element):
 	def __init__(self, id, type, name = None, num_args = 0):
 		super(InternalElement,self).__init__(id,type,name)
 		self.num_args = num_args
-		
-	# def isEquivalent(self, other):
-		# if self.type == other.type and self.name == other.name and self.num_args == other.num_args:
-			# return True
-		# return False
 	
 	def isEquivalent(self, other):
 		# for each incident edge of other, there is a unique equivalent edge of self
@@ -46,8 +40,8 @@ class InternalElement(Element):
 			and self.name == other.name \
 			and self.num_args == other.num_args):
 			return False
+		return True
 			
-		#out_incident_edges = {edge for edge in }
 	
 	def isConsistent(self, other):
 	
@@ -66,7 +60,19 @@ class InternalElement(Element):
 				return False
 				
 		return True
+
+	def isCoConsistent(self,other):
+		if self.isConsistent(other) and other.isConsistent(self):
+			return True
+		return False
 		
+	def merge(self,other):
+		if not self.isCoConsistent(other):
+			print('inconsistent internal elements')
+			return
+			
+		if other.num_args > 0 and self.num_args == 0:
+			self.num_args = other.num_args
 				
 		
 class Operator(InternalElement):
@@ -74,6 +80,27 @@ class Operator(InternalElement):
 		super(Operator,self).__init__(id,type,name, num_args)
 		self.executed = executed
 		
+	def isConsistent(self,other):
+		if not super(Operator,self).isConsistent(other):
+			return False
+		
+		if other.executed not is None and self.executed != other.executed:
+			return False
+		
+		return True
+				
+	def isCoConsistent(self,other):
+		if self.isConsistent(other) and other.isConsistent(self):
+			return True
+		return False
+		
+	def merge(self, other):
+		if not self.isCoConsistent(other):
+			return
+		if not other.executed is None and self.executed is None:
+			self.executed = other.executed
+		if other.num_args > 0 and self.num_args == 0:
+			self.num_args = other.num_args
 		
 class Literal(InternalElement):
 	def __init__(self, id, type, name = None, num_args = 0, truth = None):
@@ -96,15 +123,29 @@ class Literal(InternalElement):
 		return False
 		
 	def isEquivalent(self,other):
-		if self.name == other.name and self.type == other.type:
-			return True
-		return False
+		if self.name != other.name:
+			return False
+		if self.type != other.type:
+			return False
+		if self.truth != other.truth:
+			return False
+		return True
 		
 	def isEqual(self, other):
 		if self.isEquivalent(other) and other.isEquivalent(self):
 			return True
 		return False
-
+		
+	def merge(self, other):
+		if self.isEqual(other):
+			return
+		if not self.isCoConsistent(other):
+			print('cannot merge literal')"
+			return
+		if self.truth is None and not other.truth is None:
+			self.truth = other.truth
+		if self.num_args ==0 and other.num_args > 0:
+			self.num_args = other.num_args
 		
 class Argument(Element):
 	def __init__(self, id, type, name= None, arg_pos_dict = {}):
@@ -272,7 +313,7 @@ class Graph(Element):
 		return rDetectEquivalentEdgeGraph(other_descendant_edges, descendant_edges)
 		
 def rDetectConsistentEdgeGraph(Remaining = set(), Available = set()):
-	""" Returns True if all remaining edges can be assigned an equivalent non-used edge in self """
+	""" Returns True if all remaining edges can be assigned a consistent non-used edge in self """
 	if len(Remaining)  == 0:
 		return True
 		
@@ -309,17 +350,78 @@ def rDetectEquivalentEdgeGraph(Remaining = set(), Available = set()):
 	
 class ElementGraph(Graph):
 	def __init__(self,id,type,name=None, Elements = set(), root_element = None, Edges = set(), Constraints = set()):
-		super(ElementGraph,self).__init__(Elements,Edges,Constraints)
-		self.id = id
-		self.type = root_element.type
-		self.name = name
+		super(ElementGraph,self).__init__(id,type,name,Elements,Edges,Constraints)
 		self.root = root
+	
+	def getElementGraphFromElement(self, element):
+		if self.root is element:
+			return self
 		
+		return ElementGraph(element.id, type='element %s' %subgraph, name=self.name\
+			self.rGetDescendants(element)\
+			root=element\
+			self.rGetDescendantEdges(element)\
+			self.rGetDescendantConstraints(element))
+			
+	def rMerge(self, other, consistent_merges = {self}):
+		incidentEdges = self.getIncidentEdges(self.root)
+		otherEdges = self.getIncidentEdges(other.root)
+		consistent_edges = \
+				{(edge,other) for edge in incidentEdges for other in otherEdges \
+					if edge.isCoConsistent(other)\
+				}
+		#replace a subgraph of a graph with another subgraph. 
+		for sink1,sink2 in consistent_sinks:	
+			sink_merge = copy.deepcopy(sink1).Merge(sink2)
+			
+			merge_graph = self.getElementGraphFromElement(sink_merge)
+			sink1_graph = self.getElementGraphFromElement(sink1)
+			sink2_graph = other.getElementGraphFromElement(sink2)
+			
+			merge_graph.rMerge(sink2_graph, consistent_merges)
+			sink1_graph.rMerge(sink2_graph, consistent_merges)
+	
+	def Merge(self, other, consistent_merges = {self}):
 		
-def isConsistentElementGraphMerge(one,other):
+		#For each pair of equivalent edges,
+			#save graph, rMerge()
+			#merge, rMerge()
+		incidentEdges = self.getIncidentEdges(self.root)
+		otherEdges = self.getIncidentEdges(other.root)
+		
+		while(len(otherEdges) > 0):
+			consistent_sinks = \
+				{(edge.sink,other.sink) for edge in incidentEdges for other in otherEdges \
+					if edge.isCoConsistent(other)\
+				}
+			
+			#consistent sinks: sink1, sink2
+				#ElementGraphs EG1 EG2 from sink1 and sink2
+			sink_merge = copy.deepcopy(sink1).Merge(sink2)
+			self.getElementGraphFromElement(sink_merge)
+				#EG1.Merge(EG2,consistent_merges)
+				#consistent_merges.add(EG1)
+			#incidentEdges = self.getIncidentEdges(EG1.root)
+			#otherEdges = self.getIncidentEdges(EG)
+		
+		#Base Case
+		incidentEdges = self.getIncidentEdges(self.root)
+		if len(incidentEdges) == 0:
+			return element
+			
+		#Induction
+		for edge in incidentEdges:
+			Descendants.add(element)
+			Descendants = self.rGetDescendants(edge.sink, Descendants)
+		return Descendants
+
+def getElementGraphMerge(one,other):
 	
 	if not one.isCoConsistent(other):
 		return set()
+		
+	
+	possible_worlds = {element_graph for element_graph in {}}
 		
 	if one.root.name is None:
 		if other.root.name is None:
@@ -385,7 +487,9 @@ class Action(ElementGraph):
 		
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
-	def __init__(self,id,type,name=None,Elements=set(), literal_root = None, Edges = set(), Constraints = set()):
+	def __init__(self,id,type,name=None,\
+		Elements=set(), literal_root = None, Edges = set(), Constraints = set()):
+		
 		super(Condition,self).__init__(id,type,name,Elements,literal_root,Edges,Constraints)
 		self.labels = labels = ['first-arg','second-arg','third-arg','fourth-arg']
 		
@@ -399,16 +503,13 @@ class Condition(ElementGraph):
 					if len(other_edge_to_args) > 0:
 						self.edges.add(Edge(self.root,other_edge_to_args.sink, other_edge_to_args.label))
 		
+	#def fromSubgraph(self,subplan):
 	
-def extractSubgraphFromElement(G, element, Type):
+def extractElementsubGraphFromElement(G, element, Type):
 	Edges = G.rGetDescendantEdges(element)
 	Elements = G.rGetDescendants(element)
 	Constraints = G.rGetDescendantConstraints(element)
-	return Type(element.id,type = element.type, name=element.name, Elements, Edges, Constraints)		
-		
-def literalToCondition(G,literal):
-	return extractSubgraphFromElement(G,literal,Condition)
-		
+	return Type(element.id,type = element.type, name=element.name, Elements, Edges, Constraints)			
 	
 		
 class CausalLink(Edge):
@@ -439,6 +540,7 @@ class CausalLink(Edge):
 #Do I need this?
 class Binding(Edge):
 	def __init__(self, id, type, name=None, element1, element2, binding_type):
+	
 		super(Binding,self).__init__(element1,element2,binding_type)
 		self.X = element1
 		self.Y = element2
@@ -467,17 +569,38 @@ class Edge:
 		if self.source.isConsistent(other.source) and self.sink.isConsistent(other.sink) and self.label == other.label:
 			return True
 		return False
+		
+	def isCoConsistent(self,other):
+		if self.isCoConsistent(other) and other.isCoConsistent(self):
+			return True
+			
+		return False
 
 	def isEquivalent(self, other):
 		if self.source.isEquivalent(other.source) and self.sink.isEquivalent(other.sink) and self.label == other.label:
 			return True
 		return False
-
+		
 class Subplan(ElementGraph):
-	def __init__(self,id,type,name=None, Elements = set(), source = None, initial = None, sink = None, goal=None, Edges = set(), Constraints = set(),  Rhetorical_charge = None):
+	def __init__(self,id,type,name=None, Elements = set(),\
+		source = None, initial = None, sink = None, goal=None, \
+		Edges = set(), Constraints = set(),  Rhetorical_charge = None):
+		
 		super(Subplan,self).__init__(id,type,name, Elements, sink, Edges, Constraints)
+		
+		self.goal = goal
+		self.source =  source
+		self.initial = initial
+		self.rhetorical_charge = Rhetorical_charge
+		self.Steps = \
+			{step for step in \
+				{extractElementsubGraphFromElement(element) for element in self.elements \
+					if type(element)==Operator and element.id != source.id\
+				}\
+			}
 		#self.causal_links
 		#self.steps = {step.source for step in self.causal_links}.union({self.sink for step in self.causal_links})
+
 
 class Motivation(Literal):
 	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender=None, goal=None):
@@ -485,16 +608,37 @@ class Motivation(Literal):
 		self.actor = intender
 		self.goal = goal #Goal is a literal. THIS is a case where... a Literal has-a Literal
 		
-class IntentionFrame(Subplan):
-	def __init__(self,id,type,name=None, Elements=set(),source=None,initial=None,sink=None,goal=None,Edges=set(),Constraints=set(),Rhetorical_charge=None, intender=None):
-		super(IntentionFrame,self).__init__(id,type,name, Elements, source, initial,sink, goal, Edges, Constraints, Rhetorical_charge)
-
+class IntentionFrameElement(Element):
+	def __init__(self, id, type, name= None, ms, motivation, intender, goal, sat, steps):
+		super(IntentionFrameElement,self).__init__(id,type,name)
 		self.ms = ms
-		self.intender = actor
+		self.motivation = motivation
+		self.intender = intender
 		self.goal = goal
 		self.sat = sat
 		self.subplan = subplan
+		
+class IntentionFrame(Subplan):
+	def __init__(self,id,type,name=None, \
+		Elements=set(),source=None,initial=None,sink=None,goal=None,\
+		Edges=set(),Constraints=set(),Rhetorical_charge=None, intender=None):
+
+		super(IntentionFrame,self).__init__(id,type,name, \
+			Elements, source=source, initial=initial, sink=sink, goal, \
+			Edges, Constraints, Rhetorical_charge)
+			
+		self.ms = source #Will have no outgoing 
+		self.intender = actor
+		self.goal = goal
+		self.sat = sink
 		self.motivation = Motivation(id, intender=self.actor, goal = self.goal)
+		self.root = IntentionFrameElement(self.id,type='intention_frame', \
+			ms=self.ms, \
+			motivation=self.motivation\
+			intender=self.intender\
+			goal=self.goal\
+			sat=self.sat\
+			subplan=self.Steps)
 		
 		
 	def isInternallyConsistent(self):
@@ -510,25 +654,46 @@ class IntentionFrame(Subplan):
 		if not self.actor in self.sat.getActors():
 			return False
 		for effect in self.ms.getEffects():
-			if not self.motivation.isConsistent(effect)
+			if not self.motivation.isConsistent(effect):
+				return False
 		if not self.motivation in self.ms.getEffects()
 			return False
 		
 		return True
 		
 		
-def DomainOperator(Graph):
-	def __init__(self,id,type,name=None, Elements, Operator_Element, Edges, Constraints):
-		super(DomainOperator,self).__init__(id,type,name,Elements,Edges,Constraints)
-		self.Operator = Operator_Element
-		Args = {i:arg for i in range(self.Operator.num_args) for arg in self.Elements if type(arg) is Argument and arg.arg_pos_dic[i]}
+def DomainOperator(ElementGraph):
+	def __init__(self,id,type,name=None, \
+		Elements = set(), root_element = None, Edges = set(), Constraints = set()):
 		
-def Prerequisite(Graph):
+		super(DomainOperator,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
+		Args = {i:arg for i in range(self.root.num_args) for arg in self.elements if type(arg) is Argument and arg.arg_pos_dic[i]}
+		
+def PlanElement(Element):
+
+	def __init__(self,id,type, name=None,\
+		Steps=set(), Orderings=set(), Bindings = set(), CausalLinks=set(), IntentionFrames=set()):
+		
+		self.Steps = Steps
+		self.Bindings = Bindings
+		self.Orderings = Orderings
+		self.CausalLinks = CausalLinks
+		self.IntentionFrames = IntentionFrames
+		
+		
+def PlanElementGraph(ElementGraph):
+
 	def __init__(self,id,type,name=None, Elements, Edges, Constraints):
-		super(Prerequisite,self).__init__(id,type,name,Elements,Edges,Constraints)
+	
 		Causal_Links = {edge for edge in Edges if type(edge) is CausalLink}
 		Orderings = {edge for edge in Edges if type(edge) is Ordering}
 		Steps = {element for element in Elements if type(element) is Operator}
+		Bindings = {edge for edge in Edges if type(edge) is Binding}
+		IntentionFrames = {}
+		
+		
+		super(PlanElementGraph,self).__init__(id,type,name,Elements,Edges,Constraints)
+		#Bindings = something to track possibly equivalent steps, or reverse
 	
 	def evaluateOperators(self,Operators):
 		self.consistent_mappings = {step.id : {D.id for D in Operators if D.isConsistent(step)} for step in Steps}
