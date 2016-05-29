@@ -9,24 +9,63 @@ class DomainOperator(ElementGraph):
 		Elements = set(), root_element = None, Edges = set(), Constraints = set()):
 		
 		super(DomainOperator,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
-		Args = {i:arg for i in range(self.root.num_args) for arg in self.elements if type(arg) is Argument and arg.arg_pos_dic[i]}
+		Args = {i:arg \
+					for i in range(self.root.num_args) \
+					for arg in self.elements \
+						if type(arg) is Argument \
+						and arg.arg_pos_dic[i]\
+				}
+	def mergeEdgesFromSource(self, other, edge_source = self.root, mergeable_edges):
+		"""Override ElementGraph, need to make sure we merge args"""
+		if edge_source.merge(other.root) is None:
+			return None
+			
+		subgraph = other.getElementGraphFromElement(other.root,type(self))
 		
-class Action(ElementGraph):
+		#Goal, access each arg via the element.Args dictionary
+		#for each entry of the form old_id: pos, create entry new_id: pos
+		other.getElementGraphFromElement(other.root,type(self))\
+			.Args.union_update({edge_source.id: value} \
+								for key,value in subgraph.Args \
+								if key==other.root.id\
+							)
+							
+		return super(DomainOperator,self).mergeEdgesFromSource(self,other,edge_source,mergeable_edges)
+		
+class Action(DomainOperator):
 	""" Action Graph: for step graph"""
 	def __init__(self, id, type, name=None, \
-		Elements=set(), root_element = None, Edges=set(), Constraints = set()):
+				Elements=set(), \
+				root_element = None, \
+				Edges=set(), \
+				Constraints = set()\
+				):
 		
 		super(Action,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 		
 	def isConsistentAntecedentFor(self, action):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
-		effects = {egde.sink for edge in self.edges if edge.label == 'effect-of'}
+		effects = {egde.sink \
+								for edge in self.edges \
+										if edge.label == 'effect-of'\
+				}
+				
 		if len(effects) == 0:
 			return False
-		preconditions = {edge.sink for edge in self.edges if edge.label == 'precond-of'}
+			
+		preconditions = {edge.sink \
+							for edge in self.edges \
+								if edge.label == 'precond-of'\
+						}
 		if len(preconditions) == 0:
 			return False
-		prospects = {(eff,pre) for eff in effects for pre in preconditions if eff.isCoConsistent(pre)}
+			
+		prospects = {(eff,pre) \
+								for eff in effects \
+								for pre in preconditions \
+										if eff.isCoConsistent(pre)\
+					}
+					
 		if len(prospects)  == 0:
 			return False
 			
@@ -38,19 +77,52 @@ class Condition(ElementGraph):
 		Elements=set(), literal_root = None, Edges = set(), Constraints = set()):
 		
 		super(Condition,self).__init__(id,type,name,Elements,literal_root,Edges,Constraints)
-		self.labels = labels = ['first-arg','second-arg','third-arg','fourth-arg']
+		#self.labels = labels = ['first-arg','second-arg','third-arg','fourth-arg']
+	
+	def rMerge(self, other, self_element = self.root, other_element = other.root, consistent_merges = set()):
+		""" Returns set of consistent merges, which are Edge Graphs of the form self.merge(other)""" 
+		#self_element.merge(other_element)
 		
-	def mergeFrom(self, other):
-		super(Condition,self).mergeFrom(other)
+		otherEdges = other.getIncidentEdges(other_element)
 		
-		for i in range(num_args):
-			self_edge_to_args = self.getIncidentEdgesByLabel(self.root, self.labels[i]).pop()
-				if len(self_edge_to_args) == 0:
-					other_edge_to_args = other.getIncidentEdgesByLabel(other.root, self.labels[i]).pop()
-					if len(other_edge_to_args) > 0:
-						self.edges.add(Edge(self.root,other_edge_to_args.sink, other_edge_to_args.label))
+		#BASE CASE
+		if len(otherEdges) == 0:
+			return consistent_merges.add(self)
+			
 		
-	#def fromSubgraph(self,subplan):			
+		consistent_edge_pairs = self.getConsistentEdgePairs(self.getIncidentEdges(self_element), \
+															otherEdges\
+															)
+
+		#INDUCTION	
+		
+		#First, merge inconsistent other edges, do this on every path
+		mergeEdgesFromSource(other, \
+							self.element, \
+							other_element, \
+							getInconsistentEdges(\
+												otherEdges,\
+												consistent_edge_pairs\
+												)\
+							) 
+		
+		#Assimilation Merge: see if we can merge the sinks.
+		num_copies = len(consistent_edge_pairs) #
+		consistent_merges.union_update({\
+										self.copyGen().rMerge(\
+																other, \
+																e.sink, \
+																o.sink, \
+																consistent_merges\
+															) \
+															for (e,o) in consistent_edge_pairs \
+										})
+
+		#Accomodation Merge: see if we can add the sink's element graph
+		#Don't check if type is Condition/literal, because if edges are consistent, \
+			#then they share label, and literals have unique labels
+	
+		return consistent_merges		
 	
 		
 class CausalLink(Edge):
@@ -111,8 +183,10 @@ class Subplan(ElementGraph):
 		self.rhetorical_charge = Rhetorical_charge
 		self.Steps = \
 			{step for step in \
-				{extractElementsubGraphFromElement(element) for element in self.elements \
-					if type(element)==Operator and element.id != source.id\
+				{self.getElementGraphFromElement(element, Action) \
+					for element in self.elements \
+						if type(element)==Operator \
+						and element.id != source.id\
 				}\
 			}
 		#self.causal_links
@@ -184,6 +258,7 @@ class PlanElementGraph(ElementGraph):
 										CausalLinks,\
 										IntentionFrames\
 									)
+									
 		super(PlanElementGraph,self).__init__(\
 												id,\
 												type,\
@@ -194,7 +269,21 @@ class PlanElementGraph(ElementGraph):
 											)
 	
 	def evaluateOperators(self,Operators):
-		self.consistent_mappings = {step.id : {D.id for D in Operators if D.isConsistent(step)} for step in Steps}
+		"""
+			1) Go through steps and determine consistent operators
+				- To instantiate a step as an operator, copy operator and operator.rMerge(step)
+				- In plan, step.mergeAt(copyoperator) ('take its family')
+				- What to do about arguments? Will need special merge overload
+			
+			2) For each causal link (source,sink,condition), 
+				narrow down consistent mappings to just those which are consistent 
+				given assignment of positions to arguments
+			2) rMerge(self, other, self_element = self.root, other_element = other.root, consistent_merges = set())
+		"""
+		self.consistent_mappings = {step.id : {\
+												D.id for D in Operators if D.isConsistent(step)\
+												} for step in Steps \
+									}
 		#TODO: check if two steps with nonempty intersection can be merged
 		
 		#{self.consistent_mappings[step.id].add(D.id) for step in Steps for D in Operators if D.isConsistent(step)}	

@@ -18,18 +18,18 @@ class ElementGraph(Graph):
 	def copyGen(self):
 		yield copy.deepcopy(self)
 		
-	def getElementGraphFromElement(self, element):
+	def getElementGraphFromElement(self, element, Type=ElementGraph):
 		if self.root is element:
 			return self
 		
-		return ElementGraph(element.id, \
-							type='element %s' %subgraph, \
-							name=self.name\
-							self.rGetDescendants(element)\#Needs a set
-							root=element\
-							self.rGetDescendantEdges(element)\
-							self.rGetDescendantConstraints(element)\
-							)
+		return Type(element.id, \
+					type='element %s' %subgraph, \
+					name=self.name\
+					self.rGetDescendants(element)\#Needs a set
+					root=element\
+					self.rGetDescendantEdges(element)\
+					self.rGetDescendantConstraints(element)\
+					)
 			
 	def mergeEdgesFromSource(self, other, edge_source = self.root, mergeable_edges):
 		""" Treats all edges as unique, does not merge the edges, merges FROM edges"""
@@ -40,7 +40,7 @@ class ElementGraph(Graph):
 									edge.sink, \
 									edge.label\
 									) \
-								for edge in mergeable_edges\
+									for edge in mergeable_edges\
 							}
 		self.edges.union_update(new_incident_edges)
 		for new_edge in new_incident_edges:
@@ -59,13 +59,15 @@ class ElementGraph(Graph):
 		return {(edge,other_edge) \
 									for edge in incidentEdges \
 									for other_edge in otherEdges \
-									if edge.isCoConsistent(other)\
+												if edge.isCoConsistent(other)\
 				}
-	def getInconsistentEdgePairs(self, other_edges, consistent_edge_pairs):
+				
+	def getInconsistentEdges(self, other_edges, consistent_edge_pairs):
+		"""Returns set, because parameter mergeable edges in mergeEdgesFromSource takes set"""
 		return {other_edge \
 					for other_edge in otherEdges \
-					if other_edge not in \
-						(oe for (e,oe) in consistent_edge_pairs\
+						if other_edge not in \
+							(oe for (e,oe) in consistent_edge_pairs\
 						)\
 				}
 			
@@ -97,10 +99,10 @@ class ElementGraph(Graph):
 		mergeEdgesFromSource(other, \
 							self.element, \
 							other_element, \
-							getInconsistentEdgePairs(\
-													otherEdges,\
-													consistent_edge_pairs\
-													)\
+							getInconsistentEdges(\
+												otherEdges,\
+												consistent_edge_pairs\
+												)\
 							) 
 		
 		#Assimilation Merge: see if we can merge the sinks.
@@ -112,7 +114,7 @@ class ElementGraph(Graph):
 																o.sink, \
 																consistent_merges\
 															) \
-											for (e,o) in consistent_edge_pairs \
+															for (e,o) in consistent_edge_pairs \
 										})
 
 		#Accomodation Merge: see if we can add the sink's element graph
