@@ -18,8 +18,8 @@ class Action(ElementGraph):
 		
 		super(Action,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 		
-	"""Determine if two Actions can be joined by a causal link"""
 	def isConsistentAntecedentFor(self, action):
+		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
 		effects = {egde.sink for edge in self.edges if edge.label == 'effect-of'}
 		if len(effects) == 0:
 			return False
@@ -29,8 +29,8 @@ class Action(ElementGraph):
 		prospects = {(eff,pre) for eff in effects for pre in preconditions if eff.isCoConsistent(pre)}
 		if len(prospects)  == 0:
 			return False
+			
 		return prospects
-	
 		
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""

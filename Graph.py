@@ -43,7 +43,9 @@ class Edge:
 
 class Graph(Element):
 	"""A graph is an element with elements, edges, and constraints"""
-	def __init__(self, id, type, name = None, Elements = set(), Edges = set(), Constraints = set()):
+	def __init__(self, id, type, name = None, \
+		Elements = set(), Edges = set(), Constraints = set()):
+		
 		super(Graph,self).__init__(id,type,name)
 		self.elements = Elements
 		self.edges = Edges;
@@ -89,6 +91,7 @@ class Graph(Element):
 	def findConsistentEdgeWithIgnoreList(self, edge, Ignore_List):
 		return set(member for member in self.edges if member not in Ignore_List and member.isConsistent(edge))
 		
+	######       rGet       ####################
 	def rGetDescendants(self, element, Descendants = set()):
 	
 		#Base Case
@@ -115,26 +118,6 @@ class Graph(Element):
 			
 		return Descendant_Edges	
 		
-	def equivalentWithConstraints(self, other):
-		for c in other.constraints:
-			#First, narrow down edges to just those which are equivalent with constraint source
-			suspects = {edge.source for edge in self.edges if edge.source.isEquivalent(c.source)}
-			for suspect in suspects:
-				print('suspect id: ', suspect.id)
-				if self.constraintEquivalentWithElement(other, suspect, c.source):
-					return True
-		return False	
-		
-	def constraintEquivalentWithElement(self, other, self_element, constraint_element):
-		""" Returns True if element and constraint have equivalent descendant edge graphs"""
-		#Assumes self_element is equivalent with constraint_element, but just in case
-		if not self_element.isEquivalent(constraint_element):
-			return False
-		
-		descendant_edges = self.rGetDescendantEdges(self_element)
-		constraints = other.rGetDescendantConstraints(constraint_element)
-		return rDetectEquivalentEdgeGraph(constraints, descendant_edges)
-		
 	def rGetDescendantConstraints(self, constraint_source, Descendant_Constraints = set()):
 		#Base Case
 		incident_constraints = self.getConstraints(constraint_source)
@@ -148,7 +131,8 @@ class Graph(Element):
 			
 		return Descendant_Constraints
 	
-	###############################################################
+	
+	################  Consistency ###############################
 	def isConsistent(self, other):
 		""" Returns True if for every edge in other_graph, there is some consistent edge in self"""
 		if rDetectConsistentEdgeGraph(Remaining = other.edges, Available = self.edges):
@@ -184,6 +168,27 @@ class Graph(Element):
 		descendant_edges = self.rGetDescendantEdges(self_element)
 		other_descendant_edges = other.rGetDescendantEdges(other_element)
 		return rDetectEquivalentEdgeGraph(other_descendant_edges, descendant_edges)
+
+	######       Constraints       ####################
+	def equivalentWithConstraints(self, other):
+		for c in other.constraints:
+			#First, narrow down edges to just those which are equivalent with constraint source
+			suspects = {edge.source for edge in self.edges if edge.source.isEquivalent(c.source)}
+			for suspect in suspects:
+				print('suspect id: ', suspect.id)
+				if self.constraintEquivalentWithElement(other, suspect, c.source):
+					return True
+		return False	
+		
+	def constraintEquivalentWithElement(self, other, self_element, constraint_element):
+		""" Returns True if element and constraint have equivalent descendant edge graphs"""
+		#Assumes self_element is equivalent with constraint_element, but just in case
+		if not self_element.isEquivalent(constraint_element):
+			return False
+		
+		descendant_edges = self.rGetDescendantEdges(self_element)
+		constraints = other.rGetDescendantConstraints(constraint_element)
+		return rDetectEquivalentEdgeGraph(constraints, descendant_edges)
 		
 def rDetectConsistentEdgeGraph(Remaining = set(), Available = set()):
 	""" Returns True if all remaining edges can be assigned a consistent non-used edge in self """

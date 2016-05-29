@@ -1,7 +1,7 @@
 from Graph import *
 
 class ElementGraph(Graph):
-	"""An element graph is a graph with a root"""
+	"""An element graph is a graph with a root element"""
 	
 	def __init__(self,id,type,name=None, Elements = set(), root_element = None, Edges = set(), Constraints = set()):
 		super(ElementGraph,self).__init__(id,type,name,Elements,Edges,Constraints)
@@ -17,44 +17,80 @@ class ElementGraph(Graph):
 			self.rGetDescendantEdges(element)\
 			self.rGetDescendantConstraints(element))
 			
+	def mergeFromEdges(self, other, edge_source = self.root, mergeable_edges):
+		""" Treats all edges as unique, does not merge the edges, merges FROM edges"""
+		if edge_source.merge(other.root) is None:
+			return None
+		new_incident_edges = {Edge(edge_source, edge.sink, edge.label) for edge in mergeable_edges}
+		self.edges.union_update(new_incident_edges)
+		for new_edge in new_incident_edges:
+			self.elements.add(new_edge.sink)
+			self.elements.union_update(other.rGetDescendants(new_edge.sink))
+			
+			self.edges.union_update(other.rGetDescendantEdges(new_edge.sink))
+			self.constraints.union_update(other.rGetDescendantConstraints(new_edge.sink)
+	
+		return self	
+			
+	def mergeAt(self, other, edge_source = self.root):		
+		return self.mergeFromEdges(other, edge_source, other.getIncidentEdges(other.root))
+
+
 	def rMerge(self, other, self_element = self.root, other_element = other.root, consistent_merges = {self}):
+		
+		#self_element.merge(other_element)
 		incidentEdges = self.getIncidentEdges(self_element)
 		otherEdges = other.getIncidentEdges(other_element)
 		
 		#Base Case
-		if len(incidentEdges) == 0 and len(otherEdges) == 0:
-			return consistent_merges
+		if len(otherEdges) == 0:
+			return consistent_merges.add(self)
 			
-		#Induction
+
 		consistent_edges = \
-				{(edge,other) for edge in incidentEdges for other in otherEdges \
+				{(edge,other_edge) for edge in incidentEdges for other in otherEdges \
 					if edge.isCoConsistent(other)\
 				}
+				
+		#Base Case 2	
+		if len(consistent_edges) == 0:
+			to_merge = other.getElementGraphFromElement(other_element)
+			if self.mergeAt(self_element,to_merge) is None:
+				return consistent_merges
+			return consistent_merges.add(self)
+				
 		
 		#For each pair of consistent edges which are not equivalent (if they are equivalent, then ignore), 
 			#edit the 'n' merge-graphs where both are separated edges, where 'n' is the number of consistent_merges
 			#another 'n' merge-graph where both are merged into the first-arg,
 		#Then, rMerge, but from self_element.sink and other_element.sink
 		
-		#Get the eelementgraph from the sink1, and the 
-		for edge,other in consistent_sinks:	
-			if not edge.isEqual(other):
-				for consistent_merge in consistent_merges:
-					consistent_merges = consistent_merge.rMerge(other,edge.sink, other.sink, consistent_merges)
-					new_merge = copy.deepcopy(consistent_merge)
-					edge.Merge(other)
-					consistent_merges = new_merge.rMerge(other,edge.sink, other.sink, consistent_merges)
-				element_graph_merge.add()
-				merge = copy.deepcopy(edge).Merge(other)
+		#For each consistent edge, both do and do not merge:
+		for edge,other_edge in consistent_edges:
+			version_1 = copy.deepcopy(self)
+			version_1.mergeFromEdges(other, self_element, other_element, {other_edge})
+			consistent_merges = version_1.rMerge(other, edge.sink, other_edge.sink, consistent_merges)
+		
+			version_2 = copy.deepcopy(self)
+			version_2.rMerge(other, edge.sink, )
+			
+		# new_merge = copy.deepcopy(consistent_merge)
+		# consistent_merges.union_update(self.rMerge(other,edge.sink, other.sink, consistent_merges))
+
+		# edge.Merge(other)
+		# consistent_merges = new_merge.rMerge(other,edge.sink, other.sink, consistent_merges)
+		# element_graph_merge.add()
+		# merge = copy.deepcopy(edge).Merge(other)
+		
+		
+		# merge_graph = self.getElementGraphFromElement(sink_merge)
+		# sink1_graph = self.getElementGraphFromElement(sink1)
+		# sink2_graph = other.getElementGraphFromElement(sink2)
+		
+		# merge_graph.rMerge(sink2_graph, consistent_merges)
+		# sink1_graph.rMerge(sink2_graph, consistent_merges)
 				
-				
-				merge_graph = self.getElementGraphFromElement(sink_merge)
-				sink1_graph = self.getElementGraphFromElement(sink1)
-				sink2_graph = other.getElementGraphFromElement(sink2)
-				
-				merge_graph.rMerge(sink2_graph, consistent_merges)
-				sink1_graph.rMerge(sink2_graph, consistent_merges)
-	
+		return consistent_merges
 
 def extractElementsubGraphFromElement(G, element, Type):
 	Edges = G.rGetDescendantEdges(element)
