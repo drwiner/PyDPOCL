@@ -50,13 +50,7 @@ class Condition(ElementGraph):
 					if len(other_edge_to_args) > 0:
 						self.edges.add(Edge(self.root,other_edge_to_args.sink, other_edge_to_args.label))
 		
-	#def fromSubgraph(self,subplan):
-	
-def extractElementsubGraphFromElement(G, element, Type):
-	Edges = G.rGetDescendantEdges(element)
-	Elements = G.rGetDescendants(element)
-	Constraints = G.rGetDescendantConstraints(element)
-	return Type(element.id,type = element.type, name=element.name, Elements, Edges, Constraints)			
+	#def fromSubgraph(self,subplan):			
 	
 		
 class CausalLink(Edge):

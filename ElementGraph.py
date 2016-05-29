@@ -56,6 +56,12 @@ class ElementGraph(Graph):
 				sink1_graph.rMerge(sink2_graph, consistent_merges)
 	
 
+def extractElementsubGraphFromElement(G, element, Type):
+	Edges = G.rGetDescendantEdges(element)
+	Elements = G.rGetDescendants(element)
+	Constraints = G.rGetDescendantConstraints(element)
+	return Type(element.id,type = element.type, name=element.name, Elements, Edges, Constraints)
+	
 def getElementGraphMerge(one,other):
 	
 	if not one.isCoConsistent(other):
