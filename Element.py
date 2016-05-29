@@ -211,3 +211,29 @@ class Argument(Element):
 		self.arg_pos_dict = {**self.arg_pos_dict, **other.arg_pos_dict}
 		return self
 
+class PlanElement(Element):
+
+	def __init__(self,id,type, name=None,\
+		Steps=set(), Orderings=set(), Bindings = set(), CausalLinks=set(), IntentionFrames=set()):
+		
+		self.Steps = Steps
+		self.Bindings = Bindings
+		self.Orderings = Orderings
+		self.CausalLinks = CausalLinks
+		self.IntentionFrames = IntentionFrames
+		
+class IntentionFrameElement(Element):
+	def __init__(self, id, type, name= None, ms, motivation, intender, goal, sat, steps):
+		super(IntentionFrameElement,self).__init__(id,type,name)
+		self.ms = ms
+		self.motivation = motivation
+		self.intender = intender
+		self.goal = goal
+		self.sat = sat
+		self.subplan = subplan
+		
+class Motivation(Literal):
+	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender=None, goal=None):
+		super(Motivation,self).__init__(id,type,name,num_args,truth)
+		self.actor = intender
+		self.goal = goal #Goal is a literal. THIS is a case where... a Literal has-a Literal

@@ -440,21 +440,6 @@ class Subplan(ElementGraph):
 		#self.steps = {step.source for step in self.causal_links}.union({self.sink for step in self.causal_links})
 
 
-class Motivation(Literal):
-	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender=None, goal=None):
-		super(Motivation,self).__init__(id,type,name,num_args,truth)
-		self.actor = intender
-		self.goal = goal #Goal is a literal. THIS is a case where... a Literal has-a Literal
-		
-class IntentionFrameElement(Element):
-	def __init__(self, id, type, name= None, ms, motivation, intender, goal, sat, steps):
-		super(IntentionFrameElement,self).__init__(id,type,name)
-		self.ms = ms
-		self.motivation = motivation
-		self.intender = intender
-		self.goal = goal
-		self.sat = sat
-		self.subplan = subplan
 		
 class IntentionFrame(Subplan):
 	def __init__(self,id,type,name=None, \
@@ -507,16 +492,6 @@ def DomainOperator(ElementGraph):
 		super(DomainOperator,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 		Args = {i:arg for i in range(self.root.num_args) for arg in self.elements if type(arg) is Argument and arg.arg_pos_dic[i]}
 		
-def PlanElement(Element):
-
-	def __init__(self,id,type, name=None,\
-		Steps=set(), Orderings=set(), Bindings = set(), CausalLinks=set(), IntentionFrames=set()):
-		
-		self.Steps = Steps
-		self.Bindings = Bindings
-		self.Orderings = Orderings
-		self.CausalLinks = CausalLinks
-		self.IntentionFrames = IntentionFrames
 		
 		
 def PlanElementGraph(ElementGraph):
