@@ -3,16 +3,19 @@ from Graph import *
 class Belief(ElementGraph):
 	def __init__(self, id, type, name=None, Elements = set(), root_element=None, Edges = set(), Constraints = set()):
 		super(Belief, self).__init__(id,type,name,Elements, root_element, Edges, Constraints)
-	
-	# def isEquivalent(other_belief):
-		# if self.story_element.isEquivalent(other_belief.story_element) \
-		# and other_belief.story_element.isEquivalent(self.story_element):
-			# return True:
-		# return False
+
+class DomainOperator(ElementGraph):
+	def __init__(self,id,type,name=None, \
+		Elements = set(), root_element = None, Edges = set(), Constraints = set()):
+		
+		super(DomainOperator,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
+		Args = {i:arg for i in range(self.root.num_args) for arg in self.elements if type(arg) is Argument and arg.arg_pos_dic[i]}
 		
 class Action(ElementGraph):
 	""" Action Graph: for step graph"""
-	def __init__(self, id, type, name=None, Elements=set(), root_element = None, Edges=set(), Constraints = set()):
+	def __init__(self, id, type, name=None, \
+		Elements=set(), root_element = None, Edges=set(), Constraints = set()):
+		
 		super(Action,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 		
 	"""Determine if two Actions can be joined by a causal link"""
@@ -166,17 +169,7 @@ class IntentionFrame(Subplan):
 		
 		return True
 		
-		
-def DomainOperator(ElementGraph):
-	def __init__(self,id,type,name=None, \
-		Elements = set(), root_element = None, Edges = set(), Constraints = set()):
-		
-		super(DomainOperator,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
-		Args = {i:arg for i in range(self.root.num_args) for arg in self.elements if type(arg) is Argument and arg.arg_pos_dic[i]}
-		
-		
-		
-def PlanElementGraph(ElementGraph):
+class PlanElementGraph(ElementGraph):
 
 	def __init__(self,id,type,name=None, Elements, Edges, Constraints):
 	
