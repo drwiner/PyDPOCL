@@ -116,21 +116,11 @@ class ElementGraph(Graph):
 														consistent_edge_pairs\
 														)\
 									) 
-		
-		# #Assimilation Merge: see if we can merge the sinks.
-		# consistent_merges.update({\
-										# self.copyGen().rMerge(\
-																# other.getElementGraphFromElement(o.sink,o.sink.type), \ 	#other
-																# e.sink, \ 													#self_element
-																# consistent_merges\											#consistent_merges
-															# ) \
-															# for (e,o) in consistent_edge_pairs \
-										# })
 										
 		#For each pair of consistent edges, create a copy of self and see what happens if we merge sinks and rMerge onward
 		#For each consistent_edge, try assimilating, and try accomodating. For each one that works,
 		edge_mapper = {}
-		for i,(e,oe) in enumerate(consistent_edge_pairs):
+		for e,oe in consistent_edge_pairs:
 			accomodate_self = self.getElementGraphFromElement(e.sink, e.sink.type)
 			assimilate_self = self.getElementGraphFromElement(e.sink, e.sink.type)
 			to_merge = other.getElementGraphFromElement(oe.sink, oe.sink.type)

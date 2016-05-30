@@ -25,10 +25,10 @@ class Action(ElementGraph):
 											Constraints\
 										)
 		Args = {i:arg \
-					for i in range(self.root.num_args) \
-					for arg in self.elements \
-						if type(arg) is Argument \
-						and arg.arg_pos_dic[i]\
+							for i in range(self.root.num_args) \
+							for arg in self.elements \
+										if type(arg) is Argument \
+										and arg.arg_pos_dic[i]\
 				}
 				
 	def mergeArgs(self, other, remove = False):
@@ -122,7 +122,11 @@ class CausalLink(Edge):
 		effects = {egde.sink for edge in self.edges if edge.label == 'effect-of' and edge.sink.id == self.condition.id}
 		if len(effects) == 0:
 			return False
-		preconditions = {edge.sink for edge in self.edges if edge.label == 'precond-of' and edge.sink.id == self.condition.id}
+		preconditions = {edge.sink \
+							for edge in self.edges \
+								if edge.label == 'precond-of' \
+								and edge.sink.id == self.condition.id\
+						}
 		if len(preconditions) == 0:
 			return False
 		return True
