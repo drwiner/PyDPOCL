@@ -40,6 +40,9 @@ class Edge:
 			return False
 		
 		return self.sink.merge(other.sink)
+	
+	def swapSink(self,sink):
+		self.sink = sink
 
 class Graph(Element):
 	"""A graph is an element with elements, edges, and constraints"""
