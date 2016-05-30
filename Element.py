@@ -187,25 +187,50 @@ class Argument(Element):
 		Bindings are stored on arguments. 
 			An argument can take at most 1 position per operator id.
 			A Merge makes a codesignation between two arguments.
-			Noncodesignation is 
+		 
 	"""
 	
 	def __init__(self, id, type, name= None, arg_pos_dict = {}):
 		super(Argument,self).__init__(id,type,name)
+		#arg_pos_dict is a mapping from operator.ids to positions
 		self.arg_pos_dict = arg_pos_dict
 		
 	def isConsistent(self, other):
+		""" isConsistent if for every other.id in arg_pos_dict, 
+			either	A) there is no id in self
+					B) the same id is there and the position is the same
+		"""
 		if not super(Argument,self).isConsistent(other):
 			return False
-		if other.id in other.arg_pos_dict:
-			if other.arg_pos_dict[other.id] != self.arg_pos_dict[self.id]:
-				return False
+		
+		#Trivially, true if other has no arg_pos_dicts to speak of
+		if len(other.arg_pos_dict) == 0:
+			return True
+			
+		for id, pos in other.arg_pos_dict.items():
+			if id in self.arg_pos_dict:
+				if other.arg_pos_dict[id] != self.arg_pos_dict[id]:
+					return False
 		return True
 	
-	def isEquivalent(self, other):###Equivalent if for every shared key, share the same value?
-		if super(Argument,self).isEquivalent(other) and self.isConsistent(other):
-			return True
-		return False
+	def isEquivalent(self, other):
+		""" equivalent if for super equivalent and 
+			for every id:pos in other, id in self and id: pos
+			BUT cannot be equivalent if it has no arg_pos_dict
+		"""
+		if not super(Argument,self).isEquivalent(other):
+			return False
+			
+		if len(other.arg_pos_dict) == 0:
+			return False
+			
+		for id,pos in other.arg_pos_dict.items(): 
+			if not id in self.arg_pos_dict:
+				return False
+			if other.arg_pos_dict[id] != self.arg_pos_dict[id]:
+				return False
+				
+		return True
 		
 	def isEqual(self,other):
 		if self.isEquivalent(other) and other.isEquivalent(self):

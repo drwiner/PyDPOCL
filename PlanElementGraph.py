@@ -40,7 +40,7 @@ class Action(ElementGraph):
 			#Else, if 'i' not in self.Args, add self.Args.update({i:arg})
 			#Add self.id:value to the arg.arg_pos_dict each key,value where key is other.id
 	
-		for pos,arg in other.Args:
+		for pos,arg in other.Args.items():
 			if not pos in self.Args:
 				self.Args.update({pos:arg})
 			#Remove id from other
