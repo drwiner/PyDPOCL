@@ -50,7 +50,7 @@ example = Operator(id = 1, type= 'op')
 example_p1 = Literal(id=2, type='precondition', name='alive', truth = True)
 example_e1 = Literal(id=3, type = 'effect', name='has', truth = True)
 example_actor = Argument(id=4, type='actor',arg_pos_dict={example.id : 1})
-example_item = Argument(id=5,type='var', arg_pos_dict={example.id : 0})
+example_item = Argument(id=5,type='var', arg_pos_dict={})
 #arg_pos_dict={example.id : 0})
 
 example_edge0 = Edge(example, example_p1, 'precond-of')
