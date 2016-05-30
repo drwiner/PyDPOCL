@@ -232,7 +232,7 @@ def rDetectConsistentEdgeGraph(Remaining = set(), Available = set()):
 			if rDetectConsistentEdgeGraph(	Remaining, \
 											{item \
 												for item in Available \
-													if not item is prospect\
+													if not (item is prospect)\
 											}):
 				return True
 	return False
@@ -250,10 +250,6 @@ def rDetectEquivalentEdgeGraph(Remaining = set(), Available = set()):
 	print('constraints remaining ', len(Remaining))
 	for prospect in Available:
 		if prospect.isEquivalent(other_edge):
-			#print('prospect is equivalent other edge')
-			#print('label ', prospect.label)
-			#print('other_edge.label ', other_edge.label)
-			#print('prospect.sink.arg_dict ', prospect.sink.name)
 			if rDetectEquivalentEdgeGraph(	Remaining, \
 											{item \
 												for item in Available \
