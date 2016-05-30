@@ -1,5 +1,16 @@
 
-		
+""" Policies: 
+		element.id is unique across all data structures
+		element.type refers to the type of an elementgraph with that element as the root
+		element.name sometimes refers to the predicate name or operator name. otherwise None
+		num_args is 0 means that num_args is in essence None. If predicate with no args, then this will cause problems
+	Properties:
+		Another element is consistent with self iff for each non-None parameter in self, the other's parameter is None or ==
+		Another element is equivalent with self iff for each non-None parameter in self, other's parameter == and cannot be None
+		Another element is identical just when their ids match and they're equivalent
+	Operations:
+		Merge operation takes all non-None parameters of other, and assumes co-consistency
+""" 
 class Element:
 	"""Element is a token or label"""
 	def __init__(self, id, type = None, name = None):
@@ -34,9 +45,6 @@ class Element:
 		if self.isEquivalent(other) and other.isEquivalent(self):
 			return True
 		return False
-	
-	def isProperty(self, other, property):
-		return self.property(other)
 			
 	def merge(self, other):
 		"""merge returns self with non-None properties of other,
@@ -112,7 +120,7 @@ class Operator(InternalElement):
 		if not super(Operator,self).isConsistent(other):
 			return False
 		
-		if other.executed not is None and self.executed != other.executed:
+		if not other.executed is None and self.executed != other.executed:
 			return False
 		
 		return True
@@ -208,7 +216,7 @@ class Argument(Element):
 		if super(Argument,self).merge(other) is None:
 			return None
 		
-		self.arg_pos_dict = {**self.arg_pos_dict, **other.arg_pos_dict}
+		self.arg_pos_dict.update(other.arg_pos_dict)
 		return self
 
 class PlanElement(Element):
@@ -230,7 +238,7 @@ class PlanElement(Element):
 		self.IntentionFrames = IntentionFrames
 		
 class IntentionFrameElement(Element):
-	def __init__(self, id, type, name= None, ms, motivation, intender, goal, sat, steps):
+	def __init__(self, id, type, name= None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = set()):
 		super(IntentionFrameElement,self).__init__(id,type,name)
 		
 		self.ms = ms

@@ -18,23 +18,24 @@ class ElementGraph(Graph):
 	def copyGen(self):
 		yield copy.deepcopy(self)
 		
-	def getElementGraphFromElement(self, element, Type=ElementGraph):
+	def getElementGraphFromElement(self, element, Type):
 		if self.root is element:
 			return self
 		
 		return Type(element.id, \
 					type='element %s' %subgraph, \
-					name=self.name\
-					self.rGetDescendants(element)\#Needs a set
-					root=element\
-					self.rGetDescendantEdges(element)\
-					self.rGetDescendantConstraints(element)\
+					name=self.name,\
+					Elements = self.rGetDescendants(element),\
+					root_element = element,\
+					Edges = self.rGetDescendantEdges(element),\
+					Constraints = self.rGetDescendantConstraints(element)\
 					)
 			
-	def mergeEdgesFromSource(self, other, edge_source = self.root, mergeable_edges):
-		""" Treats all edges as unique, does not merge the edges, merges FROM edges"""
+	def mergeEdgesFromSource(self, other, edge_source, mergeable_edges = set()):
+		""" Treats all edges as unique, does not merge the edges, merges source"""
 		if edge_source.merge(other.root) is None:
 			return None
+			
 		new_incident_edges = {Edge(\
 									edge_source, \
 									edge.sink, \
@@ -48,12 +49,15 @@ class ElementGraph(Graph):
 			self.elements.union_update(other.rGetDescendants(new_edge.sink)) #Try using Generator
 			
 			self.edges.union_update(other.rGetDescendantEdges(new_edge.sink))
-			self.constraints.union_update(other.rGetDescendantConstraints(new_edge.sink)
+			self.constraints.union_update(other.rGetDescendantConstraints(new_edge.sink))
 	
 		return self	
 			
-	def mergeAt(self, other, edge_source = self.root):		
-		return self.mergeFromEdges(other, edge_source, other.getIncidentEdges(other.root))
+	def mergeAt(self, other, edge_source):		
+		return self.mergeFromEdges(	other, \
+									edge_source, \
+									other.getIncidentEdges(other.root)\
+								)
 		
 	def getConsistentEdgePairs(self, incidentEdges, otherEdges):
 		return {(edge,other_edge) \
@@ -71,11 +75,12 @@ class ElementGraph(Graph):
 						)\
 				}
 			
-	def rMerge(self, other, self_element = self.root, other_element = other.root, consistent_merges = set()):
+	def rMerge(self, other, self_element, consistent_merges = set()):
 		""" Returns set of consistent merges, which are Edge Graphs of the form self.merge(other)""" 
 		#self_element.merge(other_element)
 		
-		otherEdges = other.getIncidentEdges(other_element)
+		#Get next edges
+		otherEdges = other.getIncidentEdges(other.root)
 		
 		#BASE CASE
 		if len(otherEdges) == 0:
@@ -85,51 +90,58 @@ class ElementGraph(Graph):
 		consistent_edge_pairs = self.getConsistentEdgePairs(self.getIncidentEdges(self_element), \
 															otherEdges\
 															)
+															
 
 		#If they're all inconsistent, then let's just get to den, aye?
 		if len(consistent_edge_pairs) == 0:
-			to_merge = other.getElementGraphFromElement(other_element)
-			if self.mergeAt(self_element,to_merge) is None:
+			if self.mergeAt(self_element,other) is None:
 				return consistent_merges
 			return consistent_merges.add(self)
 			
 		#INDUCTION	
 		
 		#First, merge inconsistent other edges, do this on every path
-		mergeEdgesFromSource(other, \
-							self.element, \
-							other_element, \
-							getInconsistentEdges(\
-												otherEdges,\
-												consistent_edge_pairs\
-												)\
-							) 
+		self.mergeEdgesFromSource(	other, \									#other 
+									self.element, \								#self_element
+									getInconsistentEdges(\						#mergeable_edges
+														otherEdges,\			
+														consistent_edge_pairs\
+														)\
+									) 
 		
 		#Assimilation Merge: see if we can merge the sinks.
-		num_copies = len(consistent_edge_pairs) #
 		consistent_merges.union_update({\
 										self.copyGen().rMerge(\
-																other, \
-																e.sink, \
-																o.sink, \
-																consistent_merges\
+																other.getElementGraphFromElement(o.sink,o.sink.type), \ 	#other
+																e.sink, \ 													#self_element
+																consistent_merges\											#consistent_merges
 															) \
 															for (e,o) in consistent_edge_pairs \
 										})
+										
+		#For each pair of consistent edges, create a copy of self and see what happens if we merge sinks and rMerge onward
+		#For each consistent_edge, try assimilating, and try accomodating. For each one that works,
+		for e,oe in consistent_edge_pairs:
+			new_self = self.copyGen()
+			new_self.root.merge(other.root)
+			self.getElementGraphFromElement(e.sink, e.sink.type)
+			new_other  = other.getElementGraphFromElement(oe.sink,oe.sink.type)
+			consistent_merges.union_update(new_self.rMerge(new_other,e.sink,consistent_merges))
 
 		#Accomodation Merge: see if we can add the sink's element graph
-		for (e,o) in consistent_edge_pairs:
-			take_other = self.copyGen().mergeEdgesFromSource(other, \
-															self_element, \
-															other_element, \
-															{o}\
-															)
-			consistent_merges = take_other.rMerge(\
-													other, \
-													e.sink, \
-													o.sink, \
-													consistent_merges\
-												)
+		#Don't check if type is literal, because if edges are consistent, \
+			#then they share label, and literals have unique labels
+		if not type(self_element) == Literal:
+			for (e,o) in consistent_edge_pairs:
+				take_other = self.copyGen().mergeEdgesFromSource(other, \			#other
+																self_element, \		#edge_source
+																{o}\				#mergeable_edges
+																)
+				consistent_merges = take_other.rMerge(\
+														other.getElementGraphFromElement(o.sink,o.sink.type), \	#other
+														e.sink, \												#self_element 
+														consistent_merges\										#consistent_merges
+													)
 	
 		return consistent_merges
 		
@@ -141,49 +153,9 @@ def extractElementsubGraphFromElement(G, element, Type):
 	return Type(element.id,\
 				type = element.type, \
 				name=element.name, \
-				Elements, \
-				root_element = element\
-				Edges, \
-				Constraints\
+				Elements = Elements, \
+				root_element = element,\
+				Edges = Edges, \
+				Constraints = Constraints\
 				)
 	
-def getElementGraphMerge(one,other):
-	
-	if not one.isCoConsistent(other):
-		return set()
-		
-	
-	possible_worlds = {element_graph for element_graph in {}}
-		
-	if one.root.name is None:
-		if other.root.name is None:
-			print('if this were a literal, needs a name')
-		else:
-			one.root.name = other.root.name	
-
-	if type(one.root) == 'Literal':
-		if one.root.num_args is None:
-			if other.root.num_args is None:
-				print('need to put num_args in literals')
-				return None
-			else:
-				self.root.num_args = other.root.num_args
-				
-	if type(one.root) == 'Operator':
-		preconditions = {edge for edge in }
-		#For each pair of co-consistent preconditions (one.precondition, other.precondition), 
-			#If they both have the same name,
-				#Create new ElementGraphs EG1,EG2, where EG1 makes them the same precondition, and EG2 keeps them separated
-		#Do same for each pair of effects.
-			#Don't need to do this for consenting actor
-	#Action, Condition, 
-		""" BUT, then there will be a combinatorial explosion of different ElementGraphs for each permuation,
-			especially more complex ElementGraphs.
-			What if, for each element in an ElementGraph, we store a set of possible mergers?"""
-				
-				
-		"""TODO: with literals, there are no edges with same label. With steps, there are. 
-			With steps, consider the unnamed step which contains two same-named literals. (e.g. to preconditions (at x loc) and (at y loc))
-			Where self has (at arg1 loc) and other has (at None loc). 
-			Two options, combine the literals or let there be two preconditions in merged Condition.
-			Ought we store a list of alternatives? Ought this method not be a class method?"""

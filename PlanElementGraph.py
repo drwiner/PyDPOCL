@@ -10,7 +10,7 @@ class Belief(ElementGraph):
 		
 		super(Belief, self).__init__(id,type,name,Elements, root_element, Edges, Constraints)
 
-class DomainOperator(ElementGraph):
+class Action(ElementGraph):
 	def __init__(self,id,type,name=None, \
 				Elements = set(), \
 				root_element = None, \
@@ -18,12 +18,12 @@ class DomainOperator(ElementGraph):
 				Constraints = set()\
 				):
 		
-		super(DomainOperator,self).__init__(id,type,name,\
+		super(Action,self).__init__(id,type,name,\
 											Elements,\
 											root_element,\
 											Edges,\
 											Constraints\
-											)
+										)
 		Args = {i:arg \
 					for i in range(self.root.num_args) \
 					for arg in self.elements \
@@ -31,38 +31,37 @@ class DomainOperator(ElementGraph):
 						and arg.arg_pos_dic[i]\
 				}
 				
-	def mergeEdgesFromSource(self, other, edge_source = self.root, mergeable_edges):
-		"""Override ElementGraph, need to make sure we merge args"""
+	def mergeArgs(self, other, remove = False):
+		"""For every other.arg dicionary value of the form ID: value, create self.root_element.id: value"""
+		#Remove = True: completely replace arg dictionary after finding positions. 
+			#Only makes sense for arguments in domain operators
+		#For all arguments in other.args i:arg
+			#if i already in self.Args, do not add
+			#Else, if 'i' not in self.Args, add self.Args.update({i:arg})
+			#Add self.id:value to the arg.arg_pos_dict each key,value where key is other.id
+	
+		for pos,arg in other.Args:
+			if not pos in self.Args:
+				self.Args.update({pos:arg})
+			#Remove id from other
+			if remove:
+				arg.arg_pos_dict = {self.root.id : pos}
+			arg.arg_pos_dict.update({self.root.id : pos })
+		return self
+									
+				
+	def mergeEdgesFromSource(self, other, edge_source, mergeable_edges = set()):
+		"""Override ElementGraph, need to make sure we merge args for a Domain Operator"""
 		if edge_source.merge(other.root) is None:
 			return None
-			
-		subgraph = other.getElementGraphFromElement(other.root,type(self))
 		
-		#Goal, access each arg via the element.Args dictionary
-		#for each entry of the form old_id: pos, create entry new_id: pos
-		other.getElementGraphFromElement(other.root,type(self))\
-			.Args.union_update({edge_source.id: value} \
-								for key,value in subgraph.Args \
-									if key==other.root.id\
-							)
+		self.mergeArgs(self,other)
 							
-		return super(DomainOperator,self).mergeEdgesFromSource( self,\
+		return super(Action,self).mergeEdgesFromSource( self,\
 																other,\
 																edge_source,\
 																mergeable_edges\
 																)
-		
-class Action(DomainOperator):
-	""" Action Graph: for step graph"""
-	def __init__(self, id, type, name=None, \
-				Elements=set(), \
-				root_element = None, \
-				Edges=set(), \
-				Constraints = set()\
-				):
-		
-		super(Action,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
-		
 	def isConsistentAntecedentFor(self, action):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
 		effects = {egde.sink \
@@ -91,6 +90,15 @@ class Action(DomainOperator):
 			
 		return prospects
 		
+	# @staticmethod
+	# def operatorToAction(Operator, action_id):
+		# """ given a domain operator, create an action which is a copy of the operator but with merged args"""
+		# root_id = Operator.root_element.id
+		# copy_operator = Operator.copyGen()
+		# copy_operator.update({action_id:value}\
+								# for key,value in copy_operator)	
+		
+		
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
 	def __init__(self,id,type,name=None,\
@@ -98,57 +106,12 @@ class Condition(ElementGraph):
 		
 		super(Condition,self).__init__(id,type,name,Elements,literal_root,Edges,Constraints)
 		#self.labels = labels = ['first-arg','second-arg','third-arg','fourth-arg']
-	
-	def rMerge(self, other, self_element = self.root, other_element = other.root, consistent_merges = set()):
-		""" Returns set of consistent merges, which are Edge Graphs of the form self.merge(other)""" 
-		#self_element.merge(other_element)
-		
-		otherEdges = other.getIncidentEdges(other_element)
-		
-		#BASE CASE
-		if len(otherEdges) == 0:
-			return consistent_merges.add(self)
-			
-		
-		consistent_edge_pairs = self.getConsistentEdgePairs(self.getIncidentEdges(self_element), \
-															otherEdges\
-															)
 
-		#INDUCTION	
-		
-		#First, merge inconsistent other edges, do this on every path
-		mergeEdgesFromSource(other, \
-							self.element, \
-							other_element, \
-							getInconsistentEdges(\
-												otherEdges,\
-												consistent_edge_pairs\
-												)\
-							) 
-		
-		#Assimilation Merge: see if we can merge the sinks.
-		num_copies = len(consistent_edge_pairs) #
-		consistent_merges.union_update({\
-										self.copyGen().rMerge(\
-																other, \
-																e.sink, \
-																o.sink, \
-																consistent_merges\
-															) \
-															for (e,o) in consistent_edge_pairs \
-										})
-
-		#Accomodation Merge: see if we can add the sink's element graph
-		#Don't check if type is Condition/literal, because if edges are consistent, \
-			#then they share label, and literals have unique labels
-	
-		return consistent_merges		
-	
 		
 class CausalLink(Edge):
 	""" A causal link is an edge, s.t. the source and sink are actions, and the condition is itself an edge between a dummy element
 		and the dependency literal element, rather than just a label"""
-	def __init__(self, id, type, name=None, action1, action2, condition):
+	def __init__(self, id, type, name=None, action1 = None, action2 = None, condition = None):
 		super(CausalLink,self).__init__(source=action1,sink=action2,label=condition.id)
 		self.id = id
 		self.type = type
@@ -172,7 +135,7 @@ class CausalLink(Edge):
 		
 #Do I need this?
 class Binding(Edge):
-	def __init__(self, id, type, name=None, element1, element2, binding_type):
+	def __init__(self, id, type, name=None, element1 = None, element2 = None, binding_type = None):
 	
 		super(Binding,self).__init__(element1,element2,binding_type)
 		self.X = element1
@@ -206,7 +169,6 @@ class Subplan(ElementGraph):
 		self.goal = goal
 		self.source =  source
 		self.initial = initial
-		self.rhetorical_charge = Rhetorical_charge
 		self.Steps = \
 			{step for step in \
 				{self.getElementGraphFromElement(element, Action) \
@@ -227,16 +189,16 @@ class IntentionFrame(Subplan):
 				goal=None,\
 				Edges=set(),\
 				Constraints=set(),\
-				intender=None):
+				actor=None):
 
 		super(IntentionFrame,self).__init__(id,type,name, \
 											Elements, \
 											source=source, \
 											initial=initial, \
 											sink=sink, \
-											goal, \
-											Edges, \
-											Constraints, \
+											goal = goal, \
+											Edges = Edges, \
+											Constraints = Constraints, \
 											)
 			
 		self.ms = source #Will have no outgoing 
@@ -244,16 +206,16 @@ class IntentionFrame(Subplan):
 		self.goal = goal
 		self.sat = sink
 		self.motivation = Motivation(id, \
-									intender=self.actor, \
+									intender=self.intender, \
 									goal = self.goal\
 									)
-		self.root = IntentionFrameElement(  self.id,type='intention_frame', \
-											ms=self.ms, \
-											motivation=self.motivation\
-											intender=self.intender\
-											goal=self.goal\
-											sat=self.sat\
-											subplan=self.Steps\
+		self.root = IntentionFrameElement(  id = self.id,type='intention_frame', \
+											ms =self.ms, \
+											motivation = self.motivation,\
+											intender = self.intender,\
+											goal = self.goal,\
+											sat = self.sat,\
+											steps = self.Steps\
 										)
 		
 	def isInternallyConsistent(self):
@@ -264,14 +226,14 @@ class IntentionFrame(Subplan):
 			#All steps must be isTransitiveClosure_isAntecedent
 			if not step.isTransitiveClosure_isAntecedent(self.sat):
 				return False
-			if not self.actor in step.getActors():
+			if not self.intender in step.getActors():
 				return False
-		if not self.actor in self.sat.getActors():
+		if not self.intender in self.sat.getActors():
 			return False
 		for effect in self.ms.getEffects():
 			if not self.motivation.isConsistent(effect):
 				return False
-		if not self.motivation in self.ms.getEffects()
+		if not self.motivation in self.ms.getEffects():
 			return False
 		
 		return True
@@ -295,11 +257,11 @@ class PlanElementGraph(ElementGraph):
 										id =self.id, \
 										type='plan element', \
 										name=self.name,\
-										Steps, \
-										Bindings,\
-										Orderings,\
-										CausalLinks,\
-										IntentionFrames\
+										Steps = Steps, \
+										Bindings = Bindings,\
+										Orderings = Orderings,\
+										CausalLinks = CausalLinks,\
+										IntentionFrames = IntentionFrames\
 									)
 									
 		super(PlanElementGraph,self).__init__(\

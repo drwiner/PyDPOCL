@@ -1,4 +1,4 @@
-from Element import *
+from PlanElementGraph import *
 
 excavate = Operator(id = 1, type = 'op', name = 'excavate', num_args = 3)
 p1 = Literal(id=2, type='precondition', name= 'alive', num_args = 1, truth = True)
@@ -9,9 +9,9 @@ p4 = Literal(id=5, type='precondition', name= 'knows-location', num_args = 3, tr
 e1 = Literal(id=6, type='effect', name='burried', num_args=2, truth = False)
 e2 = Literal(id=7, type='effect', name='has', num_args=2, truth = True)
 
-consent = Argument(id=8, type='actor', name='?character', {excavate.id: 1)
-item = Argument(id = 9, type='var', name='?item', {excavate.id : 2})
-place = Argument(id = 10, type='var', name='?place', {excavate.id : 3})
+consent = Argument(id=8, type='actor', name='?character', arg_pos_dict = {excavate.id: 1})
+item = Argument(id = 9, type='var', name='?item', arg_pos_dict={excavate.id : 2})
+place = Argument(id = 10, type='var', name='?place',arg_pos_dict= {excavate.id : 3})
 
 edge0 = Edge(excavate, consent, 'actor-of')
 edge1 = Edge(excavate, p1, 'precond-of')
@@ -42,13 +42,14 @@ edge20 = Edge(e1, place, 'sec-arg')
 excavate_elements = {excavate, p1, p2, p3, p4, e1, e2, consent, item, place}
 excavate_edges = {edge0, edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8, edge9, edge10, edge11, edge12, edge13, edge14,edge15, edge16,edge17, edge18, edge19, edge20}
 
-Excavate_graph = Graph(id = 0,type = 'step', excavate_elements, excavate_edges)
+####Operator - Domain Action
+Excavate_graph = Graph(id = 0,type = 'step', name = 'excavate', Elements = excavate_elements, Edges = excavate_edges)
 
 example = Operator(id = 1, type= 'op')
 example_p1 = Literal(id=2, type='precondition', name='alive', truth = True)
 example_e1 = Literal(id=3, type = 'effect', name='has', truth = True)
-example_actor = Argument(id=4, type='actor', {example.id : 1)
-example_item = Argument(id=5,type='var', {example.id : 2)
+example_actor = Argument(id=4, type='actor',arg_pos_dict= {example.id : 1})
+example_item = Argument(id=5,type='var', arg_pos_dict={example.id : 2})
 
 example_edge0 = Edge(example, example_p1, 'precond-of')
 example_edge1 = Edge(example, example_e1, 'effect-of')
@@ -66,6 +67,7 @@ example_elements = {example, example_p1, example_e1, example_actor, example_item
 example_edges = {example_edge0, example_edge1, example_edge2, example_edge3, example_edge4}
 example_constraints = {example_constraint_edge0, example_constraint_edge1}
 
-Example_graph = Graph(id = 1, type='step', example_elements,example_edges, example_constraints)
+#### Partial-step Action/DomainOperator?
+Example_graph = Graph(id = 1, type='step', Elements = example_elements, Edges = example_edges, Constraints = example_constraints)
 
 print(Excavate_graph.isConsistent(Example_graph))
