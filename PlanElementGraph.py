@@ -1,20 +1,36 @@
-from Graph import *
+from ElementGraph import *
 
 class Belief(ElementGraph):
-	def __init__(self, id, type, name=None, Elements = set(), root_element=None, Edges = set(), Constraints = set()):
+	def __init__(self, id, type, name=None, \
+				Elements = set(), \
+				root_element=None, \
+				Edges = set(), \
+				Constraints = set()\
+				):
+		
 		super(Belief, self).__init__(id,type,name,Elements, root_element, Edges, Constraints)
 
 class DomainOperator(ElementGraph):
 	def __init__(self,id,type,name=None, \
-		Elements = set(), root_element = None, Edges = set(), Constraints = set()):
+				Elements = set(), \
+				root_element = None, \
+				Edges = set(), \
+				Constraints = set()\
+				):
 		
-		super(DomainOperator,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
+		super(DomainOperator,self).__init__(id,type,name,\
+											Elements,\
+											root_element,\
+											Edges,\
+											Constraints\
+											)
 		Args = {i:arg \
 					for i in range(self.root.num_args) \
 					for arg in self.elements \
 						if type(arg) is Argument \
 						and arg.arg_pos_dic[i]\
 				}
+				
 	def mergeEdgesFromSource(self, other, edge_source = self.root, mergeable_edges):
 		"""Override ElementGraph, need to make sure we merge args"""
 		if edge_source.merge(other.root) is None:
@@ -27,10 +43,14 @@ class DomainOperator(ElementGraph):
 		other.getElementGraphFromElement(other.root,type(self))\
 			.Args.union_update({edge_source.id: value} \
 								for key,value in subgraph.Args \
-								if key==other.root.id\
+									if key==other.root.id\
 							)
 							
-		return super(DomainOperator,self).mergeEdgesFromSource(self,other,edge_source,mergeable_edges)
+		return super(DomainOperator,self).mergeEdgesFromSource( self,\
+																other,\
+																edge_source,\
+																mergeable_edges\
+																)
 		
 class Action(DomainOperator):
 	""" Action Graph: for step graph"""
@@ -46,16 +66,16 @@ class Action(DomainOperator):
 	def isConsistentAntecedentFor(self, action):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
 		effects = {egde.sink \
-								for edge in self.edges \
-										if edge.label == 'effect-of'\
+						for edge in self.edges \
+								if edge.label == 'effect-of'\
 				}
 				
 		if len(effects) == 0:
 			return False
 			
 		preconditions = {edge.sink \
-							for edge in self.edges \
-								if edge.label == 'precond-of'\
+								for edge in self.edges \
+										if edge.label == 'precond-of'\
 						}
 		if len(preconditions) == 0:
 			return False
@@ -171,9 +191,15 @@ class Ordering(Edge):
 		
 		
 class Subplan(ElementGraph):
-	def __init__(self,id,type,name=None, Elements = set(),\
-		source = None, initial = None, sink = None, goal=None, \
-		Edges = set(), Constraints = set(),  Rhetorical_charge = None):
+	def __init__(self,id,type,name=None, \
+				Elements = set(),\
+				source = None, \
+				initial = None, \
+				sink = None, \
+				goal=None, \
+				Edges = set(), \
+				Constraints = set(),  \
+				):
 		
 		super(Subplan,self).__init__(id,type,name, Elements, sink, Edges, Constraints)
 		
@@ -194,26 +220,41 @@ class Subplan(ElementGraph):
 	
 class IntentionFrame(Subplan):
 	def __init__(self,id,type,name=None, \
-		Elements=set(),source=None,initial=None,sink=None,goal=None,\
-		Edges=set(),Constraints=set(),Rhetorical_charge=None, intender=None):
+				Elements=set(),\
+				source=None,\
+				initial=None,\
+				sink=None,\
+				goal=None,\
+				Edges=set(),\
+				Constraints=set(),\
+				intender=None):
 
 		super(IntentionFrame,self).__init__(id,type,name, \
-			Elements, source=source, initial=initial, sink=sink, goal, \
-			Edges, Constraints, Rhetorical_charge)
+											Elements, \
+											source=source, \
+											initial=initial, \
+											sink=sink, \
+											goal, \
+											Edges, \
+											Constraints, \
+											)
 			
 		self.ms = source #Will have no outgoing 
 		self.intender = actor
 		self.goal = goal
 		self.sat = sink
-		self.motivation = Motivation(id, intender=self.actor, goal = self.goal)
-		self.root = IntentionFrameElement(self.id,type='intention_frame', \
-			ms=self.ms, \
-			motivation=self.motivation\
-			intender=self.intender\
-			goal=self.goal\
-			sat=self.sat\
-			subplan=self.Steps)
-		
+		self.motivation = Motivation(id, \
+									intender=self.actor, \
+									goal = self.goal\
+									)
+		self.root = IntentionFrameElement(  self.id,type='intention_frame', \
+											ms=self.ms, \
+											motivation=self.motivation\
+											intender=self.intender\
+											goal=self.goal\
+											sat=self.sat\
+											subplan=self.Steps\
+										)
 		
 	def isInternallyConsistent(self):
 		for effect in self.sat.getEffects():
@@ -237,7 +278,11 @@ class IntentionFrame(Subplan):
 		
 class PlanElementGraph(ElementGraph):
 
-	def __init__(self,id,type,name=None, Elements = set(), planElement = None, Edges = set(), Constraints = set()):
+	def __init__(self,id,type,name=None, \
+				Elements = set(), \
+				planElement = None, \
+				Edges = set(), \
+				Constraints = set()):
 		
 		self.Steps = {element for element in Elements if type(element) is Operator}
 		self.Bindings = {edge for edge in Edges if type(edge) is Binding}
@@ -272,25 +317,16 @@ class PlanElementGraph(ElementGraph):
 				- To instantiate a step as an operator, copy operator and operator.rMerge(step)
 				- In plan, step.mergeAt(copyoperator) ('take its family')
 				- Successfully instantiated argument adopter
-			
+
 			2) For each causal link (source,sink,condition), 
 				narrow down consistent mappings to just those which are consistent 
 				given assignment of positions to arguments
-			2) rMerge(self, other, self_element = self.root, other_element = other.root, consistent_merges = set())
+
+			3) rMerge(self, other, self_element = self.root, other_element = other.root, consistent_merges = set())
 		"""
-		self.consistent_mappings = {step.id : {\
-												D.id for D in Operators if D.isConsistent(step)\
+		self.consistent_mappings = {step.id :  {\
+												D.id for D in Operators \
+													if D.isConsistent(step)\
 												} for step in Steps \
 									}
-		#TODO: check if two steps with nonempty intersection can be merged
 		
-		#{self.consistent_mappings[step.id].add(D.id) for step in Steps for D in Operators if D.isConsistent(step)}	
-		#for D in Operators:
-		#	{self.consistent_mappings[step.id].add(D.id) for step in Steps if D.isConsistent(step)}
-			
-	def evaluateCausalLinks(self)
-		""" For every pair of steps, determine if consistent for causal link. 
-			Create a "condition" by finding an source.effect that is consistent with a sink.precondition"""
-		"""For every causal link Qi --Condition()--> Qj, find steps di = c-map[Qi.id] and dj = c-map[Qj.id] s.t. 
-			Condition().Args[di.id] == Condition().Args[dj.id]
-			For e"""
