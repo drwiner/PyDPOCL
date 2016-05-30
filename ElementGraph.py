@@ -13,7 +13,7 @@ class ElementGraph(Graph):
 											Edges,\
 											Constraints\
 										)
-		self.root = root
+		self.root = root_element
 		
 	def copyGen(self):
 		yield copy.deepcopy(self)
