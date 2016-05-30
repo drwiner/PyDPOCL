@@ -63,9 +63,9 @@ class ElementGraph(Graph):
 		return self		
 			
 	def mergeAt(self, other, edge_source):		
-		return self.mergeEdgesFromSource(	other, \								#other
-											edge_source, \							#edge_source
-											other.getIncidentEdges(other.root)\		#mergeable_edges
+		return self.mergeEdgesFromSource(	other, \
+											edge_source, \
+											other.getIncidentEdges(other.root)\
 										)
 		
 	def getConsistentEdgePairs(self, incidentEdges, otherEdges):
@@ -109,10 +109,10 @@ class ElementGraph(Graph):
 		#INDUCTION	
 		
 		#First, merge inconsistent other edges, do this on every path
-		self.mergeEdgesFromSource(	other, \									#other 
-									self.element, \								#self_element
-									getInconsistentEdges(\						#mergeable_edges
-														otherEdges,\			
+		self.mergeEdgesFromSource(	other, \
+									self.element, \
+									getInconsistentEdges(\
+														otherEdges,\
 														consistent_edge_pairs\
 														)\
 									) 
@@ -141,9 +141,9 @@ class ElementGraph(Graph):
 			#Can we accomodate this new edge (let this be a new edge)
 			
 			if not type(e.sink) == Literal\
-				and not accomodate_self.mergeEdgesFromSource(	other, \			#other
-																e.sink, \			#edge_source
-																{o}\				#mergeable_edges
+				and not accomodate_self.mergeEdgesFromSource(	other, \
+																e.sink, \
+																{o}\
 															) 	is None:
 				accomodate_merges = accomodate_self.rMerge(to_merge)
 			else:
@@ -175,15 +175,15 @@ class ElementGraph(Graph):
 			return complete_merges
 
 		sink = sinks_remaining.pop()
-		complete_merges.update	(\
-									{self.copyGen().swap(sink,strategy).\
+		complete_merges.update	({\
+									self.copyGen().swap(sink,strategy).\
 													rCreateConsistentMerges	(\
 																			sinks_remaining,\
 																			edge_mapper,\
 																			complete_merges\
 																			)\
-									) for strategy in edge_mapper[sink]\
-								}
+								 for strategy in edge_mapper[sink]\
+								})
 								
 		# strategies = edge_mapper[sink]
 		# for strategy in strategies:
@@ -198,7 +198,7 @@ def extractElementsubGraphFromElement(G, element, Type):
 	Elements = G.rGetDescendants(element)
 	Constraints = G.rGetDescendantConstraints(element)
 	return Type(element.id,\
-				type = element.type, \ 
+				type = element.type, \
 				name=element.name, \
 				Elements = Elements, \
 				root_element = element,\
