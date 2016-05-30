@@ -41,14 +41,15 @@ edge20 = Edge(e1, place, 'sec-arg')
 excavate_elements = {excavate, p1, p2, p3, p4, e1, e2, consent, item, place}
 excavate_edges = {edge0, edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8, edge9, edge10, \
 					edge12, edge13, edge14,edge15, edge16,edge17, edge18, edge19, edge20}
+					
 
 ####Operator - Domain Action
-Excavate_graph = ElementGraph(	id = 0,\
-								type = 'Action', \
-								name = 'excavate', \
-								Elements = excavate_elements, \
-								root_element = excavate,\
-								Edges = excavate_edges)
+Excavate_graph = Action(	id = 0,\
+							graph_type = 'Action', \
+							name = 'excavate', \
+							Elements = excavate_elements, \
+							root_element = excavate,\
+							Edges = excavate_edges)
 
 example = Operator(id = 111, type= 'Action')
 example_p1 = Literal(id=211, type='Condition', name='alive', truth = True)
@@ -73,12 +74,14 @@ example_elements = {example, example_p1, example_e1, example_actor, example_item
 example_edges = {example_edge0, example_edge1, example_edge2, example_edge3, example_edge4}
 example_constraints = {example_constraint_edge0, example_constraint_edge1}
 
-#### Partial-step Action/DomainOperator?
-Example_graph = ElementGraph(	id = 1111, \
-								type='Action', \
-								Elements = example_elements, \
-								root_element = example,\
-								Edges = example_edges, \
-								Constraints = example_constraints)
+
+Example_graph = Action(	id = 1111, \
+						graph_type='Action', \
+						Elements = example_elements, \
+						root_element = example,\
+						Edges = example_edges, \
+						Constraints = example_constraints)
 
 print('consistent: ', Excavate_graph.isConsistent(Example_graph))
+
+

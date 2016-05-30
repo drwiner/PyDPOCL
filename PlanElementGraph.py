@@ -11,25 +11,27 @@ class Belief(ElementGraph):
 		super(Belief, self).__init__(id,type,name,Elements, root_element, Edges, Constraints)
 
 class Action(ElementGraph):
-	def __init__(self,id,type,name=None, \
+	def __init__(self,id,graph_type,name=None, \
 				Elements = set(), \
 				root_element = None, \
 				Edges = set(), \
 				Constraints = set()\
 				):
 		
-		super(Action,self).__init__(id,type,name,\
-											Elements,\
-											root_element,\
-											Edges,\
-											Constraints\
-										)
-		Args = {i:arg \
+		super(Action,self).__init__(	id,graph_type,name,\
+										Elements,\
+										root_element,\
+										Edges,\
+										Constraints\
+									)
+
+									
+		Args = 		{i:arg \
 							for i in range(self.root.num_args) \
 							for arg in self.elements \
-										if type(arg) is Argument \
-										and arg.arg_pos_dic[i]\
-				}
+										if (type(arg) == Argument) \
+										and i in arg.arg_pos_dict\
+					}
 				
 	def mergeArgs(self, other, remove = False):
 		"""For every other.arg dicionary value of the form ID: value, create self.root_element.id: value"""
