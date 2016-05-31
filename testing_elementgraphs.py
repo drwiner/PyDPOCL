@@ -181,7 +181,8 @@ if b != a - 1:
 		
 """Test getElementGraphFromElement """
 print("\n \t TEST getElementGraphFromElement \n")
-
+excavate_clone = Excavate_graph.copyGen()
+excavate_clone.getElementGraphFromElement(p1,type(p1))
 
 """ Testing ElementGraph Operations"""
 	#getElementGraphFromElement
