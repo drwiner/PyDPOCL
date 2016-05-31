@@ -32,25 +32,40 @@ class ElementGraph(Graph):
 					)
 					
 	def swap(self, source, other):
-		"""	Completely replaces source with other.root and all descending
-			Assumes that other has already merged important parts of descendants of source
-			1) Remove source's subtree, 2) add other
-			
+		"""	SWAP: 	
+					For every descendant d of source, find d' which has same ID
+						If it doesn't exist, add d' to self
+						otherwise, d.merge(d')
+					For every descendant edge d' --> y'
+						If there is no edge d --> y in self.edges, add d --> y
+						otherwise, do nothing
+						
+			Purpose:
+					Other is consistent subgraph with root equivalent to source
+					Merging other with self at source is a consistent_merge
+			Check:	
+					If elementGraph is an operator, make sure to mergeArgs
 		"""
-		#If an operator, make sure to mergeArgs
+		descendants = self.rGetDescendants(source)
+		self_ids = {descendant.id for descendant in descendants}
+		other_ids = {element.id for element in other.elements}
+		#New ids are other_ids which are not in self_ids
+		new_ids = other_ids - self_ids.intersection(other_ids)
 		
-		#Step 1: remove all descendant edges
-		{self.edges.remove(edge) for edge in self.edges if edge.source.isIdentical(source)}
-		self.edges.union(
-						{edge.swapSource(other.root) \
-							for edge in self.edges \
-								if not source.merge(edge) is None
-						})
-				
-		{edge.swapSink(other.root) for edge in self.edges if source.isIdentical(edge.sink)}
-		{self.edges.remove(edge) for edge in self.rGetDescendantEdges(source)}
-		{self.elements.remove(element) for element in self.rGetDescendants(source)}
-		{self.constraints.remove(edge) for edge in self.rGetDescendantConstraints(source)}
+		#If d'.id == d.id, then merge
+		merged_elements = {d.merge(d_prime) for d in descendants for d_prime in other.elements if d_prime.id == d.id}
+		#If there is no d' s.t. d'.id == d.id then add d'
+		new_elements = {d_prime for d_prime in other.elements if d_prime.id in new_ids}
+		descendants.update(new_elements)
+		self.elements.update(new_elements)
+		
+		#Add Missing Edges
+		descendantEdges = self.rGetDescendantEdges(source)
+		{self.addEdgeByIdentity(edge) for edge in other.edges if not self.hasEdgeIdentity(edge)}
+		
+		#Add Missing Constraints (problem: all constraint elements must be in self.elements)
+		descendantConstraints = self.rGetDescendantConstraints(source)
+		{self.addConstraintByIdentity(edge) for edge in other.constraints if not self.hasConstraintIdentity(edge)}
 		return self
 			
 	def mergeEdgesFromSource(self, other, edge_source, mergeable_edges = set()):
@@ -75,8 +90,9 @@ class ElementGraph(Graph):
 		return self		
 			
 	def mergeAt(self, other, edge_source):
-		""" Steals all edges from other, adds edges to edges_source"""
-		""" All edges are 'Accomodated' """"
+		""" Steals all edges from other, adds edges to edges_source
+		 All edges are 'Accomodated' 
+		 """
 		return self.mergeEdgesFromSource(	other, \
 											edge_source, \
 											other.getIncidentEdges(other.root)\

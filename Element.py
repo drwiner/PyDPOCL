@@ -272,6 +272,10 @@ class Argument(Element):
 		return False
 		
 	def merge(self, other):
+		""" Merging arguments:
+				Assume self and other arg_pos_dicts are consistent/equivalent
+				Take all entries from other's arg_pos_dict
+		"""
 		if super(Argument,self).merge(other) is None:
 			return None
 		

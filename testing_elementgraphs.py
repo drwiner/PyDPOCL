@@ -123,4 +123,5 @@ Excavate_graph.print_graph()
 """ Testing ElementGraph Operations"""
 	#Test swap
 	#getElementGraphFromElement
-	# 
+	#mergeAt
+	#rMerge

@@ -71,10 +71,44 @@ class Graph(Element):
 	def addEdge(self, edge):
 		if edge not in self.edges:
 			self.edges.add(edge)
+			
+	def hasEdgeIdentity(self, edge):
+		""" Returns set of edges s.t. (source.id, label, sink.id) in self.edges"""
+		return self.getEdgesByIdsAndLabel(edge.source.id, edge.sink.id, edge.label)
+		
+	def hasConstraintIdentity(self, edge):
+		return self.getConstraintsByIdsAndLabel(edge.source.id, edge.sink.id, edge.label)
+	
+	def addEdgeByIdentity(self, edge):
+		""" Assumes edge not in Graph
+			Finds elements with edge.source.id and edge.sink.id
+			Adds edge between them with edge.label
+		"""
+		source = getElementById(edge.source.id)
+		sink = getElementById(edge.sink.id)
+		label = edge.label
+		self.addEdge(Edge(source, sink, label))
+		
+	def addConstraintByIdentity(self, edge):
+		source = getElementById(edge.source.id)
+		sink = getElementById(edge.sink.id)
+		label = edge.label
+		self.addConstraint(Edge(source, sink, label))
+	
+	def getElementById(self, id):
+		for element in self.elements:
+			if element.id == id:
+				return element
 		
 	def addConstraint(self, edge):
 		if edge not in self.constraints:
 			self.constraints.add(edge)
+			
+	def getEdgesByIdsAndLabel(self, source_id, sink_id, label):
+		return {edge for edge in self.edges if edge.source.id == source_id and edge.sink.id == sink_id and edge.label == label}
+		
+	def getConstraintsByIdsAndLabel(self, source_id, sink_id, label):
+		return {edge for edge in self.constraints if edge.source.id == source_id and edge.sink.id == sink_id and edge.label == label}
 			
 	def getIncidentEdges(self, element):
 		return {edge for edge in self.edges if edge.source is element}
