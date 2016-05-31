@@ -221,9 +221,9 @@ def rDetectConsistentEdgeGraph(Remaining = set(), Available = set()):
 	if len(Remaining)  == 0:
 		return True
 		
-	#No solution if there are more edges remaining then there are available edges
-	if len(Remaining) > len(Available):
-		return False
+	# #No solution if there are more edges remaining then there are available edges
+	# if len(Remaining) > len(Available):
+		# return False
 
 	other_edge = Remaining.pop()
 	print('remaining ', len(Remaining))

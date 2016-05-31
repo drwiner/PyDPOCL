@@ -10,9 +10,9 @@ p4 = Literal(id=5, type='Condition', name= 'knows-location', 	num_args = 3, trut
 e1 = Literal(id=6, type='Condition', name='burried',	num_args=2,	 truth = False)
 e2 = Literal(id=7, type='Condition', name='has', 		num_args=2,	 truth = True)
 
-consent = Argument(	id=8,	 	type='actor',	 arg_pos_dict = {excavate.id: 1})
-item = Argument(	id = 9, 	type='var',		 arg_pos_dict={excavate.id : 2})
-place = Argument(	id = 10, 	type='var',		 arg_pos_dict= {excavate.id : 3})
+consent = Argument(	id=8,	 	type='actor',	 arg_pos_dict = {excavate.id :	1})
+item = Argument(	id = 9, 	type='var',		 arg_pos_dict=	{excavate.id :  2})
+place = Argument(	id = 10, 	type='var',		 arg_pos_dict=	{excavate.id :  3})
 
 edge0 = Edge(excavate, consent, 'actor-of')
 edge1 = Edge(excavate, p1,	 	'precond-of')
@@ -106,5 +106,7 @@ print('consistent <-: ', Example_graph.isConsistent(Excavate_graph))
 """ False, ought to be true
 		Consistency: 
 """
-
+item = Argument(	id = 9, 	type='var',		 arg_pos_dict=	{excavate.id :  2})
+place = Argument(	id = 10, 	type='var',		 arg_pos_dict=	{excavate.id :  3})
+print(item.isConsistent(place))
 #Example_graph.rMerge()
