@@ -1,5 +1,4 @@
 from Graph import *
-import copy
 
 class ElementGraph(Graph):
 	"""An element graph is a graph with a root element"""
@@ -18,18 +17,33 @@ class ElementGraph(Graph):
 	def copyGen(self):
 		return copy.deepcopy(self)
 		
-	def getElementGraphFromElement(self, element, Type):
-		if self.root is element:
-			return self
+	
+	@classmethod
+	def makeElementGraph(cls, elementGraph, element):
+		return cls(				id=element.id, \
+								type= element.type, \
+								name=None,\
+								Elements = elementGraph.rGetDescendants(element),\
+								root_element = element,\
+								Edges = elementGraph.rGetDescendantEdges(element),\
+								Constraints = elementGraph.rGetDescendantConstraints(element)\
+								)
+					
 		
-		return Type(element.id, \
-					type='element %s' %subgraph, \
-					name=self.name,\
-					Elements = self.rGetDescendants(element),\
-					root_element = element,\
-					Edges = self.rGetDescendantEdges(element),\
-					Constraints = self.rGetDescendantConstraints(element)\
-					)
+	def getElementGraphFromElement(self, element, Type):
+		if self.root.id == element.id:
+			return self.copyGen()
+			
+		return Type.makeElementGraph(self,element)
+								
+		# return ElementGraph	(id=element.id, \
+								# type= element.type, \
+								# name=None,\
+								# Elements = self.rGetDescendants(element),\
+								# root_element = element,\
+								# Edges = self.rGetDescendantEdges(element),\
+								# Constraints = self.rGetDescendantConstraints(element)\
+								# )
 					
 	def swap(self, source, other):
 		"""	SWAP: 	

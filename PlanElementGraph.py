@@ -103,11 +103,20 @@ class Action(ElementGraph):
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
 	def __init__(self,id,type,name=None,\
-		Elements=set(), literal_root = None, Edges = set(), Constraints = set()):
+		Elements=set(), root_element = None, Edges = set(), Constraints = set()):
 		
-		super(Condition,self).__init__(id,type,name,Elements,literal_root,Edges,Constraints)
+		super(Condition,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 		#self.labels = labels = ['first-arg','second-arg','third-arg','fourth-arg']
-
+		
+	# def makeElementGraph(self,element):
+		# return Condition(		id=element.id, \
+								# type= element.type, \
+								# name=None,\
+								# Elements = self.rGetDescendants(element),\
+								# root_element = element,\
+								# Edges = self.rGetDescendantEdges(element),\
+								# Constraints = self.rGetDescendantConstraints(element)\
+								# )
 		
 class CausalLink(Edge):
 	""" A causal link is an edge, s.t. the source and sink are actions, and the condition is itself an edge between a dummy element

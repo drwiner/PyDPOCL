@@ -178,11 +178,42 @@ if b != a - 1:
 	print("\n")
 	for E in Example_graph.elements:
 		print(E.id)
+
+		
+"""Test rGetDescendants """
+print("\n \t TEST getElementGraphFromElement \n")
+print('descendants')
+print(len(Excavate_graph.rGetDescendants(p1)))
+print('descendant edges')
+print(len(Excavate_graph.rGetDescendantEdges(p1)))
 		
 """Test getElementGraphFromElement """
 print("\n \t TEST getElementGraphFromElement \n")
 excavate_clone = Excavate_graph.copyGen()
-excavate_clone.getElementGraphFromElement(p1,type(p1))
+Action.makeElementGraph(Excavate_graph, p1)
+print('test real vs clone edges')
+print(len(Excavate_graph.rGetDescendantEdges(p1)))
+print(len(excavate_clone.rGetDescendantEdges(p1)))
+
+print('num_elements in excavate Before getElementGraphFromElement:')
+print(len(Excavate_graph.elements))
+print('num_edges in excavate Before getElementGraphFromElement:')
+print(len(Excavate_graph.edges))
+
+print('\n Literal \n')
+print(p1.id)
+print(p1.type)
+sub_graph = excavate_clone.getElementGraphFromElement(p1,eval(p1.type))
+print('\n sub_graph \n')
+print(sub_graph.id)
+print(sub_graph.type)
+print(' \n')
+print('num_elements in excavate Condition After getElementGraphFromElement:')
+print(len(sub_graph.elements))
+print('num_edges in excavate Condition After getElementGraphFromElement:')
+print(len(sub_graph.edges))
+print(len(excavate_clone.rGetDescendantEdges(p1)))
+print(len(sub_graph.rGetDescendantEdges(p1)))
 
 """ Testing ElementGraph Operations"""
 	#getElementGraphFromElement
