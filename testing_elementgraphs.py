@@ -80,7 +80,9 @@ example_edges = 	{	example_edge0, \
 						example_edge2, \
 						example_edge3, \
 						example_edge4}
-example_constraints = {example_constraint_edge0, example_constraint_edge1}
+						
+example_constraints = {	example_constraint_edge0, \
+						example_constraint_edge1}
 
 
 ####Operator - Domain Action
@@ -98,7 +100,7 @@ Example_graph =	 Action(	id = 1111, \
 							Edges = example_edges, \
 							Constraints = example_constraints)
 
-print('consistent ->:',	 Excavate_graph.isConsistent(Example_graph))
+#print('consistent ->:',	 Excavate_graph.isConsistent(Example_graph))
 
 print('consistent <-: ', Example_graph.isConsistent(Excavate_graph))
 """ False, ought to be true
