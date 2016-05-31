@@ -85,14 +85,14 @@ class Graph(Element):
 			Finds elements with edge.source.id and edge.sink.id
 			Adds edge between them with edge.label
 		"""
-		source = getElementById(edge.source.id)
-		sink = getElementById(edge.sink.id)
+		source = self.getElementById(edge.source.id)
+		sink = self.getElementById(edge.sink.id)
 		label = edge.label
 		self.addEdge(Edge(source, sink, label))
 		
 	def addConstraintByIdentity(self, edge):
-		source = getElementById(edge.source.id)
-		sink = getElementById(edge.sink.id)
+		source = self.getElementById(edge.source.id)
+		sink = self.getElementById(edge.sink.id)
 		label = edge.label
 		self.addConstraint(Edge(source, sink, label))
 	

@@ -46,17 +46,21 @@ class ElementGraph(Graph):
 			Check:	
 					If elementGraph is an operator, make sure to mergeArgs
 		"""
-		descendants = self.rGetDescendants(source)
-		self_ids = {descendant.id for descendant in descendants}
+		#descendants = self.rGetDescendants(source)
+		self_ids = {descendant.id for descendant in self.elements}
 		other_ids = {element.id for element in other.elements}
 		#New ids are other_ids which are not in self_ids
 		new_ids = other_ids - self_ids.intersection(other_ids)
 		
+		print("NEW IDs \n")
+		for id in new_ids:
+			print(id)
+		print("\n")
 		#If d'.id == d.id, then merge
-		merged_elements = {d.merge(d_prime) for d in descendants for d_prime in other.elements if d_prime.id == d.id}
+		merged_elements = {d.merge(d_prime) for d in self.elements for d_prime in other.elements if d_prime.id == d.id}
 		#If there is no d' s.t. d'.id == d.id then add d'
 		new_elements = {d_prime for d_prime in other.elements if d_prime.id in new_ids}
-		descendants.update(new_elements)
+		#descendants.update(new_elements)
 		self.elements.update(new_elements)
 		
 		#Add Missing Edges

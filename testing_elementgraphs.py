@@ -102,15 +102,32 @@ Example_graph =	 Action(	id = 1111, \
 							Constraints = example_constraints)
 
 
+Excavate_graph.print_graph()
+Example_graph.print_graph()
+
+""" Test Absolve"""
+print("\n \t TEST Absolve \n")
+print('num_elements in excavate Before Absolve Example:')
+print(len(Excavate_graph.elements))
+print('num_edges in excavate Before Absolve Example:')
+print(len(Excavate_graph.edges))
+print("\n")		
+
 print('Absolves ->:',	 Excavate_graph.absolves(Example_graph))
-""" True because 
-"""
+
+print("\n")
+print('num_elements in excavate After Absolve Example:')
+print(len(Excavate_graph.elements))
+print('num_edges in excavate After Absolve Example:')
+print(len(Excavate_graph.edges))
+
+print("\n")
 print('Absolves <-: ', Example_graph.absolves(Excavate_graph))
 """ Not True because, consistency 
 """
 
 #print("Operators", example.isConsistent(excavate))
-Excavate_graph.print_graph()
+
 #print(item.isConsistent(place))
 #consistent_merges = Example_graph.Merge(Excavate_graph)
 #for i in consistent_merges:
@@ -118,8 +135,8 @@ Excavate_graph.print_graph()
 
 
 
-""" Test elementGraph swap """
-print("TEST swap \n")
+""" Test elementGraph """
+print("\n \t TEST add elements and edges \n")
 example_clone = Example_graph.copyGen()
 print(example_clone.id)
 print('num_elements:')
@@ -132,8 +149,41 @@ print('num_elements After add:')
 print(len(example_clone.elements))
 print('num_edges After add:')
 print(len(example_clone.edges))
+
+"""Test Swap"""
+example_clone2 = Example_graph.copyGen()
+print("\n \t TEST Swap \n")
+print('num_elements in example Before swap:')
+b = len(Example_graph.elements)
+print(len(Example_graph.elements))
+print('num_edges in example Before swap:')
+print(len(Example_graph.edges))
+Example_graph.swap(Example_graph.root, example_clone)
+print('num_elements in example After swap:')
+a = len(Example_graph.elements)
+print(len(Example_graph.elements))
+print('num_edges in example After swap:')
+print(len(Example_graph.edges))
+
+#Should only add one element...
+if b != a - 1:
+	print('elements did not add right')
+	for E in Example_graph.elements:
+		found = False
+		for element in example_clone2.elements:
+			if E.id == element.id:
+				found = True
+		if not found:
+			print(E.id)
+	print("\n")
+	for E in Example_graph.elements:
+		print(E.id)
+		
+"""Test getElementGraphFromElement """
+print("\n \t TEST getElementGraphFromElement \n")
+
+
 """ Testing ElementGraph Operations"""
-	#Test swap
 	#getElementGraphFromElement
 	#mergeAt
 	#rMerge
