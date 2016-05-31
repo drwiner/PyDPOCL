@@ -26,7 +26,7 @@ class Action(ElementGraph):
 									)
 
 									
-		Args = 		{i:arg \
+		self.Args = {i:arg \
 							for i in range(self.root.num_args) \
 							for arg in self.elements \
 										if (type(arg) == Argument) \
@@ -59,17 +59,16 @@ class Action(ElementGraph):
 		
 		self.mergeArgs(self,other)
 							
-		return super(Action,self).mergeEdgesFromSource( self,\
-																other,\
+		return super(Action,self).mergeEdgesFromSource( 		other,\
 																edge_source,\
 																mergeable_edges\
 																)
 	def isConsistentAntecedentFor(self, action):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
-		effects = {egde.sink \
+		effects = 	{egde.sink \
 						for edge in self.edges \
 								if edge.label == 'effect-of'\
-				}
+					}
 				
 		if len(effects) == 0:
 			return False

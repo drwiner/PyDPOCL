@@ -45,14 +45,13 @@ class ElementGraph(Graph):
 		if edge_source.merge(other.root) is None:
 			return None
 			
-		new_incident_edges = {Edge(\
-									edge_source, \
-									edge.sink, \
-									edge.label\
-									) \
-									for edge in mergeable_edges\
-							}
+		if len(mergeable_edges) == 0:
+			return None
+			
+		new_incident_edges = {edge.swapSource(edge_source) for edge in mergeable_edges}
+		
 		self.edges.update(new_incident_edges)
+	
 		for new_edge in new_incident_edges:
 			self.elements.add(new_edge.sink)
 			self.elements.update(other.rGetDescendants(new_edge.sink)) #Try using Generator
@@ -83,7 +82,10 @@ class ElementGraph(Graph):
 							(oe for (e,oe) in consistent_edge_pairs\
 						)\
 				}
-			
+	
+	def Merge(self, other):
+		return self.rMerge(other, other.root)
+	
 	def rMerge(self, other, self_element, consistent_merges = set()):
 		""" Returns set of consistent merges, which are Edge Graphs of the form self.merge(other)""" 
 		#self_element.merge(other_element)
@@ -102,7 +104,7 @@ class ElementGraph(Graph):
 															
 		#If they're all inconsistent, then let's just get to den, aye?
 		if len(consistent_edge_pairs) == 0:
-			if self.mergeAt(self_element,other) is None:
+			if self.mergeAt(other, self_element) is None:
 				return None
 			return self
 			
@@ -123,7 +125,7 @@ class ElementGraph(Graph):
 		for e,oe in consistent_edge_pairs:
 			accomodate_self = self.getElementGraphFromElement(e.sink, e.sink.type)
 			assimilate_self = self.getElementGraphFromElement(e.sink, e.sink.type)
-			to_merge = other.getElementGraphFromElement(oe.sink, oe.sink.type)
+			to_merge 		= other.getElementGraphFromElement(oe.sink, oe.sink.type)
 	
 			#Can we rMerge from the sinks? (Let this be the same edge)
 			assimilate_merges = assimilate_self.rMerge(to_merge)
