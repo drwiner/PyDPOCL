@@ -74,7 +74,7 @@ example_constraint_edge1 = Edge(ex_const_element, example_item, 	'sec-arg')
 example_elements = 	{	example, \
 						example_p1, \
 						example_e1, \
-						example_e3,\
+					#	example_e3,\
 						example_actor, \
 						example_item,\
 						ex_const_element}
@@ -83,7 +83,7 @@ example_edges = 	{	example_edge0, \
 						example_edge1,\
 						example_edge2, \
 						example_edge3, \
-						example_edge5,\
+					#	example_edge5,\
 						example_edge4}
 						
 example_constraints = {	example_constraint_edge0, \
@@ -114,7 +114,7 @@ print('Absolves <-: ', Example_graph.absolves(Excavate_graph))
 """
 
 #print("Operators", example.isConsistent(excavate))
-
+Excavate_graph.print_graph()
 #print(item.isConsistent(place))
 consistent_merges = Example_graph.Merge(Excavate_graph)
 for i in consistent_merges:

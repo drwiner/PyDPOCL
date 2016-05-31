@@ -42,6 +42,11 @@ class Edge:
 	def swapSink(self,sink):
 		self.sink = sink
 		return self
+		
+	def print_edge(self):
+		self.source.print_element()
+		print(self.label)
+		self.sink.print_element()
 
 class Graph(Element):
 	"""A graph is an element with elements, edges, and constraints"""
@@ -52,6 +57,15 @@ class Graph(Element):
 		self.elements = Elements
 		self.edges = Edges;
 		self.constraints = Constraints
+		
+	def print_graph(self):
+		print('edges:')
+		for edge in self.edges:
+			print('[')
+			edge.source.print_element()
+			print(edge.label)
+			edge.sink.print_element()
+			print(']')
 		
 	def addEdge(self, edge):
 		if edge not in self.edges:

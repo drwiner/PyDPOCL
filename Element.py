@@ -71,6 +71,9 @@ class Element:
 			self.name = other.name
 		return self
 		
+	def print_element(self):
+		print('(',self.id, self.type, self.name,')')
+		
 class InternalElement(Element):
 	"""Internal Element is an Element with a possibly unimportant name, and a number of arguments"""
 	def __init__(self, id, type, name = None, num_args = 0):

@@ -13,7 +13,7 @@ class ElementGraph(Graph):
 											Edges,\
 											Constraints\
 										)
-		self.root = root_element
+		self.root = root_element		
 		
 	def copyGen(self):
 		yield copy.deepcopy(self)
@@ -69,9 +69,9 @@ class ElementGraph(Graph):
 		
 	def getConsistentEdgePairs(self, incidentEdges, otherEdges):
 		return {(edge,other_edge) \
-									for edge in incidentEdges \
-									for other_edge in otherEdges \
-												if edge.isConsistent(other)\
+					for edge in incidentEdges \
+							for other_edge in otherEdges \
+									if edge.isConsistent(other)\
 				}
 				
 	def getInconsistentEdges(self, other_edges, consistent_edge_pairs):
@@ -188,6 +188,7 @@ class ElementGraph(Graph):
 																		complete_merges))
 			
 		return complete_merges
+
 
 def extractElementsubGraphFromElement(G, element, Type):
 	Edges = G.rGetDescendantEdges(element)
