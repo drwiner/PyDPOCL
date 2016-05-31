@@ -162,27 +162,27 @@ class ElementGraph(Graph):
 										edge_mapper = {}, \
 										complete_merges = set()):
 		""" Given a set of sinks and a set of strategies per sink, 
-			Find the set of sink-strategy assignments
+			Find a strategy per sink, swap in strategy in self.copy
 		"""
 		#Base Case				
 		if len(sinks_remaining) == 0:
-			return complete_merges
+			return self
 
 		sink = sinks_remaining.pop()
 		# complete_merges.update	({\
-									# self.copyGen().swap(sink,strategy).\
-													# rCreateConsistentMerges	(\
-																			# sinks_remaining,\
-																			# edge_mapper,\
-																			# complete_merges\
-																			# )\
-								 # for strategy in edge_mapper[sink]\
-								# })
+				# self.copyGen().swap(sink,strategy).\
+					# rCreateConsistentMerges	(\
+											# sinks_remaining,\
+											# edge_mapper,\
+											# complete_merges\
+											# )\
+									 # for strategy in edge_mapper[sink]\
+									# })
 								
 		strategies = edge_mapper[sink]
 		for strategy in edge_mapper[sink]:
 			self_copy = self.copyGen()
-			self_copy.swap(sink,strategy)
+			self_copy.swap(sink, strategy)
 			complete_merges.update(self_copy.rCreateConsistentMerges(	sinks_remaining,\
 																		edge_mapper,\
 																		complete_merges))
@@ -193,12 +193,12 @@ def extractElementsubGraphFromElement(G, element, Type):
 	Edges = G.rGetDescendantEdges(element)
 	Elements = G.rGetDescendants(element)
 	Constraints = G.rGetDescendantConstraints(element)
-	return Type(element.id,\
-				type = element.type, \
-				name=element.name, \
-				Elements = Elements, \
-				root_element = element,\
-				Edges = Edges, \
-				Constraints = Constraints\
+	return Type(	element.id,\
+					type = element.type, \
+					name=element.name, \
+					Elements = Elements, \
+					root_element = element,\
+					Edges = Edges, \
+					Constraints = Constraints\
 				)
 	
