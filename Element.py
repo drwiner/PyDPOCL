@@ -16,30 +16,42 @@ class Element:
 	def __init__(self, id, type = None, name = None):
 		self.id = id
 		self.type = type
+		#Optional:
 		self.name = name
 		
 	def isConsistent(self, other):
-		#""" Returns True if self and other have same name or unassigned"""
-		if not other.type is None:
+		""" Returns True if self and other have same name or unassigned"""
+		if not self.type is None and not other.type is None:
 			if self.type != other.type:
+				return False
+		if not self.name is None and not other.name is None:
+			if self.name != other.name:
 				return False
 		return True
 		
 	def isCoConsistent(self, other):
-		if self.isConsistent(other) and other.isConsistent(self):
-			return True
-		return false
+		return self.isConsistent(other)
 		
 	def isIdentical(self, other):
 		if self.id == other.id:
-			if self.isEquivalent(other):
+			if self.isEqual(other):
 				return True
 		return False
 		
 	def isEquivalent(self, other):
-		if self.type == other.type:
-			return True
-		return False
+		"""Another element is equivalent with self iff 
+				for each non-None parameter in self, 
+					other's parameter == 
+					and cannot be None
+				and if for each None parameter in self,
+					other's parameter cannot be None
+		"""
+		
+		if not self.type is None:
+			if self.type != other.type:
+				return False
+				
+		return True
 		
 	def isEqual(self, other):
 		if self.isEquivalent(other) and other.isEquivalent(self):
@@ -66,12 +78,27 @@ class InternalElement(Element):
 		self.num_args = num_args
 	
 	def isEquivalent(self, other):
-		# for each incident edge of other, there is a unique equivalent edge of self
-		# and for each constraint of other, there is no uniqe equivalent edge of self
-		if not (super(InternalElement,self).isEquivalent(other) \
-			and self.name == other.name \
-			and self.num_args == other.num_args):
+		"""Another element is equivalent with self iff 
+				for each non-None parameter in self, 
+					other's parameter == 
+					and cannot be None 
+				and if for each None parameter in self,
+						other's parameter must be None
+		"""
+		if not super(InternalElement,self).isEquivalent(other):
 			return False
+		
+
+		if not self.name is None:
+			if self.name != other.name:
+				return False
+				
+		# must be num_args if there is no name
+		if not other.name is None:
+			if self.num_args == 0:
+				if self.num_args != other.num_args:
+					return False
+				
 		return True
 			
 	
@@ -81,13 +108,12 @@ class InternalElement(Element):
 		if not super(InternalElement,self).isConsistent(other):
 			return False
 				
-		#If other has an argument number, then return False if they are not the same
-		if other.num_args > 0:
+		if self.num_args >0 and other.num_args > 0:
 			if self.num_args != other.num_args:
 				return False
-	
+
 		#If other has a predicate name, then return False if they are not the same
-		if not other.name is None:
+		if not self.name is None and not other.name is None:
 			if self.name != other.name:
 				return False
 				
@@ -120,8 +146,9 @@ class Operator(InternalElement):
 		if not super(Operator,self).isConsistent(other):
 			return False
 		
-		if not other.executed is None and self.executed != other.executed:
-			return False
+		if not other.executed is None and not self.executed is None:
+			if self.executed != other.executed:
+				return False
 		
 		return True
 				
@@ -149,7 +176,7 @@ class Literal(InternalElement):
 		if not super(Literal,self).isConsistent(other):
 			return False
 				
-		if not other.truth is None:
+		if not self.truth is None and not other.truth is None:
 			if self.truth != other.truth:
 				return False
 				
@@ -161,12 +188,11 @@ class Literal(InternalElement):
 		return False
 		
 	def isEquivalent(self,other):
-		if self.name != other.name:
+		if not super(Literal, self).isEquivalent(other):
 			return False
-		if self.type != other.type:
-			return False
-		if self.truth != other.truth:
-			return False
+		if not self.truth is None:
+			if self.truth != other.truth:
+				return False
 		return True
 		
 	def isEqual(self, other):
@@ -207,6 +233,12 @@ class Argument(Element):
 		if len(other.arg_pos_dict) == 0:
 			return True
 			
+		if not self.isConsistentArgPosDict(other):
+			return False
+			
+		return True
+	
+	def isConsistentArgPosDict(self, other):
 		for id, pos in other.arg_pos_dict.items():
 			if id in self.arg_pos_dict:
 				if other.arg_pos_dict[id] != self.arg_pos_dict[id]:
@@ -214,6 +246,8 @@ class Argument(Element):
 		return True
 	
 	def isEquivalent(self, other):
+		""" isEquivalent if for all shared keys, the value is the same.
+		"""
 		""" equivalent if for super equivalent and 
 			for every id:pos in other, id in self and id: pos
 			BUT cannot be equivalent if it has no arg_pos_dict
@@ -224,11 +258,8 @@ class Argument(Element):
 		if len(other.arg_pos_dict) == 0:
 			return False
 			
-		for id,pos in other.arg_pos_dict.items(): 
-			if not id in self.arg_pos_dict:
-				return False
-			if other.arg_pos_dict[id] != self.arg_pos_dict[id]:
-				return False
+		if not self.isConsistentArgPosDict(other):
+			return False
 				
 		return True
 		
