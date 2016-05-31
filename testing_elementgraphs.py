@@ -105,6 +105,30 @@ Example_graph =	 Action(	id = 1111, \
 Excavate_graph.print_graph()
 Example_graph.print_graph()
 
+""" Test Clone"""
+print("\n \t TEST Clone \n")
+print('num_elements in excavate Before Clone Example:')
+print(len(Excavate_graph.elements))
+print('num_edges in excavate Before Clone Example:')
+print(len(Excavate_graph.edges))
+print("\n")	
+
+excavate_clone = Excavate_graph.copyGen()
+
+print('num_elements in excavate After Clone Example:')
+print(len(excavate_clone.elements))
+print('num_edges in excavate After Clone Example:')
+print(len(excavate_clone.edges))
+print("\n")	
+
+print('rGetDescendantEdges test real vs clone edges \n')
+
+print(len(Excavate_graph.rGetDescendantEdges(p1)))
+
+#print(len(excavate_clone.rGetDescendantEdges(p1)))
+p1_prime = excavate_clone.getElementById(p1.id)
+print(len(excavate_clone.rGetDescendantEdges(p1_prime)))
+
 """ Test Absolve"""
 print("\n \t TEST Absolve \n")
 print('num_elements in excavate Before Absolve Example:')
@@ -180,42 +204,49 @@ if b != a - 1:
 		print(E.id)
 
 		
-"""Test rGetDescendants """
-print("\n \t TEST getElementGraphFromElement \n")
-print('descendants')
-print(len(Excavate_graph.rGetDescendants(p1)))
-print('descendant edges')
-print(len(Excavate_graph.rGetDescendantEdges(p1)))
 		
 """Test getElementGraphFromElement """
 print("\n \t TEST getElementGraphFromElement \n")
-excavate_clone = Excavate_graph.copyGen()
-Action.makeElementGraph(Excavate_graph, p1)
-print('test real vs clone edges')
+
+print(len(Excavate_graph.rGetDescendantConstraints(p1_prime)))
+
+#p1_graph = Action.makeElementGraph(excavate_clone, p1)
+
+
+print('num_descendant elements in excavate Before getElementGraphFromElement:')
+print(len(Excavate_graph.rGetDescendants(p1)))
+print('num descendant edges in excavate Before getElementGraphFromElement:')
 print(len(Excavate_graph.rGetDescendantEdges(p1)))
-print(len(excavate_clone.rGetDescendantEdges(p1)))
 
-print('num_elements in excavate Before getElementGraphFromElement:')
-print(len(Excavate_graph.elements))
-print('num_edges in excavate Before getElementGraphFromElement:')
-print(len(Excavate_graph.edges))
-
-print('\n Literal \n')
+print('\n Literal with type Condition \n')
 print(p1.id)
 print(p1.type)
-sub_graph = excavate_clone.getElementGraphFromElement(p1,eval(p1.type))
-print('\n sub_graph \n')
+sub_graph = excavate_clone.getElementGraphFromElement(p1_prime,eval(p1_prime.type))
+print('\n Condition \n')
 print(sub_graph.id)
 print(sub_graph.type)
 print(' \n')
 print('num_elements in excavate Condition After getElementGraphFromElement:')
 print(len(sub_graph.elements))
-print('num_edges in excavate Condition After getElementGraphFromElement:')
+print('num_edges in subgraph Condition After getElementGraphFromElement:')
 print(len(sub_graph.edges))
-print(len(excavate_clone.rGetDescendantEdges(p1)))
-print(len(sub_graph.rGetDescendantEdges(p1)))
+print('descendant edges in original')
+print(len(excavate_clone.rGetDescendantEdges(p1_prime)))
+print('descendant edges in subgraph')
+print(len(sub_graph.rGetDescendantEdges(p1_prime)))
+
+""" Testing mergeEdgesFromSource """
+print("\n \t TEST mergeEdgesFromSource \n")
+# mergeEdgesFromSource(self, other, edge_source, mergeable_edges = set()):
+# Accomodates all edges in mergeable_edges in other to the new edge_source
+# Idea: add an edge to sub_graph, then see if we can merge sub_graph back in
+print('num_edges in excavate before merge edges from sub_graph')
+print(len(Excavate_graph.edges))
+excavate_clone.mergeEdgesFromSource(sub_graph, p1_prime, sub_graph.edges)
+print('num_edges in excavate_clone after merge edges from sub_graph')
+print(len(excavate_clone.edges))
+
 
 """ Testing ElementGraph Operations"""
-	#getElementGraphFromElement
 	#mergeAt
 	#rMerge
