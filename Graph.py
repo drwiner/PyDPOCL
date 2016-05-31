@@ -61,11 +61,10 @@ class Graph(Element):
 	def print_graph(self):
 		print('edges:')
 		for edge in self.edges:
-			print('[')
+			print('|')
 			edge.source.print_element()
 			print(edge.label)
 			edge.sink.print_element()
-			print(']')
 		
 	def addEdge(self, edge):
 		if edge not in self.edges:
