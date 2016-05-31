@@ -31,17 +31,30 @@ class ElementGraph(Graph):
 					Constraints = self.rGetDescendantConstraints(element)\
 					)
 					
-	def swap(self,source, other):
-		"""Swaps source in self for other, an ElementGraph"""
+	def swap(self, source, other):
+		"""	Completely replaces source with other.root and all descending
+			Assumes that other has already merged important parts of descendants of source
+			1) Remove source's subtree, 2) add other
+			
+		"""
 		#If an operator, make sure to mergeArgs
-		{edge.swapSink(other.root) for edge in self.edges if source is Identical(edge.sink)}
+		
+		#Step 1: remove all descendant edges
+		{self.edges.remove(edge) for edge in self.edges if edge.source.isIdentical(source)}
+		self.edges.union(
+						{edge.swapSource(other.root) \
+							for edge in self.edges \
+								if not source.merge(edge) is None
+						})
+				
+		{edge.swapSink(other.root) for edge in self.edges if source.isIdentical(edge.sink)}
 		{self.edges.remove(edge) for edge in self.rGetDescendantEdges(source)}
 		{self.elements.remove(element) for element in self.rGetDescendants(source)}
 		{self.constraints.remove(edge) for edge in self.rGetDescendantConstraints(source)}
 		return self
 			
 	def mergeEdgesFromSource(self, other, edge_source, mergeable_edges = set()):
-		""" Treats all edges as unique, does not merge the edges, merges source"""
+		""" Accommodates, does not merge the edges, merges source"""
 		if edge_source.merge(other.root) is None:
 			return None
 			
@@ -61,7 +74,9 @@ class ElementGraph(Graph):
 	
 		return self		
 			
-	def mergeAt(self, other, edge_source):		
+	def mergeAt(self, other, edge_source):
+		""" Steals all edges from other, adds edges to edges_source"""
+		""" All edges are 'Accomodated' """"
 		return self.mergeEdgesFromSource(	other, \
 											edge_source, \
 											other.getIncidentEdges(other.root)\
@@ -182,6 +197,7 @@ class ElementGraph(Graph):
 		strategies = edge_mapper[sink]
 		for strategy in edge_mapper[sink]:
 			self_copy = self.copyGen()
+			#Swap: given strategy/graph, pin the root onto sink element
 			self_copy.swap(sink, strategy)
 			complete_merges.update(self_copy.rCreateConsistentMerges(	sinks_remaining,\
 																		edge_mapper,\

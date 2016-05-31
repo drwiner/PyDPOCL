@@ -25,18 +25,19 @@ class Edge:
 		return False
 		
 	def merge(self, other):
-		"""Returns merge other.sink into self.sink"""
-		#Assume source is already equal and edge label is already equal
-		if not self.source.isEqual(other.source):
-			return False
-		#Assume edges are co-consistent
+		"""Merges source and sink"""
+
+		#Assume edges are consistent
 		if not self.isConsistent(other):
-			return False
+			return None
+			
+		self.source.merge(other.source)
+		self.sink.merge(other.sink)
 		
-		return self.sink.merge(other.sink)
+		return self
 	
 	def swapSource(self,source):
-		self.source = source
+		self.source= source
 		return self
 	
 	def swapSink(self,sink):

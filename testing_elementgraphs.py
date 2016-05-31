@@ -116,6 +116,11 @@ print('Absolves <-: ', Example_graph.absolves(Excavate_graph))
 #print("Operators", example.isConsistent(excavate))
 Excavate_graph.print_graph()
 #print(item.isConsistent(place))
-consistent_merges = Example_graph.Merge(Excavate_graph)
-for i in consistent_merges:
-	print(i.id)
+#consistent_merges = Example_graph.Merge(Excavate_graph)
+#for i in consistent_merges:
+#	print(i.id)
+
+""" Testing ElementGraph Operations"""
+	#Test swap
+	#getElementGraphFromElement
+	# 
