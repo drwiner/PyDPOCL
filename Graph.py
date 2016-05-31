@@ -59,6 +59,7 @@ class Graph(Element):
 		self.constraints = Constraints
 		
 	def print_graph(self):
+		print("-------", self.id, self.type, self.name, "-----")
 		print('edges:')
 		for edge in self.edges:
 			print('|')
