@@ -99,7 +99,7 @@ class Graph(Element):
 		#Base Case
 		incidentEdges = self.getIncidentEdges(element)
 		if len(incidentEdges) == 0:
-			return element
+			return {element}
 			
 		#Induction
 		for edge in incidentEdges:

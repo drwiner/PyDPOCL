@@ -67,7 +67,7 @@ class Element:
 			return self
 		if self.type is None and not other.type is None:
 			self.type = other.type
-		if self.name is none and not other.name is None:
+		if self.name is None and not other.name is None:
 			self.name = other.name
 		return self
 		

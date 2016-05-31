@@ -10,9 +10,9 @@ p4 = Literal(id=5, type='Condition', name= 'knows-location', 	num_args = 3, trut
 e1 = Literal(id=6, type='Condition', name='burried',	num_args=2,	 truth = False)
 e2 = Literal(id=7, type='Condition', name='has', 		num_args=2,	 truth = True)
 
-consent = Argument(	id=8,	 	type='actor',	 arg_pos_dict = {excavate.id :	1})
-item = Argument(	id = 9, 	type='var',		 arg_pos_dict=	{excavate.id :  2})
-place = Argument(	id = 10, 	type='var',		 arg_pos_dict=	{excavate.id :  3})
+consent = 	Argument(id=8,	 	type='actor',	 arg_pos_dict = {excavate.id :	1})
+item = 		Argument(id = 9, 	type='var',		 arg_pos_dict=	{excavate.id :  2})
+place = 	Argument(id = 10, 	type='var',		 arg_pos_dict=	{excavate.id :  3})
 
 edge0 = Edge(excavate, consent, 'actor-of')
 edge1 = Edge(excavate, p1,	 	'precond-of')
@@ -50,6 +50,7 @@ example = Operator(id = 111, type= 'Action')
 
 example_p1 =		Literal(id=211, 		type='Condition', 		name='alive', 			truth = True)
 example_e1 = 		Literal(id=311, 		type = 'Condition', 	name='has', 			truth = True)
+example_e3 = 		Literal(id=911, 		type = 'Condition', 	name='has', 			truth = True)
 ex_const_element = 	Literal(id=611, 		type ='Condition',		name='knows-location', 	truth = True)
 example_actor = 	Argument(id=411, 		type='actor',			arg_pos_dict={example.id : 1})
 example_item = 		Argument(id=511,		type='var', 			arg_pos_dict={})
@@ -61,6 +62,8 @@ example_edge2 = Edge(example_p1, example_actor, 'first-arg')
 example_edge3 = Edge(example_e1, example_actor, 'first-arg')
 example_edge4 = Edge(example_e1, example_item, 	'sec-arg')
 
+example_edge5 = Edge(example,	 example_e3, 	'effect-of')
+
 #Cannot have a precondition with name 'knows-location', first-arg is actor, sec-arg is item
 #Since we know this is precondition of excavate, the example_graph should not be consistent
 
@@ -71,6 +74,7 @@ example_constraint_edge1 = Edge(ex_const_element, example_item, 	'sec-arg')
 example_elements = 	{	example, \
 						example_p1, \
 						example_e1, \
+						example_e3,\
 						example_actor, \
 						example_item,\
 						ex_const_element}
@@ -79,6 +83,7 @@ example_edges = 	{	example_edge0, \
 						example_edge1,\
 						example_edge2, \
 						example_edge3, \
+						example_edge5,\
 						example_edge4}
 						
 example_constraints = {	example_constraint_edge0, \
@@ -112,3 +117,5 @@ print('Absolves <-: ', Example_graph.absolves(Excavate_graph))
 
 #print(item.isConsistent(place))
 consistent_merges = Example_graph.Merge(Excavate_graph)
+for i in consistent_merges:
+	print(i.id)

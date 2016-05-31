@@ -84,7 +84,7 @@ class ElementGraph(Graph):
 				}
 	
 	def Merge(self, other):
-		return self.rMerge(other, other.root)
+		return self.rMerge(other, self.root)
 	
 	def rMerge(self, other, self_element, consistent_merges = set()):
 		""" Returns set of consistent merges, which are Edge Graphs of the form self.merge(other)""" 
@@ -92,10 +92,10 @@ class ElementGraph(Graph):
 		
 		#Get next edges
 		otherEdges = other.getIncidentEdges(other.root)
-		
+		print('how many incident edges: ', len(otherEdges))
 		#BASE CASE
 		if len(otherEdges) == 0:
-			return self
+			return {self}
 			
 		
 		consistent_edge_pairs = self.getConsistentEdgePairs(self.getIncidentEdges(self_element), \
@@ -106,7 +106,7 @@ class ElementGraph(Graph):
 		if len(consistent_edge_pairs) == 0:
 			if self.mergeAt(other, self_element) is None:
 				return None
-			return self
+			return {self}
 			
 		#INDUCTION	
 		
@@ -151,10 +151,12 @@ class ElementGraph(Graph):
 		
 		#Then, for each entry edge, pick a merge and move on. If we get through the whole thing, then we've found a consistent_merge
 		
-		return self.rCreateConsistentMerges(set(edge_mapper.keys()),\
-											edge_mapper,\
-											consistent_merges\
+		return self.rCreateConsistentMerges(	set(edge_mapper.keys()),\
+												edge_mapper,\
+												consistent_merges\
 											)
+											
+		#return consistent_merges
 	
 	def rCreateConsistentMerges(self, 	sinks_remaining = set(), \
 										edge_mapper = {}, \
@@ -167,21 +169,23 @@ class ElementGraph(Graph):
 			return complete_merges
 
 		sink = sinks_remaining.pop()
-		complete_merges.update	({\
-									self.copyGen().swap(sink,strategy).\
-													rCreateConsistentMerges	(\
-																			sinks_remaining,\
-																			edge_mapper,\
-																			complete_merges\
-																			)\
-								 for strategy in edge_mapper[sink]\
-								})
+		# complete_merges.update	({\
+									# self.copyGen().swap(sink,strategy).\
+													# rCreateConsistentMerges	(\
+																			# sinks_remaining,\
+																			# edge_mapper,\
+																			# complete_merges\
+																			# )\
+								 # for strategy in edge_mapper[sink]\
+								# })
 								
-		# strategies = edge_mapper[sink]
-		# for strategy in strategies:
-			# self_copy = self.copyGen()
-			# self_copy.swap(sink,strategy)
-			# complete_merges.update(self_copy.rCreateConsistentMerges(sinks_remaining,edge_mapper,complete_merges))
+		strategies = edge_mapper[sink]
+		for strategy in edge_mapper[sink]:
+			self_copy = self.copyGen()
+			self_copy.swap(sink,strategy)
+			complete_merges.update(self_copy.rCreateConsistentMerges(	sinks_remaining,\
+																		edge_mapper,\
+																		complete_merges))
 			
 		return complete_merges
 
