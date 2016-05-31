@@ -79,12 +79,8 @@ example_elements = 	{	example, \
 						example_item,\
 						ex_const_element}
 						
-example_edges = 	{	example_edge0, \
-						example_edge1,\
-						example_edge2, \
-						example_edge3, \
-					#	example_edge5,\
-						example_edge4}
+example_edges = 	{example_edge0,example_edge1,example_edge2,example_edge3,example_edge4}
+
 						
 example_constraints = {	example_constraint_edge0, \
 						example_constraint_edge1}
@@ -120,6 +116,22 @@ Excavate_graph.print_graph()
 #for i in consistent_merges:
 #	print(i.id)
 
+
+
+""" Test elementGraph swap """
+print("TEST swap \n")
+example_clone = Example_graph.copyGen()
+print(example_clone.id)
+print('num_elements:')
+print(len(example_clone.elements))
+print('num_edges:')
+print(len(example_clone.edges))
+example_clone.elements.add(example_e3)
+example_clone.edges.add(example_edge5)
+print('num_elements After add:')
+print(len(example_clone.elements))
+print('num_edges After add:')
+print(len(example_clone.edges))
 """ Testing ElementGraph Operations"""
 	#Test swap
 	#getElementGraphFromElement

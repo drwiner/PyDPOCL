@@ -16,7 +16,7 @@ class ElementGraph(Graph):
 		self.root = root_element		
 		
 	def copyGen(self):
-		yield copy.deepcopy(self)
+		return copy.deepcopy(self)
 		
 	def getElementGraphFromElement(self, element, Type):
 		if self.root is element:

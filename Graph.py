@@ -1,4 +1,5 @@
 from Element import *
+import copy
 
 class Edge:
 	def __init__(self, source, sink, label):
@@ -203,7 +204,7 @@ class Graph(Element):
 	def absolves(self, other):
 		""" A graph absolves another iff for each other.edge, there is a consistent self.edge
 		"""
-		if rDetectConsistentEdgeGraph(Remaining = other.edges, Available = self.edges):
+		if rDetectConsistentEdgeGraph(Remaining = copy.deepcopy(other.edges), Available = copy.deepcopy(self.edges)):
 			print('consistent without constraints')
 			if not self.equivalentWithConstraints(other):
 				print('consistent with constraints')
@@ -264,7 +265,7 @@ class Graph(Element):
 		descendant_edges = self.rGetDescendantEdges(self_element)
 		constraints = other.rGetDescendantConstraints(constraint_element)
 		#Equivalent if we can find an equivalent edge graph
-		return rDetectEquivalentEdgeGraph(constraints, descendant_edges)
+		return rDetectEquivalentEdgeGraph(copy.deepcopy(constraints), copy.deepcopy(descendant_edges))
 		
 def rDetectConsistentEdgeGraph(Remaining = set(), Available = set()):
 	""" Returns True if all remaining edges can be assigned a consistent non-used edge in self """
