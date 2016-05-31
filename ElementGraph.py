@@ -221,14 +221,12 @@ class ElementGraph(Graph):
 					
 					Induction: 
 							Case 1 incident edge is consistent with some other edge
-							Case 2 incident edge sink is consistent with some self.element (but no consistent edge)
-							Case 3 incident edge is inconsistent with any edge (i.e. no consistent sink)
+							Case 2 incident edge sink is inconsistent (but may have consistent sink)
 							
 							Methods:
 								A)	self_sink.merge(other_sink)
 								B)	create element (and add to elements)
 								C)	add edge to self_sink
-								
 							
 							Case 1:
 								1) A 				- Assimilate
@@ -236,12 +234,8 @@ class ElementGraph(Graph):
 							Case 2:
 								1) A then C			- Assimilate
 								2) B then C			- Accomodate
-							Case 3:
-								1) B then C			- Accomodate
 								
-
 		""" 
-		#self_element.merge(other_element)
 		
 		#Get next edges
 		otherEdges = other.getIncidentEdges(other.root)
@@ -255,83 +249,95 @@ class ElementGraph(Graph):
 		
 		consistent_edge_pairs	= 	self.getConsistentEdgePairs(self.getIncidentEdges(self_element),otherEdges)
 		inconsistent_edges		= 	self.getInconsistentEdges(otherEdges,consistent_edge_pairs)
-		
-		#new_merges are merges that were recursively successful at commitment to assimilate vs accomodate
-		#But, says nothing about 
+
 		new_merges	=set()				
-		
+		edge_mapper = {}
 		#Case 1
 		for e, oe in consistent_edge_pairs:
 			#Assimilate
-				""" A """ 
-				new_merges.update(self.assimilate(other, e.sink, oe.sink, consistent_merges))
+			new_merges.update(self.assimilate(other, e.sink, oe.sink, consistent_merges))
 			#Accomodate
-				""" B then C"""
-				new_merges.update(self.accomodateNewEdge(other, e.sink, oe, consistent_merges))
-				
-		#Cases 2-3
+			new_merges.update(self.accomodateNewEdge(other, e.sink, oe, consistent_merges))
+			#Map actions to edge
+			edge_mapper[oe.sink].update(new_merges)
+		#Case 2
 		for ie in inconsistent_edges:
-			#Assimilate Case 2
-				""" A then C""" 
-				prospects = {consistent_element for consistent_element in self.elements if consistent_element.isConsistent(ie.sink)}
-				new_merges.update({self.accomodateNewEdge(other, self_element, prospect, ie, consistent_merges) for prospect in prospects})
-			#Accomodate Case 2
-			
-			
-															
-		#If they're all inconsistent, then let's just get to den, aye?
-		if len(consistent_edge_pairs) == 0:
-			if self.mergeAt(other, self_element) is None:
-				return None
-			return {self}
-			
-		#INDUCTION	
-		
-		#First, merge inconsistent other edges, do this on every path
-		self.mergeEdgesFromSource(	other, \
-									self.element, \
-									self.getInconsistentEdges(\
-															otherEdges,\
-															consistent_edge_pairs\
-															)\
-									) 
-										
-		#For each pair of consistent edges, create a copy of self and see what happens if we merge sinks and rMerge onward
-		#For each consistent_edge, try assimilating, and try accomodating. For each one that works,
-		edge_mapper = {}
-		for e,oe in consistent_edge_pairs:
-			accomodate_self = self.getElementGraphFromElement(e.sink, e.sink.type)
-			assimilate_self = self.getElementGraphFromElement(e.sink, e.sink.type)
-			to_merge 		= other.getElementGraphFromElement(oe.sink, oe.sink.type)
-	
-			#Can we rMerge from the sinks? (Let this be the same edge)
-			assimilate_merges = assimilate_self.rMerge(to_merge)
-			
-			#Can we accomodate this new edge (let this be a new edge)
-			
-			if not type(e.sink) == Literal\
-				and not accomodate_self.mergeEdgesFromSource(	other, \
-																e.sink, \
-																{o}\
-															) 	is None:
-				accomodate_merges = accomodate_self.rMerge(to_merge)
-			else:
-				accomodate_merges = set()
+			#Assimilate
+			prospects = {consistent_element for consistent_element in self.elements if consistent_element.isConsistent(ie.sink)}
+			new_merges.update({self.accomodateNewEdge(other, self_element, prospect, ie, consistent_merges) for prospect in prospects})
+			#Accomodate
+			new_merges.update(self.accomodate(other, ie, consistent_merges))
+			#Map actions to edge
+			edge_mapper[ie.sink].update(new_merges)
 				
-			if len(assimilate_merges) ==0 and len(accomodate_merges) == 0:
-				"""e.sink has no consistent merge with other.sink"""
-				print('e.sink has no consistent merge with other.sink')
-				return None
+		""" What to do with new_merges, which only represent an action per incident edge...?
+				Goal: 	For each edge, choose one action. Must find all assignments of actions-edges that satisfy
+				Idea:	Map actions to edges. The edge_mapper. Then use swap to see if it works
+				IDs:	
+		"""
+		#FAIL
+		if len(new_merges) == 0:
+			return none
 			
-			edge_mapper[e.sink].update(assimilate_merges)
-			edge_mapper[e.sink].update(accomodate_merges)
-		
-		#Then, for each entry edge, pick a merge and move on. If we get through the whole thing, then we've found a consistent_merge
-		
 		return self.rCreateConsistentMerges(	set(edge_mapper.keys()),\
 												edge_mapper,\
 												consistent_merges\
 											)
+											
+															
+		# #If they're all inconsistent, then let's just get to den, aye?
+		# if len(consistent_edge_pairs) == 0:
+			# if self.mergeAt(other, self_element) is None:
+				# return None
+			# return {self}
+			
+		# #INDUCTION	
+		
+		# #First, merge inconsistent other edges, do this on every path
+		# self.mergeEdgesFromSource(	other, \
+									# self.element, \
+									# self.getInconsistentEdges(\
+															# otherEdges,\
+															# consistent_edge_pairs\
+															# )\
+									# ) 
+										
+		# #For each pair of consistent edges, create a copy of self and see what happens if we merge sinks and rMerge onward
+		# #For each consistent_edge, try assimilating, and try accomodating. For each one that works,
+		# edge_mapper = {}
+		# for e,oe in consistent_edge_pairs:
+			# accomodate_self = self.getElementGraphFromElement(e.sink, e.sink.type)
+			# assimilate_self = self.getElementGraphFromElement(e.sink, e.sink.type)
+			# to_merge 		= other.getElementGraphFromElement(oe.sink, oe.sink.type)
+	
+			# #Can we rMerge from the sinks? (Let this be the same edge)
+			# assimilate_merges = assimilate_self.rMerge(to_merge)
+			
+			# #Can we accomodate this new edge (let this be a new edge)
+			
+			# if not type(e.sink) == Literal\
+				# and not accomodate_self.mergeEdgesFromSource(	other, \
+																# e.sink, \
+																# {o}\
+															# ) 	is None:
+				# accomodate_merges = accomodate_self.rMerge(to_merge)
+			# else:
+				# accomodate_merges = set()
+				
+			# if len(assimilate_merges) ==0 and len(accomodate_merges) == 0:
+				# """e.sink has no consistent merge with other.sink"""
+				# print('e.sink has no consistent merge with other.sink')
+				# return None
+			
+			# edge_mapper[e.sink].update(assimilate_merges)
+			# edge_mapper[e.sink].update(accomodate_merges)
+		
+		# #Then, for each entry edge, pick a merge and move on. If we get through the whole thing, then we've found a consistent_merge
+		
+		# return self.rCreateConsistentMerges(	set(edge_mapper.keys()),\
+												# edge_mapper,\
+												# consistent_merges\
+											# )
 											
 		#return consistent_merges
 	
@@ -345,18 +351,7 @@ class ElementGraph(Graph):
 		if len(sinks_remaining) == 0:
 			return self
 
-		sink = sinks_remaining.pop()
-		# complete_merges.update	({\
-				# self.copyGen().swap(sink,strategy).\
-					# rCreateConsistentMerges	(\
-											# sinks_remaining,\
-											# edge_mapper,\
-											# complete_merges\
-											# )\
-									 # for strategy in edge_mapper[sink]\
-									# })
-								
-		strategies = edge_mapper[sink]
+		sink = sinks_remaining.pop()					
 		for strategy in edge_mapper[sink]:
 			self_copy = self.copyGen()
 			#Swap: given strategy/graph, pin the root onto sink element
