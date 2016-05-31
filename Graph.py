@@ -13,12 +13,6 @@ class Edge:
 		if self.source.isConsistent(other.source) and self.sink.isConsistent(other.sink) and self.label == other.label:
 			return True
 		return False
-		
-	def isCoConsistent(self,other):
-		if self.isCoConsistent(other) and other.isCoConsistent(self):
-			return True
-			
-		return False
 
 	def isEquivalent(self, other):
 		if self.source.isEquivalent(other.source) and self.sink.isEquivalent(other.sink) and self.label == other.label:
@@ -36,7 +30,7 @@ class Edge:
 		if not self.source.isEqual(other.source):
 			return False
 		#Assume edges are co-consistent
-		if not self.isCoConsistent(other):
+		if not self.isConsistent(other):
 			return False
 		
 		return self.sink.merge(other.sink)
@@ -152,8 +146,9 @@ class Graph(Element):
 	
 	
 	################  Consistency ###############################
-	def isConsistent(self, other):
-		""" Returns True if for every edge in other_graph, there is some consistent edge in self"""
+	def absolves(self, other):
+		""" A graph absolves another iff for each other.edge, there is a consistent self.edge
+		"""
 		if rDetectConsistentEdgeGraph(Remaining = other.edges, Available = self.edges):
 			print('consistent without constraints')
 			if not self.equivalentWithConstraints(other):
@@ -161,10 +156,11 @@ class Graph(Element):
 				return True
 		return False
 		
-	def isCoConsistent(self,other):
+	def coAbsolvant(self, other):
 		if self.isConsistent(other) and other.isConsistent(self):
 			return True
 		return False
+		
 	###############################################################
 		
 	def elementsAreConsistent(self, other, self_element, other_element):
@@ -197,7 +193,7 @@ class Graph(Element):
 							if edge.source.isEquivalent(c.source)\
 						}
 			for suspect in suspects:
-				print('suspect id: ', suspect.id)
+				print('suspect: (', suspect.id, 'has ', c.label, '-', c.sink.type, ')')
 				if self.constraintEquivalentWithElement(other, \
 														suspect, \
 														c.source\
@@ -227,12 +223,14 @@ def rDetectConsistentEdgeGraph(Remaining = set(), Available = set()):
 
 	other_edge = Remaining.pop()
 	print('remaining ', len(Remaining))
+	#print('available ', len(Available))
 	for prospect in Available:
+		#print('prospect ,', prospect.source.id, ' ', 	prospect.label, ' ', 	prospect.sink.id)
+		#print('other_edge ,', other_edge.source.id, ' ', other_edge.label, ' ', 	other_edge.sink.id)
 		if prospect.isConsistent(other_edge):
 			if rDetectConsistentEdgeGraph(	Remaining, \
 											{item \
-												for item in Available \
-													if not (item is prospect)\
+												for item in Available - {prospect}\
 											}):
 				return True
 	return False

@@ -72,7 +72,7 @@ class ElementGraph(Graph):
 		return {(edge,other_edge) \
 									for edge in incidentEdges \
 									for other_edge in otherEdges \
-												if edge.isCoConsistent(other)\
+												if edge.isConsistent(other)\
 				}
 				
 	def getInconsistentEdges(self, other_edges, consistent_edge_pairs):

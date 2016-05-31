@@ -100,13 +100,16 @@ Example_graph =	 Action(	id = 1111, \
 							Edges = example_edges, \
 							Constraints = example_constraints)
 
-#print('consistent ->:',	 Excavate_graph.isConsistent(Example_graph))
 
-print('consistent <-: ', Example_graph.isConsistent(Excavate_graph))
-""" False, ought to be true
-		Consistency: 
+print('Absolves ->:',	 Excavate_graph.absolves(Example_graph))
+""" True because 
+"""
+print('Absolves <-: ', Example_graph.absolves(Excavate_graph))
+""" Not True because, consistency 
 """
 item = Argument(	id = 9, 	type='var',		 arg_pos_dict=	{excavate.id :  2})
 place = Argument(	id = 10, 	type='var',		 arg_pos_dict=	{excavate.id :  3})
-print(item.isConsistent(place))
+#print("Operators", example.isConsistent(excavate))
+
+#print(item.isConsistent(place))
 #Example_graph.rMerge()

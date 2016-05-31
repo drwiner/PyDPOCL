@@ -84,7 +84,7 @@ class Action(ElementGraph):
 		prospects = {(eff,pre) \
 								for eff in effects \
 								for pre in preconditions \
-										if eff.isCoConsistent(pre)\
+										if eff.isConsistent(pre)\
 					}
 					
 		if len(prospects)  == 0:
@@ -121,14 +121,21 @@ class CausalLink(Edge):
 		self.dependency = condition #A literal element#
 		
 	def isInternallyConsistent(self):
-		effects = {egde.sink for edge in self.edges if edge.label == 'effect-of' and edge.sink.id == self.condition.id}
+		effects = 	{egde.sink \
+						for edge in self.edges \
+							if edge.label == 'effect-of' \
+							and edge.sink.id == self.condition.id\
+					}
+					
 		if len(effects) == 0:
 			return False
+			
 		preconditions = {edge.sink \
 							for edge in self.edges \
 								if edge.label == 'precond-of' \
 								and edge.sink.id == self.condition.id\
 						}
+						
 		if len(preconditions) == 0:
 			return False
 		return True
