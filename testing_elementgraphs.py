@@ -250,11 +250,12 @@ print("\n \t TEST rCreateConsistentEdgeGraph \n")
 #####
 #Completed = Example_graph.rCreateConsistentEdgeGraph(Excavate_graph, Remaining = Excavate_graph.edges, Available = Example_graph.edges)
 Completed = Excavate_graph_A.absolveFrom(Example_graph_A, Remaining = Example_graph_A.edges, Available = Excavate_graph_A.edges)
-print(len(Completed))
+
 
 attempt = Completed.pop()
 attempt.print_graph()
-
+print("\n num_collected ")
+print(len(Completed))
 # if Excavate_graph_A.absolves(Example_graph_A):
 	# EGA  = Excavate_graph_A.copyGen()
 	# EGA.constraints = Example_graph_A.constraints

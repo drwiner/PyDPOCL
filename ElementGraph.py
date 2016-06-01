@@ -113,17 +113,21 @@ class ElementGraph(Graph):
 			return {self}
 			
 		other_edge = Remaining.pop()
-		other_edge = Remaining.pop()
 		print('remaining ', len(Remaining))
 
+		found = False
 		for prospect in Available:
-			if prospect.isConsistent(other_edge):
+			if other_edge.isConsistent(prospect):
+				found = True
 				new_self = self.copyGen()
 				old_source = new_self.getElementById(prospect.source.id)
 				old_sink = new_self.getElementById(prospect.sink.id)
 				old_source.merge(other_edge.source)
 				old_sink.merge(other_edge.sink)
 				Collected.update(new_self.rCreateConsistentEdgeGraph(other,Remaining,Available-{prospect},Collected))
+				
+		if not found:
+			return None
 
 		
 		print('collected ', len(Collected))
