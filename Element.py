@@ -173,6 +173,7 @@ class InternalElement(Element):
 				return id
 		return False
 		
+		
 class Operator(InternalElement):
 	""" An operator element is an internal element with an executed status and orphan status"""
 	def __init__(self, id, type, name = None, num_args = 0, roles = {}, isOrphan = True, executed = None):
@@ -198,6 +199,11 @@ class Operator(InternalElement):
 			self.executed = other.executed
 			
 		return self
+		
+	def print_element(self):
+		print('executed:',self.executed,'orphan=',self.is_orphan,'(',self.id, self.type, self.name,')')
+		for key,value in self.roles.items():
+			print("\t id=", key,":","role=",value)
 
 		
 class Literal(InternalElement):

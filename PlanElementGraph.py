@@ -46,23 +46,6 @@ class Action(ElementGraph):
 					arg.arg_pos_dict[new_id] = arg.arg_pos_dict.pop(old_id)
 		return new_self
 	
-	def mergeArgs(self, other, remove = False):
-		"""For every other.arg dicionary value of the form ID: value, create self.root_element.id: value"""
-		#Remove = True: completely replace arg dictionary after finding positions. 
-			#Only makes sense for arguments in domain operators
-		#For all arguments in other.args i:arg
-			#if i already in self.Args, do not add
-			#Else, if 'i' not in self.Args, add self.Args.update({i:arg})
-			#Add self.id:value to the arg.arg_pos_dict each key,value where key is other.id
-	
-		for pos,arg in other.Args.items():
-			if not pos in self.Args:
-				self.Args.update({pos:arg})
-			#Remove id from other
-			if remove:
-				arg.arg_pos_dict = {self.root.id : pos}
-			arg.arg_pos_dict.update({self.root.id : pos })
-		return self
 											
 
 	def isConsistentAntecedentFor(self, action):
@@ -217,6 +200,9 @@ class IntentionFrame(ElementGraph):
 						and element.id != self.ms.id\
 				}\
 			}
+	
+	def addStep(self, Action)
+		if step.is_orphan
 		
 	def isInternallyConsistent(self):
 		for effect in self.sat.getEffects():

@@ -108,3 +108,5 @@ F 		=		IntentionFrame(id = 2222, type = 'intention_frame', name=None, \
 								Edges=example_edges,\
 								Constraints=example_constraints,\
 								actor=None)
+								
+print(len(F.Steps))
