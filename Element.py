@@ -211,6 +211,9 @@ class Literal(InternalElement):
 			self.truth = other.truth
 		return self
 		
+	def print_element(self):
+		print(self.truth, '(',self.id, self.type, self.name,')')
+		
 class Argument(Element):
 	""" An Argument Element is an element with a dictionary mapping operator ids to positions 
 		Bindings are stored on arguments. 

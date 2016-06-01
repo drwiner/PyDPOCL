@@ -248,6 +248,9 @@ print("\n \t TEST rCreateConsistentEdgeGraph \n")
 Completed = Example_graph.rCreateConsistentEdgeGraph(Excavate_graph, Remaining = Excavate_graph.edges, Available = Example_graph.edges)
 print(len(Completed))
 
+attempt = Completed.pop()
+attempt.print_graph()
+
 """ Testing ElementGraph Operations"""
 	#mergeAt
 	#rMerge
