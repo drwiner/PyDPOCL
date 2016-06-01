@@ -68,6 +68,17 @@ class Element:
 			self.name = other.name
 		return self
 		
+	def combine(self, other):
+		if not self.isConsistent(other):
+			return None
+		if self.isEqual(other):
+			return self
+		if other.merge(self) is None:
+			return None
+		if self.merge(other) is None:
+			return None
+		return self
+			
 	def print_element(self):
 		print('(',self.id, self.type, self.name,')')
 		

@@ -252,6 +252,25 @@ print(len(Excavate_graph_A.edges))
 merges = Excavate_graph_A.possible_mergers(Example_graph_A)
 print('merges')
 print(len(merges))
-merges.pop().print_graph()
+#merges.pop().print_graph()
 
 
+""" Testing Combine """
+print("\n \t TEST Combine \n")
+
+lit_1 = 		Literal(id=311, 		type = 'Condition', 	name='has', 			truth = True)
+lit_2 = 		Literal(id=911, 		type = 'Condition', 	name='has', 	num_args = 25,	truth = None)
+
+lit_2.combine(lit_1).print_element()
+print(lit_2.num_args)
+
+lit_1 = 		Literal(id=311, 		type = 'Condition', 	name='has', 			truth = True)
+lit_2 = 		Literal(id=911, 		type = 'Condition', 	name='has', 	num_args = 25,	truth = None)
+
+lit_1.combine(lit_2).print_element()
+print(lit_1.num_args)
+
+""" NEXT TESTS"""
+#NEED TO TEST EXAMPLE WITH MULTIPLE CONSISTENT MERGES
+#TEST WHETHER MERGE IS CONSISTENT IS INTERNALLY CONSISTENT GIVEN CONSTRAINTS
+#TEST COMBINE
