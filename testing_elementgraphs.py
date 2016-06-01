@@ -247,9 +247,14 @@ print(len(Completed))
 
 attempt = Completed.pop()
 #attempt.print_graph()
+example_clone3 = Example_graph_A.copyGen()
+print('before')
 print(len(Example_graph_A.edges))
 print(len(Excavate_graph_A.edges))
 merges = Excavate_graph_A.possible_mergers(Example_graph_A)
+print('after')
+print(len(Example_graph_A.edges))
+print(len(Excavate_graph_A.edges))
 print('merges')
 print(len(merges))
 #merges.pop().print_graph()
@@ -269,6 +274,31 @@ lit_2 = 		Literal(id=911, 		type = 'Condition', 	name='has', 	num_args = 25,	tru
 
 lit_1.combine(lit_2).print_element()
 print(lit_1.num_args)
+
+""" TESTING SWAP AGAIN"""
+#print(len(Example_graph_A.edges))
+#print(len(Excavate_graph_A.edges))
+
+
+excavate_clone3 = Excavate_graph_A.copyGen()
+
+#swapee= merges.pop()
+
+
+print("\n \t TEST Swap \n")
+print('num_elements in example Before swap:')
+
+print(len(example_clone3.elements))
+print('num_edges in example Before swap:')
+print(len(example_clone3.edges))
+example_clone3.swap(example_clone3.root,merges.pop())
+print('num_elements in example After swap:')
+
+print(len(example_clone3.elements))
+print('num_edges in example After swap:')
+print(len(example_clone3.edges))
+
+example_clone3.print_graph()
 
 """ NEXT TESTS"""
 #NEED TO TEST EXAMPLE WITH MULTIPLE CONSISTENT MERGES
