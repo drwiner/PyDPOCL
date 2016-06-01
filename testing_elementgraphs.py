@@ -257,6 +257,9 @@ print(len(Example_graph_A.edges))
 print(len(Excavate_graph_A.edges))
 print('merges')
 print(len(merges))
+x = merges.pop()
+print(len(x.edges))
+print(len(x.elements))
 #merges.pop().print_graph()
 
 
@@ -291,7 +294,7 @@ print('num_elements in example Before swap:')
 print(len(example_clone3.elements))
 print('num_edges in example Before swap:')
 print(len(example_clone3.edges))
-example_clone3.swap(example_clone3.root,merges.pop())
+#example_clone3.swap(example_clone3.root,merges.pop())
 print('num_elements in example After swap:')
 
 print(len(example_clone3.elements))
@@ -300,6 +303,7 @@ print(len(example_clone3.edges))
 
 #example_clone3.print_graph()
 
+<<<<<<< HEAD
 """ Test copy_with_new_ids"""
 
 print("\n \t TEST copy_with_new_ids \n")
@@ -307,6 +311,8 @@ print("\n \t TEST copy_with_new_ids \n")
 #excavate_clone3.print_graph()
 new_clone = excavate_clone3.copyWithNewIDs(1000)
 #new_clone.print_graph()
+=======
+>>>>>>> addRolesToElements
 
 """ NEXT TESTS"""
 #NEED TO TEST EXAMPLE WITH MULTIPLE CONSISTENT MERGES
