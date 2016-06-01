@@ -110,31 +110,30 @@ class ElementGraph(Graph):
 				USAGE: Excavate_Graph.absolves(other, other.edges, self.edges, Collected)
 		"""
 		if len(Remaining)  == 0:
-			return Collected.add(self)
-			
-		if len(Remaining) > len(Available):
-			return None
+			Collected.add(self)
+			return Collected
 			
 		other_edge = Remaining.pop()
 		print('remaining ', len(Remaining))
-
 		found = False
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
-				found = True
 				new_self = self.copyGen()
 				self_source = new_self.getElementById(prospect.source.id)
 				self_sink = new_self.getElementById(prospect.sink.id)
 				self_source.merge(other_edge.source)
 				self_sink.merge(other_edge.sink)
-				update_Available = set()
-				update_Available.update({Edge(new_self.getElementById(edge.source.id),new_self.getElementById(edge.sink.id), edge.label) for edge in Available-{prospect}})
-				new_collected= new_self.rCreateConsistentEdgeGraph(other, Remaining,update_Available,Collected)
-				if not new_collected is None:
-					Collected = new_collected
+				Collected = new_self.absolveFrom(other, Remaining,Available-{prospect},Collected)
+				#update_Available={Edge(new_self.getElementById(edge.source.id),new_self.getElementById(edge.sink.id), edge.label) for edge in Available-{prospect}}
+				#Collected = new_self.absolveFrom(other, Remaining,update_Available,Collected)
+				# if new_collected:
+					# found = True
+					# Collected = new_collected
+				# else:#False alarm
+					# found = False
 				
-		if not found:
-			return None
+		# if not found:
+			# return False
 
 		
 		print('collected ', len(Collected))

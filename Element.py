@@ -29,9 +29,6 @@ class Element:
 				return False
 		return True
 		
-	def isCoConsistent(self, other):
-		return self.isConsistent(other)
-		
 	def isIdentical(self, other):
 		if self.id == other.id:
 			if self.isEqual(other):
@@ -61,7 +58,7 @@ class Element:
 	def merge(self, other):
 		"""merge returns self with non-None properties of other,
 			and assumes elements are co-consistent"""
-		if not self.isCoConsistent(other):
+		if not self.isConsistent(other):
 			return None
 		if self.isEqual(other):
 			return self
