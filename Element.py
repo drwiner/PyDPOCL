@@ -166,6 +166,7 @@ class Operator(InternalElement):
 
 		if not other.executed is None and self.executed is None:
 			self.executed = other.executed
+			
 
 		return self
 		

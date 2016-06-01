@@ -105,12 +105,15 @@ class ElementGraph(Graph):
 			An edge from self cannot account for more than one edge from other
 			
 				Remaining: edges left to account for in other
-				Available: edges in self, which cannot account for more than one edge
+				Available: edges in 'first' self, which cannot account for more than one edge
 				
 				USAGE: Excavate_Graph.absolves(other, other.edges, self.edges, Collected)
 		"""
 		if len(Remaining)  == 0:
-			return {self}
+			return Collected.add(self)
+			
+		if len(Remaining) > len(Available):
+			return None
 			
 		other_edge = Remaining.pop()
 		print('remaining ', len(Remaining))
@@ -120,11 +123,15 @@ class ElementGraph(Graph):
 			if other_edge.isConsistent(prospect):
 				found = True
 				new_self = self.copyGen()
-				old_source = new_self.getElementById(prospect.source.id)
-				old_sink = new_self.getElementById(prospect.sink.id)
-				old_source.merge(other_edge.source)
-				old_sink.merge(other_edge.sink)
-				Collected.update(new_self.rCreateConsistentEdgeGraph(other,Remaining,Available-{prospect},Collected))
+				self_source = new_self.getElementById(prospect.source.id)
+				self_sink = new_self.getElementById(prospect.sink.id)
+				self_source.merge(other_edge.source)
+				self_sink.merge(other_edge.sink)
+				update_Available = set()
+				update_Available.update({Edge(new_self.getElementById(edge.source.id),new_self.getElementById(edge.sink.id), edge.label) for edge in Available-{prospect}})
+				new_collected= new_self.rCreateConsistentEdgeGraph(other, Remaining,update_Available,Collected)
+				if not new_collected is None:
+					Collected = new_collected
 				
 		if not found:
 			return None
