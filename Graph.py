@@ -201,7 +201,7 @@ class Graph(Element):
 	
 	
 	################  Consistency ###############################
-	def absolves(self, other):
+	def canAbsolve(self, other):
 		""" A graph absolves another iff for each other.edge, there is a consistent self.edge
 		"""
 		if rDetectConsistentEdgeGraph(Remaining = copy.deepcopy(other.edges), Available = copy.deepcopy(self.edges)):

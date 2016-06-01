@@ -138,7 +138,7 @@ print('num_edges in excavate Before Absolve Example:')
 print(len(Excavate_graph.edges))
 print("\n")		
 
-print('Absolves ->:',	 Excavate_graph.absolves(Example_graph))
+print('Absolves ->:',	 Excavate_graph.canAbsolve(Example_graph))
 
 print("\n")
 print('num_elements in excavate After Absolve Example:')
@@ -147,7 +147,7 @@ print('num_edges in excavate After Absolve Example:')
 print(len(Excavate_graph.edges))
 
 print("\n")
-print('Absolves <-: ', Example_graph.absolves(Excavate_graph))
+print('Absolves <-: ', Example_graph.canAbsolve(Excavate_graph))
 """ Not True because, consistency 
 """
 
@@ -236,35 +236,22 @@ print(len(excavate_clone.rGetDescendantEdges(p1_prime)))
 print('descendant edges in subgraph')
 print(len(sub_graph.rGetDescendantEdges(p1_prime)))
 
-""" Testing rCreateConsistentEdgeGraph """
+""" Testing absolve """
 print("\n \t TEST rCreateConsistentEdgeGraph \n")
-# mergeEdgesFromSource(self, other, edge_source, mergeable_edges = set()):
-# Accomodates all edges in mergeable_edges in other to the new edge_source
-# Idea: add an edge to sub_graph, then see if we can merge sub_graph back in
-
-#Completed = excavate_clone.rCreateConsistentEdgeGraph(Example_graph, Remaining = Example_graph.edges, Available = excavate_clone.edges)
-#print(len(Completed))
-#Completed = Excavate_graph.rCreateConsistentEdgeGraph(Example_graph, Remaining = Example_graph.edges, Available = Excavate_graph.edges)
-#print(len(Completed))
-
-#####
-#Completed = Example_graph.rCreateConsistentEdgeGraph(Excavate_graph, Remaining = Excavate_graph.edges, Available = Example_graph.edges)
 
 print(len(Example_graph_A.edges))
 print(len(Excavate_graph_A.edges))
-Completed = Excavate_graph_A.absolveFrom(Example_graph_A, Remaining = Example_graph_A.edges, Available = Excavate_graph_A.edges)
+Completed = Excavate_graph_A.absolve(Example_graph_A, Remaining = copy.deepcopy(Example_graph_A.edges), Available = Excavate_graph_A.edges)
+print('merges')
 print(len(Completed))
 
 attempt = Completed.pop()
-attempt.print_graph()
-print("\n num_collected ")
+#attempt.print_graph()
+print(len(Example_graph_A.edges))
+print(len(Excavate_graph_A.edges))
+merges = Excavate_graph_A.possible_mergers(Example_graph_A)
+print('merges')
+print(len(merges))
+merges.pop().print_graph()
 
-# if Excavate_graph_A.absolves(Example_graph_A):
-	# EGA  = Excavate_graph_A.copyGen()
-	# EGA.constraints = Example_graph_A.constraints
-	
-#EGA.print_graph()
 
-""" Testing ElementGraph Operations"""
-	#mergeAt
-	#rMerge
