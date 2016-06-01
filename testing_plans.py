@@ -97,5 +97,7 @@ Example_graph =	 Action(	id = 1111, \
 							Edges = example_edges, \
 							Constraints = example_constraints)
 
-Excavate_graph_A = Excavate_graph.copyGen()
+Excavate_graph_A = Excavate_graph.makeCopyFromID(10000)
 Example_graph_A  = Example_graph.copyGen()
+
+Excavate_graph_A.print_graph()

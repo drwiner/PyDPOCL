@@ -34,16 +34,17 @@ class Action(ElementGraph):
 					}
 	
 	def makeCopyFromID(self, start_from):
+		new_self = self.copyGen()
 		old_id = self.root.id
-		for element in self.elements:
-			element.id = start_from
+		for element in new_self.elements:
+			new_self.id = start_from
 			start_from = start_from + 1
-		new_id = self.root.id
-		for i, arg in self.Args.items():
-			for id,pos in arg.arg_pos_dict.items()
-				if id == old_id
-					arg[new_id] = arg[old_id]
-					del arg[id]
+		new_id = new_self.root.id
+		for i, arg in new_self.Args.items():
+			for id,pos in arg.arg_pos_dict.items():
+				if id == old_id:
+					arg.arg_pos_dict[new_id] = arg.arg_pos_dict.pop(old_id)
+		return new_self
 	
 	def mergeArgs(self, other, remove = False):
 		"""For every other.arg dicionary value of the form ID: value, create self.root_element.id: value"""
