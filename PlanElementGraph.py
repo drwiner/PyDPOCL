@@ -32,7 +32,19 @@ class Action(ElementGraph):
 										if (type(arg) == Argument) \
 										and i in arg.arg_pos_dict\
 					}
-				
+	
+	def makeCopyFromID(self, start_from):
+		old_id = self.root.id
+		for element in self.elements:
+			element.id = start_from
+			start_from = start_from + 1
+		new_id = self.root.id
+		for i, arg in self.Args.items():
+			for id,pos in arg.arg_pos_dict.items()
+				if id == old_id
+					arg[new_id] = arg[old_id]
+					del arg[id]
+	
 	def mergeArgs(self, other, remove = False):
 		"""For every other.arg dicionary value of the form ID: value, create self.root_element.id: value"""
 		#Remove = True: completely replace arg dictionary after finding positions. 
@@ -198,6 +210,8 @@ class Subplan(ElementGraph):
 						and element.id != source.id\
 				}\
 			}
+			
+
 		#self.causal_links
 		#self.steps = {step.source for step in self.causal_links}.union({self.sink for step in self.causal_links})
 	

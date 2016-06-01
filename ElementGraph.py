@@ -17,7 +17,7 @@ class ElementGraph(Graph):
 	def copyGen(self):
 		return copy.deepcopy(self)
 		
-	
+
 	@classmethod
 	def makeElementGraph(cls, elementGraph, element):
 		return cls(				element.id, \
