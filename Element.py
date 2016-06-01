@@ -83,10 +83,18 @@ class Element:
 		print('(',self.id, self.type, self.name,')')
 		
 class InternalElement(Element):
-	"""Internal Element is an Element with a possibly unimportant name, and a number of arguments"""
-	def __init__(self, id, type, name = None, num_args = 0):
+	"""Internal Element is an Element with a possibly unimportant name, and a number of arguments
+			Plus, a dictionary mapping ids of superordinate elements to 'roles'
+				Only one role per id... ?
+				Examples:			excavate.id : 'precondition'
+									operator.id : 'effect'
+									frame.id	: 'initial'
+									frame.id	: 'source'
+	"""
+	def __init__(self, id, type, name = None, num_args = 0, roles = {}):
 		super(InternalElement,self).__init__(id,type,name)
 		self.num_args = num_args
+		self.roles = roles
 	
 	def isEquivalent(self, other):
 		"""Another element is equivalent with self iff 
@@ -109,6 +117,10 @@ class InternalElement(Element):
 			if self.num_args == 0:
 				if self.num_args != other.num_args:
 					return False
+					
+						
+		if not self.isConsistentRoleDict(other):
+			return False
 				
 		return True
 			
@@ -128,12 +140,11 @@ class InternalElement(Element):
 			if self.name != other.name:
 				return False
 				
+						
+		if not self.isConsistentRoleDict(other):
+			return False
+				
 		return True
-
-	def isCoConsistent(self,other):
-		if self.isConsistent(other) and other.isConsistent(self):
-			return True
-		return False
 		
 	def merge(self,other):
 		"""Element merge assumes co-consistent 
@@ -145,12 +156,21 @@ class InternalElement(Element):
 		if other.num_args > 0 and self.num_args == 0:
 			self.num_args = other.num_args
 			
+		self.roles.update(other.roles)
+			
 		return self
+		
+	def isConsistentRoleDict(self, other):
+		for id, pos in other.roles.items():
+			if id in self.roles:
+				if other.roles[id] != self.roles[id]:
+					return False
+		return True
 		
 class Operator(InternalElement):
 	""" An operator element is an internal element with an executed status"""
-	def __init__(self, id, type, name = None, num_args = 0, executed = None):
-		super(Operator,self).__init__(id,type,name, num_args)
+	def __init__(self, id, type, name = None, num_args = 0, roles = {}, executed = None):
+		super(Operator,self).__init__(id,type,name, num_args, roles)
 		self.executed = executed
 		
 	def isConsistent(self,other):
@@ -162,11 +182,6 @@ class Operator(InternalElement):
 				return False
 		
 		return True
-				
-	def isCoConsistent(self,other):
-		if self.isConsistent(other) and other.isConsistent(self):
-			return True
-		return False
 		
 	def merge(self, other):
 		if super(Operator,self).merge(other) is None:
@@ -179,9 +194,10 @@ class Operator(InternalElement):
 		return self
 		
 class Literal(InternalElement):
-	""" A Literal element is an internal element with a truth status"""
-	def __init__(self, id, type, name = None, num_args = 0, truth = None):
-		super(Literal,self).__init__(id,type,name, num_args)
+	""" A Literal element is an internal element with a truth status
+	"""
+	def __init__(self, id, type, name = None, num_args = 0, roles = {},truth = None):
+		super(Literal,self).__init__(id,type,name, num_args, roles)
 		self.truth = truth
 
 	def isConsistent(self, other):
@@ -191,20 +207,18 @@ class Literal(InternalElement):
 		if not self.truth is None and not other.truth is None:
 			if self.truth != other.truth:
 				return False
-				
+	
 		return True
-
-	def isCoConsistent(self, other):
-		if self.isConsistent(other) and other.isConsistent(self):
-			return True
-		return False
 		
 	def isEquivalent(self,other):
 		if not super(Literal, self).isEquivalent(other):
 			return False
+			
 		if not self.truth is None:
 			if self.truth != other.truth:
 				return False
+				
+			
 		return True
 		
 	def isEqual(self, other):
@@ -218,7 +232,9 @@ class Literal(InternalElement):
 			
 		if self.truth is None and not other.truth is None:
 			self.truth = other.truth
+			
 		return self
+		
 		
 	def print_element(self):
 		print(self.truth, '(',self.id, self.type, self.name,')')
@@ -331,7 +347,7 @@ class IntentionFrameElement(Element):
 		
 class Motivation(Literal):
 	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender=None, goal=None):
-		super(Motivation,self).__init__(id,type,name,num_args,truth)
+		super(Motivation,self).__init__(id,type,name,num_args,{},truth)
 		self.actor = intender
 		self.goal = goal #Goal is a literal. THIS is a case where... a Literal has-a Literal
 		
