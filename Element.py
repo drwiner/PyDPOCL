@@ -216,10 +216,6 @@ class Literal(InternalElement):
 				return False
 	
 		return True
-<<<<<<< HEAD
-
-=======
->>>>>>> addRolesToElements
 		
 	def isEquivalent(self,other):
 		if not super(Literal, self).isEquivalent(other):
