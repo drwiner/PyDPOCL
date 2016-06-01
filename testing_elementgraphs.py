@@ -235,17 +235,18 @@ print(len(excavate_clone.rGetDescendantEdges(p1_prime)))
 print('descendant edges in subgraph')
 print(len(sub_graph.rGetDescendantEdges(p1_prime)))
 
-""" Testing mergeEdgesFromSource """
-print("\n \t TEST mergeEdgesFromSource \n")
+""" Testing rCreateConsistentEdgeGraph """
+print("\n \t TEST rCreateConsistentEdgeGraph \n")
 # mergeEdgesFromSource(self, other, edge_source, mergeable_edges = set()):
 # Accomodates all edges in mergeable_edges in other to the new edge_source
 # Idea: add an edge to sub_graph, then see if we can merge sub_graph back in
-print('num_edges in excavate before merge edges from sub_graph')
-print(len(Excavate_graph.edges))
-excavate_clone.mergeEdgesFromSource(sub_graph, p1_prime, sub_graph.edges)
-print('num_edges in excavate_clone after merge edges from sub_graph')
-print(len(excavate_clone.edges))
 
+Completed = excavate_clone.rCreateConsistentEdgeGraph(Example_graph, Remaining = Example_graph.edges, Available = excavate_clone.edges)
+print(len(Completed))
+Completed = Excavate_graph.rCreateConsistentEdgeGraph(Example_graph, Remaining = Example_graph.edges, Available = Excavate_graph.edges)
+print(len(Completed))
+Completed = Example_graph.rCreateConsistentEdgeGraph(Excavate_graph, Remaining = Excavate_graph.edges, Available = Example_graph.edges)
+print(len(Completed))
 
 """ Testing ElementGraph Operations"""
 	#mergeAt

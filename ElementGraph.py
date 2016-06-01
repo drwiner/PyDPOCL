@@ -187,27 +187,6 @@ class ElementGraph(Graph):
 		self_sink.merge(other_sink)
 		return new_self.rMerge(other, self_sink, other_sink, consistent_merges)
 		
-	#### This would entail, do this for each consistent sink
-	def assimilateNewEdge(self, other, self_source, consistent_sink, other_edge, consistent_merges = set()):
-		new_self = self.copyGen()
-		self_sink = new_self.getElementById(consistent_sink.id)
-		self_sink.merge(other_edge.sink)
-		new_self.edges.add(Edge(self_source, self_sink, other_edge.label))
-		return new_self.rMerge(other, self_sink, other_edge.sink, consistent_merges)
-	
-	def accommodate(self, other, other_edge, consistent_merges = set()):
-		new_self = self.copyGen()
-		self_sink = copy.deepcopy(other_edge.sink)
-		self.elements.add(self_sink)
-		return new_self.rMerge(other, self_sink, other_edge.sink, consistent_merges)
-		
-	def accomodateNewEdge(self, other, self_source, other_edge, consistent_merges = set()):
-		new_self = self.copyGen()
-		self_sink = copy.deepcopy(other_edge.sink)
-		self.elements.add(self_sink)
-		new_self.edges.add(Edge(self_source, self_sink, other_edge.label))
-		return new_self.rMerge(other, self_sink, other_edge.sink, consistent_merges)
-	
 	def Merge(self, other):
 		return self.rMerge(other, self.root)
 	
@@ -361,7 +340,119 @@ class ElementGraph(Graph):
 																		complete_merges))
 			
 		return complete_merges
+	
+	def rCreateConsistentEdgeGraph(		self, \
+										other, \
+										Remaining = set(), \
+										Available = set(),\
+										Collected = set()):
+		""" 
+		Returns a set of self-copies ('Collected') which have subsumed all edges in Remaining
+		Remaining edges are edges of other
+		Available edges are edges of self
+		If for each edge in remaining, 	we either create an edge (no removal from Available)
+										or we reuse an edge (removal from Available)
+										so that each other_edge can be subsumed by some strategy
+		
+		Base case: 	no more edges left in Remaining. Return self to add to Collected
+		
+		Induction:
 
+			Case 1 remaining edge is consistent with some other edge
+			Case 2 remaining edge is inconsistent but has a consistent source and sink
+			Case 3 remaining edge is inconsistent but has a consistent source and not consistent sink
+			Case 4 remaining edge is inconsistent but has a consistent sink and not consistent source
+			Case 5 remaining edge is inconsistent and neither the source nor sink is consistent with any available element
+			
+		"""
+		if len(Remaining)  == 0:
+			return {self}
+		
+		other_edge = Remaining.pop()
+		print('remaining ', len(Remaining))
+		
+		for prospect in Available:
+			if not prospect.isConsistent(other_edge): 
+				#Cannot reuse edge, must create one
+				if prospect.source.isConsistent(other_edge.source):
+					new_self = self.accomodateNewEdge(	other, \
+														prospect.source, \
+														other_edge)
+					Collected.union(\
+						new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
+					# if there exists a source or sink that is consistent but no edge, let it be
+					for possible_sink in self.elements - {prospect.sink}:
+						if possible_sink.isConsistent(other_edge.sink):
+							new_self = self.assimilateNewEdge(	other, \
+																prospect.source, \
+																possible_sink, \
+																other_edge,\
+																)
+							Collected.union(\
+								new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
+				elif prospect.sink.isConsistent(other_edge.sink):
+					new_self = self.copyGen()
+					new_source = copy.deepcopy(other_edge.source)
+					new_self.elements.add(new_source)
+					prospect.sink.merge(other_edge.sink)
+					new_self.edges.add(Edge(new_source,prospect.sink, other_edge.label))
+					Collected.union(\
+								new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
+				else:
+					new_self = self.copyGen() 
+					new_sink = copy.deepcopy(other_edge.sink)
+					new_source = copy.deepcopy(other_edge.source)
+					new_self.elements.add(new_source)
+					new_self.edges.add(Edge(new_source,new_sink, other_edge.label))
+					Collected.union(\
+								new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
+			else:
+				new_self = self.assimilate(other, prospect, other_edge)
+				Collected.union(\
+								new_self.rCreateConsistentEdgeGraph(other,Remaining,Available-{prospect},Collected))
+				new_self = self.accomodateNewEdge(	other, \
+														prospect.source, \
+														other_edge)
+				Collected.union(\
+						new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
+				#can both reuse an edge and create one
+				
+		return Collected
+	
+	def assimilateNewEdge(self, other, old_source, old_sink, other_edge):
+		"""	Provided with consistent source and sink
+			Returns new self with merged source and sink and new edge
+		"""
+		new_self = self.copyGen()
+		self_sink = new_self.getElementById(old_sink.id)					#sink from new_self
+		self_source = new_self.getElementById(old_source.id)				#source from new_self
+		self_source.merge(other_edge.source) 								#source merge
+		self_sink.merge(other_edge.sink)									#sink merge
+		new_self.edges.add(Edge(self_source, self_sink, other_edge.label))	#Add Edge
+		return new_self
+	
+	def assimilate(self, other, old_edge, other_edge):
+		"""	Provided with old_edge consistent with other_edge
+			Merges source and sinks
+		"""
+		new_self = self.copyGen()
+		self_source = new_self.getElementById(old_edge.source.id)			#source from new_self
+		self_source.merge(other_edge.source)								#source merge
+		self_sink = new_self.getElementById(old_edge.sink.id)				#sink from new_self
+		self_sink.merge(other_edge.sink)									#sink merge
+		return new_self
+		
+	def accomodateNewEdge(self, other, old_source, other_edge):
+		"""	Provided with consistent source and other_edge
+			Makes a deep copy of other_edge.sink and adds edge 
+		"""
+		new_self = self.copyGen()
+		self_sink = copy.deepcopy(other_edge.sink)
+		self_source = new_self.getElementById(old_source.id)
+		self_source.merge(other_edge.source)
+		new_self.elements.add(self_sink)
+		new_self.edges.add(Edge(self_source, self_sink, other_edge.label))
+		return new_self
 
 def extractElementsubGraphFromElement(G, element, Type):
 	Edges = G.rGetDescendantEdges(element)
