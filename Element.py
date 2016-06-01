@@ -194,10 +194,6 @@ class Literal(InternalElement):
 				
 		return True
 
-	def isCoConsistent(self, other):
-		if self.isConsistent(other) and other.isConsistent(self):
-			return True
-		return False
 		
 	def isEquivalent(self,other):
 		if not super(Literal, self).isEquivalent(other):

@@ -298,7 +298,15 @@ print(len(example_clone3.elements))
 print('num_edges in example After swap:')
 print(len(example_clone3.edges))
 
-example_clone3.print_graph()
+#example_clone3.print_graph()
+
+""" Test copy_with_new_ids"""
+
+print("\n \t TEST copy_with_new_ids \n")
+
+#excavate_clone3.print_graph()
+new_clone = excavate_clone3.copyWithNewIDs(1000)
+#new_clone.print_graph()
 
 """ NEXT TESTS"""
 #NEED TO TEST EXAMPLE WITH MULTIPLE CONSISTENT MERGES

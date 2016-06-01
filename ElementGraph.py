@@ -17,6 +17,12 @@ class ElementGraph(Graph):
 	def copyGen(self):
 		return copy.deepcopy(self)
 		
+	def copyWithNewIDs(self, from_this_num):
+		new_self= self.copyGen()
+		for element in new_self.elements:
+			element.id = from_this_num 
+			from_this_num = from_this_num+1
+		return new_self
 	
 	@classmethod
 	def makeElementGraph(cls, elementGraph, element):
