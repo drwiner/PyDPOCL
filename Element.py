@@ -349,7 +349,7 @@ class IntentionFrameElement(Element):
 		self.intender = intender
 		self.goal = goal
 		self.sat = sat
-		self.subplan = subplan
+		self.subplan = steps
 		
 class Motivation(Literal):
 	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender=None, goal=None):

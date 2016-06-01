@@ -97,7 +97,14 @@ Example_graph =	 Action(	id = 1111, \
 							Edges = example_edges, \
 							Constraints = example_constraints)
 
-Excavate_graph_A = Excavate_graph.makeCopyFromID(10000)
+Excavate_graph_A = Excavate_graph.makeCopyFromID(9000,11)
+#print(Excavate_graph_A.root.id)
 Example_graph_A  = Example_graph.copyGen()
 
 Excavate_graph_A.print_graph()
+
+F 		=		IntentionFrame(id = 2222, type = 'intention_frame', name=None, \
+								Elements=example_elements,\
+								Edges=example_edges,\
+								Constraints=example_constraints,\
+								actor=None)

@@ -33,12 +33,12 @@ class Action(ElementGraph):
 										and i in arg.arg_pos_dict\
 					}
 	
-	def makeCopyFromID(self, start_from):
+	def makeCopyFromID(self, start_from, increment = 1):
 		new_self = self.copyGen()
 		old_id = self.root.id
 		for element in new_self.elements:
-			new_self.id = start_from
-			start_from = start_from + 1
+			element.id = start_from
+			start_from = start_from + increment
 		new_id = new_self.root.id
 		for i, arg in new_self.Args.items():
 			for id,pos in arg.arg_pos_dict.items():
@@ -63,19 +63,8 @@ class Action(ElementGraph):
 				arg.arg_pos_dict = {self.root.id : pos}
 			arg.arg_pos_dict.update({self.root.id : pos })
 		return self
-									
-				
-	def mergeEdgesFromSource(self, other, edge_source, mergeable_edges = set()):
-		"""Override ElementGraph, need to make sure we merge args for a Domain Operator"""
-		if edge_source.merge(other.root) is None:
-			return None
-		
-		self.mergeArgs(self,other)
-							
-		return super(Action,self).mergeEdgesFromSource( 		other,\
-																edge_source,\
-																mergeable_edges\
-																)
+											
+
 	def isConsistentAntecedentFor(self, action):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
 		effects = 	{egde.sink \
@@ -184,75 +173,50 @@ class Binding(Edge):
 		
 class Ordering(Edge):
 	def __init__(self,action1,action2):
+		if not action1.type == 'Action' or not action2.type == 'Action':
+			print('cannot order non-actions')
+			return None
 		super(Ordering, self).__init__(action1,action2,'<')
 		
-		
-class Subplan(ElementGraph):
-	def __init__(self,id,type,name=None, \
-				Elements = set(),\
-				source = None, \
-				initial = None, \
-				sink = None, \
-				goal=None, \
-				Edges = set(), \
-				Constraints = set(),  \
-				):
-		
-		super(Subplan,self).__init__(id,type,name, Elements, sink, Edges, Constraints)
-		
-		self.goal = goal
-		self.source =  source
-		self.initial = initial
-		self.Steps = \
-			{step for step in \
-				{self.getElementGraphFromElement(element, Action) \
-					for element in self.elements \
-						if type(element)==Operator \
-						and element.id != source.id\
-				}\
-			}
-			
-
-		#self.causal_links
-		#self.steps = {step.source for step in self.causal_links}.union({self.sink for step in self.causal_links})
 	
-class IntentionFrame(Subplan):
-	def __init__(self,id,type,name=None, \
+class IntentionFrame(ElementGraph):
+	def __init__(self,id,type='intention_frame',name=None, \
 				Elements=set(),\
-				source=None,\
-				initial=None,\
-				sink=None,\
-				goal=None,\
+				root = None,\
+				actor=Element(id = -1),\
+				ms=Element(id = -1),\
+				sat=Element(id = -1),\
+				goal=Element(id = -1),\
 				Edges=set(),\
-				Constraints=set(),\
-				actor=None):
-
-		super(IntentionFrame,self).__init__(id,type,name, \
-											Elements, \
-											source=source, \
-											initial=initial, \
-											sink=sink, \
-											goal = goal, \
-											Edges = Edges, \
-											Constraints = Constraints, \
-											)
+				Constraints=set()):
+				
 			
-		self.ms = source #Will have no outgoing 
+		self.ms = ms #Will have no outgoing 
 		self.intender = actor
 		self.goal = goal
-		self.sat = sink
+		self.sat = sat
 		self.motivation = Motivation(id, \
 									intender=self.intender, \
 									goal = self.goal\
 									)
-		self.root = IntentionFrameElement(  id = self.id,type='intention_frame', \
+			
+		if root is None:
+			root = IntentionFrameElement(  	id,type, \
 											ms =self.ms, \
 											motivation = self.motivation,\
 											intender = self.intender,\
 											goal = self.goal,\
-											sat = self.sat,\
-											steps = self.Steps\
-										)
+											sat = self.sat
+											)
+		super(IntentionFrame,self).__init__(id,type,name,Elements,root,Edges,Constraints)
+		self.Steps = \
+			{step for step in \
+				{self.getElementGraphFromElement(element, Action) \
+					for element in self.elements \
+						if element.type=='Action' \
+						and element.id != self.ms.id\
+				}\
+			}
 		
 	def isInternallyConsistent(self):
 		for effect in self.sat.getEffects():
