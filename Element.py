@@ -167,11 +167,18 @@ class InternalElement(Element):
 					return False
 		return True
 		
+	def isRole(self, role_str):
+		for id, role in self.roles.items():
+			if role == role_str:
+				return id
+		return False
+		
 class Operator(InternalElement):
-	""" An operator element is an internal element with an executed status"""
-	def __init__(self, id, type, name = None, num_args = 0, roles = {}, executed = None):
+	""" An operator element is an internal element with an executed status and orphan status"""
+	def __init__(self, id, type, name = None, num_args = 0, roles = {}, isOrphan = True, executed = None):
 		super(Operator,self).__init__(id,type,name, num_args, roles)
 		self.executed = executed
+		self.is_orphan = isOrphan
 		
 	def isConsistent(self,other):
 		if not super(Operator,self).isConsistent(other):
@@ -190,8 +197,8 @@ class Operator(InternalElement):
 		if not other.executed is None and self.executed is None:
 			self.executed = other.executed
 			
-
 		return self
+
 		
 class Literal(InternalElement):
 	""" A Literal element is an internal element with a truth status
@@ -234,8 +241,7 @@ class Literal(InternalElement):
 			self.truth = other.truth
 			
 		return self
-		
-		
+			
 	def print_element(self):
 		print(self.truth, '(',self.id, self.type, self.name,')')
 		

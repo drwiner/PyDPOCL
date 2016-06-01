@@ -257,6 +257,9 @@ print(len(Example_graph_A.edges))
 print(len(Excavate_graph_A.edges))
 print('merges')
 print(len(merges))
+x = merges.pop()
+print(len(x.edges))
+print(len(x.elements))
 #merges.pop().print_graph()
 
 
@@ -291,14 +294,14 @@ print('num_elements in example Before swap:')
 print(len(example_clone3.elements))
 print('num_edges in example Before swap:')
 print(len(example_clone3.edges))
-example_clone3.swap(example_clone3.root,merges.pop())
+#example_clone3.swap(example_clone3.root,merges.pop())
 print('num_elements in example After swap:')
 
 print(len(example_clone3.elements))
 print('num_edges in example After swap:')
 print(len(example_clone3.edges))
 
-example_clone3.print_graph()
+#example_clone3.print_graph()
 
 """ NEXT TESTS"""
 #NEED TO TEST EXAMPLE WITH MULTIPLE CONSISTENT MERGES
