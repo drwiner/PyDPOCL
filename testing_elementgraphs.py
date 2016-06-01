@@ -101,7 +101,8 @@ Example_graph =	 Action(	id = 1111, \
 							Edges = example_edges, \
 							Constraints = example_constraints)
 
-
+Excavate_graph_A = Excavate_graph.copyGen()
+Example_graph_A  = Example_graph.copyGen()
 Excavate_graph.print_graph()
 Example_graph.print_graph()
 
@@ -245,11 +246,20 @@ print("\n \t TEST rCreateConsistentEdgeGraph \n")
 #print(len(Completed))
 #Completed = Excavate_graph.rCreateConsistentEdgeGraph(Example_graph, Remaining = Example_graph.edges, Available = Excavate_graph.edges)
 #print(len(Completed))
-Completed = Example_graph.rCreateConsistentEdgeGraph(Excavate_graph, Remaining = Excavate_graph.edges, Available = Example_graph.edges)
+
+#####
+#Completed = Example_graph.rCreateConsistentEdgeGraph(Excavate_graph, Remaining = Excavate_graph.edges, Available = Example_graph.edges)
+Completed = Excavate_graph_A.absolveFrom(Example_graph_A, Remaining = Example_graph_A.edges, Available = Excavate_graph_A.edges)
 print(len(Completed))
 
 attempt = Completed.pop()
 attempt.print_graph()
+
+# if Excavate_graph_A.absolves(Example_graph_A):
+	# EGA  = Excavate_graph_A.copyGen()
+	# EGA.constraints = Example_graph_A.constraints
+	
+#EGA.print_graph()
 
 """ Testing ElementGraph Operations"""
 	#mergeAt

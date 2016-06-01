@@ -284,6 +284,12 @@ class Argument(Element):
 		
 		self.arg_pos_dict.update(other.arg_pos_dict)
 		return self
+		
+	def print_element(self):
+		print('(',self.id, self.type, self.name,')')
+		for key,value in self.arg_pos_dict.items():
+			print("\t op.id=", key,":","pos=",value)
+			
 
 class PlanElement(Element):
 

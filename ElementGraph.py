@@ -99,12 +99,43 @@ class ElementGraph(Graph):
 		
 		return self
 	
+	
+	def absolveFrom(self, other, Remaining = set(), Available = set(), Collected = set()):
+		""" Every edge from other must be consistent with some edge in self.
+			An edge from self cannot account for more than one edge from other
+			
+				Remaining: edges left to account for in other
+				Available: edges in self, which cannot account for more than one edge
+				
+				USAGE: Excavate_Graph.absolves(other, other.edges, self.edges, Collected)
+		"""
+		if len(Remaining)  == 0:
+			return {self}
+			
+		other_edge = Remaining.pop()
+		other_edge = Remaining.pop()
+		print('remaining ', len(Remaining))
+
+		for prospect in Available:
+			if prospect.isConsistent(other_edge):
+				new_self = self.copyGen()
+				old_source = new_self.getElementById(prospect.source.id)
+				old_sink = new_self.getElementById(prospect.sink.id)
+				old_source.merge(other_edge.source)
+				old_sink.merge(other_edge.sink)
+				Collected.update(new_self.rCreateConsistentEdgeGraph(other,Remaining,Available-{prospect},Collected))
+
+		
+		print('collected ', len(Collected))
+		return Collected
+		
 	def rCreateConsistentEdgeGraph(		self, \
 										other, \
 										Remaining = set(), \
 										Available = set(),\
 										Collected = set()):
 		""" 
+		REASON: could be multiple ways to absolve, and need to merge elements
 		Returns a set of self-copies ('Collected') which have subsumed all edges in Remaining
 		Remaining edges are edges of other
 		
