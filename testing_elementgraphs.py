@@ -241,10 +241,10 @@ print("\n \t TEST rCreateConsistentEdgeGraph \n")
 # Accomodates all edges in mergeable_edges in other to the new edge_source
 # Idea: add an edge to sub_graph, then see if we can merge sub_graph back in
 
-Completed = excavate_clone.rCreateConsistentEdgeGraph(Example_graph, Remaining = Example_graph.edges, Available = excavate_clone.edges)
-print(len(Completed))
-Completed = Excavate_graph.rCreateConsistentEdgeGraph(Example_graph, Remaining = Example_graph.edges, Available = Excavate_graph.edges)
-print(len(Completed))
+#Completed = excavate_clone.rCreateConsistentEdgeGraph(Example_graph, Remaining = Example_graph.edges, Available = excavate_clone.edges)
+#print(len(Completed))
+#Completed = Excavate_graph.rCreateConsistentEdgeGraph(Example_graph, Remaining = Example_graph.edges, Available = Excavate_graph.edges)
+#print(len(Completed))
 Completed = Example_graph.rCreateConsistentEdgeGraph(Excavate_graph, Remaining = Excavate_graph.edges, Available = Example_graph.edges)
 print(len(Completed))
 

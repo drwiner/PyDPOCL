@@ -349,6 +349,7 @@ class ElementGraph(Graph):
 		""" 
 		Returns a set of self-copies ('Collected') which have subsumed all edges in Remaining
 		Remaining edges are edges of other
+		
 		Available edges are edges of self
 		If for each edge in remaining, 	we either create an edge (no removal from Available)
 										or we reuse an edge (removal from Available)
@@ -357,66 +358,56 @@ class ElementGraph(Graph):
 		Base case: 	no more edges left in Remaining. Return self to add to Collected
 		
 		Induction:
-
-			Case 1 remaining edge is consistent with some other edge
-			Case 2 remaining edge is inconsistent but has a consistent source and sink
-			Case 3 remaining edge is inconsistent but has a consistent source and not consistent sink
-			Case 4 remaining edge is inconsistent but has a consistent sink and not consistent source
-			Case 5 remaining edge is inconsistent and neither the source nor sink is consistent with any available element
-			
+			For every prospect, 
+				CASE1 if prospect is consistent, assimilate
+				CASE2	elif prospect source and sink are consistent but no edge, accomodate
+				CASE3 if prospect source is consistent, accomodate with new sink
+				CASE4 if prospect sink is consistent, accomodate with new source
+				CASE5 try creating a new edge
 		"""
 		if len(Remaining)  == 0:
 			return {self}
 		
 		other_edge = Remaining.pop()
 		print('remaining ', len(Remaining))
-		
+
 		for prospect in Available:
-			if not prospect.isConsistent(other_edge): 
-				#Cannot reuse edge, must create one
-				if prospect.source.isConsistent(other_edge.source):
-					new_self = self.accomodateNewEdge(	other, \
-														prospect.source, \
-														other_edge)
-					Collected.union(\
-						new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
-					# if there exists a source or sink that is consistent but no edge, let it be
-					for possible_sink in self.elements - {prospect.sink}:
-						if possible_sink.isConsistent(other_edge.sink):
-							new_self = self.assimilateNewEdge(	other, \
-																prospect.source, \
-																possible_sink, \
-																other_edge,\
-																)
-							Collected.union(\
-								new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
-				elif prospect.sink.isConsistent(other_edge.sink):
-					new_self = self.copyGen()
-					new_source = copy.deepcopy(other_edge.source)
-					new_self.elements.add(new_source)
-					prospect.sink.merge(other_edge.sink)
-					new_self.edges.add(Edge(new_source,prospect.sink, other_edge.label))
-					Collected.union(\
-								new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
-				else:
-					new_self = self.copyGen() 
-					new_sink = copy.deepcopy(other_edge.sink)
-					new_source = copy.deepcopy(other_edge.source)
-					new_self.elements.add(new_source)
-					new_self.edges.add(Edge(new_source,new_sink, other_edge.label))
-					Collected.union(\
-								new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
-			else:
+			
+			#CASE 1
+			if prospect.isConsistent(other_edge):
 				new_self = self.assimilate(other, prospect, other_edge)
-				Collected.union(\
-								new_self.rCreateConsistentEdgeGraph(other,Remaining,Available-{prospect},Collected))
-				new_self = self.accomodateNewEdge(	other, \
-														prospect.source, \
-														other_edge)
-				Collected.union(\
-						new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
-				#can both reuse an edge and create one
-				
+				Collected.update(new_self.rCreateConsistentEdgeGraph(other,Remaining,Available-{prospect},Collected))
+			#CASE 2
+			elif prospect.source.isConsistent(other_edge.source) and prospect.sink.isConsistent(other_edge.sink):
+				new_self = self.copyGen()
+				old_source = new_self.getElementById(prospect.source)
+				old_sink = new_self.getElementById(prospect.sink)
+				old_source.merge(other_edge.source)
+				old_sink.merge(other_edge.sink)				
+				new_self.edges.add(Edge(old_source,old_sink, other_edge.label))
+				Collected.update(new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
+		
+			#CASE 3
+			if prospect.source.isConsistent(other_edge.source): 
+				new_self = self.accomodateNewEdge(other,prospect.source,other_edge)
+				Collected.update(new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
+			#CASE 4
+			if prospect.sink.isConsistent(other_edge.sink):
+				new_self = self.copyGen()
+				new_source = copy.deepcopy(other_edge.source)
+				old_sink = new_self.getElementById(prospect.sink.id)
+				old_sink.merge(other_edge.sink)
+				new_self.elements.add(new_source)
+				new_self.edges.add(Edge(new_source,old_sink, other_edge.label))
+				Collected.update(new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
+			#CASE 5
+			new_self = self.copyGen() 
+			new_sink = copy.deepcopy(other_edge.sink)
+			new_source = copy.deepcopy(other_edge.source)
+			new_self.elements.add(new_source)
+			new_self.edges.add(Edge(new_source,new_sink, other_edge.label))
+			Collected.update(new_self.rCreateConsistentEdgeGraph(other,Remaining,Available,Collected))
+			
 		return Collected
 	
 	def assimilateNewEdge(self, other, old_source, old_sink, other_edge):
