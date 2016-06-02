@@ -213,11 +213,9 @@ class IntentionFrame(ElementGraph):
 						Edge(ms, self.motivation, 'effect-of')\
 						Edge(sat, actor, 'actor-of'),
 						})
+
 						
 		
-		
-						
-		super(IntentionFrame,self).__init__(id,type,name,Elements,self.root,Edges,Constraints)
 		self.Steps = \
 			{step for step in \
 				{self.getElementGraphFromElement(element, Action) \
@@ -232,8 +230,11 @@ class IntentionFrame(ElementGraph):
 		Constraints.update( {Ordering(ms, step) for step in self.Steps})
 		""" recursively decide on an actor and update orphan status for each actor, then for each step"""
 		# If there were any steps with just one consenting actor, then that would be a good place to start
-		if self.intender is None:
-			consistent_actors = self.rPickActorFromSteps(remaining_steps = self.Steps)
+		if len(self.intender.arg_pos_dict) == 0:
+			s = next(iter(self.Steps))
+			consistent_actors = self.rPickActorFromSteps(remaining_steps = copy.deepcopy(self.Steps - {s}),s.consenting_actors)
+			
+		super(IntentionFrame,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 	
 
 	def rPickActorFromSteps(self, remaining_steps = set(), potential_actors = set()):
@@ -249,13 +250,28 @@ class IntentionFrame(ElementGraph):
 			Problem:	Given a set of steps with consenting actors, find the subset of actors
 							that are consistent with one actor in every step.
 			
-			Strategy:	given at least one actor, 
+			Strategy:	for each actor in potential_actors, remove if not consistent with any step actors
 		"""
-		for step in remaining_steps:
-			for actor in potential_actors:
-				for 
-			{actor for actor in step.consenting_actors if actor.isConsistent}
-			self.rPickActorFromSteps(step.consenting_actors)
+		
+		
+		if len(remaining_steps) == 0:
+			return potential_actors
+		if len(potential_actors) == 0:
+			return
+		
+		step = remaining_steps.pop()
+		
+		for actor in potential_actors
+			prospects = {prospect for prospect in step.consenting_actors if actor.isConsistent(prospect)}
+			if len(prospects) == 0:
+				potential_actors.remove(actor)
+			else:
+				potential_actors.update(prospects)
+		potential_actors = self.rPickActorFromSteps(remaining_steps, potential_actors)
+		
+					
+		return potential_actors
+		
 
 	def addStep(self, Action, Plan):
 		""" Adding a step to an intention frame
