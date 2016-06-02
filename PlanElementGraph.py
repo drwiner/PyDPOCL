@@ -210,7 +210,7 @@ class IntentionFrame(ElementGraph):
 	def addStep(self, Action)
 		""" Adding a step to an intention frame
 				Return False if not added:
-					Does the Action have an actor, that is inconsistent with intender?
+					Does the Action have a consenting actor, that is inconsistent with intender?
 					Is there an ordering s.t. Operator is necessarily ordered before source?
 																			  or after sat?
 						

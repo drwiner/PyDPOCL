@@ -176,10 +176,9 @@ class InternalElement(Element):
 		
 class Operator(InternalElement):
 	""" An operator element is an internal element with an executed status and orphan status"""
-	def __init__(self, id, type, name = None, num_args = 0, roles = {}, isOrphan = True, executed = None):
+	def __init__(self, id, type, name = None, num_args = 0, roles = {}, executed = None):
 		super(Operator,self).__init__(id,type,name, num_args, roles)
 		self.executed = executed
-		self.is_orphan = isOrphan
 		
 	def isConsistent(self,other):
 		if not super(Operator,self).isConsistent(other):
@@ -326,7 +325,34 @@ class Argument(Element):
 		print('(',self.id, self.type, self.name,')')
 		for key,value in self.arg_pos_dict.items():
 			print("\t op.id=", key,":","pos=",value)
+
+class Actor(Argument):
+	""" An actor is an argument such that 
+			For each operator in arg_pos_dict where the argument is a consenting actor 'a',
+			then that operator needs to be part of an intention frame where 'a' is the intender
 			
+		An orphan_dict is a dictionary whose keys are operators where the actor is a consenting actor
+		and whose values are True or False depending on the actor's orphan status for that step
+			Example:		{operator.id : True, another_operator.id : False}
+			
+		When we instantiate an Action, we identify all consenting actor arguments
+				When this occurs, we add the {Operator.id : False} to the orphan_dict of that actor
+		If we successfully add that Action to an intention frame, we add {Operator.id : True} 
+				for the actor that matches the intention frame's intender
+		When we merge 2 actors, we merge the orphan_dicts with preference for True
+	""""
+	def __init__(self, id, type, name= None, arg_pos_dict = {}, orphan_dict = {}):
+		super(Actor,self).__init__(id,type,name, arg_pos_dict)
+		self.orphan_dict=  orphan_dict
+		
+	def merge(self, other):
+		if super(Actor,self).merge(other) is None:
+			return None
+		
+		for operatorID, status in self.orphan_dict.items():
+			if operatorID not in 
+		self.arg_pos_dict.update(other.arg_pos_dict)
+		return self
 
 class PlanElement(Element):
 
