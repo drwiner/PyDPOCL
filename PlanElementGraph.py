@@ -177,6 +177,10 @@ class Ordering(Edge):
 		
 	
 class IntentionFrame(ElementGraph):
+	""" 
+		Intention Frame is an element graph plus a set of special elements
+		Initially, 
+	"""
 	def __init__(self,id,type='intention_frame',name=None, \
 				Elements=set(),\
 				root = None,\
@@ -216,10 +220,15 @@ class IntentionFrame(ElementGraph):
 			}
 		
 		""" recursively decide on an actor and update orphan status for each actor, then for each step"""
-		# If there were any steps with just one consenting actor, then 
-		for step in self.Steps:
-			
+		# If there were any steps with just one consenting actor, then that would be a good place to start
+		if self.intender is None:
+			consistent_actors = self.rPickActorFromSteps()
 	
+
+	def rPickActorFromSteps(self,potential_actors = set()):
+		for step in self.Steps:
+			self.rPickActorFromSteps(step.consenting_actors)
+
 	def addStep(self, Action, Plan):
 		""" Adding a step to an intention frame
 				Return False if not added:
