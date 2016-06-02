@@ -181,35 +181,43 @@ class IntentionFrame(ElementGraph):
 		Intention Frame is an element graph plus a set of special elements
 		Initially, 
 	"""
-	def __init__(self,id,type='intention_frame',name=None, \
+	def __init__(self,id,type='IntentionFrame',name=None, \
 				Elements=set(),\
-				root = None,\
-				actor=Element(id = -1),\
-				ms=Element(id = -1),\
-				sat=Element(id = -1),\
-				goal=Element(id = -1),\
+				root_element = None,\
+				actor=Actor(id= id+1,type='actor'),\
+				ms=Operator(id = id+2,type='Action', roles={id:'motivating-step'}, executed = False),\
+				sat=Operator(id = id+3, type='Action', roles={id:'satisfying-step'}, executed = False),\
+				goal=Literal(id =id + 4, type='Condition', roles={id: 'goal'}, truth = True),\
 				Edges=set(),\
 				Constraints=set()):
 				
-			
-		self.ms = ms #Will have no outgoing 
+		self.ms = ms
 		self.intender = actor
 		self.goal = goal
 		self.sat = sat
-		self.motivation = Motivation(id, \
-									intender=self.intender, \
-									goal = self.goal\
-									)
-			
-		if root is None:
-			root = IntentionFrameElement(  	id,type, \
-											ms =self.ms, \
-											motivation = self.motivation,\
-											intender = self.intender,\
-											goal = self.goal,\
-											sat = self.sat
-											)
-		super(IntentionFrame,self).__init__(id,type,name,Elements,root,Edges,Constraints)
+		self.motivation = Motivation(id= id + 5, intender=self.intender, goal = self.goal)	
+		if root_element is None:
+			root_element = IntentionFrameElement(  id,type, \
+												ms =self.ms, \
+												motivation = self.motivation,\
+												intender = self.intender,\
+												goal = self.goal,\
+												sat = self.sat
+												)
+												
+		Edges.update({	Edge(root_element, actor, 'actor-of'), \
+						Edge(root_element, ms, 'motivating-step-of'), \
+						Edge(root_element, sat, 'sat-step-of'),\
+						Edge(root_element, goal, 'goal-of'),\
+						Edge(sat, goal, 'effect-of'), \
+						Edge(ms, self.motivation, 'effect-of')\
+						Edge(sat, actor, 'actor-of'),
+						})
+						
+		
+		
+						
+		super(IntentionFrame,self).__init__(id,type,name,Elements,self.root,Edges,Constraints)
 		self.Steps = \
 			{step for step in \
 				{self.getElementGraphFromElement(element, Action) \
@@ -219,14 +227,34 @@ class IntentionFrame(ElementGraph):
 				}\
 			}
 		
+		Constraints.update({ Ordering(ms,sat)})
+		Constraints.update( {Ordering(step, sat) for step in self.Steps if not step.isIdentical(sat)})
+		Constraints.update( {Ordering(ms, step) for step in self.Steps})
 		""" recursively decide on an actor and update orphan status for each actor, then for each step"""
 		# If there were any steps with just one consenting actor, then that would be a good place to start
 		if self.intender is None:
-			consistent_actors = self.rPickActorFromSteps()
+			consistent_actors = self.rPickActorFromSteps(remaining_steps = self.Steps)
 	
 
-	def rPickActorFromSteps(self,potential_actors = set()):
-		for step in self.Steps:
+	def rPickActorFromSteps(self, remaining_steps = set(), potential_actors = set()):
+		""" Pick a step and for each actor in consenting_actors, 
+			if consistent with potential_actors, 
+			invoke rPickActorFromSteps(remaining_steps-{step},potential_actors+{actor})
+			
+			Purpose:
+						In CPOCL, intention frames are initialized with an actor. In BiPOCL,
+							we may say that two steps are in the same plan.
+						Are there any other situations when we have to do the following:
+						
+			Problem:	Given a set of steps with consenting actors, find the subset of actors
+							that are consistent with one actor in every step.
+			
+			Strategy:	given at least one actor, 
+		"""
+		for step in remaining_steps:
+			for actor in potential_actors:
+				for 
+			{actor for actor in step.consenting_actors if actor.isConsistent}
 			self.rPickActorFromSteps(step.consenting_actors)
 
 	def addStep(self, Action, Plan):

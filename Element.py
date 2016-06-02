@@ -379,7 +379,7 @@ class PlanElement(Element):
 		self.IntentionFrames = IntentionFrames
 		
 class IntentionFrameElement(Element):
-	def __init__(self, id, type, name= None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = set()):
+	def __init__(self, id, type='IntentionFrame', name= None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = set()):
 		super(IntentionFrameElement,self).__init__(id,type,name)
 		
 		self.ms = ms
