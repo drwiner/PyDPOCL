@@ -10,7 +10,7 @@ p4 = Literal(id=5, type='Condition', name= 'knows-location', 	num_args = 3, trut
 e1 = Literal(id=6, type='Condition', name='burried',	num_args=2,	 truth = False)
 e2 = Literal(id=7, type='Condition', name='has', 		num_args=2,	 truth = True)
 
-consent = 	Argument(id=8,	 	type='actor',	 arg_pos_dict = {excavate.id :	1})
+consent = 	Actor(id=8,	 	type='actor',	 arg_pos_dict = {excavate.id :	1})
 item = 		Argument(id = 9, 	type='var',		 arg_pos_dict=	{excavate.id :  2})
 place = 	Argument(id = 10, 	type='var',		 arg_pos_dict=	{excavate.id :  3})
 
@@ -52,7 +52,7 @@ example_p1 =		Literal(id=211, 		type='Condition', 		name='alive', 			truth = Tru
 example_e1 = 		Literal(id=311, 		type = 'Condition', 	name='has', 			truth = True)
 example_e3 = 		Literal(id=911, 		type = 'Condition', 	name='has', 			truth = True)
 ex_const_element = 	Literal(id=611, 		type ='Condition',		name='knows-location', 	truth = True)
-example_actor = 	Argument(id=411, 		type='actor',			arg_pos_dict={example.id : 1})
+example_actor = 	Actor(id=411, 		type='actor',			arg_pos_dict={example.id : 1})
 example_item = 		Argument(id=511,		type='var', 			arg_pos_dict={})
 #arg_pos_dict={example.id : 0})
 
@@ -117,3 +117,5 @@ F 		=		IntentionFrame(id = 2222, type = 'intention_frame', name=None, \
 								actor=None)
 								
 print(len(F.Steps))
+
+""" Test whether Actions in F.Steps are equivalent to Actions created in isolation"""

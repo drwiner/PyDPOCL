@@ -340,7 +340,7 @@ class Actor(Argument):
 		If we successfully add that Action to an intention frame, we add {Operator.id : True} 
 				for the actor that matches the intention frame's intender
 		When we merge 2 actors, we merge the orphan_dicts with preference for True
-	""""
+	"""
 	def __init__(self, id, type, name= None, arg_pos_dict = {}, orphan_dict = {}):
 		super(Actor,self).__init__(id,type,name, arg_pos_dict)
 		self.orphan_dict=  orphan_dict
@@ -353,6 +353,7 @@ class Actor(Argument):
 			if operatorID not in self.orphan_dict:
 				self.orphan_dict[operatorID] = status
 			elif status != self.orphan_dict[operatorID]:
+				#One of them must be True if they are unequal
 				self.orphan_dict[operatorID] = True
 				
 		self.arg_pos_dict.update(other.arg_pos_dict)
