@@ -205,7 +205,7 @@ class IntentionFrame(ElementGraph):
 												sat = self.sat
 												)
 												
-		Edges.update({	Edge(root_element, actor, 'actor-of'), \
+		Edges.update({	Edge(root_element, actor, 'intender-of'), \
 						Edge(root_element, ms, 'motivating-step-of'), \
 						Edge(root_element, sat, 'sat-step-of'),\
 						Edge(root_element, goal, 'goal-of'),\
@@ -214,7 +214,6 @@ class IntentionFrame(ElementGraph):
 						Edge(sat, actor, 'actor-of'),
 						})
 
-						
 		
 		self.Steps = \
 			{step for step in \
@@ -225,7 +224,7 @@ class IntentionFrame(ElementGraph):
 				}\
 			}
 		
-		Constraints.update({ Ordering(ms,sat)})
+		Constraints.add(Ordering(ms,sat))
 		Constraints.update( {Ordering(step, sat) for step in self.Steps if not step.isIdentical(sat)})
 		Constraints.update( {Ordering(ms, step) for step in self.Steps})
 		""" recursively decide on an actor and update orphan status for each actor, then for each step"""
@@ -233,6 +232,14 @@ class IntentionFrame(ElementGraph):
 		if len(self.intender.arg_pos_dict) == 0:
 			s = next(iter(self.Steps))
 			consistent_actors = self.rPickActorFromSteps(remaining_steps = copy.deepcopy(self.Steps - {s}),s.consenting_actors)
+			if len(consistent_actors) == 0:
+				print('consenting actors in steps in intention frame', self.id, 'cannot unify to consistent actor')
+				return None
+			elif len(consistent_actors) > 1:
+				print('several actors to choose from')
+			else:
+				consistent_actor = consistent_actors.pop()
+				self.intender.merge(consistent_actor.pop())
 			
 		super(IntentionFrame,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 	
@@ -267,10 +274,7 @@ class IntentionFrame(ElementGraph):
 				potential_actors.remove(actor)
 			else:
 				potential_actors.update(prospects)
-		potential_actors = self.rPickActorFromSteps(remaining_steps, potential_actors)
-		
-					
-		return potential_actors
+		return self.rPickActorFromSteps(remaining_steps, potential_actors)
 		
 
 	def addStep(self, Action, Plan):
