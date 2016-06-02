@@ -348,10 +348,15 @@ class Actor(Argument):
 	def merge(self, other):
 		if super(Actor,self).merge(other) is None:
 			return None
-		
-		for operatorID, status in self.orphan_dict.items():
-			if operatorID not in 
+			
+		for operatorID, status in other.orphan_dict.items():
+			if operatorID not in self.orphan_dict:
+				self.orphan_dict[operatorID] = status
+			elif status != self.orphan_dict[operatorID]:
+				self.orphan_dict[operatorID] = True
+				
 		self.arg_pos_dict.update(other.arg_pos_dict)
+		
 		return self
 
 class PlanElement(Element):
