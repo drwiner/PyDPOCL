@@ -25,13 +25,19 @@ class Action(ElementGraph):
 										Constraints\
 									)
 
-									
+		""" Get Action arguments by position"""							
 		self.Args = {i:arg \
-							for i in range(self.root.num_args) \
+						for i in range(self.root.num_args) \
 							for arg in self.elements \
-										if (type(arg) == Argument) \
-										and i in arg.arg_pos_dict\
-					}
+								if (type(arg) == Argument) \
+								and i in arg.arg_pos_dict}
+				
+		""" Get consenting actors"""
+		self.consenting_actors = set()			
+		self.consenting_actors.update({edge.sink \
+										for edge in self.edges \
+											if edge.source is self.root \
+											and edge.label == 'actor-of'})
 	
 	def makeCopyFromID(self, start_from, increment = 1):
 		new_self = self.copyGen()
@@ -202,6 +208,18 @@ class IntentionFrame(ElementGraph):
 			}
 	
 	def addStep(self, Action)
+		""" Adding a step to an intention frame
+				Return False if not added:
+					Does the Action have an actor, that is inconsistent with intender?
+					Is there an ordering s.t. Operator is necessarily ordered before source?
+																			  or after sat?
+						
+				Change status of operator
+					Operator is no longer an orphan
+					If intender is None but operator has an actor, or vice versa, then fill in
+					
+					
+		"""
 		if step.is_orphan
 		
 	def isInternallyConsistent(self):

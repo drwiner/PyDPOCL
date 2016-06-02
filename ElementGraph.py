@@ -16,7 +16,6 @@ class ElementGraph(Graph):
 		
 	def copyGen(self):
 		return copy.deepcopy(self)
-		
 
 	def copyWithNewIDs(self, from_this_num):
 		new_self= self.copyGen()

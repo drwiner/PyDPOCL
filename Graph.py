@@ -69,9 +69,6 @@ class Graph(Element):
 			print(edge.label)
 			edge.sink.print_element()
 		
-	def addEdge(self, edge):
-		if edge not in self.edges:
-			self.edges.add(edge)
 			
 	def hasEdgeIdentity(self, edge):
 		""" Returns set of edges s.t. (source.id, label, sink.id) in self.edges"""
@@ -100,6 +97,7 @@ class Graph(Element):
 		for element in self.elements:
 			if element.id == id:
 				return element
+		return None
 		
 	def addConstraint(self, edge):
 		if edge not in self.constraints:
