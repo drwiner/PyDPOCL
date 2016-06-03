@@ -247,15 +247,23 @@ class IntentionFrame(ElementGraph):
 				Edges=set(),\
 				Constraints=set()):
 		if actor is None:
-			print('need to select consistent_actor before instantiation')
-			
+			#print('need to select consistent_actor before instantiation')
 			actor=Actor(id+1,type='actor')
+
 		if ms is None:
 			ms = Operator(id+2,type='Action', roles={id:'motivating-step'}, executed = False)
+			
 		if sat is None:
 			sat = Operator(id+3, type='Action', roles={id:'satisfying-step'}, executed = False)
+			
 		if goal is None:
 			goal = Literal(id+ 4, type='Condition', roles={id: 'goal'}, truth = None)
+			
+			
+		Elements.add(actor)
+		Elements.add(ms)
+		Elements.add(sat)	
+		Elements.add(goal)
 		
 		self.root = root_element
 		self.ms = ms
@@ -287,17 +295,11 @@ class IntentionFrame(ElementGraph):
 		
 		self.Steps = {step for step in self.elements if type(step) is Operator}
 		
-		self.constraints.add(Ordering(ms,sat))
-		self.constraints.update({Ordering(step, sat) for step in self.Steps if not step.id == sat.id})
-		self.constraints.update({Ordering(ms, step) for step in self.Steps})
+		#self.constraints.add(Ordering(ms,sat))
+		#self.constraints.update({Ordering(step, sat) for step in self.Steps if not step.id == sat.id})
+		#self.constraints.update({Ordering(ms, step) for step in self.Steps})
 		
-		# If there were any steps with just one consenting actor, then that would be a good place to start
-			
-	# def updateSteps(self):
-		# self.Steps = {self.getElementGraphFromElement(element,Action) \
-						# for element in self.elements \
-							# if element.type == 'Action' and element.id != self.ms.id}
-		# return self
+	
 		
 
 	def addStep(self, Action, Plan, action_already_in_plan = True):
@@ -489,6 +491,7 @@ class PlanElementGraph(ElementGraph):
 			step.print_element()
 		print('frames:')
 		for frame in self.IntentionFrames:
+			print('frame id {}:'.format(frame.id), end=" ")
 			Goal = self.getElementGraphFromElement(frame.goal, Condition)
 			#if self.intender
 			Goal.print_graph(motive=True,actor_id = frame.intender.id)

@@ -122,7 +122,7 @@ class Graph(Element):
 	def getParentsByLabel(self, element, label):
 		return set(edge.source for edge in self.edges if edge.sink is element and edge.label is label)
 	def getConstraints(self, element):
-		return {edge for edge in self.constraints if edge.source is element}
+		return {edge for edge in self.constraints if edge.source.id == element.id}
 	def getConstraintsByLabel(self, element, label):
 		return set(edge for edge in self.constraints if edge.source is element and edge.label is label)
 	def getConstraintsByParent(self, element):
@@ -183,6 +183,7 @@ class Graph(Element):
 		return Descendant_Edges
 		
 	def rGetDescendantConstraints(self, constraint_source, Descendant_Constraints = set()):
+		
 		#Base Case
 		incident_constraints = self.getConstraints(constraint_source)
 		if len(incident_constraints) == 0:

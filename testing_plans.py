@@ -137,10 +137,11 @@ F.print_frame()
 
 print('\n\tPlan')
 #print(len(P1.Steps))
-#P1.print_plan()
+P1.print_plan()
 
 s = next(iter(P1.Steps))
 step = P1.getElementGraphFromElement(s, Action)
+#P1.print_plan()
 new_plans = step.instantiate(Excavate_operator_A,P1)
 
 
