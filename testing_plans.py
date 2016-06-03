@@ -108,17 +108,20 @@ Excavate_operator_B = Excavate_operator.makeCopyFromID(9000,11)
 #print(Excavate_graph_A.root.id)
 Example_step_B  = Example_step.copyGen()
 
+print('\n\texcavate operator:')
 Excavate_operator_A.print_graph()
+
 
 F	=	IntentionFrame(id = 2222, type = 'IntentionFrame', name=None, \
 		Elements=example_elements,\
 		Edges=example_edges,\
 		Constraints=example_constraints,\
 		goal = example_p1,\
+		ms = None,\
+		sat = None,\
 		actor=None)
 		
 example_elements.add(F.root) #Intention Frame element
-
 
 
 P1 = 	PlanElementGraph(id = 5432,\
@@ -128,11 +131,16 @@ P1 = 	PlanElementGraph(id = 5432,\
 		)
 
 
-								
-print(len(F.Steps))
+print('\n\tintention_frame:')						
+#print(len(F.Steps))
 F.print_frame()
 
-print(len(P1.Steps))
+
+print('\n\tPlan')
+#print(len(P1.Steps))
 P1.print_plan()
 """ Test whether Actions in F.Steps are equivalent to Actions created in isolation"""
 """ Test rPickActorFromSteps when there are and are not consistent_actors"""
+
+"""
+"""

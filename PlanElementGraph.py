@@ -30,11 +30,18 @@ class Action(ElementGraph):
 									)
 
 		""" Get Action arguments by position"""							
-		self.Args = {i:arg \
-						for i in range(self.root.num_args) \
-							for arg in self.elements \
-								if (type(arg) == Argument) \
-								and i in arg.arg_pos_dict}
+		# self.Args = {i:arg \
+						# for i in range(self.root.num_args) \
+							# for arg in self.elements \
+								# if (type(arg) == Argument or type(arg) == Actor) \
+								# and i in arg.arg_pos_dict}					
+		self.Args = {}
+		for arg in self.elements:
+			if type(arg) == Argument or type(arg) == Actor:
+				for op_id, pos in arg.arg_pos_dict.items():
+					if op_id == self.root.id:
+						self.Args[pos] = arg
+
 				
 		""" Get consenting actors"""
 		self.consenting_actors = set()			
@@ -94,6 +101,17 @@ class Action(ElementGraph):
 			return False
 			
 		return prospects
+
+	def print_graph(self):
+		print('\n({}'.format(self.root.name),end = " ")
+
+		for i in range(1,self.root.num_args+1):
+			if i not in self.Args:
+				print('__',end = " ")
+			else:
+				print('({}:{})'.format(self.Args[i].type,self.Args[i].id),end = " ")
+		
+		print(')')
 		
 	# @staticmethod
 	# def operatorToAction(Operator, action_id):
@@ -117,10 +135,10 @@ class Condition(ElementGraph):
 		
 		return [self.getNeighborsByLabel(self.root, self.labels[i]) for i in range(self.root.num_args)]
 		
-	def print_graph(self, motive = False):
+	def print_graph(self, motive = False, actor_id = -1):
 		args = self.getArgList()
 		if motive:
-			print('intends', end=" ")
+			print('intends {}'.format(actor_id), end=" ")
 		print('{}({}'.format(self.root.truth,self.root.name), end=" ")
 		for i, arg in enumerate(args):
 			if len(arg) == 0:
@@ -356,10 +374,10 @@ class IntentionFrame(ElementGraph):
 		return True
 	
 	def print_frame(self):
-		arg_labels = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
 		Goal = self.getElementGraphFromElement(self.goal, Condition)
 		print('\n motivation {}:'.format(self.id))
-		Goal.print_graph(motive=True)
+		#if self.intender
+		Goal.print_graph(motive=True,actor_id = self.intender.id)
 		
 class PlanElementGraph(ElementGraph):
 
@@ -453,7 +471,7 @@ class PlanElementGraph(ElementGraph):
 									}
 									
 	def print_plan(self):
-		print('\n PLAN', self.id)
+		print('\nPLAN', self.id)
 		print('steps:')
 		for step in self.Steps:
 			step.print_element()
