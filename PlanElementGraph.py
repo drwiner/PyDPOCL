@@ -435,6 +435,7 @@ class PlanElementGraph(ElementGraph):
 		"""
 		step = next(iter(subseteq))
 		Step = self.getElementGraphFromElement(step,Action)
+		print('NUMBER OF CONSENTING ACTORS TO START WITH IN GET CNSISTENT ACTORS {}'.format(len(Step.consenting_actors)))
 		S = copy.deepcopy(subseteq)
 		S = S - {action for action in S if action.id != step.id}
 		return self.rPickActorFromSteps(remaining_steps = S,potential_actors = Step.consenting_actors)

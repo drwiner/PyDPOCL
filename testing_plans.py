@@ -144,13 +144,13 @@ step = P1.getElementGraphFromElement(s, Action)
 new_plans = step.instantiate(Excavate_operator_A,P1)
 
 
-print('num_consenting actors = {} in step {}'.format(len(P1.getConsistentActors(P1.Steps)),s.id))
+print('num_consenting actors = {} in step {}'.format(len(P1.getConsistentActors(P1.Steps)),step.id))
 
 #print(step.id)
 
 print('num new plans: {}'.format(len(new_plans)))
 for plan in new_plans:
-	print('num_consenting actors = {} in step {}'.format(len(plan.getConsistentActors(plan.Steps)),s.id))
+	print('num_consenting actors = {} in steps'.format(len(plan.getConsistentActors(plan.Steps))))
 	plan.print_plan()
 	#for element in plan.elements:
 		#element.print_element()
