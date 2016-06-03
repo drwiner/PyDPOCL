@@ -49,7 +49,7 @@ excavate_edges = {edge0, edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8,
 example = Operator(id = 111, type= 'Action')
 
 example_p1 =		Literal(id=211, 		type='Condition', 		name='alive', 		num_args = 1,	truth = True)
-example_e1 = 		Literal(id=311, 		type = 'Condition', 	name='has', 			truth = True)
+example_e1 = 		Literal(id=311, 		type = 'Condition', 	name='has', 	num_args = 2,		truth = True)
 example_e3 = 		Literal(id=911, 		type = 'Condition', 	name='has', 			truth = True)
 ex_const_element = 	Literal(id=611, 		type ='Condition',		name='knows-location', 	truth = True)
 example_actor = 	Actor(id=411, 		type='actor',			arg_pos_dict={example.id : 1})
@@ -123,7 +123,6 @@ F	=	IntentionFrame(id = 2222, type_graph = 'IntentionFrame', name=None, \
 		
 example_elements.add(F.root) #Intention Frame element
 
-
 P1 = 	PlanElementGraph(id = 5432,\
 		Elements=example_elements,\
 		Edges=example_edges,\
@@ -143,6 +142,7 @@ P1.print_plan()
 s = next(iter(P1.Steps))
 #print(s.id)
 step = P1.getElementGraphFromElement(s, Action)
+print('num_consenting actors = {} in step {}'.format(len(P1.getConsistentActors(P1.Steps)),s.id))
 #print(step.id)
 new_plans = step.instantiate(Excavate_operator_A,P1)
 print('num new plans: {}'.format(len(new_plans)))

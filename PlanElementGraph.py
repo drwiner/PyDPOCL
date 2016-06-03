@@ -434,9 +434,10 @@ class PlanElementGraph(ElementGraph):
 		""" Given subseteq of steps in self.Steps, return set of consistent actors
 		"""
 		step = next(iter(subseteq))
+		Step = self.getElementGraphFromElement(step,Action)
 		S = copy.deepcopy(subseteq)
 		S = S - {action for action in S if action.id != step.id}
-		return self.rPickActorFromSteps(remaining_steps = S,potential_actors = step.consenting_actors)
+		return self.rPickActorFromSteps(remaining_steps = S,potential_actors = Step.consenting_actors)
 			
 	def rPickActorFromSteps(self, remaining_steps = set(), potential_actors = set()):
 		""" Pick a step and for each actor in consenting_actors, 
@@ -460,13 +461,19 @@ class PlanElementGraph(ElementGraph):
 			return set()
 		
 		step = remaining_steps.pop()
+		step = self.getElementGraphFromElement(step,Action)
 		
+		to_remove = set()
+		to_add = set()
 		for actor in potential_actors:
 			prospects = {prospect for prospect in step.consenting_actors if actor.isConsistent(prospect)}
 			if len(prospects) == 0:
-				potential_actors.remove(actor)
+				to_remove.add(actor)
+				#potential_actors.remove(actor)
 			else:
-				potential_actors.update(prospects)
+				to_add.update(prospects)
+		potential_actors = potential_actors - to_remove
+		potential_actors.update(to_add)
 		return self.rPickActorFromSteps(remaining_steps, potential_actors)
 	
 	
