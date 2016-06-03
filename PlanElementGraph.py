@@ -201,6 +201,8 @@ class IntentionFrame(ElementGraph):
 				Edges=set(),\
 				Constraints=set()):
 		if actor is None:
+			print('need to select consistent_actor before instantiation')
+			
 			actor=Actor(id+1,type='actor')
 		if ms is None:
 			ms = Operator(id+2,type='Action', roles={id:'motivating-step'}, executed = False)
@@ -217,13 +219,13 @@ class IntentionFrame(ElementGraph):
 		self.motivation = Motivation(id + 5, intender=self.intender, goal = self.goal)	
 		
 		if root_element is None:
-			root_element = IntentionFrameElement(  id,type, \
-												ms =self.ms, \
-												motivation = self.motivation,\
-												intender = self.intender,\
-												goal = self.goal,\
-												sat = self.sat
-												)
+			root_element = IntentionFrameElement(	id,type, \
+													ms =self.ms, \
+													motivation = self.motivation,\
+													intender = self.intender,\
+													goal = self.goal,\
+													sat = self.sat\
+													)
 												
 		Edges.update({	Edge(root_element, actor, 'intender-of'), \
 						Edge(root_element, ms, 'motivating-step-of'), \
@@ -237,15 +239,9 @@ class IntentionFrame(ElementGraph):
 		super(IntentionFrame,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 		#########################################################################################
 		
-		self.Steps = \
-			{step for step in \
-				{self.getElementGraphFromElement(element, Action) \
-					for element in self.elements \
-						if element.type=='Action' \
-						and element.id != self.ms.id\
-				}\
-			}
-			
+		self.Steps = {self.getElementGraphFromElement(element,Action) \
+						for element in self.elements \
+							if element.type == 'Action' and element.id != self.ms.id}
 		print('how many steps', len(self.Steps))
 		
 		self.constraints.add(Ordering(ms,sat))
@@ -253,56 +249,7 @@ class IntentionFrame(ElementGraph):
 		self.constraints.update({Ordering(ms, step) for step in self.Steps})
 		""" recursively decide on an actor and update orphan status for each actor, then for each step"""
 		# If there were any steps with just one consenting actor, then that would be a good place to start
-		if len(self.intender.arg_pos_dict) == 0:
-			step = next(iter(self.Steps))
-			#step = self.getElementGraphFromElement(s,Action)
-			print(step.id)
-			S = copy.deepcopy(self.Steps)
-			S = S - {action for action in S if action.id != step.id}
-			consistent_actors = self.rPickActorFromSteps(remaining_steps = S,potential_actors = step.consenting_actors)
-			if len(consistent_actors) == 0:
-				print('consenting actors in steps in intention frame', self.id, 'cannot unify to consistent actor')
-			elif len(consistent_actors) > 1:
-				print('several actors to choose from')
-			else:
-				consistent_actor = consistent_actors.pop()
-				self.intender.merge(consistent_actor.pop())
 			
-		
-	
-
-	def rPickActorFromSteps(self, remaining_steps = set(), potential_actors = set()):
-		""" Pick a step and for each actor in consenting_actors, 
-			if consistent with potential_actors, 
-			invoke rPickActorFromSteps(remaining_steps-{step},potential_actors+{actor})
-			
-			Purpose:
-						In CPOCL, intention frames are initialized with an actor. In BiPOCL,
-							we may say that two steps are in the same plan.
-						Are there any other situations when we have to do the following:
-						
-			Problem:	Given a set of steps with consenting actors, find the subset of actors
-							that are consistent with one actor in every step.
-			
-			Strategy:	for each actor in potential_actors, remove if not consistent with any step actors
-		"""
-		
-		
-		if len(remaining_steps) == 0:
-			return potential_actors
-		if len(potential_actors) == 0:
-			return set()
-		
-		step = remaining_steps.pop()
-		
-		for actor in potential_actors:
-			prospects = {prospect for prospect in step.consenting_actors if actor.isConsistent(prospect)}
-			if len(prospects) == 0:
-				potential_actors.remove(actor)
-			else:
-				potential_actors.update(prospects)
-		return self.rPickActorFromSteps(remaining_steps, potential_actors)
-		
 
 	def addStep(self, Action, Plan):
 		""" Adding a step to an intention frame
@@ -443,6 +390,44 @@ class PlanElementGraph(ElementGraph):
 												Edges,\
 												Constraints\
 											)
+	def getConsistentActors(self, subseteq):
+		""" Given subseteq of steps in self.Steps, return set of consistent actors
+		"""
+		step = next(iter(self.Steps))
+		S = copy.deepcopy(self.Steps)
+		S = S - {action for action in S if action.id != step.id}
+		return self.rPickActorFromSteps(remaining_steps = S,potential_actors = step.consenting_actors)
+			
+	def rPickActorFromSteps(self, remaining_steps = set(), potential_actors = set()):
+		""" Pick a step and for each actor in consenting_actors, 
+			if consistent with potential_actors, 
+			invoke rPickActorFromSteps(remaining_steps-{step},potential_actors+{actor})
+			
+			Purpose:
+						In CPOCL, intention frames are initialized with an actor. In BiPOCL,
+							we may say that two steps are in the same plan.
+						Are there any other situations when we have to do the following:
+						
+			Problem:	Given a set of steps with consenting actors, find the subset of actors
+							that are consistent with one actor in every step.
+			
+			Strategy:	For each actor in potential_actors, remove if not consistent with any step actors
+		"""
+		
+		if len(remaining_steps) == 0:
+			return potential_actors
+		if len(potential_actors) == 0:
+			return set()
+		
+		step = remaining_steps.pop()
+		
+		for actor in potential_actors:
+			prospects = {prospect for prospect in step.consenting_actors if actor.isConsistent(prospect)}
+			if len(prospects) == 0:
+				potential_actors.remove(actor)
+			else:
+				potential_actors.update(prospects)
+		return self.rPickActorFromSteps(remaining_steps, potential_actors)
 	
 	def evaluateOperators(self,Operators):
 		"""

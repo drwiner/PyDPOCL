@@ -120,3 +120,4 @@ F	=	IntentionFrame(id = 2222, type = 'IntentionFrame', name=None, \
 print(len(F.Steps))
 F.print_frame()
 """ Test whether Actions in F.Steps are equivalent to Actions created in isolation"""
+""" Test rPickActorFromSteps when there are and are not consistent_actors"""
