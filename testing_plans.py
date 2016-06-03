@@ -116,9 +116,9 @@ F	=	IntentionFrame(id = 2222, type = 'IntentionFrame', name=None, \
 		Elements=example_elements,\
 		Edges=example_edges,\
 		Constraints=example_constraints,\
-		goal = None,\
+		goal = example_e1,#change with example_p1 to fail\
 		ms = None,\
-		sat = None,\
+		sat = example,\
 		actor=None)
 		
 example_elements.add(F.root) #Intention Frame element
@@ -141,15 +141,15 @@ print('\n\tPlan')
 P1.print_plan()
 
 s = next(iter(P1.Steps))
-print(s.id)
+#print(s.id)
 step = P1.getElementGraphFromElement(s, Action)
-print(step.id)
+#print(step.id)
 new_plans = step.instantiate(Excavate_operator_A,P1)
 print('num new plans: {}'.format(len(new_plans)))
 for plan in new_plans:
 	plan.print_plan()
-	for element in plan.elements:
-		element.print_element()
+	#for element in plan.elements:
+		#element.print_element()
 		
 
 

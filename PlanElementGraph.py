@@ -127,10 +127,13 @@ class Action(ElementGraph):
 		# print('from op_clone.possible_mergers')
 		# merges = {test}
 		plans = set()
+		id = PLAN.id + 1
 		for merge in merges:
 			Plan = PLAN.copyGen()
 			Plan.swap(self.root, merge)
 			if Plan.isInternallyConsistent():
+				Plan.id = id 
+				id = id + 1
 				plans.add(Plan)
 		return plans
 		
@@ -279,7 +282,7 @@ class IntentionFrame(ElementGraph):
 		self.updateSteps()
 		
 		self.constraints.add(Ordering(ms,sat))
-		self.constraints.update({Ordering(step, sat) for step in self.Steps if not step.isIdentical(sat)})
+		self.constraints.update({Ordering(step, sat) for step in self.Steps if not step.id == sat.id})
 		self.constraints.update({Ordering(ms, step) for step in self.Steps})
 		""" recursively decide on an actor and update orphan status for each actor, then for each step"""
 		# If there were any steps with just one consenting actor, then that would be a good place to start
@@ -296,12 +299,10 @@ class IntentionFrame(ElementGraph):
 					Does the Action have a consenting actor, that is inconsistent with intender?
 					Is there an ordering s.t. Operator is necessarily ordered before source?
 																			  or after sat?
-						
 				Change status of operator
-					Operator is no longer an orphan
+					Operator may no longer be an orphan
 					If intender is None but operator has an actor, or vice versa, then fill in
-					
-					
+	
 		"""
 		
 		""" Pick Which Consenting Actor"""
