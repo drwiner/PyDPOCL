@@ -110,7 +110,12 @@ class Condition(ElementGraph):
 		Elements=set(), root_element = None, Edges = set(), Constraints = set()):
 		
 		super(Condition,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
-		#self.labels = labels = ['first-arg','second-arg','third-arg','fourth-arg']
+		self.labels = ['first-arg','second-arg','third-arg','fourth-arg']
+		
+	def getArgList(self):
+
+		
+		return [self.getNeighborsByLabel(self.root, self.labels[i]) for i in range(self.root.num_args)]
 		
 	# def makeElementGraph(self,element):
 		# return Condition(		id=element.id, \
@@ -389,12 +394,20 @@ class IntentionFrame(ElementGraph):
 		
 		return True
 	
-	def print_frame(self)
-		arg_labels = ['first-arg', 'second-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
-		edges = set()
-		for i, arg in enumerate(self.motivation.goal.num_args):
-			self.motivation.goal.getIncidentEdgesByLabel(arg_labels[i]) 
-		print('INTENTION FRAME:: intends %s (%s )' %s self.motivation.goal.name %s )
+	def print_frame(self):
+		arg_labels = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
+		Goal = self.getElementGraphFromElement(self.goal, Condition)
+		args = Goal.getArgList()
+		print('len args', len(args))
+		print('intends {} ({}'.format(self.intender.id,self.goal.name), end=" ")
+		for i, arg in enumerate(args):
+			if len(arg) == 0:
+				str = '__'
+			else:
+				this_arg = arg.pop()
+				str = this_arg.id
+			print(str, end=" ") 
+		print(')')
 		
 class PlanElementGraph(ElementGraph):
 

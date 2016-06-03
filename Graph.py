@@ -116,9 +116,9 @@ class Graph(Element):
 	def getParents(self, element):
 		return set(edge.source for edge in self.edges if edge.sink is element)
 	def getNeighborsByLabel(self, element, label):
-		return set(edge.sink for edge in self.edges if edge.source is element and edge.label is label)
+		return {edge.sink for edge in self.edges if edge.source.id == element.id and edge.label == label}
 	def getIncidentEdgesByLabel(self, element, label):
-		return {edge for edge in self.edges if edge.source is element and edge.label is label}
+		return {edge for edge in self.edges if edge.source.id == element.id and edge.label == label}
 	def getParentsByLabel(self, element, label):
 		return set(edge.source for edge in self.edges if edge.sink is element and edge.label is label)
 	def getConstraints(self, element):

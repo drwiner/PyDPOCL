@@ -48,7 +48,7 @@ excavate_edges = {edge0, edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8,
 	
 example = Operator(id = 111, type= 'Action')
 
-example_p1 =		Literal(id=211, 		type='Condition', 		name='alive', 			truth = True)
+example_p1 =		Literal(id=211, 		type='Condition', 		name='alive', 		num_args = 1,	truth = True)
 example_e1 = 		Literal(id=311, 		type = 'Condition', 	name='has', 			truth = True)
 example_e3 = 		Literal(id=911, 		type = 'Condition', 	name='has', 			truth = True)
 ex_const_element = 	Literal(id=611, 		type ='Condition',		name='knows-location', 	truth = True)
@@ -114,9 +114,9 @@ F	=	IntentionFrame(id = 2222, type = 'IntentionFrame', name=None, \
 		Elements=example_elements,\
 		Edges=example_edges,\
 		Constraints=example_constraints,\
-		goal = p1,\
+		goal = example_p1,\
 		actor=None)
 								
 print(len(F.Steps))
-
+F.print_frame()
 """ Test whether Actions in F.Steps are equivalent to Actions created in isolation"""

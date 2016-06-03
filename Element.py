@@ -391,10 +391,9 @@ class IntentionFrameElement(Element):
 		self.subplan = steps
 		
 class Motivation(Literal):
-	def __init__(self, id, type='motivation', num_args = 1, truth = True, intender=None, goal=None):
+	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender=None, goal=None):
 		super(Motivation,self).__init__(id,type,name,num_args,{},truth)
 		
-		if goal is None:
 			
 		self.actor = intender
 		self.goal = goal #Goal is a literal. THIS is a case where... a Literal has-a Literal
