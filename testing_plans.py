@@ -112,7 +112,7 @@ print('\n\texcavate operator:')
 Excavate_operator_A.print_graph()
 
 
-F	=	IntentionFrame(id = 2222, type = 'IntentionFrame', name=None, \
+F	=	IntentionFrame(id = 2222, type_graph = 'IntentionFrame', name=None, \
 		Elements=example_elements,\
 		Edges=example_edges,\
 		Constraints=example_constraints,\
@@ -156,5 +156,5 @@ for plan in new_plans:
 """ Test whether Actions in F.Steps are equivalent to Actions created in isolation"""
 """ Test rPickActorFromSteps when there are and are not consistent_actors"""
 
-"""
+"""	Test adding step to an intention frame if already in plan. 
 """

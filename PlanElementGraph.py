@@ -112,6 +112,12 @@ class Action(ElementGraph):
 		
 		print(')')
 		
+	def isOrphan(self):
+		for actor in self.consenting_actors:
+			if actor.orphan_dict[self.root.id] == True:
+				self.is_orphan = True
+				break
+				
 	def instantiate(self, operator, PLAN):
 		""" instantiates self as operator in PLAN
 			RETURNS a set of plans, one for each instantiation which is internally consistent
@@ -231,7 +237,7 @@ class IntentionFrame(ElementGraph):
 		Intention Frame is an element graph plus a set of special elements
 		Initially, 
 	"""
-	def __init__(self,id,type='IntentionFrame',name=None, \
+	def __init__(self,id,type_graph='IntentionFrame',name=None, \
 				Elements=set(),\
 				root_element = None,\
 				actor=None,\
@@ -259,7 +265,7 @@ class IntentionFrame(ElementGraph):
 		self.motivation = Motivation(id + 5, intender=self.intender, goal = self.goal)	
 		
 		if root_element is None:
-			root_element = IntentionFrameElement(	id,type, \
+			root_element = IntentionFrameElement(	id,type_graph, \
 													ms =self.ms, \
 													motivation = self.motivation,\
 													intender = self.intender,\
@@ -279,21 +285,22 @@ class IntentionFrame(ElementGraph):
 		super(IntentionFrame,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 		#########################################################################################
 		
-		self.updateSteps()
+		self.Steps = {step for step in self.elements if type(step) is Operator}
 		
 		self.constraints.add(Ordering(ms,sat))
 		self.constraints.update({Ordering(step, sat) for step in self.Steps if not step.id == sat.id})
 		self.constraints.update({Ordering(ms, step) for step in self.Steps})
-		""" recursively decide on an actor and update orphan status for each actor, then for each step"""
+		
 		# If there were any steps with just one consenting actor, then that would be a good place to start
 			
-	def updateSteps(self):
-		self.Steps = {self.getElementGraphFromElement(element,Action) \
-						for element in self.elements \
-							if element.type == 'Action' and element.id != self.ms.id}
-		return self
+	# def updateSteps(self):
+		# self.Steps = {self.getElementGraphFromElement(element,Action) \
+						# for element in self.elements \
+							# if element.type == 'Action' and element.id != self.ms.id}
+		# return self
+		
 
-	def addStep(self, Action, Plan):
+	def addStep(self, Action, Plan, action_already_in_plan = True):
 		""" Adding a step to an intention frame
 				Return False if not added:
 					Does the Action have a consenting actor, that is inconsistent with intender?
@@ -301,65 +308,58 @@ class IntentionFrame(ElementGraph):
 																			  or after sat?
 				Change status of operator
 					Operator may no longer be an orphan
-					If intender is None but operator has an actor, or vice versa, then fill in
-	
+					
+			RETURN new plan with step in intention frame
 		"""
+		if not action_already_in_plan:
+			print('action_already_in_plan = false for plan {}; functionality not finished'.format(Plan.id))
 		
 		""" Pick Which Consenting Actor"""
-		if self.intender is None:
-			print('intention frame', self.id, 'has no intender, but needss one to add step')
-			return False
-			
 		if len(Action.consenting_actors) == 0:
 			print('Action', Action.id, 'has no consenting actors, but needs one to add to intention frame', self.id)
 			return False
 		
-		this_actor = None
-		if not self.intender in Action.consenting_actors:
-			found = False
-			for actor in Action.consenting_actors:
-				if self.intender.isConsistent(actor):
-					this_actor = actor
-					found = True
-					break
-			if not found:
-				print('Action', Action.id, 'has no consenting actors consistent with intender of intention frame', self.id)
-				return False
-
+		consistent_actors = Plan.getConsistentActors(self.Steps)
+		if len(consistent_actors) == 0:
+			print('Cannot add step {} to plan {} because there are no consistent actors in {}'.format(Action.id, Plan.id, Plan.id))
+			return False
+			
 		"""Check ordering constraints"""
-		if not self.source is None:
-			if Plan.necessarilyOrdered(Action.root, self.source):
-				return False
-		if not self.sat is None:
-			if Plan.necessarilyOrdered(self.sat, Action.root):
-				return False
-		else:
-			print('ought to be satisfying step in intention frame', self.id, 'if we are adding a step...', Action.id)
+		if Plan.necessarilyOrdered(Action.root, self.source):
+			print('Cannot add action {} to plan {} because of ordering constraint {} < {}'.format(Action.id,Plan.id,Action.root.id,self.source.id))
+			return False
+		if Plan.necessarilyOrdered(self.sat, Action.root):
+			print('Cannot add action {} to plan {} because of ordering constraint {} < {}'.format(Action.id,Plan.id,self.sat.id,Action.root.id))
+			return False
+			
+		new_plan = plan.copyGen()
+		new_plan.Steps.add(Action.root)
+		new_plan.elements.update(Action.elements)
+		new_plan.edges.update(Action.edges)
+		new_plan.constraints.update(Action.constraints)
+		this_frame_element.getElementById(self.root.id)
+		consistent_actors = new_plan.getConsistentActors(self.Steps)
+		if len(consistent_actors) == 0:
+			print('After simulation, cannot add step {} to plan {} because there are no consistent actors which unify'.format(Action.id, new_plan.id))
+			return False
+
 			
 		""" Make it so"""
-		
-		self.Steps.add(Action)
-		
-		if not self.sat is None:
-			Plan.addOrdering(Action.root, self.sat)
-		if not self.source is None:
-			Plan.addOrdering(self.source, Action.root)
+		#Add ordering
+		new_plan.addOrdering(Action.root, this_frame_element.sat)
+		new_plan.addOrdering(this_frame_element.ms, Action.root)
 			
-		false_detected = False
-		for actor in Action.consenting_actors:
-			for op_id, status in actor.orphan_dict.items():
-				if op_id == Action.root.id and actor is this_actor:
-					this_actor.orphan_dict[op_id] = False
+		#Orphan status
+		if len(consistent_actors) == 1:
+			this_frame_element.intender = consistent_actors.pop()
+			for op_id, status in this_frame_element.intender.orphan_dict.items():
+				if op_id == Action.root.id:
+					this_frame_element.intender.orphan_dict[op_id] = False
 					break
-			if False in actor.orphan_dict.values():
-				false_detected = True
-				
-		self.intender.combine(this_actor)
-		
-		if not false_detected:
-			Action.is_orphan = False
+		#Update if action is an orphan
+		Action.isOrphan()
 			
-		return self
+		return new_plan
 	
 	def isInternallyConsistent(self):
 		# for effect in self.sat.getEffects():
@@ -433,8 +433,8 @@ class PlanElementGraph(ElementGraph):
 	def getConsistentActors(self, subseteq):
 		""" Given subseteq of steps in self.Steps, return set of consistent actors
 		"""
-		step = next(iter(self.Steps))
-		S = copy.deepcopy(self.Steps)
+		step = next(iter(subseteq))
+		S = copy.deepcopy(subseteq)
 		S = S - {action for action in S if action.id != step.id}
 		return self.rPickActorFromSteps(remaining_steps = S,potential_actors = step.consenting_actors)
 			
