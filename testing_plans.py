@@ -87,34 +87,34 @@ example_constraints = {	example_constraint_edge0, \
 
 
 ####Operator - Domain Action
-Excavate_graph = Action(	id = 0,\
+Excavate_operator =			Action(	id = 200,\
 							graph_type = 'Action', \
 							name = 'excavate', \
 							Elements = excavate_elements, \
 							root_element = excavate,\
 							Edges = excavate_edges)
 
-Example_graph =	 Action(	id = 1111, \
+Example_step =	 			Action(	id = 1111, \
 							graph_type='Action', \
 							Elements = example_elements, \
 							root_element = example,\
 							Edges = example_edges, \
 							Constraints = example_constraints)
 
-Excavate_graph_A = Excavate_graph.copyGen()
-Example_graph_A  = Example_graph.copyGen()
+Excavate_operator_A = Excavate_operator.copyGen()
+Example_step_A  = Example_step.copyGen()
 
-Excavate_graph_A = Excavate_graph.makeCopyFromID(9000,11)
+Excavate_operator_B = Excavate_operator.makeCopyFromID(9000,11)
 #print(Excavate_graph_A.root.id)
-Example_graph_A  = Example_graph.copyGen()
+Example_step_B  = Example_step.copyGen()
 
-Excavate_graph_A.print_graph()
+Excavate_operator_A.print_graph()
 
-F 		=		IntentionFrame(id = 2222, type = 'intention_frame', name=None, \
-								Elements=example_elements,\
-								Edges=example_edges,\
-								Constraints=example_constraints,\
-								actor=None)
+F	=	IntentionFrame(id = 2222, type = 'IntentionFrame', name=None, \
+		Elements=example_elements,\
+		Edges=example_edges,\
+		Constraints=example_constraints,\
+		actor=None)
 								
 print(len(F.Steps))
 

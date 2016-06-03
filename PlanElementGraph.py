@@ -18,6 +18,10 @@ class Action(ElementGraph):
 				Constraints = set()\
 				):
 		
+		
+		if root_element is None:
+			root_element = Operator(id + 201,type='Action')
+			
 		super(Action,self).__init__(	id,graph_type,name,\
 										Elements,\
 										root_element,\
@@ -184,18 +188,28 @@ class IntentionFrame(ElementGraph):
 	def __init__(self,id,type='IntentionFrame',name=None, \
 				Elements=set(),\
 				root_element = None,\
-				actor=Actor(id= id+1,type='actor'),\
-				ms=Operator(id = id+2,type='Action', roles={id:'motivating-step'}, executed = False),\
-				sat=Operator(id = id+3, type='Action', roles={id:'satisfying-step'}, executed = False),\
-				goal=Literal(id =id + 4, type='Condition', roles={id: 'goal'}, truth = True),\
+				actor=None,\
+				ms=None,\
+				sat=None,\
+				goal=None,\
 				Edges=set(),\
 				Constraints=set()):
-				
+		if actor is None:
+			actor=Actor(id+1,type='actor')
+		if ms is None:
+			ms = Operator(id+2,type='Action', roles={id:'motivating-step'}, executed = False)
+		if sat is None:
+			sat = Operator(id+3, type='Action', roles={id:'satisfying-step'}, executed = False)
+		if goal is None:
+			goal = Literal(id+ 4, type='Condition', roles={id: 'goal'}, truth = True)
+		
+		self.root = root_element
 		self.ms = ms
 		self.intender = actor
 		self.goal = goal
 		self.sat = sat
-		self.motivation = Motivation(id= id + 5, intender=self.intender, goal = self.goal)	
+		self.motivation = Motivation(id + 5, intender=self.intender, goal = self.goal)	
+		
 		if root_element is None:
 			root_element = IntentionFrameElement(  id,type, \
 												ms =self.ms, \
@@ -210,10 +224,12 @@ class IntentionFrame(ElementGraph):
 						Edge(root_element, sat, 'sat-step-of'),\
 						Edge(root_element, goal, 'goal-of'),\
 						Edge(sat, goal, 'effect-of'), \
-						Edge(ms, self.motivation, 'effect-of')\
-						Edge(sat, actor, 'actor-of'),
+						Edge(ms, self.motivation, 'effect-of'),\
+						Edge(sat, actor, 'actor-of')\
 						})
-
+		#########################################################################################
+		super(IntentionFrame,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
+		#########################################################################################
 		
 		self.Steps = \
 			{step for step in \
@@ -223,25 +239,30 @@ class IntentionFrame(ElementGraph):
 						and element.id != self.ms.id\
 				}\
 			}
+			
+		print('how many steps', len(self.Steps))
 		
-		Constraints.add(Ordering(ms,sat))
-		Constraints.update( {Ordering(step, sat) for step in self.Steps if not step.isIdentical(sat)})
-		Constraints.update( {Ordering(ms, step) for step in self.Steps})
+		self.constraints.add(Ordering(ms,sat))
+		self.constraints.update({Ordering(step, sat) for step in self.Steps if not step.isIdentical(sat)})
+		self.constraints.update({Ordering(ms, step) for step in self.Steps})
 		""" recursively decide on an actor and update orphan status for each actor, then for each step"""
 		# If there were any steps with just one consenting actor, then that would be a good place to start
 		if len(self.intender.arg_pos_dict) == 0:
-			s = next(iter(self.Steps))
-			consistent_actors = self.rPickActorFromSteps(remaining_steps = copy.deepcopy(self.Steps - {s}),s.consenting_actors)
+			step = next(iter(self.Steps))
+			#step = self.getElementGraphFromElement(s,Action)
+			print(step.id)
+			S = copy.deepcopy(self.Steps)
+			S = S - {action for action in S if action.id != step.id}
+			consistent_actors = self.rPickActorFromSteps(remaining_steps = S,potential_actors = step.consenting_actors)
 			if len(consistent_actors) == 0:
 				print('consenting actors in steps in intention frame', self.id, 'cannot unify to consistent actor')
-				return None
 			elif len(consistent_actors) > 1:
 				print('several actors to choose from')
 			else:
 				consistent_actor = consistent_actors.pop()
 				self.intender.merge(consistent_actor.pop())
 			
-		super(IntentionFrame,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
+		
 	
 
 	def rPickActorFromSteps(self, remaining_steps = set(), potential_actors = set()):
@@ -264,11 +285,11 @@ class IntentionFrame(ElementGraph):
 		if len(remaining_steps) == 0:
 			return potential_actors
 		if len(potential_actors) == 0:
-			return
+			return set()
 		
 		step = remaining_steps.pop()
 		
-		for actor in potential_actors
+		for actor in potential_actors:
 			prospects = {prospect for prospect in step.consenting_actors if actor.isConsistent(prospect)}
 			if len(prospects) == 0:
 				potential_actors.remove(actor)
