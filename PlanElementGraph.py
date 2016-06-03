@@ -50,6 +50,7 @@ class Action(ElementGraph):
 			elif actor.orphan_dict[self.root.id] == True:
 				self.is_orphan = True
 				break
+
 	
 	def makeCopyFromID(self, start_from, increment = 1):
 		new_self = self.copyGen()
@@ -367,7 +368,7 @@ class IntentionFrame(ElementGraph):
 			Action.is_orphan = False
 			
 		return self
-		
+	
 	def isInternallyConsistent(self):
 		for effect in self.sat.getEffects():
 			if not self.goal.isConsistent(effect):
@@ -387,6 +388,13 @@ class IntentionFrame(ElementGraph):
 			return False
 		
 		return True
+	
+	def print_frame(self)
+		arg_labels = ['first-arg', 'second-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
+		edges = set()
+		for i, arg in enumerate(self.motivation.goal.num_args):
+			self.motivation.goal.getIncidentEdgesByLabel(arg_labels[i]) 
+		print('INTENTION FRAME:: intends %s (%s )' %s self.motivation.goal.name %s )
 		
 class PlanElementGraph(ElementGraph):
 
