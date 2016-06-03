@@ -116,7 +116,7 @@ F	=	IntentionFrame(id = 2222, type = 'IntentionFrame', name=None, \
 		Elements=example_elements,\
 		Edges=example_edges,\
 		Constraints=example_constraints,\
-		goal = example_p1,\
+		goal = None,\
 		ms = None,\
 		sat = None,\
 		actor=None)
@@ -148,6 +148,10 @@ new_plans = step.instantiate(Excavate_operator_A,P1)
 print('num new plans: {}'.format(len(new_plans)))
 for plan in new_plans:
 	plan.print_plan()
+	for element in plan.elements:
+		element.print_element()
+		
+
 
 """ Test whether Actions in F.Steps are equivalent to Actions created in isolation"""
 """ Test rPickActorFromSteps when there are and are not consistent_actors"""

@@ -246,7 +246,7 @@ class IntentionFrame(ElementGraph):
 		if sat is None:
 			sat = Operator(id+3, type='Action', roles={id:'satisfying-step'}, executed = False)
 		if goal is None:
-			goal = Literal(id+ 4, type='Condition', roles={id: 'goal'}, truth = True)
+			goal = Literal(id+ 4, type='Condition', roles={id: 'goal'}, truth = None)
 		
 		self.root = root_element
 		self.ms = ms
@@ -384,8 +384,6 @@ class IntentionFrame(ElementGraph):
 	
 	def print_frame(self):
 		Goal = self.getElementGraphFromElement(self.goal, Condition)
-		print('\n motivation {}:'.format(self.id))
-		#if self.intender
 		Goal.print_graph(motive=True,actor_id = self.intender.id)
 		
 class PlanElementGraph(ElementGraph):
@@ -429,6 +427,7 @@ class PlanElementGraph(ElementGraph):
 		self.Orderings = {edge for edge in Constraints if type(edge) is Ordering}
 		self.Causal_Links = {edge for edge in Edges if type(edge) is CausalLink}
 		self.IntentionFrames = {element for element in Elements if type(element) is IntentionFrameElement}
+		return self
 											
 	def getConsistentActors(self, subseteq):
 		""" Given subseteq of steps in self.Steps, return set of consistent actors
@@ -469,18 +468,6 @@ class PlanElementGraph(ElementGraph):
 				potential_actors.update(prospects)
 		return self.rPickActorFromSteps(remaining_steps, potential_actors)
 	
-	def evaluateOperators(self,Operators):
-		"""
-			2) For each causal link (source,sink,condition), 
-				narrow down consistent mappings to just those which are consistent 
-				given assignment of positions to arguments
-
-		"""
-		self.consistent_mappings = {step.id :  {\
-												D.id for D in Operators \
-													if D.isConsistent(step)\
-												} for step in Steps \
-									}
 	
 	def isInternallyConsistent(self):
 		return True
