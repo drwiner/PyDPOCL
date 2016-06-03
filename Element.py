@@ -201,9 +201,10 @@ class Operator(InternalElement):
 		return self
 		
 	def print_element(self):
-		print('executed:',self.executed,'orphan=',self.is_orphan,'(',self.id, self.type, self.name,')')
+		print('executed: {}, orphan: {}, ({}, {}, {})'.format(self.executed, self.is_orphan, self.name, self.type, self.id))
+		#print('executed:',self.executed,', orphan=',self.is_orphan,'(',self.id, self.type, self.name,')')
 		for key,value in self.roles.items():
-			print("\t id=", key,":","role=",value)
+			print('\t id={}, role={}'.format(key, value))
 
 		
 class Literal(InternalElement):

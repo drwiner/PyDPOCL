@@ -117,6 +117,20 @@ class Condition(ElementGraph):
 		
 		return [self.getNeighborsByLabel(self.root, self.labels[i]) for i in range(self.root.num_args)]
 		
+	def print_graph(self, motive = False):
+		args = self.getArgList()
+		if motive:
+			print('intends', end=" ")
+		print('{}({}'.format(self.root.truth,self.root.name), end=" ")
+		for i, arg in enumerate(args):
+			if len(arg) == 0:
+				str = '__'
+			else:
+				this_arg = arg.pop()
+				str = this_arg.id
+			print(str, end=" ") 
+		print(')')	
+		
 	# def makeElementGraph(self,element):
 		# return Condition(		id=element.id, \
 								# type= element.type, \
@@ -344,47 +358,37 @@ class IntentionFrame(ElementGraph):
 	def print_frame(self):
 		arg_labels = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
 		Goal = self.getElementGraphFromElement(self.goal, Condition)
-		args = Goal.getArgList()
-		print('len args', len(args))
-		print('intends {} ({}'.format(self.intender.id,self.goal.name), end=" ")
-		for i, arg in enumerate(args):
-			if len(arg) == 0:
-				str = '__'
-			else:
-				this_arg = arg.pop()
-				str = this_arg.id
-			print(str, end=" ") 
-		print(')')
+		print('\n motivation {}:'.format(self.id))
+		Goal.print_graph(motive=True)
 		
 class PlanElementGraph(ElementGraph):
 
-	def __init__(self,id,type,name=None, \
+	def __init__(self,id,type_graph ='PlanElementGraph',name=None, \
 				Elements = set(), \
 				planElement = None, \
 				Edges = set(), \
 				Constraints = set()):
 		
 		self.Steps = {element for element in Elements if type(element) is Operator}
-		self.Bindings = {edge for edge in Edges if type(edge) is Binding}
-		self.Orderings = {edge for edge in Edges if type(edge) is Ordering}
+		#self.Bindings = {edge for edge in Edges if type(edge) is Binding}
+		self.Orderings = {edge for edge in Constraints if type(edge) is Ordering}
 		self.Causal_Links = {edge for edge in Edges if type(edge) is CausalLink}
 		self.IntentionFrames = {element for element in Elements if type(element) is IntentionFrameElement}
 		
 		if planElement is None:
 			planElement = PlanElement(\
-										id =self.id, \
-										type='plan element', \
-										name=self.name,\
-										Steps = Steps, \
-										Bindings = Bindings,\
-										Orderings = Orderings,\
-										CausalLinks = CausalLinks,\
-										IntentionFrames = IntentionFrames\
+										id =id, \
+										type=type_graph, \
+										name=name,\
+										Steps = self.Steps, \
+										Orderings = self.Orderings,\
+										CausalLinks = self.Causal_Links,\
+										IntentionFrames = self.IntentionFrames\
 									)
 									
 		super(PlanElementGraph,self).__init__(\
 												id,\
-												type,\
+												type_graph,\
 												name,\
 												Elements,planElement,\
 												Edges,\
@@ -447,4 +451,10 @@ class PlanElementGraph(ElementGraph):
 													if D.isConsistent(step)\
 												} for step in Steps \
 									}
+									
+	def print_plan(self):
+		print('\n PLAN', self.id)
+		print('steps:')
+		for step in self.Steps:
+			step.print_element()
 		

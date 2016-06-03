@@ -116,8 +116,23 @@ F	=	IntentionFrame(id = 2222, type = 'IntentionFrame', name=None, \
 		Constraints=example_constraints,\
 		goal = example_p1,\
 		actor=None)
+		
+example_elements.add(F.root) #Intention Frame element
+
+
+
+P1 = 	PlanElementGraph(id = 5432,\
+		Elements=example_elements,\
+		Edges=example_edges,\
+		Constraints=example_constraints,\
+		)
+
+
 								
 print(len(F.Steps))
 F.print_frame()
+
+print(len(P1.Steps))
+P1.print_plan()
 """ Test whether Actions in F.Steps are equivalent to Actions created in isolation"""
 """ Test rPickActorFromSteps when there are and are not consistent_actors"""
