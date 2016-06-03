@@ -49,6 +49,8 @@ class Action(ElementGraph):
 										for edge in self.edges \
 											if edge.source is self.root \
 											and edge.label == 'actor-of'})
+											
+		print('num_CONSENTING actors = {} in action {}'.format(len(self.consenting_actors),self.id))
 		
 		""" Determine if Action is an orphan"""
 		for actor in self.consenting_actors:
@@ -433,7 +435,7 @@ class PlanElementGraph(ElementGraph):
 		return self
 											
 	def getConsistentActors(self, subseteq):
-		""" Given subseteq of steps in self.Steps, return set of consistent actors
+		""" Given subseteq of step elements in plan, return set of consistent actors (i.e. an actor that could be a consenting actor in each)
 		"""
 		step = next(iter(subseteq))
 		Step = self.getElementGraphFromElement(step,Action)
