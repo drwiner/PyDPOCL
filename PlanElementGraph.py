@@ -57,7 +57,6 @@ class Action(ElementGraph):
 			elif actor.orphan_dict[self.root.id] == True:
 				self.is_orphan = True
 				break
-
 	
 	def makeCopyFromID(self, start_from, increment = 1):
 		new_self = self.copyGen()
@@ -113,13 +112,28 @@ class Action(ElementGraph):
 		
 		print(')')
 		
-	# @staticmethod
-	# def operatorToAction(Operator, action_id):
-		# """ given a domain operator, create an action which is a copy of the operator but with merged args"""
-		# root_id = Operator.root_element.id
-		# copy_operator = Operator.copyGen()
-		# copy_operator.update({action_id:value}\
-								# for key,value in copy_operator)	
+	def instantiate(self, operator, PLAN):
+		""" instantiates self as operator in PLAN
+			RETURNS a set of plans, one for each instantiation which is internally consistent
+			- To instantiate a step as an operator, 
+							1) make a copy of operator with new IDs
+							2) operator.absolve(step)
+							3) swap operator for step in plan
+		"""
+		op_clone = operator.makeCopyFromID(self.id + 777,1)
+		merges = op_clone.possible_mergers(self)
+		# test = merges.pop()
+		# test.root.print_element()
+		# print('from op_clone.possible_mergers')
+		# merges = {test}
+		plans = set()
+		for merge in merges:
+			Plan = PLAN.copyGen()
+			Plan.swap(self.root, merge)
+			if Plan.isInternallyConsistent():
+				plans.add(Plan)
+		return plans
+		
 		
 		
 class Condition(ElementGraph):
@@ -149,15 +163,6 @@ class Condition(ElementGraph):
 			print(str, end=" ") 
 		print(')')	
 		
-	# def makeElementGraph(self,element):
-		# return Condition(		id=element.id, \
-								# type= element.type, \
-								# name=None,\
-								# Elements = self.rGetDescendants(element),\
-								# root_element = element,\
-								# Edges = self.rGetDescendantEdges(element),\
-								# Constraints = self.rGetDescendantConstraints(element)\
-								# )
 		
 class CausalLink(Edge):
 	""" A causal link is an edge, s.t. the source and sink are actions, and the condition is itself an edge between a dummy element
@@ -271,10 +276,7 @@ class IntentionFrame(ElementGraph):
 		super(IntentionFrame,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
 		#########################################################################################
 		
-		self.Steps = {self.getElementGraphFromElement(element,Action) \
-						for element in self.elements \
-							if element.type == 'Action' and element.id != self.ms.id}
-		print('how many steps', len(self.Steps))
+		self.updateSteps()
 		
 		self.constraints.add(Ordering(ms,sat))
 		self.constraints.update({Ordering(step, sat) for step in self.Steps if not step.isIdentical(sat)})
@@ -282,6 +284,11 @@ class IntentionFrame(ElementGraph):
 		""" recursively decide on an actor and update orphan status for each actor, then for each step"""
 		# If there were any steps with just one consenting actor, then that would be a good place to start
 			
+	def updateSteps(self):
+		self.Steps = {self.getElementGraphFromElement(element,Action) \
+						for element in self.elements \
+							if element.type == 'Action' and element.id != self.ms.id}
+		return self
 
 	def addStep(self, Action, Plan):
 		""" Adding a step to an intention frame
@@ -354,22 +361,24 @@ class IntentionFrame(ElementGraph):
 		return self
 	
 	def isInternallyConsistent(self):
-		for effect in self.sat.getEffects():
-			if not self.goal.isConsistent(effect):
-				return False
-		for step in self.subplan.elements:
-			#All steps must be isTransitiveClosure_isAntecedent
-			if not step.isTransitiveClosure_isAntecedent(self.sat):
-				return False
-			if not self.intender in step.getActors():
-				return False
-		if not self.intender in self.sat.getActors():
-			return False
-		for effect in self.ms.getEffects():
-			if not self.motivation.isConsistent(effect):
-				return False
-		if not self.motivation in self.ms.getEffects():
-			return False
+		# for effect in self.sat.getEffects():
+			# if not self.goal.isConsistent(effect):
+				# return False
+				
+		# for step in self.subplan.elements:
+			# #All steps must be isTransitiveClosure_isAntecedent
+			# if not step.isTransitiveClosure_isAntecedent(self.sat):
+				# return False
+			# if not self.intender in step.getActors():
+				# return False
+		
+		# if not self.intender in self.sat.getActors():
+			# return False
+		# for effect in self.ms.getEffects():
+			# if not self.motivation.isConsistent(effect):
+				# return False
+		# if not self.motivation in self.ms.getEffects():
+			# return False
 		
 		return True
 	
@@ -387,11 +396,7 @@ class PlanElementGraph(ElementGraph):
 				Edges = set(), \
 				Constraints = set()):
 		
-		self.Steps = {element for element in Elements if type(element) is Operator}
-		#self.Bindings = {edge for edge in Edges if type(edge) is Binding}
-		self.Orderings = {edge for edge in Constraints if type(edge) is Ordering}
-		self.Causal_Links = {edge for edge in Edges if type(edge) is CausalLink}
-		self.IntentionFrames = {element for element in Elements if type(element) is IntentionFrameElement}
+		self.updatePlan(Elements,Edges,Constraints)
 		
 		if planElement is None:
 			planElement = PlanElement(\
@@ -412,6 +417,19 @@ class PlanElementGraph(ElementGraph):
 												Edges,\
 												Constraints\
 											)
+	
+	def updatePlan(self, Elements = None,Edges = None,Constraints = None):
+		if Elements is None:
+			Elements = self.elements
+		if Edges is None:
+			Edges = self.edges
+		if Constraints is None:
+			Constraints = self.constraints
+		self.Steps = {element for element in Elements if type(element) is Operator}
+		self.Orderings = {edge for edge in Constraints if type(edge) is Ordering}
+		self.Causal_Links = {edge for edge in Edges if type(edge) is CausalLink}
+		self.IntentionFrames = {element for element in Elements if type(element) is IntentionFrameElement}
+											
 	def getConsistentActors(self, subseteq):
 		""" Given subseteq of steps in self.Steps, return set of consistent actors
 		"""
@@ -453,26 +471,30 @@ class PlanElementGraph(ElementGraph):
 	
 	def evaluateOperators(self,Operators):
 		"""
-			1) Go through steps and determine consistent operators
-				- To instantiate a step as an operator, copy operator and operator.rMerge(step)
-				- In plan, step.mergeAt(copyoperator) ('take its family')
-				- Successfully instantiated argument adopter
-
 			2) For each causal link (source,sink,condition), 
 				narrow down consistent mappings to just those which are consistent 
 				given assignment of positions to arguments
 
-			3) rMerge(self, other, self_element = self.root, other_element = other.root, consistent_merges = set())
 		"""
 		self.consistent_mappings = {step.id :  {\
 												D.id for D in Operators \
 													if D.isConsistent(step)\
 												} for step in Steps \
 									}
-									
+	
+	def isInternallyConsistent(self):
+		return True
+	
 	def print_plan(self):
+		self.updatePlan()
 		print('\nPLAN', self.id)
 		print('steps:')
 		for step in self.Steps:
 			step.print_element()
+		print('frames:')
+		for frame in self.IntentionFrames:
+			Goal = self.getElementGraphFromElement(frame.goal, Condition)
+			#if self.intender
+			Goal.print_graph(motive=True,actor_id = frame.intender.id)
+			#frame.print_frame()
 		

@@ -85,13 +85,13 @@ class Graph(Element):
 		source = self.getElementById(edge.source.id)
 		sink = self.getElementById(edge.sink.id)
 		label = edge.label
-		self.addEdge(Edge(source, sink, label))
+		self.edges.add(Edge(source, sink, label))
 		
 	def addConstraintByIdentity(self, edge):
 		source = self.getElementById(edge.source.id)
 		sink = self.getElementById(edge.sink.id)
 		label = edge.label
-		self.addConstraint(Edge(source, sink, label))
+		self.constraints.add(Edge(source, sink, label))
 	
 	def getElementById(self, id):
 		for element in self.elements:

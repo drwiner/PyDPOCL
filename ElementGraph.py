@@ -41,8 +41,65 @@ class ElementGraph(Graph):
 			
 		return Type.makeElementGraph(self,element)
 
-					
 	def swap(self, source, other):
+		""" source is root of partial step in self, other is other which absolved source.Action
+		
+				purpose: 	for each element in other, 
+							if element.replaced_id is sink in an edge in self.edges
+							replace sink of edge with element
+							
+							Note: 	its already the case that all edges in self where edge.source in self.edges
+									is an element in other has been replaced, or else the getElementGraphFromElement
+									made an error
+							
+							For each new element and edge in other, need to add those to self as well
+							
+		"""
+		for element in other.elements:
+			for edge in self.edges:
+				if element.replaced_id == edge.sink.id:
+					print('replacing sink {} with {}'.format(edge.sink.id, element.id))
+					sink = self.getElementById(edge.sink.id)
+					edge.swapSink(element)
+					self.elements.add(element)
+					if not sink is None:
+						print('removing sink {}'.format(edge.sink.id))
+						self.elements.remove(sink)
+						
+					print('\nsink swap')
+					edge.print_edge()
+					#edge.sink.print_element()
+				if element.replaced_id == edge.source.id:
+					print('replacing source {} with {}'.format(edge.source.id, element.id))
+					source = self.getElementById(edge.source.id)
+					edge.swapSource(element)
+					
+					if not source is None:
+						print('removing source {}'.format(edge.source.id))
+						self.elements.remove(source)
+					print('\nsource swap')
+					self.elements.add(element)
+					edge.print_edge()
+					#edge.source.print_element()
+					
+		for edge in other.edges:
+			new_edge = False
+			if edge.sink.replaced_id == -1: #-1 means the element is new
+				self.elements.add(edge.sink)
+				new_edge =True
+			if edge.source.replaced_id == -1:
+				self.elements.add(edge.source)
+				new_edge = True
+			if new_edge:
+				self.edges.add(edge)
+		
+		
+		return self
+		
+		#{edge.swapSink(element) for edge in self.edges for element in other.elements if element.replaced_id == edge.sink.id
+
+				
+	def swap_1(self, source, other):
 		"""	SWAP: 	
 					For every descendant d of source, find d' which has same ID
 						If it doesn't exist, add d' to self
@@ -54,8 +111,7 @@ class ElementGraph(Graph):
 			Purpose:
 					Other is consistent subgraph with root equivalent to source
 					Merging other with self at source is a consistent_merge
-			Check:	
-					If elementGraph is an operator, make sure to mergeArgs
+
 		"""
 		#descendants = self.rGetDescendants(source)
 		self_ids = {descendant.id for descendant in self.elements}
@@ -107,7 +163,9 @@ class ElementGraph(Graph):
 	
 	
 	def possible_mergers(self, other):
-		
+		""" self is operator, other is partial step"""
+		for element in self.elements:
+			element.replaced_id = -1
 		completed = self.absolve(other, other.edges, self.edges)
 		for element_graph in completed:
 			element_graph.constraints = other.constraints
@@ -120,7 +178,9 @@ class ElementGraph(Graph):
 				Remaining: edges left to account for in other
 				Available: edges in 'first' self, which cannot account for more than one edge
 				
-				USAGE: Excavate_Graph.absolves(other, other.edges, self.edges, Collected)
+				USAGE: Excavate_Graph.absolves(partial_step, partial_step.edges, self.edges, Collected)
+				
+				Returns: Set of copies of Operator which absolve the step (i.e. merge)
 		"""
 		if len(Remaining)  == 0:
 			Collected.add(self)
@@ -141,11 +201,14 @@ class ElementGraph(Graph):
 	def assimilate(self, other, old_edge, other_edge):
 		"""	Provided with old_edge consistent with other_edge
 			Merges source and sinks
+			Self is usually operator, other is partial step
 		"""
 		new_self = self.copyGen()
 		self_source = new_self.getElementById(old_edge.source.id)			#source from new_self
 		self_source.merge(other_edge.source)								#source merge
+		self_source.replaced_id = other_edge.source.id
 		self_sink = new_self.getElementById(old_edge.sink.id)				#sink from new_self
+		self_sink.replaced_id = other_edge.sink.id
 		self_sink.merge(other_edge.sink)									#sink merge
 		return new_self
 		

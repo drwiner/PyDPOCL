@@ -139,6 +139,16 @@ F.print_frame()
 print('\n\tPlan')
 #print(len(P1.Steps))
 P1.print_plan()
+
+s = next(iter(P1.Steps))
+print(s.id)
+step = P1.getElementGraphFromElement(s, Action)
+print(step.id)
+new_plans = step.instantiate(Excavate_operator_A,P1)
+print('num new plans: {}'.format(len(new_plans)))
+for plan in new_plans:
+	plan.print_plan()
+
 """ Test whether Actions in F.Steps are equivalent to Actions created in isolation"""
 """ Test rPickActorFromSteps when there are and are not consistent_actors"""
 
