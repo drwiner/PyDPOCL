@@ -108,8 +108,8 @@ Excavate_operator_B = Excavate_operator.makeCopyFromID(9000,11)
 #print(Excavate_graph_A.root.id)
 Example_step_B  = Example_step.copyGen()
 
-print('\n\texcavate operator:')
-Excavate_operator_A.print_graph()
+#print('\n\texcavate operator:')
+#Excavate_operator_A.print_graph()
 
 
 F	=	IntentionFrame(id = 2222, type_graph = 'IntentionFrame', name=None, \
@@ -123,21 +123,28 @@ F	=	IntentionFrame(id = 2222, type_graph = 'IntentionFrame', name=None, \
 		
 example_elements.add(F.root) #Intention Frame element
 
+# example_elements.add(IntentionFrameElement(	id = 2222, type_graph = 'IntentionFrame', name=None, \
+													# ms =None, \
+													# motivation =None,\
+													# intender = None,\
+													# goal = example_e1,\
+													# sat = example\
+													# )
+
 P1 = 	PlanElementGraph(id = 5432,\
 		Elements=example_elements,\
 		Edges=example_edges,\
-		Constraints=example_constraints,\
-		)
+		Constraints=example_constraints)
 
 
-print('\n\tintention_frame:')						
+#print('\n\tintention_frame:')						
 #print(len(F.Steps))
-F.print_frame()
+#F.print_frame()
 
 
 print('\n\tPlan')
 #print(len(P1.Steps))
-P1.print_plan()
+#P1.print_plan()
 
 s = next(iter(P1.Steps))
 step = P1.getElementGraphFromElement(s, Action)
@@ -152,7 +159,7 @@ print('num_consenting actors = {} in step {}'.format(len(P1.getConsistentActors(
 print('num new plans: {}'.format(len(new_plans)))
 for plan in new_plans:
 	print('num_consenting actors = {} in steps'.format(len(plan.getConsistentActors(plan.Steps))))
-	plan.print_plan()
+#	plan.print_plan()
 	#for element in plan.elements:
 		#element.print_element()
 		
