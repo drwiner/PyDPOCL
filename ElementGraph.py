@@ -190,7 +190,7 @@ class ElementGraph(Graph):
 			
 		other_edge = Remaining.pop()
 		print('remaining ', len(Remaining))
-		other_edge.print_edge()
+		#other_edge.print_edge()
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
 				new_self=  self.assimilate(other,prospect, other_edge)
