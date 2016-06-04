@@ -139,7 +139,7 @@ class Action(ElementGraph):
 			Plan.swap(self.root, merge)
 			if Plan.isInternallyConsistent():
 				Plan.id = id 
-				id = id + 1
+				id += 1
 				plans.add(Plan)
 		return plans
 		
@@ -384,6 +384,7 @@ class IntentionFrame(ElementGraph):
 			# return False
 		
 		return True
+		
 	
 	def print_frame(self):
 		Goal = self.getElementGraphFromElement(self.goal, Condition)
