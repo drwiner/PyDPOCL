@@ -505,6 +505,45 @@ class PlanElementGraph(ElementGraph):
 		step = self.getElementGraphFromElement(step_element, Action)
 		return step.instantiate(operator, self)
 
+	def rInstantiate(self, operators):
+		"""	Recursively instantiate a step in self with some operator
+			Return set of plans with all steps instantiated
+			
+			TODO: test
+		"""
+		remaining = {step for step in self.elements if type(step) is Operator and not step.instantiated}
+		print('rInstantiate: {},\t remaining: {}'.format(self.id, len(remaining)))
+		
+		#BASE CASE
+		if len(remaining) == 0:
+			return {self}
+			
+		#INDUCTION
+		step = remaining.pop()
+		new_plans = set()
+		for op in operators:
+			new_plans.update(self.instantiate(step,op))
+		
+		#Each return from rInstantiate is a set of unique plans with all steps instantiated
+		plans_to_return = set()
+		for plan in new_plans:
+			plans_to_return.update(plan.rInstantiate(operators))
+			
+		return plans_to_return
+			
+		
+		
+	def instantiate_steps_with(self, operators):
+		""" For every action, for every operator, try to instantiate action as operator"""
+		new_plans = {self}
+		for plan in new_plans:
+			for step_element in plan.Steps:
+				if not step_element.instantiated:
+					for op in operators:
+						new_plans = plan.instantiate(step_element, op)
+	
+		{new_plans.update(self.instantiate(step_element, operator)) for step_element in self.Steps for operator in operators}
+		return new_plans
 	
 	def print_plan(self):
 		self.updatePlan()

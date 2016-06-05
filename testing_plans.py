@@ -1,7 +1,7 @@
 from PlanElementGraph import *
 
 print('-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_')
-excavate = Operator(id = 1, type = 'Action', name = 'excavate', num_args = 3)
+excavate = Operator(id = 1, type = 'Action', name = 'excavate', num_args = 3, instantiated = True)
 
 p1 = Literal(id=2, type='Condition', name= 'alive', 			num_args = 1, truth = True)
 p2 = Literal(id=3, type='Condition', name= 'at', 				num_args = 2, truth = True)
@@ -11,7 +11,7 @@ p4 = Literal(id=5, type='Condition', name= 'knows-location', 	num_args = 3, trut
 e1 = Literal(id=6, type='Condition', name='burried',	num_args=2,	 truth = False)
 e2 = Literal(id=7, type='Condition', name='has', 		num_args=2,	 truth = True)
 
-consent = 	Actor(id=8,	 	type='actor',	 arg_pos_dict = {excavate.id :	1})
+consent = 	Actor(id=8,	 		type='actor',	 arg_pos_dict = {excavate.id :	1})
 item = 		Argument(id = 9, 	type='var',		 arg_pos_dict=	{excavate.id :  2})
 place = 	Argument(id = 10, 	type='var',		 arg_pos_dict=	{excavate.id :  3})
 
@@ -44,9 +44,38 @@ excavate_elements = {excavate, p1, p2, p3, p4, e1, e2, consent, item, place}
 excavate_edges = {edge0, edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8, edge9, edge10, \
 					edge12, edge13, edge14,edge15, edge16,edge17, edge18, edge19, edge20}
 					
+op_kill = Operator(id = 3111, name = 'kill', type = 'Action', num_args = 4, executed = None, instantiated = True)
+pre_kill_1 = Literal(id = 3211, name = 'alive', type = 'Condition', num_args = 1, truth = True)
+pre_kill_2 = Literal(id = 3311, name = 'at', type = 'Condition', num_args = 2, truth = True)
+pre_kill_3 = Literal(id = 3411, name='has', type = 'Condition', num_args = 2, truth = True)
+pre_kill_4 = Literal(id = 3511, name = 'alive', type = 'Condition', num_args = 1, truth = True)
+pre_kill_5 = Literal(id = 3611, name = 'at', type = 'Condition', num_args = 2, truth = True)
+eff_kill_1 = Literal(id=3711, name='alive', type = 'Condition', num_args = 1, truth = False)
+killer = Actor(id = 3811, name = None, type = 'actor', arg_pos_dict = {3111:1})
+weapon = Argument(id=3911, type = 'var', arg_pos_dict = {3111:2})
+victim = Actor(id = 3911, name = None, type = 'actor', arg_pos_dict = {3111:3})
+place1 = Actor(id = 3921, name = None, type = 'var', arg_pos_dict = {3111:4})
 
+kill_edges = {	Edge(op_kill, pre_kill_1, 'precond-of'),\
+				Edge(op_kill, pre_kill_2, 'precond-of'),\
+				Edge(op_kill, pre_kill_3, 'precond-of'),\
+				Edge(op_kill, pre_kill_4, 'precond-of'),\
+				Edge(op_kill, pre_kill_5, 'precond-of'),\
+				Edge(op_kill, eff_kill_1, 'effect-of'),\
+				Edge(pre_kill_1, killer, 'first-arg'),\
+				Edge(pre_kill_2, killer, 'first-arg'),\
+				Edge(pre_kill_2, place1, 'sec-arg'),\
+				Edge(pre_kill_3, killer, 'first-arg'),\
+				Edge(pre_kill_3, weapon, 'sec-arg'),\
+				Edge(pre_kill_4, victim, 'first-arg'),\
+				Edge(pre_kill_5, victim, 'first-arg'),\
+				Edge(pre_kill_5, place1, 'sec-arg')}
+				
+kill_elements = {op_kill, pre_kill_2, pre_kill_1, pre_kill_3, pre_kill_4, pre_kill_5, eff_kill_1, weapon, place1, victim, killer}
 	
 example = Operator(id = 111, type= 'Action')
+example2 = Operator(id = 2111, type= 'Action')
+te = Literal(id = 2211, type='Condition', name='alive', truth= False, num_args = 1)
 
 example_p1 =		Literal(id=211, 		type='Condition', 		name='alive', 		num_args = 1,	truth = True)
 example_e1 = 		Literal(id=311, 		type = 'Condition', 	name='has', 	num_args = 2,		truth = True)
@@ -67,11 +96,19 @@ example_elements = 	{	example, \
 						example_item,\
 						ex_const_element}
 						
+# example_edges = 	{	Edge(example,	 example_p1, 	'precond-of'),\
+						# Edge(example,	 example_e1, 	'effect-of'),\
+						# Edge(example_p1, example_actor, 'first-arg'),\
+						# Edge(example_e1, example_actor, 'first-arg'),\
+						# Edge(example_e1, example_item, 	'sec-arg')}
+						
 example_edges = 	{	Edge(example,	 example_p1, 	'precond-of'),\
 						Edge(example,	 example_e1, 	'effect-of'),\
 						Edge(example_p1, example_actor, 'first-arg'),\
 						Edge(example_e1, example_actor, 'first-arg'),\
-						Edge(example_e1, example_item, 	'sec-arg')}
+						Edge(example_e1, example_item, 	'sec-arg'),\
+						Edge(example2,	 te, 			'effect-of'),\
+						Edge(te, 		 example_actor, 'first-arg')}
 
 						
 example_constraints = {	Edge(ex_const_element, example_actor,	'first-arg'),\
@@ -85,6 +122,13 @@ Excavate_operator =			Action(	id = 200,\
 							Elements = excavate_elements, \
 							root_element = excavate,\
 							Edges = excavate_edges)
+							
+Kill_operator =				Action(	id = 3001,\
+							graph_type = 'Action', \
+							name = 'kill', \
+							Elements = kill_elements, \
+							root_element = op_kill,\
+							Edges = kill_edges)
 
 Example_step =	 			Action(	id = 1111, \
 							graph_type='Action', \
@@ -100,9 +144,10 @@ Excavate_operator_B = Excavate_operator.makeCopyFromID(9000,11)
 #print(Excavate_graph_A.root.id)
 Example_step_B  = Example_step.copyGen()
 
+Excavate_operator_B = Excavate_operator.makeCopyFromID(9000,11)
+
 #print('\n\texcavate operator:')
 #Excavate_operator_A.print_graph()
-
 
 # F	=	IntentionFrame(id = 2222, type_graph = 'IntentionFrame', name=None, \
 		# Elements=example_elements,\
@@ -144,13 +189,21 @@ for plan in new_plans:
 	plan.print_graph()
 print('______________________________________\n')
 
+all_plans = P1.instantiate_steps_with({Excavate_operator, Kill_operator})
+print('___________________________________________\n')
+print('______________________________________')
+print('New Plans from ALL instantiated operator:')
+for plan in all_plans:
+	plan.print_plan()
+	plan.print_graph()
+print('______________________________________\n')
+
 print('Element Tests')
 print('______________________________')
 for plan in new_plans:
 	for element in plan.elements:
 		if type(element) is IntentionFrameElement:
 			print("++++++++++++++++++++++++")
-			
 			goal_element = plan.getElementById(element.goal.id)
 			print('goal: {}'.format(element.goal.id), end = " ")
 			plan.getElementGraphFromElement(goal_element, Condition).print_graph()

@@ -176,10 +176,11 @@ class InternalElement(Element):
 		
 class Operator(InternalElement):
 	""" An operator element is an internal element with an executed status and orphan status"""
-	def __init__(self, id, type, name = None, num_args = 0, roles = {}, is_orphan = True, executed = None):
+	def __init__(self, id, type, name = None, num_args = 0, roles = {}, is_orphan = True, executed = None, instantiated = False):
 		super(Operator,self).__init__(id,type,name, num_args, roles)
 		self.executed = executed
 		self.is_orphan = is_orphan
+		self.instantiated = instantiated
 		
 	def isConsistent(self,other):
 		if not super(Operator,self).isConsistent(other):
@@ -197,6 +198,9 @@ class Operator(InternalElement):
 
 		if not other.executed is None and self.executed is None:
 			self.executed = other.executed
+			
+		if other.instantiated:
+			self.instantiated = True
 			
 		return self
 		
