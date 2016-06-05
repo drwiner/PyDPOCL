@@ -61,14 +61,18 @@ class Graph(Element):
 		self.constraints = Constraints
 		
 	def print_graph(self):
-		print("-------", self.id, self.type, self.name, "-----")
-		print('edges:')
+		print('ElementGraph {}:'.format(self.id))
 		for edge in self.edges:
-			print('|')
-			edge.source.print_element()
-			print(edge.label)
-			edge.sink.print_element()
-		
+			print('Edge {} --{}--> {}'.format(edge.source.id, edge.label, edge.sink.id))
+			#edge.source.print_element()
+			#edge.sink.print_element()
+		for element in self.elements:
+			if type(element) is Literal:
+				print('Element {id} = {truth}{name},\ttype = {type}'.format(id=element.id, truth='not ' if not element.truth else '', name=element.name, type=element.type))
+			elif type(element) is Operator:
+				print('Element {} = {}-{},\ttype = {}'.format(element.id, element.executed,element.name, element.type))
+			else:
+				print('Element {} = {},\ttype = {}'.format(element.id, element.name, element.type))
 			
 	def hasEdgeIdentity(self, edge):
 		""" Returns set of edges s.t. (source.id, label, sink.id) in self.edges"""

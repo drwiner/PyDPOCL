@@ -381,8 +381,17 @@ class PlanElement(Element):
 		self.IntentionFrames = IntentionFrames
 		
 class IntentionFrameElement(Element):
-	def __init__(self, id, type='IntentionFrame', name= None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = set()):
-		super(IntentionFrameElement,self).__init__(id,type,name)
+	def __init__(self, id, type_graph='IntentionFrame', name= None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = set()):
+		super(IntentionFrameElement,self).__init__(id,type_graph,name)
+		if intender is None:
+			#print('need to select consistent_actor before instantiation')
+			intender=Actor(id+1,type='actor')
+		if ms is None:
+			ms = Operator(id+2,type='Action', roles={id:'motivating-step'}, executed = False)
+		if sat is None:
+			sat = Operator(id+3, type='Action', roles={id:'satisfying-step'}, executed = False)
+		if goal is None:
+			goal = Literal(id+ 4, type='Condition', roles={id: 'goal'}, truth = None)
 		
 		self.ms = ms
 		self.motivation = motivation
@@ -390,6 +399,23 @@ class IntentionFrameElement(Element):
 		self.goal = goal
 		self.sat = sat
 		self.subplan = steps
+		
+	def external_update(self, PLAN):
+		for incident_edge in PLAN.edges:
+			if incident_edge.source.id == self.id:
+				if incident_edge.label == 'goal-of':
+					self.goal = incident_edge.sink
+				if incident_edge.label == 'motive-of':
+					self.ms = incident_edge.sink
+				if incident_edge.label == 'actor-of':
+					self.intender = incident_edge.sink
+				if incident_edge.label == 'sat-of':
+					self.sat = incident_edge.sink
+				if incident_edge.label == 'in-subplan-of':
+					self.subplan.add(incident_edge.sink)
+		return self
+				
+					
 		
 class Motivation(Literal):
 	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender=None, goal=None):

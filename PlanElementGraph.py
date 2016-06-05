@@ -50,7 +50,7 @@ class Action(ElementGraph):
 											if edge.source is self.root \
 											and edge.label == 'actor-of'})
 											
-		print('num_CONSENTING actors = {} in action {}'.format(len(self.consenting_actors),self.id))
+		#print('num_CONSENTING actors = {} in action {}'.format(len(self.consenting_actors),self.id))
 		
 		""" Determine if Action is an orphan"""
 		for actor in self.consenting_actors:
@@ -142,6 +142,7 @@ class Action(ElementGraph):
 			if Plan.isInternallyConsistent():
 				Plan.id = id 
 				id += 1
+				Plan.updateIntentionFrameAttributes()
 				plans.add(Plan)
 		return plans
 		
@@ -412,6 +413,10 @@ class PlanElementGraph(ElementGraph):
 										CausalLinks = self.Causal_Links,\
 										IntentionFrames = self.IntentionFrames\
 									)
+		
+
+		#Edges.update( {Edge(planElement,IF, 'frame-of') for IF in self.IntentionFrames})
+		#Edges.update( {Edge(planElement,step, 'step-of') for step in self.Steps})
 									
 		super(PlanElementGraph,self).__init__(\
 												id,\
@@ -421,8 +426,17 @@ class PlanElementGraph(ElementGraph):
 												Edges,\
 												Constraints\
 											)
+		
+		
+		self.updateIntentionFrameAttributes()
+	
+	def updateIntentionFrameAttributes(self):
+		{element.external_update(self) for element in self.elements if type(element) is IntentionFrameElement}
+			#Keeps intention frame element attributes up to date
+			#Must be done after super instantation because needs edges
 	
 	def updatePlan(self, Elements = None,Edges = None,Constraints = None):
+		""" Updating plans to have accurate top-level Sets"""
 		if Elements is None:
 			Elements = self.elements
 		if Edges is None:
@@ -486,10 +500,22 @@ class PlanElementGraph(ElementGraph):
 	
 	def isInternallyConsistent(self):
 		return True
+		
+	def instantiate(self, step_element, operator):
+		"""	Instantiates a step_element type = operator with operator Action (elementgraph) 
+			Returns the set of plans in which the step_element is instantiated. 
+			Could be more than one way to instantiate given partial element
+		"""
+		step = self.getElementGraphFromElement(step_element, Action)
+		return step.instantiate(operator, self)
+
 	
 	def print_plan(self):
 		self.updatePlan()
-		print('\nPLAN', self.id)
+		print('\n----------------')
+		print('PLAN', self.id)
+		print('________________')
+
 		print('steps:')
 		for step in self.Steps:
 			step.print_element()
@@ -497,7 +523,7 @@ class PlanElementGraph(ElementGraph):
 		for frame in self.IntentionFrames:
 			print('frame id {}:'.format(frame.id), end=" ")
 			Goal = self.getElementGraphFromElement(frame.goal, Condition)
-			#if self.intender
 			Goal.print_graph(motive=True,actor_id = frame.intender.id)
-			#frame.print_frame()
+		print('----------------\n')
+
 		

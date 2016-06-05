@@ -1,5 +1,6 @@
 from PlanElementGraph import *
 
+print('-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_')
 excavate = Operator(id = 1, type = 'Action', name = 'excavate', num_args = 3)
 
 p1 = Literal(id=2, type='Condition', name= 'alive', 			num_args = 1, truth = True)
@@ -44,7 +45,6 @@ excavate_edges = {edge0, edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8,
 					edge12, edge13, edge14,edge15, edge16,edge17, edge18, edge19, edge20}
 					
 
-
 	
 example = Operator(id = 111, type= 'Action')
 
@@ -54,22 +54,10 @@ example_e3 = 		Literal(id=911, 		type = 'Condition', 	name='has', 			truth = Tru
 ex_const_element = 	Literal(id=611, 		type ='Condition',		name='knows-location', 	truth = True)
 example_actor = 	Actor(id=411, 		type='actor',			arg_pos_dict={example.id : 1})
 example_item = 		Argument(id=511,		type='var', 			arg_pos_dict={})
-#arg_pos_dict={example.id : 0})
 
-example_edge0 = Edge(example,	 example_p1, 	'precond-of')
-example_edge1 = Edge(example,	 example_e1, 	'effect-of')
-example_edge2 = Edge(example_p1, example_actor, 'first-arg')
-example_edge3 = Edge(example_e1, example_actor, 'first-arg')
-example_edge4 = Edge(example_e1, example_item, 	'sec-arg')
 
 example_edge5 = Edge(example,	 example_e3, 	'effect-of')
 
-#Cannot have a precondition with name 'knows-location', first-arg is actor, sec-arg is item
-#Since we know this is precondition of excavate, the example_graph should not be consistent
-
-
-example_constraint_edge0 = Edge(ex_const_element, example_actor,	'first-arg')
-example_constraint_edge1 = Edge(ex_const_element, example_item, 	'sec-arg')
 
 example_elements = 	{	example, \
 						example_p1, \
@@ -79,11 +67,15 @@ example_elements = 	{	example, \
 						example_item,\
 						ex_const_element}
 						
-example_edges = 	{example_edge0,example_edge1,example_edge2,example_edge3,example_edge4}
+example_edges = 	{	Edge(example,	 example_p1, 	'precond-of'),\
+						Edge(example,	 example_e1, 	'effect-of'),\
+						Edge(example_p1, example_actor, 'first-arg'),\
+						Edge(example_e1, example_actor, 'first-arg'),\
+						Edge(example_e1, example_item, 	'sec-arg')}
 
 						
-example_constraints = {	example_constraint_edge0, \
-						example_constraint_edge1}
+example_constraints = {	Edge(ex_const_element, example_actor,	'first-arg'),\
+						Edge(ex_const_element, example_item, 	'sec-arg')}
 
 
 ####Operator - Domain Action
@@ -112,53 +104,68 @@ Example_step_B  = Example_step.copyGen()
 #Excavate_operator_A.print_graph()
 
 
-F	=	IntentionFrame(id = 2222, type_graph = 'IntentionFrame', name=None, \
-		Elements=example_elements,\
-		Edges=example_edges,\
-		Constraints=example_constraints,\
-		goal = example_e1,#change with example_p1 to fail\
-		ms = None,\
-		sat = example,\
-		actor=None)
+# F	=	IntentionFrame(id = 2222, type_graph = 'IntentionFrame', name=None, \
+		# Elements=example_elements,\
+		# Edges=example_edges,\
+		# Constraints=example_constraints,\
+		# goal = example_e1,#change with example_p1 to fail\
+		# ms = None,\
+		# sat = example,\
+		# actor=None)
 		
-example_elements.add(F.root) #Intention Frame element
-
-# example_elements.add(IntentionFrameElement(	id = 2222, type_graph = 'IntentionFrame', name=None, \
-													# ms =None, \
-													# motivation =None,\
-													# intender = None,\
-													# goal = example_e1,\
-													# sat = example\
-													# )
+#example_elements.add(F.root) #Intention Frame element
+ife = IntentionFrameElement(	id = 2222, type_graph = 'IntentionFrame', name=None, ms =None, motivation =None,intender = None,goal = example_e1,sat = example)
+example_elements.add(ife)
+example_edges.update({Edge(ife,example_e1, 'goal-of'), Edge(ife, example, 'sat-of')})
 
 P1 = 	PlanElementGraph(id = 5432,\
 		Elements=example_elements,\
 		Edges=example_edges,\
 		Constraints=example_constraints)
 
-
-#print('\n\tintention_frame:')						
-#print(len(F.Steps))
-#F.print_frame()
-
-
-print('\n\tPlan')
-#print(len(P1.Steps))
-#P1.print_plan()
+print('___________________________________________')
+print('Plan Before instantiation of partial step elements')
+P1.print_plan()
+print('\n')
+#P1.print_graph()
+print('___________________________________________\n')
+#print('\n\tPlan')
 
 s = next(iter(P1.Steps))
-step = P1.getElementGraphFromElement(s, Action)
-P1.print_plan()
-new_plans = step.instantiate(Excavate_operator_A,P1)
+#step = P1.getElementGraphFromElement(s, Action)
+print('___________________________________________')
+print('Instantiating a partial step as an operator')
+new_plans = P1.instantiate(s, Excavate_operator)
+print('___________________________________________\n')
+print('______________________________________')
+print('New Plans from instantiated operator:')
+for plan in new_plans:
+	plan.print_plan()
+	plan.print_graph()
+print('______________________________________\n')
+
+print('Element Tests')
+print('______________________________')
+for plan in new_plans:
+	for element in plan.elements:
+		if type(element) is IntentionFrameElement:
+			print("++++++++++++++++++++++++")
+			
+			goal_element = plan.getElementById(element.goal.id)
+			print('goal: {}'.format(element.goal.id), end = " ")
+			plan.getElementGraphFromElement(goal_element, Condition).print_graph()
+
+#P1.print_plan()
+#new_plans = step.instantiate(Excavate_operator_A,P1)
 
 
-print('num_consenting actors = {} in step {}'.format(len(P1.getConsistentActors(P1.Steps)),step.id))
+#print('num_consenting actors = {} in step {}'.format(len(P1.getConsistentActors(P1.Steps)),step.id))
 
 #print(step.id)
 
-print('num new plans: {}'.format(len(new_plans)))
-for plan in new_plans:
-	print('num_consenting actors = {} in steps'.format(len(plan.getConsistentActors(plan.Steps))))
+#print('num new plans: {}'.format(len(new_plans)))
+#for plan in new_plans:
+	#print('num_consenting actors = {} in steps'.format(len(plan.getConsistentActors(plan.Steps))))
 #	plan.print_plan()
 	#for element in plan.elements:
 		#element.print_element()

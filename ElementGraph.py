@@ -60,8 +60,14 @@ class ElementGraph(Graph):
 				if element.replaced_id == edge.sink.id:
 					#print('replacing sink {} with {}'.format(edge.sink.id, element.id))
 					sink = self.getElementById(edge.sink.id)
+					print('Edge ({}--{}-->{}) \treplacing sink {} with {}'.format(edge.source.id, edge.label, edge.sink.id, edge.sink.id, element.id))
 					edge.swapSink(element)
+					#""" For every sink we replace, make sure we update all of its incident edges"""
+					#for other_edges in self.getIncidentEdges(edge.sink):
+						#if other_edges.source.id == edge.sink.id:
+					#print('replacing sink {} with {}'.format(edge.sink.id, element.id))
 					self.elements.add(element)
+				
 					if not sink is None:
 						#print('removing sink {}'.format(edge.sink.id))
 						self.elements.remove(sink)
@@ -71,6 +77,7 @@ class ElementGraph(Graph):
 					#edge.sink.print_element()
 				if element.replaced_id == edge.source.id:
 					#print('replacing source {} with {}'.format(edge.source.id, element.id))
+					print('Edge ({}--{}-->{}) \treplacing source {} with {}'.format(edge.source.id, edge.label, edge.sink.id, edge.source.id, element.id))
 					source = self.getElementById(edge.source.id)
 					edge.swapSource(element)
 					
@@ -176,7 +183,6 @@ class ElementGraph(Graph):
 		""" Every edge from other must be consistent with some edge in self.
 			An edge from self cannot account for more than one edge from other? 
 				
-			
 				Remaining: edges left to account for in other
 				Available: edges in 'first' self, which cannot account for more than one edge
 				
@@ -193,7 +199,12 @@ class ElementGraph(Graph):
 		#other_edge.print_edge()
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
-				new_self=  self.assimilate(other,prospect, other_edge)
+				#print('prospect:', end=" ")
+				#prospect.print_edge()
+				#print('other_edge:', end= " ")
+				#other_edge.print_edge()
+				new_self=  self.assimilate(other, prospect, other_edge)
+				
 				#Collected = new_self.absolve(other, Remaining,Available-{prospect},Collected)
 				Collected = new_self.absolve(other, Remaining,Available,Collected)
 		print('collected ', len(Collected))
