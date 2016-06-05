@@ -141,7 +141,7 @@ class Action(ElementGraph):
 			Plan.swap(self.root, merge)
 			if Plan.isInternallyConsistent():
 				Plan.id = id 
-				id = id + 1
+				id += 1
 				plans.add(Plan)
 		return plans
 		
@@ -386,6 +386,7 @@ class IntentionFrame(ElementGraph):
 			# return False
 		
 		return True
+		
 	
 	def print_frame(self):
 		Goal = self.getElementGraphFromElement(self.goal, Condition)
@@ -438,8 +439,9 @@ class PlanElementGraph(ElementGraph):
 		""" Given subseteq of step elements in plan, return set of consistent actors (i.e. an actor that could be a consenting actor in each)
 		"""
 		step = next(iter(subseteq))
+		print('step {} used for starting actors'.format(step.id))
 		Step = self.getElementGraphFromElement(step,Action)
-		print('NUMBER OF CONSENTING ACTORS TO START WITH IN GET CNSISTENT ACTORS {}'.format(len(Step.consenting_actors)))
+		#print('NUMBER OF CONSENTING ACTORS TO START WITH IN GET CNSISTENT ACTORS {}'.format(len(Step.consenting_actors)))
 		S = copy.deepcopy(subseteq)
 		S = S - {action for action in S if action.id != step.id}
 		return self.rPickActorFromSteps(remaining_steps = S,potential_actors = Step.consenting_actors)

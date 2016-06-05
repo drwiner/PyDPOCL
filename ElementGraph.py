@@ -67,7 +67,7 @@ class ElementGraph(Graph):
 						self.elements.remove(sink)
 						
 					#print('\nsink swap')
-					edge.print_edge()
+					#edge.print_edge()
 					#edge.sink.print_element()
 				if element.replaced_id == edge.source.id:
 					#print('replacing source {} with {}'.format(edge.source.id, element.id))
@@ -79,7 +79,7 @@ class ElementGraph(Graph):
 						self.elements.remove(source)
 					#print('\nsource swap')
 					self.elements.add(element)
-					edge.print_edge()
+					#edge.print_edge()
 					#edge.source.print_element()
 					
 		for edge in other.edges:
@@ -167,7 +167,7 @@ class ElementGraph(Graph):
 		for element in self.elements:
 			element.replaced_id = -1
 		completed = self.absolve(other, other.edges, self.edges)
-		print('completed absolvings: {}'.format(len(completed)))
+	#	print('completed absolvings: {}'.format(len(completed)))
 		for element_graph in completed:
 			element_graph.constraints = other.constraints
 		return completed
@@ -190,7 +190,7 @@ class ElementGraph(Graph):
 			
 		other_edge = Remaining.pop()
 		print('remaining ', len(Remaining))
-		other_edge.print_edge()
+		#other_edge.print_edge()
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
 				new_self=  self.assimilate(other,prospect, other_edge)
