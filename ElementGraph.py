@@ -68,9 +68,9 @@ class ElementGraph(Graph):
 					#print('replacing sink {} with {}'.format(edge.sink.id, element.id))
 					self.elements.add(element)
 				
-					if not sink is None:
-						#print('removing sink {}'.format(edge.sink.id))
+					if sink in self.elements:
 						self.elements.remove(sink)
+						#print('removing sink {}'.format(edge.sink.id))
 						
 					#print('\nsink swap')
 					#edge.print_edge()
@@ -81,7 +81,7 @@ class ElementGraph(Graph):
 					source = self.getElementById(edge.source.id)
 					edge.swapSource(element)
 					
-					if not source is None:
+					if source in self.elements:
 						#print('removing source {}'.format(edge.source.id))
 						self.elements.remove(source)
 					#print('\nsource swap')
@@ -173,8 +173,10 @@ class ElementGraph(Graph):
 		""" self is operator, other is partial step"""
 		for element in self.elements:
 			element.replaced_id = -1
-		completed = self.absolve(other, other.edges, self.edges)
+		completed = self.absolve(other, copy.deepcopy(other.edges), copy.deepcopy(self.edges))
 	#	print('completed absolvings: {}'.format(len(completed)))
+		if len(completed) == 0:
+			print('no completed instantiations of {} with operator {}'.format(other.id, self.id))
 		for element_graph in completed:
 			element_graph.updateActionParams() #only will work if this is action
 			element_graph.constraints = other.constraints
@@ -194,22 +196,23 @@ class ElementGraph(Graph):
 		if len(Remaining)  == 0:
 			Collected.add(self)
 			return Collected
-			
-		other_edge = Remaining.pop()
+		
 		print('remaining ', len(Remaining))
+		other_edge = Remaining.pop()
+		print('{} --{}--> {} needs replacement'.format(other_edge.source.id, other_edge.label, other_edge.sink.id))
+		num_collected_before = len(Collected)
 		#other_edge.print_edge()
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
-				#print('prospect:', end=" ")
-				#prospect.print_edge()
-				#print('other_edge:', end= " ")
-				#other_edge.print_edge()
 				new_self=  self.assimilate(other, prospect, other_edge)
-				
 				#Collected = new_self.absolve(other, Remaining,Available-{prospect},Collected)
 				Collected = new_self.absolve(other, Remaining,Available,Collected)
 		print('collected ', len(Collected))
-		return Collected
+		
+		if len(Collected) > num_collected_before:
+			return Collected
+		else:
+			return set()
 		
 	
 	def assimilate(self, other, old_edge, other_edge):

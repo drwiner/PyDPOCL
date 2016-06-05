@@ -124,8 +124,8 @@ class Action(ElementGraph):
 							2) operator.absolve(step)
 							3) swap operator for step in plan
 		"""
-		op_clone = operator.makeCopyFromID(self.id + 777,1)
-		merges = op_clone.possible_mergers(self)
+		#p_clone = operator.makeCopyFromID(self.id + 777,1)
+		merges = operator.possible_mergers(self)
 		# test = merges.pop()
 		# test.root.print_element()
 		# print('from op_clone.possible_mergers')
@@ -140,6 +140,7 @@ class Action(ElementGraph):
 				id += 1
 				Plan.updateIntentionFrameAttributes()
 				plans.add(Plan)
+			print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
 		return plans
 		
 		
@@ -502,48 +503,56 @@ class PlanElementGraph(ElementGraph):
 			Returns the set of plans in which the step_element is instantiated. 
 			Could be more than one way to instantiate given partial element
 		"""
+		self.updatePlan()
 		step = self.getElementGraphFromElement(step_element, Action)
 		return step.instantiate(operator, self)
 
-	def rInstantiate(self, operators):
+	def rInstantiate(self, remaining = set(), operators = set(), complete_plans = set()):
 		"""	Recursively instantiate a step in self with some operator
 			Return set of plans with all steps instantiated
 			
 			TODO: test
 		"""
-		remaining = {step for step in self.elements if type(step) is Operator and not step.instantiated}
+		self.updatePlan()
+		#remaining = {step for step in self.Steps if not step.instantiated}
 		print('rInstantiate: {},\t remaining: {}'.format(self.id, len(remaining)))
 		
 		#BASE CASE
 		if len(remaining) == 0:
-			return {self}
+			complete_plans.add(self)
+			return complete_plans
+		else:
+			print('rInstantiate remainings List:')
+			for r in remaining:
+				print('\t\t\t',end=" ")
+				r.print_element()
 			
 		#INDUCTION
 		step = remaining.pop()
 		new_plans = set()
+		new_ids = {step.id + n for n in range(1,len(operators)+1)}
+		step = self.getElementById(step.id)
+		print(step.id)
+		self.getElementGraphFromElement(step, Action).print_graph()
+		print('___instantiating___')
+		#self.print_graph()
 		for op in operators:
-			new_plans.update(self.instantiate(step,op))
-		
+			new_id = new_ids.pop()
+			op_clone = op.makeCopyFromID(new_id,1)
+			#self.getElementGraphFromElement(step,Action).print_graph()
+			new_ps = self.instantiate(step, op_clone)
+			#print('{} new plans from instantiating {} from operator {}-{} in plan {}'.format(len(new_ps),step.id, op.id, op.root.name, self.id))
+			new_plans.update(new_ps)
+			
+		for plan in new_plans:
+			#plan.print_plan()
+			complete_plans = plan.rInstantiate(remaining, operators,complete_plans)
 		#Each return from rInstantiate is a set of unique plans with all steps instantiated
-		plans_to_return = set()
-		for plan in new_plans:
-			plans_to_return.update(plan.rInstantiate(operators))
+		#for plan in new_plans:
+			#complete_plans = plan.rInstantiate(operators,complete_plans)
 			
-		return plans_to_return
-			
-		
-		
-	def instantiate_steps_with(self, operators):
-		""" For every action, for every operator, try to instantiate action as operator"""
-		new_plans = {self}
-		for plan in new_plans:
-			for step_element in plan.Steps:
-				if not step_element.instantiated:
-					for op in operators:
-						new_plans = plan.instantiate(step_element, op)
-	
-		{new_plans.update(self.instantiate(step_element, operator)) for step_element in self.Steps for operator in operators}
-		return new_plans
+		return complete_plans
+
 	
 	def print_plan(self):
 		self.updatePlan()
