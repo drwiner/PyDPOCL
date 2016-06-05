@@ -70,7 +70,7 @@ class Graph(Element):
 			if type(element) is Literal:
 				print('Element {id} = {truth}{name},\ttype = {type}'.format(id=element.id, truth='not ' if not element.truth else '', name=element.name, type=element.type))
 			elif type(element) is Operator:
-				print('Element {} = {}-{},\ttype = {}'.format(element.id, element.executed,element.name, element.type))
+				print('Element {id} = {truth}{name},\ttype = {type}'.format(id=element.id, truth='not ' if element.executed==False else '', name=element.name, type=element.type))
 			else:
 				print('Element {} = {},\ttype = {}'.format(element.id, element.name, element.type))
 			

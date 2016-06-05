@@ -11,54 +11,55 @@ class Belief(ElementGraph):
 		super(Belief, self).__init__(id,type,name,Elements, root_element, Edges, Constraints)
 
 class Action(ElementGraph):
-	def __init__(self,id,graph_type,name=None, \
-				Elements = set(), \
-				root_element = None, \
-				Edges = set(), \
-				Constraints = set()\
-				):
-		
-		
+	def __init__(self,id,graph_type,name=None,Elements = set(), root_element = None, Edges = set(),Constraints = set()):
+
 		if root_element is None:
 			root_element = Operator(id + 201,type='Action')
 			
-		super(Action,self).__init__(	id,graph_type,name,\
-										Elements,\
-										root_element,\
-										Edges,\
-										Constraints\
-									)
+		super(Action,self).__init__(id,graph_type,name,Elements,root_element,Edges,Constraints)
 
-		""" Get Action arguments by position"""							
-		# self.Args = {i:arg \
-						# for i in range(self.root.num_args) \
-							# for arg in self.elements \
-								# if (type(arg) == Argument or type(arg) == Actor) \
-								# and i in arg.arg_pos_dict}					
+		""" Get Action arguments by position"""											
 		self.Args = {}
+		self.updateArgs()
+				
+		""" Get consenting actors"""
+		self.consenting_actors = set()			
+		self.updateConsentingActors()
+											
+		#print('num_CONSENTING actors = {} in action {}'.format(len(self.consenting_actors),self.id))
+		
+		""" Determine if Action is an orphan"""
+		self.isOrphan()
+				
+
+	def updateActionParams(self):
+		self.updateConsentingActors()
+		self.updateArgs()
+		self.isOrphan()
+				
+	def updateArgs(self):
+
 		for arg in self.elements:
 			if type(arg) == Argument or type(arg) == Actor:
 				for op_id, pos in arg.arg_pos_dict.items():
 					if op_id == self.root.id:
 						self.Args[pos] = arg
-
-				
-		""" Get consenting actors"""
-		self.consenting_actors = set()			
+						
+	def updateConsentingActors(self,scratch = False):
+		if scratch:
+			self.consenting_actors = set()
 		self.consenting_actors.update({edge.sink \
 										for edge in self.edges \
 											if edge.source is self.root \
 											and edge.label == 'actor-of'})
 											
-		#print('num_CONSENTING actors = {} in action {}'.format(len(self.consenting_actors),self.id))
-		
-		""" Determine if Action is an orphan"""
+	def isOrphan(self):
 		for actor in self.consenting_actors:
 			if self.root.id not in actor.orphan_dict:
 				actor.orphan_dict[self.root.id] = True
+				self.is_orphan = True
 			elif actor.orphan_dict[self.root.id] == True:
 				self.is_orphan = True
-				break
 	
 	def makeCopyFromID(self, start_from, increment = 1):
 		new_self = self.copyGen()
@@ -114,11 +115,6 @@ class Action(ElementGraph):
 		
 		print(')')
 		
-	def isOrphan(self):
-		for actor in self.consenting_actors:
-			if actor.orphan_dict[self.root.id] == True:
-				self.is_orphan = True
-				break
 				
 	def instantiate(self, operator, PLAN):
 		""" instantiates self as operator in PLAN
@@ -154,7 +150,7 @@ class Condition(ElementGraph):
 		Elements=set(), root_element = None, Edges = set(), Constraints = set()):
 		
 		super(Condition,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
-		self.labels = ['first-arg','second-arg','third-arg','fourth-arg']
+		self.labels = ['first-arg','sec-arg','third-arg','fourth-arg']
 		
 	def getArgList(self):
 
@@ -165,7 +161,7 @@ class Condition(ElementGraph):
 		args = self.getArgList()
 		if motive:
 			print('intends {}'.format(actor_id), end=" ")
-		print('{}({}'.format(self.root.truth,self.root.name), end=" ")
+		print('{truth}({name}'.format(truth='not' if not self.root.truth else '',name=self.root.name), end=" ")
 		for i, arg in enumerate(args):
 			if len(arg) == 0:
 				str = '__'

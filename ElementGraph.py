@@ -176,6 +176,7 @@ class ElementGraph(Graph):
 		completed = self.absolve(other, other.edges, self.edges)
 	#	print('completed absolvings: {}'.format(len(completed)))
 		for element_graph in completed:
+			element_graph.updateActionParams() #only will work if this is action
 			element_graph.constraints = other.constraints
 		return completed
 	
