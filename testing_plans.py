@@ -1,19 +1,19 @@
 from PlanElementGraph import *
 
 print('-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_')
-op_excavate = Operator(id = 1, type = 'Action', name = 'excavate', num_args = 3, instantiated = True)
+op_excavate = Operator(id = 71, type = 'Action', name = 'excavate', num_args = 3, instantiated = True)
 
-p1 = Literal(id=2, type='Condition', name= 'alive', 			num_args = 1, truth = True)
-p2 = Literal(id=3, type='Condition', name= 'at', 				num_args = 2, truth = True)
-p3 = Literal(id=4, type='Condition', name= 'burried', 			num_args = 2, truth = True)
-p4 = Literal(id=5, type='Condition', name= 'knows-location', 	num_args = 3, truth = True)
+p1 = Literal(id=72, type='Condition', name= 'alive', 			num_args = 1, truth = True)
+p2 = Literal(id=73, type='Condition', name= 'at', 				num_args = 2, truth = True)
+p3 = Literal(id=74, type='Condition', name= 'burried', 			num_args = 2, truth = True)
+p4 = Literal(id=75, type='Condition', name= 'knows-location', 	num_args = 3, truth = True)
 
-e1 = Literal(id=6, type='Condition', name='burried',	num_args=2,	 truth = False)
-e2 = Literal(id=7, type='Condition', name='has', 		num_args=2,	 truth = True)
+e1 = Literal(id=76, type='Condition', name='burried',	num_args=2,	 truth = False)
+e2 = Literal(id=77, type='Condition', name='has', 		num_args=2,	 truth = True)
 
-consent = 	Actor(id=8,	 		type='actor',	 arg_pos_dict = {1 :	1})
-item = 		Argument(id = 9, 	type='var',		 arg_pos_dict=	{1 :  2})
-place = 	Argument(id = 10, 	type='var',		 arg_pos_dict=	{1:  3})
+consent = 	Actor(id=78,	 		type='actor',	 arg_pos_dict = {1 :	1})
+item = 		Argument(id = 79, 	type='var',		 arg_pos_dict=	{1 :  2})
+place = 	Argument(id = 80, 	type='var',		 arg_pos_dict=	{1:  3})
 
 edge0 = Edge(op_excavate, consent, 'actor-of')
 edge1 = Edge(op_excavate, p1,	 	'precond-of')
@@ -62,6 +62,7 @@ kill_edges = {	Edge(op_kill, pre_kill_1, 'precond-of'),\
 				Edge(op_kill, pre_kill_4, 'precond-of'),\
 				Edge(op_kill, pre_kill_5, 'precond-of'),\
 				Edge(op_kill, eff_kill_1, 'effect-of'),\
+				Edge(op_kill, killer, 	  'actor-of'),\
 				Edge(pre_kill_1, killer, 'first-arg'),\
 				Edge(pre_kill_2, killer, 'first-arg'),\
 				Edge(pre_kill_2, place1, 'sec-arg'),\
@@ -298,6 +299,8 @@ print('\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 for plan in full_instance_plans:
 	plan.print_plan()
+	for element in plan.elements:
+		print('Element {} {} {}'.format(element.id, element.type, element.name))
 	print('\n')
 print('\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
 	
@@ -319,51 +322,7 @@ print('\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
-print('\n\n0000000000000000000000000000000000000000000000\n')
 
-
-PARTIAL_EXCAVATE_ACTION = P99.getElementGraphFromElementId(111,Action)
-
-for edge in PARTIAL_EXCAVATE_ACTION.edges:
-	print('{} --{}--> {}'.format(edge.source.id, edge.label, edge.sink.id))
-print('\nPartial Excavate Action: {}'.format(type(PARTIAL_EXCAVATE_ACTION)))
-print('__\n')
-EXCAVATE_ACTIONS = Excavate_operator.getInstantiations(PARTIAL_EXCAVATE_ACTION)
-print('\n')
-for ea in EXCAVATE_ACTIONS:
-	ea.print_graph()
-	print('{} instantiates {}'.format(ea.id, '111'), end=" ")
-	print(type(ea),end=" ")
-	print(ea.name)
-	
-print('\n8888888888888888888888888888888888888888888')
-	
-
-PARTIAL_KILL_ACTION = P1.getElementGraphFromElementId(2111,Action)
-
-print(len(PARTIAL_KILL_ACTION.edges))
-for edge in PARTIAL_KILL_ACTION.edges:
-	print('{} --{}--> {}'.format(edge.source.id, edge.label, edge.sink.id))
-print('\nPartial Kill Action: {}'.format(type(PARTIAL_KILL_ACTION)))
-print('__\n')
-
-
-KILL_ACTIONS = Kill_operator.getInstantiations(PARTIAL_KILL_ACTION)
-print('\n8888888888888888888888888888888888888888888')
-for km in KILL_ACTIONS:
-	km.print_graph()
-	print('{} instantiates {}'.format(km.id, '2111'), end= " ")
-	print(type(km), end=" ")
-	print(km.name)
-	
-	print(' ')
-print('__\n')
-
-
-
-#P1.rInstantiate(PARTIAL_KILL_ACTION,{Kill_operator,Excavate_operator})
-	
-print('\n0000000000000000000000000000000000000000000000')
 
 
 

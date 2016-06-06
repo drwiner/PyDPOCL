@@ -73,11 +73,13 @@ class Action(ElementGraph):
 	
 	def makeCopyFromID(self, start_from, increment = 1):
 		new_self = self.copyGen()
-		old_id = start_from
+		old_id = self.id
+		new_self.id = start_from
 		start_from += increment
 		for element in new_self.elements:
 			element.id = start_from
 			start_from = start_from + increment
+			
 		new_id = new_self.root.id
 		for i, arg in new_self.Args.items():
 			for id,pos in arg.arg_pos_dict.items():
@@ -545,19 +547,19 @@ class PlanElementGraph(ElementGraph):
 		#INDUCTION
 		step_id = remaining.pop()
 		new_plans = set()
-		new_ids = {step_id + n for n in range(10,len(operators)+1)}
-		new_self = self.copyGen()
-		step = new_self.getElementGraphFromElementId(step_id, Action)
-		print('\n___instantiating___\n')
+		new_ids = {step_id + n for n in range(1,len(operators)+10)}
+		print('\n___instantiating_{}__\n'.format(step_id))
 		
 		""" instantiate with every operator"""
 		for op in operators:
 			new_self = self.copyGen()
+			new_self.id = self.id + 1
 			step = new_self.getElementGraphFromElementId(step_id, Action)
 			new_id = new_ids.pop()
 			op_clone = op.makeCopyFromID(new_id,1)
-			print('\n Attempting instantiation with step {} and op clone {} formally {}\n'.format(step.id,op_clone.id,op.id))
+			print('\n Plan {} Attempting instantiation with step {} and op clone {} formally {}\n'.format(new_self.id, step.id,op_clone.id,op.id))
 			new_ps = step.instantiate(op_clone, new_self) 
+			print('\n returned {} new plans'.format(len(new_ps)))
 			new_plans.update(new_ps)
 			#print('{} new plans from instantiating {} from operator {}-{} in plan {}'.format(len(new_ps),step.id, op.id, op.root.name, self.id))
 			

@@ -126,12 +126,12 @@ class ElementGraph(Graph):
 		print('\n{}x{}.possible_mergers({}x{})'.format(self.id, self.type, other.id, other.type))
 		print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)\n')
 		operator = self.copyGen()
-
+		other = other.copyGen()
 		for element in operator.elements:
 			element.replaced_id = -1
 			
 	
-		completed = operator.absolve(other, copy.deepcopy(other.edges), operator.edges)
+		completed = operator.absolve(other, other.edges, operator.edges, set())
 	#	print('completed absolvings: {}'.format(len(completed)))
 		if len(completed) == 0:
 			print('no completed instantiations of {} with operator {}'.format(other.id, self.id))
@@ -154,24 +154,28 @@ class ElementGraph(Graph):
 		if len(Remaining)  == 0:
 			Collected.add(self)
 			return Collected
+			
 		#print('PRE collected ', len(Collected))
-		print('remaining ', len(Remaining))
+		print('\n ABSOLVE remaining ', len(Remaining))
 		other_edge = Remaining.pop()
-		print('{}.absolve({})... {} --{}--> {} needs replacement'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
+		print('\n{}.absolve({})... {} --{}--> {} needs replacement \n'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
 		num_collected_before = len(Collected)
 		#other_edge.print_edge()
+		
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
-				print('step {} edge {} --{}--> {} matches {} --{}--> {}'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
+				print('\nstep {} edge {} --{}--> {} matches {} --{}--> {}\n'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
 				new_self=  self.assimilate(other, prospect, other_edge)
 				#new_self.print_graph()
 				#Collected = new_self.absolve(other, Remaining,Available-{prospect},Collected)
 				Collected = new_self.absolve(other, Remaining,Available,Collected)
-		print('collected ', len(Collected))
+
+		print('\ncollected {}'.format(len(Collected)))
 		
 		if len(Collected) > num_collected_before:
 			return Collected
 		else:
+			print('\nbackup bitch\n')
 			return set()
 		
 	
