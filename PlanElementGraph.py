@@ -117,7 +117,7 @@ class Action(ElementGraph):
 			
 		return prospects
 
-	def print_graph(self):
+	def print_action(self):
 		print('\n({}'.format(self.root.name),end = " ")
 
 		for i in range(1,self.root.num_args+1):

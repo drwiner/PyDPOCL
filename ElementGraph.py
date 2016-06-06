@@ -112,11 +112,11 @@ class ElementGraph(Graph):
 		print('{}x{}.possible_mergers({}x{})'.format(self.id, self.type, other.id, other.type))
 		print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)')
 		#operator = self.copyGen()
-
+		
 		for element in self.elements:
 			element.replaced_id = -1
 					#operator.absolve(partial, partial.edges, operator.available_edges)
-		completed = self.absolve(other, other.edges, self.edges, set())
+		completed = self.absolve(other, copy.deepcopy(other.edges), self.edges, set())
 		if len(completed) == 0:
 			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other.id, self.id))
 		return completed	
@@ -168,10 +168,16 @@ class ElementGraph(Graph):
 				new_self=  self.assimilate(other, prospect, other_edge)
 				#new_self.print_graph()
 				#Collected = new_self.absolve(other, Remaining,Available-{prospect},Collected)
-				Collected = new_self.absolve(other, Remaining,Available,Collected)
+				potential = new_self.absolve(other, copy.deepcopy(Remaining), Available,Collected)
+				for p in potential:
+					p.print_graph()
+				Collected.update(potential)					
 
 		print('\ncollected {}'.format(len(Collected)))
 		
+		if len(Collected) == 0:
+			return set()
+			
 		if len(Collected) > num_collected_before:
 			return Collected
 		else:
