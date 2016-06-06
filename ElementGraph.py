@@ -39,6 +39,9 @@ class ElementGraph(Graph):
 		if self.root.id == element.id:
 			return self.copyGen()
 		return Type.makeElementGraph(self,element)
+		
+	def getElementGraphFromElementId(self, element_id, Type):
+		return self.getElementGraphFromElement(self.getElementById(element_id),Type)
 
 	def swap(self, source, other):
 		""" source is root of partial step in self, other is other which absolved source.Action
@@ -54,52 +57,51 @@ class ElementGraph(Graph):
 							For each new element and edge in other, need to add those to self as well
 							
 		"""
-		print('swapping into {}'.format(self.id))
-		print('other ought to be the operator: {}'.format(other.id))
-		
+		#print('swapping into {}'.format(self.id))
+		#print('other ought to be the operator: {}'.format(other.id))
+		""" For all edges that go into old self, replace those with edges that go into new self
+			For all edges that start from old self, replace those with edges that originate from new self
+		"""
 		for element in other.elements:
 			for edge in self.edges:
+				#edge.print_edge()
+				#if not edge.sink is None:
+				#	print('{} swap in {} at source {}; element.replaced_id {} == edge.sink.id {}'.format(self.id, other.id, source.id, element.replaced_id, edge.sink.id))
 				if element.replaced_id == edge.sink.id:
-					#print('replacing sink {} with {}'.format(edge.sink.id, element.id))
-					sink = self.getElementById(edge.sink.id)
 					print('Edge ({}--{}-->{}) \treplacing sink {} with {}'.format(edge.source.id, edge.label, edge.sink.id, edge.sink.id, element.id))
+
+					sink = self.getElementById(edge.sink.id)
 					edge.swapSink(element)
-					#""" For every sink we replace, make sure we update all of its incident edges"""
-					#for other_edges in self.getIncidentEdges(edge.sink):
-						#if other_edges.source.id == edge.sink.id:
-					#print('replacing sink {} with {}'.format(edge.sink.id, element.id))
 					self.elements.add(element)
 				
 					if sink in self.elements:
 						self.elements.remove(sink)
-						#print('removing sink {}'.format(edge.sink.id))
-						
-					#print('\nsink swap')
-					#edge.print_edge()
-					#edge.sink.print_element()
+
 				if element.replaced_id == edge.source.id:
-					#print('replacing source {} with {}'.format(edge.source.id, element.id))
 					print('Edge ({}--{}-->{}) \treplacing source {} with {}'.format(edge.source.id, edge.label, edge.sink.id, edge.source.id, element.id))
+					
 					source = self.getElementById(edge.source.id)
 					edge.swapSource(element)
+					self.elements.add(element)
 					
 					if source in self.elements:
-						#print('removing source {}'.format(edge.source.id))
 						self.elements.remove(source)
-					#print('\nsource swap')
-					self.elements.add(element)
-					#edge.print_edge()
-					#edge.source.print_element()
 					
+
+		""" For all new elements in new self, add those to old self. Add all brand new edges as well"""
 		for edge in other.edges:
 			new_edge = False
-			if edge.sink.replaced_id == -1: #-1 means the element is new
+			if edge.sink.replaced_id == -1: #-1 means the element is new and was not replaced
 				self.elements.add(edge.sink)
+				print('new element {}'.format(edge.sink.id))
 				new_edge =True
 			if edge.source.replaced_id == -1:
 				self.elements.add(edge.source)
+				print('new element {}'.format(edge.source.id))
 				new_edge = True
 			if new_edge:
+				print('New Edge ', end= " ")
+				edge.print_edge()
 				self.edges.add(edge)
 		
 		
@@ -116,13 +118,13 @@ class ElementGraph(Graph):
 					#operator.absolve(partial, partial.edges, operator.available_edges)
 		completed = self.absolve(other, other.edges, self.edges, set())
 		if len(completed) == 0:
-			print('no completed instantiations of {} with operator {}'.format(other.id, self.id))
+			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other.id, self.id))
 		return completed	
 	
 	def possible_mergers(self, other, completed = set()):
 		""" self is operator, other is partial step"""
-		print('{}x{}.possible_mergers({}x{})'.format(self.id, self.type, other.id, other.type))
-		print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)')
+		print('\n{}x{}.possible_mergers({}x{})'.format(self.id, self.type, other.id, other.type))
+		print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)\n')
 		operator = self.copyGen()
 
 		for element in operator.elements:

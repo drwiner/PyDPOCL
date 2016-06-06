@@ -45,10 +45,13 @@ class Edge:
 		self.sink = sink
 		return self
 		
+	#def print_edge(self):
+		#self.source.print_element()
+		#print(self.label)
+		#self.sink.print_element()
+		
 	def print_edge(self):
-		self.source.print_element()
-		print(self.label)
-		self.sink.print_element()
+		print('Edge {} --{}--> {}'.format(self.source.id, self.label, self.sink.id))
 
 class Graph(Element):
 	"""A graph is an element with elements, edges, and constraints"""

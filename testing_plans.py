@@ -214,18 +214,93 @@ P99 = 	PlanElementGraph(id = 15432,\
 		Edges=example_edges99,\
 		Constraints=example_constraints99)
 
-print('___________________________________________')
-print('Plan Before instantiation of partial step elements')
-for element in P1.elements:
-	print('Element {} {} {}'.format(element.id, element.type, element.name))
-for edge in P1.edges:
-	print('Edge {} --{}--> {}'.format(edge.source.id, edge.label, edge.sink.id))
-P1.print_plan()
+#kill_element = P99.getElementById(2111)
+PARTIAL_KILL_ACTION = P99.getElementGraphFromElementId(2111,Action)
+print('\nPartial Kill Action: {}'.format(type(PARTIAL_KILL_ACTION)))
+print('__\n')
+
+print('Edges in Partial Kill Action')
+for edge in PARTIAL_KILL_ACTION.edges:
+	edge.print_edge()
+
+
+print('\ninstantiate\n')
+instances = PARTIAL_KILL_ACTION.instantiate(Kill_operator,P1)
+
+print('\n instance plans with instantiated partial kill action\n')
+
+for plan in instances:
+	for element in plan.elements:
+		print('Element {} {} {}'.format(element.id, element.type, element.name))
+	for edge in plan.edges:
+		edge.print_edge()
+	print('\n------------------------------')
+		
+# print('___________________________________________')
+# print('Plan P1 Before instantiation of partial step elements\n')
+# P1.print_plan()
+# for element in P1.elements:
+	# print('Element {} {} {}'.format(element.id, element.type, element.name))
+# for edge in P1.edges:
+	# print('Edge {} --{}--> {}'.format(edge.source.id, edge.label, edge.sink.id))
+
 print('\n')
 #P1.print_graph()
 print('___________________________________________\n')
+
+
+PARTIAL_EXCAVATE_ACTION = P99.getElementGraphFromElementId(111,Action)
+
+print('\ninstantiate\n')
+excavate_instances = PARTIAL_EXCAVATE_ACTION.instantiate(Excavate_operator,P99)
+
+print('\n instance plans with instantiated partial excavate action\n')
+
+for plan in excavate_instances:
+	for element in plan.elements:
+		print('Element {} {} {}'.format(element.id, element.type, element.name))
+	for edge in plan.edges:
+		edge.print_edge()
+	print('\n------------------------------\n')
+
+print('__\n')
+
 #P99.print_graph()
 print('___________________________________________\n')
+
+
+
+test = P1.getElementGraphFromElementId(2111,Action)
+print('\ninstantiate TEST\n')
+test_instances = test.instantiate(Excavate_operator,P99)
+print('\n instance plans with instantiated partial test action\n')
+
+for plan in test_instances:
+	for element in plan.elements:
+		print('Element {} {} {}'.format(element.id, element.type, element.name))
+	for edge in plan.edges:
+		edge.print_edge()
+	print('\n------------------------------\n')
+	
+	
+print('\n\nR-INSTANTIATION TEST\n\n')
+	
+#rInstantiate(self, remaining = set(), operators = set(), complete_plans = set())
+for step in P1.Steps:
+	print(step.id)
+for step in P99.Steps:
+	print(step.id)
+	
+	
+full_instance_plans = P1.rInstantiate({111,2111},{Kill_operator, Excavate_operator}, set())
+	
+print('\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
+
+for plan in full_instance_plans:
+	plan.print_plan()
+	print('\n')
+print('\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
+	
 #print('\n\tPlan')
 #P_clone = P1.copyGen()
 #s = P_clone1.getElementById(2111)
@@ -244,14 +319,11 @@ print('___________________________________________\n')
 
 
 
-print('\n0000000000000000000000000000000000000000000000\n')
+print('\n\n0000000000000000000000000000000000000000000000\n')
 
 
+PARTIAL_EXCAVATE_ACTION = P99.getElementGraphFromElementId(111,Action)
 
-
-
-excavate_element = P99.getElementById(111)
-PARTIAL_EXCAVATE_ACTION = P99.getElementGraphFromElement(excavate_element,Action)
 for edge in PARTIAL_EXCAVATE_ACTION.edges:
 	print('{} --{}--> {}'.format(edge.source.id, edge.label, edge.sink.id))
 print('\nPartial Excavate Action: {}'.format(type(PARTIAL_EXCAVATE_ACTION)))
@@ -267,8 +339,8 @@ for ea in EXCAVATE_ACTIONS:
 print('\n8888888888888888888888888888888888888888888')
 	
 
-kill_element = P1.getElementById(2111)
-PARTIAL_KILL_ACTION = P1.getElementGraphFromElement(kill_element,Action)
+PARTIAL_KILL_ACTION = P1.getElementGraphFromElementId(2111,Action)
+
 print(len(PARTIAL_KILL_ACTION.edges))
 for edge in PARTIAL_KILL_ACTION.edges:
 	print('{} --{}--> {}'.format(edge.source.id, edge.label, edge.sink.id))
@@ -287,9 +359,14 @@ for km in KILL_ACTIONS:
 	print(' ')
 print('__\n')
 
-	
+
+
+#P1.rInstantiate(PARTIAL_KILL_ACTION,{Kill_operator,Excavate_operator})
 	
 print('\n0000000000000000000000000000000000000000000000')
+
+
+
 #Excavate_operator.print_graph()
 
 

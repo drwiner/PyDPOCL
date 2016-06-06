@@ -73,7 +73,8 @@ class Action(ElementGraph):
 	
 	def makeCopyFromID(self, start_from, increment = 1):
 		new_self = self.copyGen()
-		old_id = self.root.id
+		old_id = start_from
+		start_from += increment
 		for element in new_self.elements:
 			element.id = start_from
 			start_from = start_from + increment
@@ -134,16 +135,17 @@ class Action(ElementGraph):
 							2) operator.absolve(step)
 							3) swap operator for step in plan
 		"""
-		#p_clone = operator.makeCopyFromID(self.id + 777,1)
-		merges = operator.possible_mergers(self)
+		#op_clone= operator.makeCopyFromID(self.id + 777,1)
+		instances = operator.getInstantiations(self)
 		
 		plans = set()
 		id = PLAN.id + 1
-		for merge in merges:
-			print('merge : {}'.format(merge.id))
-			#merge.print_graph()
+		for instance in instances:
+			print('merge : {}'.format(instance.id))
+			#instance.print_graph()
 			Plan = PLAN.copyGen()
-			Plan.swap(self.root, merge)
+			Plan.swap(self.root, instance)
+			print(type(Plan))
 			if Plan.isInternallyConsistent():
 				Plan.id = id 
 				id += 1
@@ -507,23 +509,23 @@ class PlanElementGraph(ElementGraph):
 	def isInternallyConsistent(self):
 		return True
 		
-	def instantiate(self, step_element, operator):
-		"""	Instantiates a step_element type = operator with operator Action (elementgraph) 
-			Returns the set of plans in which the step_element is instantiated. 
-			Could be more than one way to instantiate given partial element
+	# def instantiate(self, step_element_, operator):
+		# """	Instantiates a step_element type = operator with operator Action (elementgraph) 
+			# Returns the set of plans in which the step_element is instantiated. 
+			# Could be more than one way to instantiate given partial element
 			
-			P1.instantiate(s, operator)
-		"""
-		#self.updatePlan()
-		step = self.getElementGraphFromElement(step_element, Action)
-		#print('in-plan step: {}'.format(step.id))
-		return step.instantiate(operator, self)
+			# P1.instantiate(s, operator)
+		# """
+		# #self.updatePlan()
+		# step = self.getElementGraphFromElementId(step_element_id, Action)
+		# #print('in-plan step: {}'.format(step.id))
+		# return step.instantiate(operator, self)
 
 	def rInstantiate(self, remaining = set(), operators = set(), complete_plans = set()):
 		"""	Recursively instantiate a step in self with some operator
 			Return set of plans with all steps instantiated
 			
-			TODO: test
+			plan.rInstantiate(steps_Ids, {operator_1, operator_2})
 		"""
 		self.updatePlan()
 		#remaining = {step for step in self.Steps if not step.instantiated}
@@ -532,37 +534,55 @@ class PlanElementGraph(ElementGraph):
 		#BASE CASE
 		if len(remaining) == 0:
 			complete_plans.add(self)
+			print('\nsuccess!, adding new plan {}\n'.format(self.id))
 			return complete_plans
 		else:
 			print('rInstantiate remainings List:')
 			for r in remaining:
-				print('\t\t\t',end=" ")
-				r.print_element()
+				print('\t\t\t {}'.format(r))
+			print('\n')
 			
 		#INDUCTION
-		step = remaining.pop()
+		step_id = remaining.pop()
 		new_plans = set()
-		new_ids = {step.id + n for n in range(1,len(operators)+1)}
-		step = self.getElementById(step.id)
-		print(step.id)
-		self.getElementGraphFromElement(step, Action).print_graph()
-		print('___instantiating___')
-		#self.print_graph()
+		new_ids = {step_id + n for n in range(10,len(operators)+1)}
+		new_self = self.copyGen()
+		step = new_self.getElementGraphFromElementId(step_id, Action)
+		print('\n___instantiating___\n')
+		
+		""" instantiate with every operator"""
 		for op in operators:
+			new_self = self.copyGen()
+			step = new_self.getElementGraphFromElementId(step_id, Action)
 			new_id = new_ids.pop()
 			op_clone = op.makeCopyFromID(new_id,1)
-			#self.getElementGraphFromElement(step,Action).print_graph()
-			new_ps = self.instantiate(step, op_clone)
-			#print('{} new plans from instantiating {} from operator {}-{} in plan {}'.format(len(new_ps),step.id, op.id, op.root.name, self.id))
+			print('\n Attempting instantiation with step {} and op clone {} formally {}\n'.format(step.id,op_clone.id,op.id))
+			new_ps = step.instantiate(op_clone, new_self) 
 			new_plans.update(new_ps)
+			#print('{} new plans from instantiating {} from operator {}-{} in plan {}'.format(len(new_ps),step.id, op.id, op.root.name, self.id))
 			
+		""" If completely empty, then this branch terminates"""
+		if len(new_plans) == 0:
+			return set()
+		
+		completed_plans_before= len(complete_plans)
+		
+		""" For each version, continue with remaining steps, choosing any operator"""
 		for plan in new_plans:
-			#plan.print_plan()
-			complete_plans = plan.rInstantiate(remaining, operators,complete_plans)
+			print('\ncalling rInstantiate with new_plans, now with remaining:',end = " ")
+			for r in remaining:
+				print('\t {}'.format(r), end= " ")
+			print('\n')
+			complete_plans = plan.rInstantiate(remaining, operators, complete_plans)
+		
+		""" if no path returns a plan, then this branch terminates"""
+		if completed_plans_before >= len(complete_plans):
+			return set()
+			
 		#Each return from rInstantiate is a set of unique plans with all steps instantiated
 		#for plan in new_plans:
 			#complete_plans = plan.rInstantiate(operators,complete_plans)
-			
+		
 		return complete_plans
 
 	
@@ -575,6 +595,8 @@ class PlanElementGraph(ElementGraph):
 		print('steps:')
 		for step in self.Steps:
 			step.print_element()
+		for edge in self.edges:
+			edge.print_edge()
 		print('frames:')
 		for frame in self.IntentionFrames:
 			print('frame id {}:'.format(frame.id), end=" ")
