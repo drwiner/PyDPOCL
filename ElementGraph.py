@@ -113,7 +113,7 @@ class ElementGraph(Graph):
 
 		for element in self.elements:
 			element.replaced_id = -1
-	
+					#operator.absolve(partial, partial.edges, operator.available_edges)
 		completed = self.absolve(other, other.edges, self.edges)
 		if len(completed) == 0:
 			print('no completed instantiations of {} with operator {}'.format(other.id, self.id))
@@ -160,7 +160,9 @@ class ElementGraph(Graph):
 		#other_edge.print_edge()
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
+				print('step {} edge {} --{}--> {} matches {} --{}--> {}'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
 				new_self=  self.assimilate(other, prospect, other_edge)
+				#new_self.print_graph()
 				#Collected = new_self.absolve(other, Remaining,Available-{prospect},Collected)
 				Collected = new_self.absolve(other, Remaining,Available,Collected)
 		print('collected ', len(Collected))
