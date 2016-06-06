@@ -11,12 +11,12 @@ class Belief(ElementGraph):
 		super(Belief, self).__init__(id,type,name,Elements, root_element, Edges, Constraints)
 
 class Action(ElementGraph):
-	def __init__(self,id,graph_type,name=None,Elements = set(), root_element = None, Edges = set(),Constraints = set()):
+	def __init__(self,id,type_graph,name=None,Elements = set(), root_element = None, Edges = set(),Constraints = set()):
 
 		if root_element is None:
 			root_element = Operator(id + 201,type='Action')
 			
-		super(Action,self).__init__(id,graph_type,name,Elements,root_element,Edges,Constraints)
+		super(Action,self).__init__(id,type_graph,name,Elements,root_element,Edges,Constraints)
 
 		""" Get Action arguments by position"""											
 		self.Args = {}
@@ -60,6 +60,16 @@ class Action(ElementGraph):
 				self.is_orphan = True
 			elif actor.orphan_dict[self.root.id] == True:
 				self.is_orphan = True
+				
+	# @classmethod
+	# def makeElementGraph(cls, elementGraph, element):
+		# return cls(				element.id, \
+								# element.type, \
+								# name=None,\
+								# Elements = elementGraph.rGetDescendants(element),\
+								# root_element = element,\
+								# Edges = elementGraph.rGetDescendantEdges(element),\
+								# Constraints = elementGraph.rGetDescendantConstraints(element))
 	
 	def makeCopyFromID(self, start_from, increment = 1):
 		new_self = self.copyGen()
@@ -126,13 +136,12 @@ class Action(ElementGraph):
 		"""
 		#p_clone = operator.makeCopyFromID(self.id + 777,1)
 		merges = operator.possible_mergers(self)
-		# test = merges.pop()
-		# test.root.print_element()
-		# print('from op_clone.possible_mergers')
-		# merges = {test}
+		
 		plans = set()
 		id = PLAN.id + 1
 		for merge in merges:
+			print('merge : {}'.format(merge.id))
+			#merge.print_graph()
 			Plan = PLAN.copyGen()
 			Plan.swap(self.root, merge)
 			if Plan.isInternallyConsistent():
@@ -147,10 +156,10 @@ class Action(ElementGraph):
 		
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
-	def __init__(self,id,type,name=None,\
+	def __init__(self,id,type_graph,name=None,\
 		Elements=set(), root_element = None, Edges = set(), Constraints = set()):
 		
-		super(Condition,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
+		super(Condition,self).__init__(id,type_graph,name,Elements,root_element,Edges,Constraints)
 		self.labels = ['first-arg','sec-arg','third-arg','fourth-arg']
 		
 	def getArgList(self):
@@ -176,10 +185,10 @@ class Condition(ElementGraph):
 class CausalLink(Edge):
 	""" A causal link is an edge, s.t. the source and sink are actions, and the condition is itself an edge between a dummy element
 		and the dependency literal element, rather than just a label"""
-	def __init__(self, id, type, name=None, action1 = None, action2 = None, condition = None):
+	def __init__(self, id, type_graph, name=None, action1 = None, action2 = None, condition = None):
 		super(CausalLink,self).__init__(source=action1,sink=action2,label=condition.id)
 		self.id = id
-		self.type = type
+		self.type = type_graph
 		self.name = name
 		self.dependency = condition #A literal element#
 		
@@ -290,7 +299,7 @@ class IntentionFrame(ElementGraph):
 						Edge(sat, actor, 'actor-of')\
 						})
 		#########################################################################################
-		super(IntentionFrame,self).__init__(id,type,name,Elements,root_element,Edges,Constraints)
+		super(IntentionFrame,self).__init__(id,type_graph,name,Elements,root_element,Edges,Constraints)
 		#########################################################################################
 		
 		self.Steps = {step for step in self.elements if type(step) is Operator}
@@ -502,9 +511,12 @@ class PlanElementGraph(ElementGraph):
 		"""	Instantiates a step_element type = operator with operator Action (elementgraph) 
 			Returns the set of plans in which the step_element is instantiated. 
 			Could be more than one way to instantiate given partial element
+			
+			P1.instantiate(s, operator)
 		"""
-		self.updatePlan()
+		#self.updatePlan()
 		step = self.getElementGraphFromElement(step_element, Action)
+		#print('in-plan step: {}'.format(step.id))
 		return step.instantiate(operator, self)
 
 	def rInstantiate(self, remaining = set(), operators = set(), complete_plans = set()):

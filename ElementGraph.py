@@ -3,10 +3,10 @@ from Graph import *
 class ElementGraph(Graph):
 	"""An element graph is a graph with a root element"""
 	
-	def __init__(self,id,type,name=None, Elements = set(), root_element = None, Edges = set(), Constraints = set()):
+	def __init__(self,id,type_graph,name=None, Elements = set(), root_element = None, Edges = set(), Constraints = set()):
 		super(ElementGraph,self).__init__(\
 											id,\
-											type,\
+											type_graph,\
 											name,\
 											Elements,\
 											Edges,\
@@ -38,7 +38,6 @@ class ElementGraph(Graph):
 	def getElementGraphFromElement(self, element, Type):
 		if self.root.id == element.id:
 			return self.copyGen()
-			
 		return Type.makeElementGraph(self,element)
 
 	def swap(self, source, other):
@@ -55,6 +54,9 @@ class ElementGraph(Graph):
 							For each new element and edge in other, need to add those to self as well
 							
 		"""
+		print('swapping into {}'.format(self.id))
+		print('other ought to be the operator: {}'.format(other.id))
+		
 		for element in other.elements:
 			for edge in self.edges:
 				if element.replaced_id == edge.sink.id:
@@ -103,77 +105,31 @@ class ElementGraph(Graph):
 		
 		return self
 		
-		#{edge.swapSink(element) for edge in self.edges for element in other.elements if element.replaced_id == edge.sink.id
-
-				
-	# def swap_1(self, source, other):
-		# """	SWAP: 	
-					# For every descendant d of source, find d' which has same ID
-						# If it doesn't exist, add d' to self
-						# otherwise, d.merge(d')
-					# For every descendant edge d' --> y'
-						# If there is no edge d --> y in self.edges, add d --> y
-						# otherwise, do nothing
-						
-			# Purpose:
-					# Other is consistent subgraph with root equivalent to source
-					# Merging other with self at source is a consistent_merge
-
-		# """
-		# #descendants = self.rGetDescendants(source)
-		# self_ids = {descendant.id for descendant in self.elements}
-		# other_ids = {element.id for element in other.elements}
-		# #New ids are other_ids which are not in self_ids
-		# new_ids = other_ids - self_ids.intersection(other_ids)
-		
-		# print("\nNEW IDs")
-		# for id in new_ids:
-			# print(id)
-		# print("\n")
-		# #If d'.id == d.id, then merge
-		# merged_elements = {d.merge(d_prime) for d in self.elements for d_prime in other.elements if d_prime.id == d.id}
-		# #If there is no d' s.t. d'.id == d.id then add d'
-		# new_elements = {d_prime for d_prime in other.elements if d_prime.id in new_ids}
-		# #descendants.update(new_elements)
-		# self.elements.update(new_elements)
-		
-		# #Add Missing Edges
-		# descendantEdges = self.rGetDescendantEdges(source)
-		# {self.addEdgeByIdentity(edge) for edge in other.edges if not self.hasEdgeIdentity(edge)}
-		
-		# #Add Missing Constraints (problem: all constraint elements must be in self.elements)
-		# descendantConstraints = self.rGetDescendantConstraints(source)
-		# {self.addConstraintByIdentity(edge) for edge in other.constraints if not self.hasConstraintIdentity(edge)}
-		# return self
-		
-	# def rAddNewDescendants(self, other, other_source):
-		# """ for each new descendant sink with an unencountered id
-			# add that element and the edge that took us there
-			# recursively 
-		# """
-		# element_ids = {element.id for element in self.elements}
-		# new_edges = {edge \
-							# for edge in other.edges \
-								# if other_source.id == edge.source.id \
-								# and edge.sink.id not in element_ids}
-									
-		# #BASE CASE:
-		# if len(new_edges) == 0:
-			# return self
-			
-		# #INDUCTION
-		# self.edges.update(new_edges)
-		# {self.elements.add(new_edge.sink) for new_edge in new_edges}
-		# {self.rAddNewDescendants(other,new_edge.sink) for new_edge in new_edges}
-		
-		# return self
-	
-	
-	def possible_mergers(self, other):
+	def getInstantiations(self, other):
 		""" self is operator, other is partial step"""
+		print('{}x{}.possible_mergers({}x{})'.format(self.id, self.type, other.id, other.type))
+		print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)')
+		#operator = self.copyGen()
+
 		for element in self.elements:
 			element.replaced_id = -1
-		completed = self.absolve(other, copy.deepcopy(other.edges), copy.deepcopy(self.edges))
+	
+		completed = self.absolve(other, other.edges, self.edges)
+		if len(completed) == 0:
+			print('no completed instantiations of {} with operator {}'.format(other.id, self.id))
+		return completed	
+	
+	def possible_mergers(self, other, completed = set()):
+		""" self is operator, other is partial step"""
+		print('{}x{}.possible_mergers({}x{})'.format(self.id, self.type, other.id, other.type))
+		print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)')
+		operator = self.copyGen()
+
+		for element in operator.elements:
+			element.replaced_id = -1
+			
+	
+		completed = operator.absolve(other, copy.deepcopy(other.edges), operator.edges)
 	#	print('completed absolvings: {}'.format(len(completed)))
 		if len(completed) == 0:
 			print('no completed instantiations of {} with operator {}'.format(other.id, self.id))
@@ -199,7 +155,7 @@ class ElementGraph(Graph):
 		
 		print('remaining ', len(Remaining))
 		other_edge = Remaining.pop()
-		print('{} --{}--> {} needs replacement'.format(other_edge.source.id, other_edge.label, other_edge.sink.id))
+		print('{}.absolve({})... {} --{}--> {} needs replacement'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
 		num_collected_before = len(Collected)
 		#other_edge.print_edge()
 		for prospect in Available:
@@ -220,6 +176,7 @@ class ElementGraph(Graph):
 			Merges source and sinks
 			Self is usually operator, other is partial step
 		"""
+
 		new_self = self.copyGen()
 		self_source = new_self.getElementById(old_edge.source.id)			#source from new_self
 		self_source.merge(other_edge.source)								#source merge

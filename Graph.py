@@ -114,9 +114,9 @@ class Graph(Element):
 		return {edge for edge in self.constraints if edge.source.id == source_id and edge.sink.id == sink_id and edge.label == label}
 			
 	def getIncidentEdges(self, element):
-		return {edge for edge in self.edges if edge.source is element}
+		return {edge for edge in self.edges if edge.source.id == element.id}
 	def getNeighbors(self, element):
-		return set(edge.sink for edge in self.edges if edge.source is element)
+		return {edge.sink for edge in self.edges if edge.source.id == element.id}
 	def getParents(self, element):
 		return set(edge.source for edge in self.edges if edge.sink is element)
 	def getNeighborsByLabel(self, element, label):
@@ -147,15 +147,16 @@ class Graph(Element):
 		
 	######       rGet       ####################
 	def rGetDescendants(self, element, Descendants = set()):
-	
+		Descendants.add(element)
+		
 		#Base Case
 		incidentEdges = self.getIncidentEdges(element)
 		if len(incidentEdges) == 0:
-			return {element}
+			return Descendants
 			
 		#Induction
 		for edge in incidentEdges:
-			Descendants.add(element)
+			#Descendants.add(edge.sink)
 			Descendants = self.rGetDescendants(edge.sink, Descendants)
 		return Descendants
 		
@@ -178,11 +179,9 @@ class Graph(Element):
 			return Descendant_Edges
 		
 		#Induction
-		Descendant_Edges=Descendant_Edges.union(incident_Edges)
+		Descendant_Edges= Descendant_Edges.union(incident_Edges)
 		for edge in incident_Edges:
-			Descendant_Edges = self.rGetDescendantEdges(edge.sink, \
-														Descendant_Edges\
-														)
+			Descendant_Edges = self.rGetDescendantEdges(edge.sink, Descendant_Edges)
 			
 		return Descendant_Edges
 		
