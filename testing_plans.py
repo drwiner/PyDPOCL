@@ -217,7 +217,9 @@ P99 = 	PlanElementGraph(id = 15432,\
 print('___________________________________________')
 print('Plan Before instantiation of partial step elements')
 for element in P1.elements:
-	print('Element {} {} {}')
+	print('Element {} {} {}'.format(element.id, element.type, element.name))
+for edge in P1.edges:
+	print('Edge {} --{}--> {}'.format(edge.source.id, edge.label, edge.sink.id))
 P1.print_plan()
 print('\n')
 #P1.print_graph()
@@ -244,6 +246,10 @@ print('___________________________________________\n')
 
 print('\n0000000000000000000000000000000000000000000000\n')
 
+
+
+
+
 excavate_element = P99.getElementById(111)
 PARTIAL_EXCAVATE_ACTION = P99.getElementGraphFromElement(excavate_element,Action)
 for edge in PARTIAL_EXCAVATE_ACTION.edges:
@@ -260,8 +266,9 @@ for ea in EXCAVATE_ACTIONS:
 	
 print('\n8888888888888888888888888888888888888888888')
 	
-kill_element = P99.getElementById(2111)
-PARTIAL_KILL_ACTION = P99.getElementGraphFromElement(kill_element,Action)
+
+kill_element = P1.getElementById(2111)
+PARTIAL_KILL_ACTION = P1.getElementGraphFromElement(kill_element,Action)
 print(len(PARTIAL_KILL_ACTION.edges))
 for edge in PARTIAL_KILL_ACTION.edges:
 	print('{} --{}--> {}'.format(edge.source.id, edge.label, edge.sink.id))

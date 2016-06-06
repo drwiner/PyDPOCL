@@ -114,7 +114,7 @@ class ElementGraph(Graph):
 		for element in self.elements:
 			element.replaced_id = -1
 					#operator.absolve(partial, partial.edges, operator.available_edges)
-		completed = self.absolve(other, other.edges, self.edges)
+		completed = self.absolve(other, other.edges, self.edges, set())
 		if len(completed) == 0:
 			print('no completed instantiations of {} with operator {}'.format(other.id, self.id))
 		return completed	
@@ -152,7 +152,7 @@ class ElementGraph(Graph):
 		if len(Remaining)  == 0:
 			Collected.add(self)
 			return Collected
-		
+		#print('PRE collected ', len(Collected))
 		print('remaining ', len(Remaining))
 		other_edge = Remaining.pop()
 		print('{}.absolve({})... {} --{}--> {} needs replacement'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
