@@ -103,6 +103,7 @@ example_elements = 	{	example, \
 						example_actor, \
 						example_item,\
 						#ex_const_element\
+						killer_actor
 						}
 						
 						
@@ -149,46 +150,41 @@ P1 = 	PlanElementGraph(id = 5432,\
 # example_item = 		Argument(id=115,		type='var', 			arg_pos_dict={})
 # example_actor = 	Actor(id=116, 			type='actor',			arg_pos_dict={})
 
+print('PLAN P1\n')
 P1.print_plan()
 print('\n')
 P1.print_graph()
 print('\n')
 
 
-#
-#P2 = copy.deepcopy(P1)
-#extractElementsubGraphFromElement(P1,P1.getElementById(2111),Action)
-#PARTIAL_KILL_ACTION = P2.getElementGraphFromElementId(2111,ElementGraph)
-#element = P1.getElementById(2111)
-
 PARTIAL_KILL_ACTION = extractElementsubGraphFromElement(P1,P1.getElementById(2111),Action)
-PARTIAL_KILL_ACTION.print_graph()
-print('\n')
-#PARTIAL_EXCAVATE_ACTION = P2.getElementGraphFromElementId(111,Action)
-
 PARTIAL_EXCAVATE_ACTION = P1.getElementGraphFromElementId(111,Action)
-#Action.makeElementGraph(P1, P1.getElementById(111))
+
 print('\n')
 PARTIAL_EXCAVATE_ACTION.print_graph()
 print('\n')
 PARTIAL_KILL_ACTION.print_graph()
 print('\n')
-print('\n not same thing \n')
-PARTIAL_EXCAVATE_ACTION.print_graph()
+
+Kill_operator.print_graph()
 print('\n')
 
-#plans_with_kill_instance = PARTIAL_KILL_ACTION.instantiate(Kill_operator,P1)
-#plans_with_excavate_instance = PARTIAL_EXCAVATE_ACTION.instantiate(Kill_operator,P1)
+kill_clone_6000= Kill_operator.makeCopyFromID(6000, 1)
+kill_clone_5000 = Kill_operator.makeCopyFromID(5000, 1)
 
-# for plan in plans_with_kill_instance:
-	# print('plan with excavate instance')
-	# plan.print_plan()
-	# print('\n')
+
+plans_with_kill_instance = PARTIAL_KILL_ACTION.instantiate(kill_clone_6000,P1)
+plans_with_excavate_instance = PARTIAL_EXCAVATE_ACTION.instantiate(kill_clone_5000,P1)
+
+for plan in plans_with_kill_instance:
+	print('plan with excavate instance')
+	plan.print_plan()
+	print('\n')
 	
-# print('\n')
-# for plan in plans_with_excavate_instance:
-	# print('plan with kill instance')
-	# plan.print_plan()
-	# print('\n')
+print('\n')
+for plan in plans_with_excavate_instance:
+	print('plan with kill instance')
+	plan.print_plan()
+	print('\n')
 	
 	

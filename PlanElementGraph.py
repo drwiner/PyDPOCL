@@ -158,16 +158,13 @@ class Action(ElementGraph):
 		plans = set()
 		id = PLAN.id + 1
 		for instance in instances:
-
-			#print('merge : {}'.format(instance.id))
-			#instance.print_graph()
 			Plan = PLAN.copyGen()
-			Plan.swap(self.root, instance)
-			#print(type(Plan))
+			Plan.mergeGraph(instance)
 			if Plan.isInternallyConsistent():
 				Plan.id = id 
 				id += 1
 				Plan.updateIntentionFrameAttributes()
+				print('adding plan {}'.format(Plan.id))
 				plans.add(Plan)
 			print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
 		return plans
