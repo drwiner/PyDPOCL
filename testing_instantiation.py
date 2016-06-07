@@ -141,6 +141,8 @@ P1 = 	PlanElementGraph(id = 5432,\
 		Edges=example_edges,\
 		Constraints=example_constraints)
 		
+P2 = P1.copyGen()
+		
 # example2 = Operator(id = 2111, type= 'Action') #kill
 # te = Literal(id = 2112, type='Condition', name='alive', truth= False, num_args = 1)
 # example_actor = 	Actor(id=2113, 			type='actor',			arg_pos_dict={2111 : 1})
@@ -157,7 +159,7 @@ P1.print_graph()
 print('\n')
 
 
-PARTIAL_KILL_ACTION = extractElementsubGraphFromElement(P1,P1.getElementById(2111),Action)
+PARTIAL_KILL_ACTION = P1.getElementGraphFromElementId(2111,Action)
 PARTIAL_EXCAVATE_ACTION = P1.getElementGraphFromElementId(111,Action)
 
 print('\n')
@@ -171,7 +173,7 @@ print('\n')
 
 kill_clone_6000= Kill_operator.makeCopyFromID(6000, 1)
 kill_clone_5000 = Kill_operator.makeCopyFromID(5000, 1)
-
+kill_clone_9000 = Kill_operator.makeCopyFromID(9000, 1)
 
 plans_with_kill_instance = PARTIAL_KILL_ACTION.instantiate(kill_clone_6000,P1)
 plans_with_excavate_instance = PARTIAL_EXCAVATE_ACTION.instantiate(kill_clone_5000,P1)
@@ -180,6 +182,16 @@ for plan in plans_with_kill_instance:
 	print('plan with excavate instance')
 	plan.print_plan()
 	print('\n')
+	for element in plan.elements:
+		if type(element) == Operator:
+			if not element.instantiated:
+				print(element.id)
+				E = plan.getElementGraphFromElement(element, Action)
+				new_plans = E.instantiate(kill_clone_9000, plan)
+				for p in new_plans:
+					p.print_plan()
+					print('\n')
+	
 	
 print('\n')
 for plan in plans_with_excavate_instance:
@@ -187,4 +199,22 @@ for plan in plans_with_excavate_instance:
 	plan.print_plan()
 	print('\n')
 	
+	
+
+# print('\n\nPLAN P2\n')
+# P2.print_plan()
+# print('\n')
+# P2.print_graph()
+# print('\n')
+
+# kill_clone_9000 = Kill_operator.makeCopyFromID(9000, 1)
+# excavate_clone_7000 = Excavate_operator.makeCopyFromID(7000,1)
+
+# plans = P2.rInstantiate({2111,111},{kill_clone_9000, excavate_clone_7000})
+# print('\n')
+# for plan in plans:
+	# print('plan with both instances')
+	# plan.print_plan()
+	# print('\n')
+
 	
