@@ -159,9 +159,11 @@ class Action(ElementGraph):
 		id = PLAN.id + 1
 		for instance in instances:
 			Plan = PLAN.copyGen()
+			Plan.id = id 
+			id += 1
 			Plan.mergeGraph(instance)
 			if Plan.isInternallyConsistent():
-				Plan.id = id 
+				
 				id += 1
 				Plan.updateIntentionFrameAttributes()
 				print('adding plan {}'.format(Plan.id))
@@ -593,7 +595,7 @@ class PlanElementGraph(ElementGraph):
 		step_id = remaining.pop()
 		new_plans = set()
 		new_ids = {step_id + n + 35 for n in range(1,len(operators)+10)}
-		print('\n___instantiating_{}__\n'.format(step_id))
+		
 		
 		""" instantiate with every operator"""
 		for op in operators:
@@ -602,6 +604,7 @@ class PlanElementGraph(ElementGraph):
 			step = new_self.getElementGraphFromElementId(step_id, Action)
 			new_id = new_ids.pop()
 			op_clone = op.makeCopyFromID(new_id,1)
+			#print('\n Plan {} ___instantiating_{}__with operator clone {}\n'.format(new_self.id, step_id, op_clone.id))
 			print('\n Plan {} Attempting instantiation with step {} and op clone {} formally {}\n'.format(new_self.id, step.id,op_clone.id,op.id))
 			new_ps = step.instantiate(op_clone, new_self) 
 			print('\n returned {} new plans'.format(len(new_ps)))

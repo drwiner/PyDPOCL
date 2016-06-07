@@ -114,12 +114,12 @@ class ElementGraph(Graph):
 			
 
 		other_edge = Remaining.pop()
-		#print('{}.absolve({})... {} --{}--> {} needs replacement \n'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
+		print('{}.absolve({})... {} --{}--> {} needs replacement \n'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
 		num_collected_before = len(Collected)
 		
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
-				#print('\nstep {} edge {} --{}--> {} matches {} --{}--> {}\n'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
+				print('\nstep {} edge {} --{}--> {} matches {} --{}--> {}\n'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
 				new_self=  self.assimilate(other, prospect, other_edge)
 				Collected.update(new_self.absolve(other, Remaining, Available, Collected))					
 		
