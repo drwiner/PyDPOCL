@@ -93,7 +93,7 @@ class InternalElement(Element):
 	"""
 	def __init__(self, id, type, name = None, num_args = None, roles = None):
 		super(InternalElement,self).__init__(id,type,name)
-		if none_args == None:
+		if num_args == None:
 			num_args = 0
 		if roles == None:
 			roles = {}
@@ -180,8 +180,12 @@ class InternalElement(Element):
 		
 class Operator(InternalElement):
 	""" An operator element is an internal element with an executed status and orphan status"""
-	def __init__(self, id, type, name = None, num_args = None, roles = None, is_orphan = True, executed = None, instantiated = False):
-		if none_args == None:
+	def __init__(self, id, type, name = None, num_args = None, roles = None, is_orphan = None, executed = None, instantiated = None):
+		if instantiated == None:
+			instantiated = False
+		if is_orphan is None:
+			is_orphan = True
+		if num_args == None:
 			num_args = 0
 		if roles == None:
 			roles = {}
@@ -364,7 +368,7 @@ class Actor(Argument):
 	def __init__(self, id, type, name= None, arg_pos_dict = None, orphan_dict = None):
 		if arg_pos_dict == None:
 			arg_pos_dict = {}
-		if orphan_dict = None:
+		if orphan_dict == None:
 			orphan_dict = {}
 			
 		super(Actor,self).__init__(id,type,name, arg_pos_dict)
@@ -406,7 +410,6 @@ class PlanElement(Element):
 		super(PlanElement,self).__init__(id,type,name)
 		
 		self.Steps = Steps
-		self.Bindings = Bindings
 		self.Orderings = Orderings
 		self.CausalLinks = CausalLinks
 		self.IntentionFrames = IntentionFrames
