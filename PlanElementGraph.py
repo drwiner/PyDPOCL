@@ -139,15 +139,16 @@ class Action(ElementGraph):
 		"""
 		#op_clone= operator.makeCopyFromID(self.id + 777,1)
 		instances = operator.getInstantiations(self)
-		
+		#print('INSTANCE ::::::::::::::::::::::::::::::::::::: {}'.format(len(instances)))
 		plans = set()
 		id = PLAN.id + 1
 		for instance in instances:
-			print('merge : {}'.format(instance.id))
+
+			#print('merge : {}'.format(instance.id))
 			#instance.print_graph()
 			Plan = PLAN.copyGen()
 			Plan.swap(self.root, instance)
-			print(type(Plan))
+			#print(type(Plan))
 			if Plan.isInternallyConsistent():
 				Plan.id = id 
 				id += 1
@@ -547,7 +548,7 @@ class PlanElementGraph(ElementGraph):
 		#INDUCTION
 		step_id = remaining.pop()
 		new_plans = set()
-		new_ids = {step_id + n for n in range(1,len(operators)+10)}
+		new_ids = {step_id + n + 35 for n in range(1,len(operators)+10)}
 		print('\n___instantiating_{}__\n'.format(step_id))
 		
 		""" instantiate with every operator"""
@@ -573,9 +574,9 @@ class PlanElementGraph(ElementGraph):
 		for plan in new_plans:
 			print('\ncalling rInstantiate with new_plans, now with remaining:',end = " ")
 			for r in remaining:
-				print('\t {}'.format(r), end= " ")
+				print('\t {}'.format(r), end= ", ")
 			print('\n')
-			complete_plans = plan.rInstantiate(remaining, operators, complete_plans)
+			complete_plans.update(plan.rInstantiate(remaining, operators, complete_plans))
 		
 		""" if no path returns a plan, then this branch terminates"""
 		if completed_plans_before >= len(complete_plans):

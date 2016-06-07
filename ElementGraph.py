@@ -64,6 +64,7 @@ class ElementGraph(Graph):
 		"""
 		for element in other.elements:
 			for edge in self.edges:
+				
 				#edge.print_edge()
 				#if not edge.sink is None:
 				#	print('{} swap in {} at source {}; element.replaced_id {} == edge.sink.id {}'.format(self.id, other.id, source.id, element.replaced_id, edge.sink.id))
@@ -71,6 +72,7 @@ class ElementGraph(Graph):
 					print('Edge ({}--{}-->{}) \treplacing sink {} with {}'.format(edge.source.id, edge.label, edge.sink.id, edge.sink.id, element.id))
 
 					sink = self.getElementById(edge.sink.id)
+					element.merge(edge.sink)
 					edge.swapSink(element)
 					self.elements.add(element)
 				
@@ -81,7 +83,9 @@ class ElementGraph(Graph):
 					print('Edge ({}--{}-->{}) \treplacing source {} with {}'.format(edge.source.id, edge.label, edge.sink.id, edge.source.id, element.id))
 					
 					source = self.getElementById(edge.source.id)
+					element.merge(edge.source)
 					edge.swapSource(element)
+					
 					self.elements.add(element)
 					
 					if source in self.elements:
@@ -90,18 +94,22 @@ class ElementGraph(Graph):
 
 		""" For all new elements in new self, add those to old self. Add all brand new edges as well"""
 		for edge in other.edges:
+			
 			new_edge = False
+			
 			if edge.sink.replaced_id == -1: #-1 means the element is new and was not replaced
 				self.elements.add(edge.sink)
-				print('new element {}'.format(edge.sink.id))
+				#print('new element {}'.format(edge.sink.id))
 				new_edge =True
+					
 			if edge.source.replaced_id == -1:
 				self.elements.add(edge.source)
-				print('new element {}'.format(edge.source.id))
+				#print('new element {}'.format(edge.source.id))
 				new_edge = True
+				
 			if new_edge:
-				print('New Edge ', end= " ")
-				edge.print_edge()
+				#print('New Edge ', end= " ")
+				#edge.print_edge()
 				self.edges.add(edge)
 		
 		
@@ -109,8 +117,8 @@ class ElementGraph(Graph):
 		
 	def getInstantiations(self, other):
 		""" self is operator, other is partial step"""
-		print('{}x{}.possible_mergers({}x{})'.format(self.id, self.type, other.id, other.type))
-		print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)')
+		print('{}x{}.get Instances given partial step ({}x{})'.format(self.id, self.type, other.id, other.type))
+		#print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)')
 		#operator = self.copyGen()
 		
 		for element in self.elements:
@@ -124,7 +132,6 @@ class ElementGraph(Graph):
 	def possible_mergers(self, other, completed = set()):
 		""" self is operator, other is partial step"""
 		print('\n{}x{}.possible_mergers({}x{})'.format(self.id, self.type, other.id, other.type))
-		print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)\n')
 		operator = self.copyGen()
 		other = other.copyGen()
 		for element in operator.elements:
@@ -156,24 +163,22 @@ class ElementGraph(Graph):
 			return Collected
 			
 		#print('PRE collected ', len(Collected))
-		print('\n ABSOLVE remaining ', len(Remaining))
+	#	print('\n ABSOLVE remaining ', len(Remaining))
 		other_edge = Remaining.pop()
-		print('\n{}.absolve({})... {} --{}--> {} needs replacement \n'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
+	#	print('{}.absolve({})... {} --{}--> {} needs replacement \n'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
 		num_collected_before = len(Collected)
 		#other_edge.print_edge()
 		
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
-				print('\nstep {} edge {} --{}--> {} matches {} --{}--> {}\n'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
+	#			print('\nstep {} edge {} --{}--> {} matches {} --{}--> {}\n'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
 				new_self=  self.assimilate(other, prospect, other_edge)
 				#new_self.print_graph()
 				#Collected = new_self.absolve(other, Remaining,Available-{prospect},Collected)
-				potential = new_self.absolve(other, copy.deepcopy(Remaining), Available,Collected)
-				for p in potential:
-					p.print_graph()
+				potential = new_self.absolve(other.copyGen(), copy.deepcopy(Remaining), copy.deepcopy(Available), copy.deepcopy(Collected))
 				Collected.update(potential)					
 
-		print('\ncollected {}'.format(len(Collected)))
+	#	print('collected {}'.format(len(Collected)))
 		
 		if len(Collected) == 0:
 			return set()
@@ -181,7 +186,7 @@ class ElementGraph(Graph):
 		if len(Collected) > num_collected_before:
 			return Collected
 		else:
-			print('\nbackup bitch\n')
+	#		print('\nbackup bitch\n')
 			return set()
 		
 	
