@@ -91,8 +91,12 @@ class InternalElement(Element):
 									frame.id	: 'initial'
 									frame.id	: 'source'
 	"""
-	def __init__(self, id, type, name = None, num_args = 0, roles = {}):
+	def __init__(self, id, type, name = None, num_args = None, roles = None):
 		super(InternalElement,self).__init__(id,type,name)
+		if none_args == None:
+			num_args = 0
+		if roles == None:
+			roles = {}
 		self.num_args = num_args
 		self.roles = roles
 	
@@ -176,7 +180,11 @@ class InternalElement(Element):
 		
 class Operator(InternalElement):
 	""" An operator element is an internal element with an executed status and orphan status"""
-	def __init__(self, id, type, name = None, num_args = 0, roles = {}, is_orphan = True, executed = None, instantiated = False):
+	def __init__(self, id, type, name = None, num_args = None, roles = None, is_orphan = True, executed = None, instantiated = False):
+		if none_args == None:
+			num_args = 0
+		if roles == None:
+			roles = {}
 		super(Operator,self).__init__(id,type,name, num_args, roles)
 		self.executed = executed
 		self.is_orphan = is_orphan
@@ -214,7 +222,11 @@ class Operator(InternalElement):
 class Literal(InternalElement):
 	""" A Literal element is an internal element with a truth status
 	"""
-	def __init__(self, id, type, name = None, num_args = 0, roles = {},truth = None):
+	def __init__(self, id, type, name = None, num_args = None, roles = None,truth = None):
+		if num_args == None:
+			num_args = 0
+		if roles == None:
+			roles = {}
 		super(Literal,self).__init__(id,type,name, num_args, roles)
 		self.truth = truth
 
@@ -264,7 +276,9 @@ class Argument(Element):
 		 
 	"""
 	
-	def __init__(self, id, type, name= None, arg_pos_dict = {}):
+	def __init__(self, id, type, name= None, arg_pos_dict = None):
+		if arg_pos_dict == None:
+			arg_pos_dict = {}
 		super(Argument,self).__init__(id,type,name)
 		#arg_pos_dict is a mapping from operator.ids to positions
 		self.arg_pos_dict = arg_pos_dict
@@ -347,7 +361,12 @@ class Actor(Argument):
 				for the actor that matches the intention frame's intender
 		When we merge 2 actors, we merge the orphan_dicts with preference for True
 	"""
-	def __init__(self, id, type, name= None, arg_pos_dict = {}, orphan_dict = {}):
+	def __init__(self, id, type, name= None, arg_pos_dict = None, orphan_dict = None):
+		if arg_pos_dict == None:
+			arg_pos_dict = {}
+		if orphan_dict = None:
+			orphan_dict = {}
+			
 		super(Actor,self).__init__(id,type,name, arg_pos_dict)
 		self.orphan_dict=  orphan_dict
 		
@@ -369,13 +388,21 @@ class Actor(Argument):
 class PlanElement(Element):
 
 	def __init__(self,id,type, name=None,\
-				Steps=set(), \
-				Bindings = set(),\
-				Orderings=set(),  \
-				CausalLinks=set(), \
-				IntentionFrames=set()\
+				Steps=None, \
+				Orderings=None,  \
+				CausalLinks=None, \
+				IntentionFrames=None\
 				):
 		
+		if Steps == None:
+			Steps = set()
+		if Orderings == None:
+			Orderings = set()
+		if CausalLinks == None:
+			CausalLinks = set()
+		if IntentionFrames == None:
+			IntentionFrames = set()
+			
 		super(PlanElement,self).__init__(id,type,name)
 		
 		self.Steps = Steps
@@ -385,7 +412,12 @@ class PlanElement(Element):
 		self.IntentionFrames = IntentionFrames
 		
 class IntentionFrameElement(Element):
-	def __init__(self, id, type_graph='IntentionFrame', name= None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = set()):
+	def __init__(self, id, type_graph=None, name= None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = None):
+		if steps == None:
+			steps = set()
+		if type_graph == None:
+			type_graph='IntentionFrame'
+			
 		super(IntentionFrameElement,self).__init__(id,type_graph,name)
 		if intender is None:
 			#print('need to select consistent_actor before instantiation')
@@ -422,7 +454,15 @@ class IntentionFrameElement(Element):
 					
 		
 class Motivation(Literal):
-	def __init__(self, id, type='motivation', name='intends', num_args = 1, truth = True, intender=None, goal=None):
+	def __init__(self, id, type=None, name=None, num_args = None, truth = None, intender=None, goal=None):
+		if num_args == None:
+			num_args = 1
+		if name == None:
+			name = 'intends'
+		if type == None:
+			type = 'motivation'
+		if truth == None:
+			truth = True
 		super(Motivation,self).__init__(id,type,name,num_args,{},truth)
 		
 			

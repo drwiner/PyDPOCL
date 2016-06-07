@@ -56,7 +56,13 @@ class Edge:
 class Graph(Element):
 	"""A graph is an element with elements, edges, and constraints"""
 	def __init__(self, id, type, name = None, \
-		Elements = set(), Edges = set(), Constraints = set()):
+		Elements = None, Edges = None, Constraints = None):
+		if Elements == None:
+			Elements = set()
+		if Edges == None:
+			Edges = set()
+		if Constraints == None:
+			Constraints = set()
 		
 		super(Graph,self).__init__(id,type,name)
 		self.elements = Elements
@@ -149,7 +155,10 @@ class Graph(Element):
 		return set(member for member in self.edges if member not in Ignore_List and member.isConsistent(edge))
 		
 	######       rGet       ####################
-	def rGetDescendants(self, element, Descendants = set()):
+	def rGetDescendants(self, element, Descendants = None):
+		if Descendants == None:
+			Descendants = set()
+			
 		Descendants.add(element)
 		
 		#Base Case
@@ -163,7 +172,9 @@ class Graph(Element):
 			Descendants = self.rGetDescendants(edge.sink, Descendants)
 		return Descendants
 		
-	def rGetDescendantsGenerator(self, element, Descendants = set()):
+	def rGetDescendantsGenerator(self, element, Descendants = None):
+		if Descendants == None:
+			Descendants = set()
 		""" TODO: test this generator"""
 		#Base Case
 		incidentEdges = self.getIncidentEdges(element)
@@ -175,7 +186,9 @@ class Graph(Element):
 			yield element
 			return self.rGetDescendants(edge.sink, Descendants)
 	
-	def rGetDescendantEdges(self, element, Descendant_Edges = set()):
+	def rGetDescendantEdges(self, element, Descendant_Edges = None):
+		if Descendant_Edges == None:
+			Descendant_Edges = set()
 		#Base Case
 		incident_Edges = self.getIncidentEdges(element)
 		if len(incident_Edges) == 0:
@@ -188,8 +201,9 @@ class Graph(Element):
 			
 		return Descendant_Edges
 		
-	def rGetDescendantConstraints(self, constraint_source, Descendant_Constraints = set()):
-		
+	def rGetDescendantConstraints(self, constraint_source, Descendant_Constraints = None):
+		if Descendant_Constraints == None:
+			Descendant_Constraints = set()
 		#Base Case
 		incident_constraints = self.getConstraints(constraint_source)
 		if len(incident_constraints) == 0:
@@ -272,7 +286,12 @@ class Graph(Element):
 		#Equivalent if we can find an equivalent edge graph
 		return rDetectEquivalentEdgeGraph(copy.deepcopy(constraints), copy.deepcopy(descendant_edges))
 		
-def rDetectConsistentEdgeGraph(Remaining = set(), Available = set()):
+def rDetectConsistentEdgeGraph(Remaining = None, Available = None):
+	if Remaining == None:
+		Remaining = set()
+	if Available == None:
+		Available = set()
+		
 	""" Returns True if all remaining edges can be assigned a consistent non-used edge in self """
 	if len(Remaining)  == 0:
 		return True
@@ -295,7 +314,11 @@ def rDetectConsistentEdgeGraph(Remaining = set(), Available = set()):
 				return True
 	return False
 	
-def rDetectEquivalentEdgeGraph(Remaining = set(), Available = set()):
+def rDetectEquivalentEdgeGraph(Remaining = None, Available = None):
+	if Remaining == None:
+		Remaining = set()
+	if Available == None:
+		Available = set()
 	""" Returns True if all remaining edges can be assigned an equivalent non-used edge in self """
 	if len(Remaining)  == 0:
 		return True

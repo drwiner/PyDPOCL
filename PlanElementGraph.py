@@ -2,16 +2,28 @@ from ElementGraph import *
 
 class Belief(ElementGraph):
 	def __init__(self, id, type, name=None, \
-				Elements = set(), \
+				Elements = None, \
 				root_element=None, \
-				Edges = set(), \
-				Constraints = set()\
+				Edges = None, \
+				Constraints = None\
 				):
+		if Elements == None:
+			Elements = set()
+		if Edges == None:
+			Edges = set()
+		if Constraints == None:
+			Constraints = set()
 		
 		super(Belief, self).__init__(id,type,name,Elements, root_element, Edges, Constraints)
 
 class Action(ElementGraph):
-	def __init__(self,id,type_graph,name=None,Elements = set(), root_element = None, Edges = set(),Constraints = set()):
+	def __init__(self,id,type_graph,name=None,Elements = None, root_element = None, Edges = None,Constraints = None):
+		if Elements == None:
+			Elements = set()
+		if Edges == None:
+			Edges = set()
+		if Constraints == None:
+			Constraints = set()
 
 		if root_element is None:
 			root_element = Operator(id + 201,type='Action')
@@ -45,7 +57,9 @@ class Action(ElementGraph):
 					if op_id == self.root.id:
 						self.Args[pos] = arg
 						
-	def updateConsentingActors(self,scratch = False):
+	def updateConsentingActors(self,scratch = None):
+		if scratch == None:
+			scratch = False
 		if scratch:
 			self.consenting_actors = set()
 		self.consenting_actors.update({edge.sink \
@@ -71,7 +85,9 @@ class Action(ElementGraph):
 								# Edges = elementGraph.rGetDescendantEdges(element),\
 								# Constraints = elementGraph.rGetDescendantConstraints(element))
 	
-	def makeCopyFromID(self, start_from, increment = 1):
+	def makeCopyFromID(self, start_from, increment = None):
+		if increment == None:
+			increment = 1
 		new_self = self.copyGen()
 		old_id = self.id
 		new_self.id = start_from
@@ -139,7 +155,6 @@ class Action(ElementGraph):
 		"""
 		#op_clone= operator.makeCopyFromID(self.id + 777,1)
 		instances = operator.getInstantiations(self)
-		#print('INSTANCE ::::::::::::::::::::::::::::::::::::: {}'.format(len(instances)))
 		plans = set()
 		id = PLAN.id + 1
 		for instance in instances:
@@ -162,7 +177,7 @@ class Action(ElementGraph):
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
 	def __init__(self,id,type_graph,name=None,\
-		Elements=set(), root_element = None, Edges = set(), Constraints = set()):
+		Elements=None, root_element = None, Edges = None, Constraints = None):
 		
 		super(Condition,self).__init__(id,type_graph,name,Elements,root_element,Edges,Constraints)
 		self.labels = ['first-arg','sec-arg','third-arg','fourth-arg']
@@ -172,7 +187,11 @@ class Condition(ElementGraph):
 		
 		return [self.getNeighborsByLabel(self.root, self.labels[i]) for i in range(self.root.num_args)]
 		
-	def print_graph(self, motive = False, actor_id = -1):
+	def print_graph(self, motive = None, actor_id = None):
+		if motive == None:
+			motive = False
+		if actor_id == None:
+			actor_id = -1
 		args = self.getArgList()
 		if motive:
 			print('intends {}'.format(actor_id), end=" ")
@@ -252,14 +271,21 @@ class IntentionFrame(ElementGraph):
 		Initially, 
 	"""
 	def __init__(self,id,type_graph='IntentionFrame',name=None, \
-				Elements=set(),\
+				Elements=None,\
 				root_element = None,\
 				actor=None,\
 				ms=None,\
 				sat=None,\
 				goal=None,\
-				Edges=set(),\
-				Constraints=set()):
+				Edges=None,\
+				Constraints=None):
+		if Elements == None:
+			Elements = set()
+		if Edges == None:
+			Edges = set()
+		if Constraints == None:
+			Constraints = set()
+			
 		if actor is None:
 			#print('need to select consistent_actor before instantiation')
 			actor=Actor(id+1,type='actor')
@@ -316,7 +342,9 @@ class IntentionFrame(ElementGraph):
 	
 		
 
-	def addStep(self, Action, Plan, action_already_in_plan = True):
+	def addStep(self, Action, Plan, action_already_in_plan = None):
+		if action_already_in_plan == None:
+			action_already_in_plan = True
 		""" Adding a step to an intention frame
 				Return False if not added:
 					Does the Action have a consenting actor, that is inconsistent with intender?
@@ -406,11 +434,20 @@ class IntentionFrame(ElementGraph):
 		
 class PlanElementGraph(ElementGraph):
 
-	def __init__(self,id,type_graph ='PlanElementGraph',name=None, \
-				Elements = set(), \
+	def __init__(self,id,type_graph =None,name=None, \
+				Elements = None, \
 				planElement = None, \
-				Edges = set(), \
-				Constraints = set()):
+				Edges = None, \
+				Constraints = None):
+				
+		if type_graph == None:
+			type_graph = 'PlanElementGraph'
+		if Elements == None:
+			Elements = set()
+		if Edges == None:
+			Edges=  set()
+		if Constraints == None:
+			Constraints = set()
 		
 		self.updatePlan(Elements,Edges,Constraints)
 		
@@ -471,7 +508,11 @@ class PlanElementGraph(ElementGraph):
 		S = S - {action for action in S if action.id != step.id}
 		return self.rPickActorFromSteps(remaining_steps = S,potential_actors = Step.consenting_actors)
 			
-	def rPickActorFromSteps(self, remaining_steps = set(), potential_actors = set()):
+	def rPickActorFromSteps(self, remaining_steps = None, potential_actors = None):
+		if remaining_steps == None:
+			remaining_steps = set()
+		if potential_actors == None:
+			potential_actors = set()
 		""" Pick a step and for each actor in consenting_actors, 
 			if consistent with potential_actors, 
 			invoke rPickActorFromSteps(remaining_steps-{step},potential_actors+{actor})
@@ -524,7 +565,13 @@ class PlanElementGraph(ElementGraph):
 		# #print('in-plan step: {}'.format(step.id))
 		# return step.instantiate(operator, self)
 
-	def rInstantiate(self, remaining = set(), operators = set(), complete_plans = set()):
+	def rInstantiate(self, remaining = None, operators = None, complete_plans = None):
+		if remaining == None:
+			remaining = set()
+		if operators == None:
+			operators = set()
+		if complete_plans == None:
+			complete_plans = set()
 		"""	Recursively instantiate a step in self with some operator
 			Return set of plans with all steps instantiated
 			

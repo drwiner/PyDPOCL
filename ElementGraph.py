@@ -3,7 +3,14 @@ from Graph import *
 class ElementGraph(Graph):
 	"""An element graph is a graph with a root element"""
 	
-	def __init__(self,id,type_graph,name=None, Elements = set(), root_element = None, Edges = set(), Constraints = set()):
+	def __init__(self,id,type_graph,name=None, Elements = None, root_element = None, Edges = None, Constraints = None):
+		if Elements == None:
+			Elements = set()
+		if Edges == None:
+			Edges = set()
+		if Constraints == None:
+			Constraints = set()
+			
 		super(ElementGraph,self).__init__(\
 											id,\
 											type_graph,\
@@ -147,7 +154,13 @@ class ElementGraph(Graph):
 			element_graph.constraints = other.constraints
 		return completed
 	
-	def absolve(self, other, Remaining = set(), Available = set(), Collected = set()):
+	def absolve(self, other, Remaining = None, Available = None, Collected = None):
+		if Remaining == None:
+			Remaining = set()
+		if Available == None:
+			Available = set()
+		if Collected == None:
+			Collected = set()
 		""" Every edge from other must be consistent with some edge in self.
 			An edge from self cannot account for more than one edge from other? 
 				
@@ -207,11 +220,11 @@ class ElementGraph(Graph):
 		
 
 def extractElementsubGraphFromElement(G, element, Type):
-	Edges = G.rGetDescendantEdges(element)
-	Elements = G.rGetDescendants(element)
-	Constraints = G.rGetDescendantConstraints(element)
+	Edges = G.rGetDescendantEdges(element, set())
+	Elements = G.rGetDescendants(element, set())
+	Constraints = G.rGetDescendantConstraints(element, set())
 	return Type(	element.id,\
-					type = element.type, \
+					type_graph = element.type, \
 					name=element.name, \
 					Elements = Elements, \
 					root_element = element,\
