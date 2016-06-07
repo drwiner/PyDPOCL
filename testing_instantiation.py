@@ -180,55 +180,55 @@ kill_clone_8000 = Kill_operator.makeCopyFromID(8000, 1)
 plans_with_kill_instance = PARTIAL_KILL_ACTION.instantiate(kill_clone_6000,P1)
 plans_with_excavate_instance = PARTIAL_EXCAVATE_ACTION.instantiate(kill_clone_5000,P1)
 
-for plan in plans_with_kill_instance:
-	print('plan with excavate instance')
-	plan.print_plan()
-	print('\n')
-	for element in plan.elements:
-		if type(element) == Operator:
-			if not element.instantiated:
-				print(element.id)
-				E = plan.getElementGraphFromElement(element, Action)
-				E.print_graph()
-				print('\n')
-				new_plans = E.instantiate(kill_clone_9000, plan)
-				for p in new_plans:
-					p.print_plan()
-					print('\n')
-	
-	
-print('\n')
-for plan in plans_with_excavate_instance:
-	print('plan with kill instance')
-	plan.print_plan()
-	print('\n')
-	for element in plan.elements:
-		if type(element) == Operator:
-			if not element.instantiated:
-				print(element.id)
-				E = plan.getElementGraphFromElement(element, Action)
-				E.print_graph()
-				print('\n')
-				new_plans = E.instantiate(kill_clone_8000, plan)
-				for p in new_plans:
-					p.print_plan()
-					print('\n')
-	
-
-# print('\n\nPLAN P2\n')
-# P2.print_plan()
-# print('\n')
-# P2.print_graph()
-# print('\n')
-
-# kill_clone_9000 = Kill_operator.makeCopyFromID(9000, 1)
-# excavate_clone_7000 = Excavate_operator.makeCopyFromID(7000,1)
-
-# plans = P2.rInstantiate({2111,111},{kill_clone_9000, excavate_clone_7000})
-# print('\n')
-# for plan in plans:
-	# print('plan with both instances')
+# for plan in plans_with_kill_instance:
+	# print('plan with excavate instance')
 	# plan.print_plan()
 	# print('\n')
+	# for element in plan.elements:
+		# if type(element) == Operator:
+			# if not element.instantiated:
+				# print(element.id)
+				# E = plan.getElementGraphFromElement(element, Action)
+				# E.print_graph()
+				# print('\n')
+				# new_plans = E.instantiate(kill_clone_9000, plan)
+				# for p in new_plans:
+					# p.print_plan()
+					# print('\n')
+	
+	
+# print('\n')
+# for plan in plans_with_excavate_instance:
+	# print('plan with kill instance')
+	# plan.print_plan()
+	# print('\n')
+	# for element in plan.elements:
+		# if type(element) == Operator:
+			# if not element.instantiated:
+				# print(element.id)
+				# E = plan.getElementGraphFromElement(element, Action)
+				# E.print_graph()
+				# print('\n')
+				# new_plans = E.instantiate(kill_clone_8000, plan)
+				# for p in new_plans:
+					# p.print_plan()
+					# print('\n')
+	
+
+print('\n\nPLAN P2\n')
+P2.print_plan()
+print('\n')
+P2.print_graph()
+print('\n')
+
+kill_clone_9000 = Kill_operator.makeCopyFromID(9000, 1)
+excavate_clone_7000 = Excavate_operator.makeCopyFromID(7000,1)
+
+plans = P2.rInstantiate({2111,111},{kill_clone_9000, excavate_clone_7000})
+print('\n')
+for plan in plans:
+	print('plan with both instances')
+	plan.print_plan()
+	print('\n')
 
 	
