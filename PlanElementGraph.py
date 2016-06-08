@@ -166,7 +166,6 @@ class Action(ElementGraph):
 			if not operator.canAbsolve(action):
 				print('Original Plan {}: constraints of partial step {} are detected in operator {}'.format(PLAN.id, self.id, operator.id))
 				continue
-			
 			if Plan.isInternallyConsistent():
 				Plan.updateIntentionFrameAttributes()
 				print('adding plan {}'.format(Plan.id))
