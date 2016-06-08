@@ -230,6 +230,22 @@ class Graph(Element):
 				return True
 		return False
 		
+	def isInternallyConsistent(self):
+		constraint_sources = self.getConstraintSources()
+		for cs in constraint_sources:
+			suspects = {edge.source for edge in self.edges if edge.source.id == cs.id}
+			if len(suspects) == 0:
+				print('no suspects for constraint source {}'.format(cs.id))
+				continue
+			cg = self.rGetDescendantConstraints(cs)
+			for sp in suspects:
+				sg = self.rGetDescendantEdges(sp)
+				if rDetectEquivalentEdgeGraph(copy.deepcopy(cg),copy.deepcopy(sg)):
+					print('suspect {} not consistent with constraints from source {}'.format(sp.id,cs.id))
+					return False
+
+		return True
+		
 	def coAbsolvant(self, other):
 		if self.isConsistent(other) and other.isConsistent(self):
 			return True

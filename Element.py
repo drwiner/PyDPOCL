@@ -391,28 +391,30 @@ class Actor(Argument):
 
 class PlanElement(Element):
 
-	def __init__(self,id,type, name=None,\
-				Steps=None, \
-				Orderings=None,  \
-				CausalLinks=None, \
-				IntentionFrames=None\
+	def __init__(self,id,type=None, name=None,\
+				#Steps=None, \
+				#Orderings=None,  \
+				#CausalLinks=None, \
+				#IntentionFrames=None\
 				):
+		if type == None:
+			type = 'PlanElementGraph'
 		
-		if Steps == None:
-			Steps = set()
-		if Orderings == None:
-			Orderings = set()
-		if CausalLinks == None:
-			CausalLinks = set()
-		if IntentionFrames == None:
-			IntentionFrames = set()
+		# if Steps == None:
+			# Steps = set()
+		# if Orderings == None:
+			# Orderings = set()
+		# if CausalLinks == None:
+			# CausalLinks = set()
+		# if IntentionFrames == None:
+			# IntentionFrames = set()
 			
 		super(PlanElement,self).__init__(id,type,name)
 		
-		self.Steps = Steps
-		self.Orderings = Orderings
-		self.CausalLinks = CausalLinks
-		self.IntentionFrames = IntentionFrames
+		# self.Steps = Steps
+		# self.Orderings = Orderings
+		# self.CausalLinks = CausalLinks
+		# self.IntentionFrames = IntentionFrames
 		
 class IntentionFrameElement(Element):
 	def __init__(self, id, type_graph=None, name= None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = None):
