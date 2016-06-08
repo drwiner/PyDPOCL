@@ -553,12 +553,13 @@ class PlanElementGraph(ElementGraph):
 	
 	def isInternallyConsistent(self):
 		""" 
-			For each constraint in the plan, check if the aforementioned relationship exists.
+			Work your way up the chain from steps:
 			
-				each constraint is actually an element graph
-				if the element graph is present in the plan, then the relationship holds
-				
-				#For each constraint, propogate to the source.
+			1) For each step in the plan, create element graph.
+			2) For each constraint with source = step, create constraint graph
+			3) Check if equivalent
+			
+			
 				
 		"""
 		return True

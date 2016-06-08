@@ -86,7 +86,7 @@ example = Operator(id = 111, type= 'Action') #excavate
 example_p1 =		Literal(id=112, 		type='Condition', 		name='alive', 			num_args = 1,		truth = True)
 example_e1 = 		Literal(id=116, 		type = 'Condition', 	name='has', 			num_args = 2,		truth = True)
 example_e3 = 		Literal(id=113, 		type = 'Condition', 	name='has', 								truth = True)
-ex_const_element = 	Literal(id=114, 		type ='Condition',		name='knows-location', 	num_args = 3,		truth = True)
+ex_const_element = 	Literal(id=114, 		type ='Condition',		name='knows-location', 	num_args = 3,		truth = False)
 example_item = 		Argument(id=115,		type='var', 			arg_pos_dict={})
 example_actor = 	Actor(id=117, 			type='actor',			arg_pos_dict={})
 
@@ -181,7 +181,7 @@ excavate_clone_9500 = Excavate_operator.makeCopyFromID(9500, 1)
 excavate_clone_9500.print_graph()
 
 plans = P1.rInstantiate({111},{excavate_clone_9500})
-#plan = plans.pop()
+plan = plans.pop()
 plan.print_plan()
 for element in plan.elements:
 	if type(element) is Operator:
