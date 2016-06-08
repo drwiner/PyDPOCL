@@ -84,11 +84,11 @@ killer_actor = 	Actor(id=2113, 			type='actor',			arg_pos_dict={2111 : 1})
 
 example = Operator(id = 111, type= 'Action') #excavate
 example_p1 =		Literal(id=112, 		type='Condition', 		name='alive', 			num_args = 1,		truth = True)
-#example_e1 = 		Literal(id=116, 		type = 'Condition', 	name='has', 			num_args = 2,		truth = True)
+example_e1 = 		Literal(id=116, 		type = 'Condition', 	name='has', 			num_args = 2,		truth = True)
 example_e3 = 		Literal(id=113, 		type = 'Condition', 	name='has', 								truth = True)
 ex_const_element = 	Literal(id=114, 		type ='Condition',		name='knows-location', 						truth = True)
 example_item = 		Argument(id=115,		type='var', 			arg_pos_dict={})
-example_actor = 	Actor(id=116, 			type='actor',			arg_pos_dict={})
+example_actor = 	Actor(id=117, 			type='actor',			arg_pos_dict={})
 
 
 example_edge5 = Edge(example,	 example_e3, 	'effect-of')
@@ -98,7 +98,7 @@ example_elements = 	{	example, \
 						example2,\
 						te,\
 						example_p1, \
-						#example_e1, \
+						example_e1, \
 					#	example_e3,\
 						example_actor, \
 						example_item,\
@@ -108,10 +108,10 @@ example_elements = 	{	example, \
 						
 						
 example_edges = 	{	Edge(example,	 example_p1, 	'precond-of'),\
-						#Edge(example,	 example_e1, 	'effect-of'),\
+						Edge(example,	 example_e1, 	'effect-of'),\
 						Edge(example_p1, example_actor, 'first-arg'),\
-						#Edge(example_e1, example_actor, 'first-arg'),\
-						#Edge(example_e1, example_item, 	'sec-arg'),\
+						Edge(example_e1, example_actor, 'first-arg'),\
+						Edge(example_e1, example_item, 	'sec-arg'),\
 						Edge(example2,	 te, 			'effect-of'),\
 						Edge(te, 		 killer_actor, 'first-arg'),\
 						#Edge(example, ex_const_element, 'precond-of')\
@@ -160,6 +160,11 @@ print('\n')
 
 
 PARTIAL_KILL_ACTION = P1.getElementGraphFromElementId(2111,Action)
+
+#excavate_prereq = P1.getElementById(111)
+#for ex in P1.rGetDescendants(excavate_prereq):#
+#	ex.print_element()
+
 PARTIAL_EXCAVATE_ACTION = P1.getElementGraphFromElementId(111,Action)
 
 print('\n')
@@ -228,8 +233,8 @@ print('\n')
 
 kill_clone_9000 = Kill_operator.makeCopyFromID(9000, 1)
 excavate_clone_7000 = Excavate_operator.makeCopyFromID(7000,1)
-
-plans = P2.rInstantiate({111,2111},{kill_clone_9000,excavate_clone_7000})
+#There's only one way to instantiate 2111 with kill
+plans = P2.rInstantiate({2111, 111},{kill_clone_9000,excavate_clone_7000})
 print('\n')
 for plan in plans:
 	print('plan with both instances')
