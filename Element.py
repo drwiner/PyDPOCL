@@ -504,27 +504,13 @@ class IntentionFrameElement(Element):
 				pass
 				#could keep them like dis: self.actors = actors
 				
-		""" NOTE: replace all actor arguments with intender? Think about how to handle this """
+		""" NOTE: combine all actors """
 		if not self.intender is None:
+			#Can we just access all actors in plan willy nillier than this?
 			for step in self.subplan:
-				neighbs = PLAN.getNeighborsByLabel(step, 'actor-of')
-				if len(neighbs) == 0:
-					print('a happening {} is in intention frame {} of plan {}'.format(step.id, self.id, PLAN.id))
-				if len(neighbs) == 1:
-					self.intender.combine(neighbs.pop())
-				if len(neighbs) > 1:
-					#print('2 consenting actors in step {} in intention frame {} of plan {}'.format(step.id, self.id, PLAN.id))
-					#figure out which one to merge
-					same_neighb = {nb for nb in neighbs if nb.id == self.intender.id}
-					if len(same_neighb) > 0:
-						continue
-						
-					{nb for nb in neighbs if nb.isConsistent(self.intender)}
-					for nb in neighbs:
-						if nb.id != self.intender.id:
-							if nb.isConsistent(self.intender)
-					PLAN.edges.add(Edge(step, self.intender, 'actor-of'))
-					#
+				{self.intender.combine(nb) for nb in PLAN.getNeighborsByLabel(step, 'actor-of') if self.id in nb.arg_pos_dict}
+				#WHEN adding a step to an intention frame, make sure to update actors with new arg_pos_dict for intention frame
+				
 			
 		return self
 	
