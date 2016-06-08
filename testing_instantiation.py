@@ -224,7 +224,7 @@ print('\n')
 kill_clone_9000 = Kill_operator.makeCopyFromID(9000, 1)
 excavate_clone_7000 = Excavate_operator.makeCopyFromID(7000,1)
 
-plans = P2.rInstantiate({2111,111},{kill_clone_9000, excavate_clone_7000})
+plans = P2.rInstantiate({111,2111},{kill_clone_9000, excavate_clone_7000})
 print('\n')
 for plan in plans:
 	print('plan with both instances')
