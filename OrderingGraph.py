@@ -7,6 +7,10 @@ class OrderingGraph(Graph):
 			type = 'ordering graph'
 		super(OrderingGraph,self).__init__(id,type,name,Elements,Edges,Constraints)
 		
+	def isInternallyConsistent(self):
+		if self.detectCycle():
+			return False
+		
 		
 	def detectCycle(self, V = None):
 		if V == None:
@@ -16,7 +20,7 @@ class OrderingGraph(Graph):
 			if element in V:
 				continue
 				
-			visited = self.rDetectCycle(element)
+			visited = self.rDetectCycle(original_element=element)
 			
 			if visited == True:
 				return True
@@ -27,14 +31,19 @@ class OrderingGraph(Graph):
 
 			
 	######       rDetect       ####################
-	def rDetectCycle(self, element, visited = None):
+	def rDetectCycle(self, original_element, element = None, visited = None):
 		""" Returns true if cycle detected. otherwise, returns visited elements"""
 		if visited == None:
 			visited = set()
 			
 		#Base Case 1
-		if element in visited:
-			return True
+		if not element is None:
+			if element is original_element
+				return True
+			
+		#Runs on first time
+		if element is None:
+			element = original_element
 			
 		visited.add(element)
 		
@@ -48,3 +57,10 @@ class OrderingGraph(Graph):
 			#Descendants.add(edge.sink)
 			visited = self.rDetectCycle(edge.sink, visited)
 		return visited
+		
+class CausalLinkGraph(OrderingGraph):
+	def __init__(self, id, type = None, name = None, Elements = None , Edges = None, Constraints = None):
+		if type == None:
+			type = 'causal link graph'
+		super(CausalLinkGraph,self).__init__(id,type,name,Elements,Edges,Constraints):
+	

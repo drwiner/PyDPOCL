@@ -184,8 +184,6 @@ class Condition(ElementGraph):
 		self.labels = ['first-arg','sec-arg','third-arg','fourth-arg']
 		
 	def getArgList(self):
-
-		
 		return [self.getNeighborsByLabel(self.root, self.labels[i]) for i in range(self.root.num_args)]
 		
 	def print_graph(self, motive = None, actor_id = None):
@@ -204,7 +202,7 @@ class Condition(ElementGraph):
 				this_arg = arg.pop()
 				str = this_arg.id
 			print(str, end=" ") 
-		print(')')	
+		print(')')
 		
 		
 class CausalLink(Edge):
@@ -226,6 +224,9 @@ class CausalLink(Edge):
 					
 		if len(effects) == 0:
 			return False
+		if len(effects) > 1:
+			print('multiple effects with dependency id?')
+			return False
 			
 		preconditions = {edge.sink \
 							for edge in self.edges \
@@ -235,28 +236,17 @@ class CausalLink(Edge):
 						
 		if len(preconditions) == 0:
 			return False
+		if len(preconditions) >1:
+			print('multiple preconditions with dependecy id?')
+			return False
+			
 		return True
 		
 	
 	#def possiblyThreatenedBy(self,action):
 	
 	def threatenedBy(self,action):
-		action_orderings = getOrderingsWith(action)
-		
-#Do I need this?
-class Binding(Edge):
-	def __init__(self, id, type, name=None, element1 = None, element2 = None, binding_type = None):
-	
-		super(Binding,self).__init__(element1,element2,binding_type)
-		self.X = element1
-		self.Y = element2
-		self.id = id
-		self.type = type
-		self.name = name
-		
-	def isInternallyConsistent(self):
-		if self.source.isIdentical(self.sink):
-			return True
+		action_orderings = getOrderingsWith(action)	
 		
 class Ordering(Edge):
 	def __init__(self,action1,action2):
