@@ -422,15 +422,15 @@ class IntentionFrameElement(Element):
 			type_graph='IntentionFrame'
 			
 		super(IntentionFrameElement,self).__init__(id,type_graph,name)
-		if intender is None:
-			#print('need to select consistent_actor before instantiation')
-			intender=Actor(id+1,type='actor')
-		if ms is None:
-			ms = Operator(id+2,type='Action', roles={id:'motivating-step'}, executed = False)
-		if sat is None:
-			sat = Operator(id+3, type='Action', roles={id:'satisfying-step'}, executed = False)
-		if goal is None:
-			goal = Literal(id+ 4, type='Condition', roles={id: 'goal'}, truth = None)
+		# if intender is None:
+			# #print('need to select consistent_actor before instantiation')
+			# intender=Actor(id+1,type='actor')
+		# if ms is None:
+			# ms = Operator(id+2,type='Action', roles={id:'motivating-step'}, executed = False)
+		# if sat is None:
+			# sat = Operator(id+3, type='Action', roles={id:'satisfying-step'}, executed = False)
+		# if goal is None:
+			# goal = Literal(id+ 4, type='Condition', roles={id: 'goal'}, truth = None)
 		
 		self.ms = ms
 		self.motivation = motivation
@@ -440,18 +440,24 @@ class IntentionFrameElement(Element):
 		self.subplan = steps
 		
 	def external_update(self, PLAN):
+		"""updates frame slots based on edges"""
 		for incident_edge in PLAN.edges:
 			if incident_edge.source.id == self.id:
-				if incident_edge.label == 'goal-of':
-					self.goal = incident_edge.sink
-				if incident_edge.label == 'motive-of':
-					self.ms = incident_edge.sink
-				if incident_edge.label == 'actor-of':
-					self.intender = incident_edge.sink
-				if incident_edge.label == 'sat-of':
-					self.sat = incident_edge.sink
+				if self.goal is None:
+					if incident_edge.label == 'goal-of':
+						self.goal = incident_edge.sink
+				if self.ms is None:
+					if incident_edge.label == 'motive-of':
+						self.ms = incident_edge.sink
+				if self.intender is None:
+					if incident_edge.label == 'actor-of':
+						self.intender = incident_edge.sink
+				if self.sat is None:
+					if incident_edge.label == 'sat-of':
+						self.sat = incident_edge.sink
 				if incident_edge.label == 'in-subplan-of':
-					self.subplan.add(incident_edge.sink)
+					if incident_edge.sink not in self.subplan:
+						self.subplan.add(incident_edge.sink)
 		return self
 				
 					
@@ -466,7 +472,7 @@ class Motivation(Literal):
 			type = 'motivation'
 		if truth == None:
 			truth = True
-		super(Motivation,self).__init__(id,type,name,num_args,{},truth)
+		super(Motivation,self).__init__(id=id,type=type,name=name,num_args=num_args,truth =truth)
 		
 			
 		self.actor = intender

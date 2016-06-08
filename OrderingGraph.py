@@ -11,7 +11,6 @@ class OrderingGraph(Graph):
 		if self.detectCycle():
 			return False
 		
-		
 	def detectCycle(self, V = None):
 		if V == None:
 			V = set()	

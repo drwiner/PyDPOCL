@@ -494,10 +494,9 @@ class PlanElementGraph(ElementGraph):
 		step = next(iter(subseteq))
 		print('step {} used for starting actors'.format(step.id))
 		Step = self.getElementGraphFromElement(step,Action)
-		#print('NUMBER OF CONSENTING ACTORS TO START WITH IN GET CNSISTENT ACTORS {}'.format(len(Step.consenting_actors)))
 		S = copy.deepcopy(subseteq)
-		S = S - {action for action in S if action.id != step.id}
-		return self.rPickActorFromSteps(remaining_steps = S,potential_actors = Step.consenting_actors)
+		S = S - {action for action in S if action.id == step.id}
+		return self.rPickActorFromSteps(remaining_steps = S, potential_actors = Step.consenting_actors)
 			
 	def rPickActorFromSteps(self, remaining_steps = None, potential_actors = None):
 		if remaining_steps == None:
@@ -524,18 +523,30 @@ class PlanElementGraph(ElementGraph):
 		if len(potential_actors) == 0:
 			return set()
 		
+		print('rpickActorFromSteps')
 		step = remaining_steps.pop()
-		step = self.getElementGraphFromElement(step,Action)
+		step.print_element()
+		print('above was chosen\n')
+		step = self.getElementGraphFromElementId(step.id,Action)
 		
 		to_remove = set()
 		to_add = set()
 		for actor in potential_actors:
+			print('potential actor: ')
+			actor.print_element()
+			print('prospects: ')
+			for p in step.consenting_actors:
+				p.print_element()
 			prospects = {prospect for prospect in step.consenting_actors if actor.isConsistent(prospect)}
+			print('consistent prospects: ')
+			for p in prospects:
+				p.print_element()
 			if len(prospects) == 0:
 				to_remove.add(actor)
 				#potential_actors.remove(actor)
 			else:
 				to_add.update(prospects)
+		
 		potential_actors = potential_actors - to_remove
 		potential_actors.update(to_add)
 		return self.rPickActorFromSteps(remaining_steps, potential_actors)
