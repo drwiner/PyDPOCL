@@ -56,6 +56,10 @@ class ElementGraph(Graph):
 				existing_element = self.getElementById(element.replaced_id)
 				existing_element.merge(element)
 			else:
+				#############################################################################
+				if type(element) is Operator:
+					print('element {} is type operator but replaced_id = -1'.format(element.id))
+				#############################################################################
 				self.elements.add(element)
 				element.replaced_id = element.id
 		
@@ -81,7 +85,7 @@ class ElementGraph(Graph):
 		for element in self.elements:
 			element.replaced_id = -1
 					#operator.absolve(partial, partial.edges, operator.available_edges)
-		completed = self.absolve(other, copy.deepcopy(other.edges), self.edges, set())
+		completed = self.absolve(other, copy.deepcopy(other.edges), self.edges)
 		if len(completed) == 0:
 			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other.id, self.id))
 			
@@ -114,14 +118,14 @@ class ElementGraph(Graph):
 			
 
 		other_edge = Remaining.pop()
-		print('{}.absolve({})... {} --{}--> {} needs replacement \n'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
+		#print('{}.absolve({})... {} --{}--> {} needs replacement \n'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
 		num_collected_before = len(Collected)
 		
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
-				print('\nstep {} edge {} --{}--> {} matches {} --{}--> {}\n'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
+			#	print('\nstep {} edge {} --{}--> {} matches {} --{}--> {}\n'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
 				new_self=  self.assimilate(other, prospect, other_edge)
-				Collected.update(new_self.absolve(other, Remaining, Available, Collected))					
+				Collected.update(new_self.absolve(other, {copy.deepcopy(rem) for rem in Remaining}, Available, Collected))					
 		
 		if len(Collected) == 0:
 			return set()

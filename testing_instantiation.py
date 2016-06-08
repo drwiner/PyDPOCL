@@ -175,10 +175,15 @@ kill_clone_6000= Kill_operator.makeCopyFromID(6000, 1)
 kill_clone_5000 = Kill_operator.makeCopyFromID(5000, 1)
 kill_clone_9000 = Kill_operator.makeCopyFromID(9000, 1)
 kill_clone_8000 = Kill_operator.makeCopyFromID(8000, 1)
+excavate_clone_9500 = Excavate_operator.makeCopyFromID(9500, 1)
+excavate_clone_8500 = Kill_operator.makeCopyFromID(8500, 1)
+excavate_clone_7500 = Excavate_operator.makeCopyFromID(7500, 1)
+excavate_clone_5500 = Kill_operator.makeCopyFromID(6500, 1)
 
+#plans_with_kill_instance = PARTIAL_KILL_ACTION.instantiate(kill_clone_6000,P1)
+#plans_with_kill_instance_2 = PARTIAL_EXCAVATE_ACTION.instantiate(Excavate_clone_8500,P1)
 
-plans_with_kill_instance = PARTIAL_KILL_ACTION.instantiate(kill_clone_6000,P1)
-plans_with_excavate_instance = PARTIAL_EXCAVATE_ACTION.instantiate(kill_clone_5000,P1)
+#plans_with_excavate_instance = PARTIAL_EXCAVATE_ACTION.instantiate(excavate_clone_9500,P1)
 
 # for plan in plans_with_kill_instance:
 	# print('plan with excavate instance')
@@ -224,7 +229,7 @@ print('\n')
 kill_clone_9000 = Kill_operator.makeCopyFromID(9000, 1)
 excavate_clone_7000 = Excavate_operator.makeCopyFromID(7000,1)
 
-plans = P2.rInstantiate({111,2111},{kill_clone_9000, excavate_clone_7000})
+plans = P2.rInstantiate({111,2111},{kill_clone_9000,excavate_clone_7000})
 print('\n')
 for plan in plans:
 	print('plan with both instances')

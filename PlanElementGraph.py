@@ -595,19 +595,26 @@ class PlanElementGraph(ElementGraph):
 		step_id = remaining.pop()
 		new_plans = set()
 		new_ids = {step_id + n + 35 for n in range(1,len(operators)+10)}
-		
+		print('\nids:')
+		for d in new_ids:
+			print(d, end= " ")
+		print('\n')
 		
 		""" instantiate with every operator"""
 		for op in operators:
-			new_self = self.copyGen()
-			new_self.id = self.id + 1
-			step = new_self.getElementGraphFromElementId(step_id, Action)
 			new_id = new_ids.pop()
+			new_self = self.copyGen()
+			new_self.id = self.id + new_id
+			step = new_self.getElementGraphFromElementId(step_id, Action)
 			op_clone = op.makeCopyFromID(new_id,1)
 			#print('\n Plan {} ___instantiating_{}__with operator clone {}\n'.format(new_self.id, step_id, op_clone.id))
 			print('\n Plan {} Attempting instantiation with step {} and op clone {} formally {}\n'.format(new_self.id, step.id,op_clone.id,op.id))
 			new_ps = step.instantiate(op_clone, new_self) 
-			print('\n returned {} new plans'.format(len(new_ps)))
+			print('\n returned {} new plans originally from {}\n'.format(len(new_ps), self.id))
+			for p in new_ps:
+				p.print_plan()
+				print('\n')
+			print('end new plans')
 			new_plans.update(new_ps)
 			#print('{} new plans from instantiating {} from operator {}-{} in plan {}'.format(len(new_ps),step.id, op.id, op.root.name, self.id))
 			
@@ -619,11 +626,12 @@ class PlanElementGraph(ElementGraph):
 		
 		""" For each version, continue with remaining steps, choosing any operator"""
 		for plan in new_plans:
-			print('\ncalling rInstantiate with new_plans, now with remaining:',end = " ")
+			print('\ncalling rInstantiate with new_plan {}, now with remaining:'.format(plan.id),end = " ")
 			for r in remaining:
 				print('\t {}'.format(r), end= ", ")
 			print('\n')
-			complete_plans.update(plan.rInstantiate(remaining, operators, complete_plans))
+			#rem = {rem_id for rem_id in remaining}
+			complete_plans.update(plan.rInstantiate({rem_id for rem_id in remaining}, operators, complete_plans))
 		
 		""" if no path returns a plan, then this branch terminates"""
 		if completed_plans_before >= len(complete_plans):
