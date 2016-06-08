@@ -153,7 +153,7 @@ class Action(ElementGraph):
 							2) operator.absolve(step)
 							3) swap operator for step in plan
 		"""
-		#op_clone= operator.makeCopyFromID(self.id + 777,1)
+		
 		instances = operator.getInstantiations(self)
 		plans = set()
 		id = PLAN.id + 1
@@ -162,9 +162,12 @@ class Action(ElementGraph):
 			Plan.id = id 
 			id += 1
 			Plan.mergeGraph(instance)
+			action = Plan.getElementGraphFromElementId(self.id, Action)
+			if not operator.canAbsolve(action):
+				print('Original Plan {}: constraints of partial step {} are detected in operator {}'.format(PLAN.id, self.id, operator.id))
+				continue
+			
 			if Plan.isInternallyConsistent():
-				
-				id += 1
 				Plan.updateIntentionFrameAttributes()
 				print('adding plan {}'.format(Plan.id))
 				plans.add(Plan)
@@ -550,19 +553,16 @@ class PlanElementGraph(ElementGraph):
 	
 	
 	def isInternallyConsistent(self):
-		return True
-		
-	# def instantiate(self, step_element_, operator):
-		# """	Instantiates a step_element type = operator with operator Action (elementgraph) 
-			# Returns the set of plans in which the step_element is instantiated. 
-			# Could be more than one way to instantiate given partial element
+		""" 
+			For each constraint in the plan, check if the aforementioned relationship exists.
 			
-			# P1.instantiate(s, operator)
-		# """
-		# #self.updatePlan()
-		# step = self.getElementGraphFromElementId(step_element_id, Action)
-		# #print('in-plan step: {}'.format(step.id))
-		# return step.instantiate(operator, self)
+				each constraint is actually an element graph
+				if the element graph is present in the plan, then the relationship holds
+				
+				#For each constraint, propogate to the source.
+				
+		"""
+		return True
 
 	def rInstantiate(self, remaining = None, operators = None, complete_plans = None):
 		if remaining == None:
@@ -660,6 +660,9 @@ class PlanElementGraph(ElementGraph):
 			print('frame id {}:'.format(frame.id), end=" ")
 			Goal = self.getElementGraphFromElement(frame.goal, Condition)
 			Goal.print_graph(motive=True,actor_id = frame.intender.id)
+		print('Constraints:')
+		for c in self.constraints:
+			c.print_edge()
 		print('----------------\n')
 
 		

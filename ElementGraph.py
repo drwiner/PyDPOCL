@@ -89,9 +89,9 @@ class ElementGraph(Graph):
 		if len(completed) == 0:
 			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other.id, self.id))
 			
-		# for element_graph in completed:
+		for element_graph in completed:
 			# element_graph.updateActionParams() #only will work if this is action
-			# element_graph.constraints = other.constraints
+			element_graph.constraints = copy.deepcopy(other.constraints)
 		return completed	
 
 	

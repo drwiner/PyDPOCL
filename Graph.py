@@ -258,33 +258,67 @@ class Graph(Element):
 		other_descendant_edges = other.rGetDescendantEdges(other_element)
 		return rDetectEquivalentEdgeGraph(other_descendant_edges, descendant_edges)
 
+	def getConstraintSources(self):
+		"""Constraints sources are constraint elements which are not sinks
+		"""
+		sinks = {constraint.sink for constraint in self.constraints}
+		return {constraint.source for constraint in self.constraints if constraint.source not in sinks}
+
+			
+		
 	######       Constraints       ####################
 	def equivalentWithConstraints(self, other):
-		for c in other.constraints:
-			#First, narrow down edges to just those which are equivalent with constraint source
-			suspects = {edge.source \
-							for edge in self.edges \
-							if edge.source.isEquivalent(c.source)\
-						}
-			for suspect in suspects:
-				print('suspect: (', suspect.id, 'has ', c.label, '-', c.sink.type, ')')
-				if self.constraintEquivalentWithElement(other, \
-														suspect, \
-														c.source\
-														):
+		"""
+			1) For each constraint source (propogate to source)
+			2) Find equivalent suspect (if none, move on)
+			3) Make constraint graph
+			4) Make operator subgraph from suspect
+			5) Determine if constraint equivalency via rDetectEquivalentEdges
+		"""
+		constraint_sources = other.getConstraintSources()
+		for cs in constraint_sources:
+			suspects = {edge.source for edge in self.edges if edge.source.isEquivalent(cs)}
+			if len(suspects) == 0:
+				print('no suspects for constraint source {}'.format(cs.id))
+				continue
+			cg = other.rGetDescendantConstraints(cs)
+			for sp in suspects:
+				sg = self.rGetDescendantEdges(sp)
+				if rDetectEquivalentEdgeGraph(copy.deepcopy(cg),copy.deepcopy(sg)):
+					print('suspect {} not consistent with constraints from source {}'.format(sp.id,cs.id))
 					return True
-		return False	
+
+		return False
 		
-	def constraintEquivalentWithElement(self, other, self_element, constraint_element):
-		""" Returns True if element and constraint have equivalent descendant edge graphs"""
-		#Assumes self_element is equivalent with constraint_element, but just in case
-		if not self_element.isEquivalent(constraint_element):
-			return False
+	# def old_equivalent_with_constraints(self, other):
+			
+		# for c in other.constraints:
+			# #First, narrow down edges to just those which are equivalent with constraint source
+			# suspects = {edge.source \
+							# for edge in self.edges \
+							# if edge.source.isEquivalent(c.source)\
+						# }
+			# for suspect in suspects:
+				# print('suspect: (', suspect.id, 'has ', c.label, '-', c.sink.type, ')')
+				# if self.constraintEquivalentWithElement(other, \
+														# suspect, \
+														# c.source\
+														# ):
+					# return True
+		# return False	
 		
-		descendant_edges = self.rGetDescendantEdges(self_element)
-		constraints = other.rGetDescendantConstraints(constraint_element)
-		#Equivalent if we can find an equivalent edge graph
-		return rDetectEquivalentEdgeGraph(copy.deepcopy(constraints), copy.deepcopy(descendant_edges))
+	# def constraintEquivalentWithElement(self, other, self_element, constraint_element):
+		# """ Returns True if element and constraint have equivalent descendant edge graphs"""
+		# #Assumes self_element is equivalent with constraint_element, but just in case
+		# if not self_element.isEquivalent(constraint_element):
+			# return False
+		# print('equiv')
+		# descendant_edges = self.rGetDescendantEdges(self_element)
+		# constraints = other.rGetDescendantConstraints(constraint_element)
+		# for c in constraints:
+			# c.print_edge()
+		# #Equivalent if we can find an equivalent edge graph
+		# return rDetectEquivalentEdgeGraph(copy.deepcopy(constraints), copy.deepcopy(descendant_edges))
 		
 def rDetectConsistentEdgeGraph(Remaining = None, Available = None):
 	if Remaining == None:
@@ -319,7 +353,8 @@ def rDetectEquivalentEdgeGraph(Remaining = None, Available = None):
 		Remaining = set()
 	if Available == None:
 		Available = set()
-	""" Returns True if all remaining edges can be assigned an equivalent non-used edge in self """
+	""" Returns True if all remaining edges can be assigned an equivalent non-used edge in self 
+	"""
 	if len(Remaining)  == 0:
 		return True
 		
@@ -329,13 +364,18 @@ def rDetectEquivalentEdgeGraph(Remaining = None, Available = None):
 
 	other_edge = Remaining.pop()
 	print('constraints remaining ', len(Remaining))
+	other_edge.print_edge()
 	for prospect in Available:
 		if prospect.isEquivalent(other_edge):
+			#print('\nequivalence detected: constraint (above) and operator edge:')
+			#prospect.print_edge()
+			#print('\n')
 			if rDetectEquivalentEdgeGraph(	Remaining, \
 											{item \
 												for item in Available \
 													if not item is prospect\
 											}):
 				return True
+
 	return False
 	
