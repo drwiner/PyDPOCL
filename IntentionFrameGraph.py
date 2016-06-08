@@ -21,18 +21,18 @@ class IntentionFrame(ElementGraph):
 		if Constraints == None:
 			Constraints = set()
 			
-		if actor is None:
-			#print('need to select consistent_actor before instantiation')
-			actor=Actor(id+1,type='actor')
+		# if actor is None:
+			# #print('need to select consistent_actor before instantiation')
+			# actor=Actor(id+1,type='actor')
 
-		if ms is None:
-			ms = Operator(id+2,type='Action', roles={id:'motivating-step'}, executed = False)
+		# if ms is None:
+			# ms = Operator(id+2,type='Action', roles={id:'motivating-step'}, executed = False)
 			
-		if sat is None:
-			sat = Operator(id+3, type='Action', roles={id:'satisfying-step'}, executed = False)
+		# if sat is None:
+			# sat = Operator(id+3, type='Action', roles={id:'satisfying-step'}, executed = False)
 			
-		if goal is None:
-			goal = Literal(id+ 4, type='Condition', roles={id: 'goal'}, truth = None)
+		# if goal is None:
+			# goal = Literal(id+ 4, type='Condition', roles={id: 'goal'}, truth = None)
 			
 			
 		Elements.add(actor)

@@ -424,15 +424,6 @@ class IntentionFrameElement(Element):
 			type_graph='IntentionFrame'
 			
 		super(IntentionFrameElement,self).__init__(id,type_graph,name)
-		# if intender is None:
-			# #print('need to select consistent_actor before instantiation')
-			# intender=Actor(id+1,type='actor')
-		# if ms is None:
-			# ms = Operator(id+2,type='Action', roles={id:'motivating-step'}, executed = False)
-		# if sat is None:
-			# sat = Operator(id+3, type='Action', roles={id:'satisfying-step'}, executed = False)
-		# if goal is None:
-			# goal = Literal(id+ 4, type='Condition', roles={id: 'goal'}, truth = None)
 		
 		self.ms = ms
 		self.motivation = motivation
@@ -442,7 +433,35 @@ class IntentionFrameElement(Element):
 		self.subplan = steps
 		
 	def external_update(self, PLAN):
-		"""updates frame slots based on edges"""
+		"""updates frame slots, edges, and constraints"""
+		
+		if not self.sat is None:
+			if not self.sat in self.subplan:
+				self.subplan.add(self.sat)
+		
+		""" If the slot is filled but the edge isn't' there, fill it in"""
+		incident_edges = PLAN.getIncidentEdges(self.id)
+		labels = {ie.label for ie in incident_edges}
+		if not self.goal is None:
+			if 'goal-of' not in labels:
+				PLAN.edges.add(Edge(self, self.goal, 'goal-of'))
+		if not self.ms is None:
+			if 'motivating-step-of' not in labels:
+				PLAN.edges.add(Edge(self, self.ms, 'motivating-step-of'))
+		if not self.sat is None:
+			if 'sat-step-of' not in labels:
+				PLAN.edges.add(Edge(self, self.sat,'sat-step-of'))
+		if not self.intender is None:
+			if 'actor-of' not in labels:
+				PLAN.edges.add(Edge(self, self.intender, 'actor-of'))
+		if len(self.subplan) == 0:
+			neighbs = {ie.sink for ie in incident_edges if ie.label == 'in-subplan-of'}
+			for step in self.subplan:
+				if step not in neighbs:
+					PLAN.edges.add(Edge(self, step, 'in-subplan-of'))
+				
+			
+		""" If there's an edge but slot is None, fill it in"""
 		for incident_edge in PLAN.edges:
 			if incident_edge.source.id == self.id:
 				if self.goal is None:
@@ -457,10 +476,58 @@ class IntentionFrameElement(Element):
 				if self.sat is None:
 					if incident_edge.label == 'sat-of':
 						self.sat = incident_edge.sink
+						if not self.sat in self.subplan:
+							self.subplan.add(self.sat)
 				if incident_edge.label == 'in-subplan-of':
 					if incident_edge.sink not in self.subplan:
 						self.subplan.add(incident_edge.sink)
+		
+		""" Add ordering constraints if not there """
+		if len(self.subplan) > 0:
+			for step in self.subplan:
+				if not self.ms is None:
+					# self.ms < step
+					pass
+				if not self.sat is None:
+					if not self.sat is step:
+						#step < self.sat
+						pass
+
+		""" consenting Actors """
+		if self.intender is None:
+			actors = PLAN.getConsentingActors(self.subplan)
+			if len(actors) == 1:
+				self.intender = actors.pop()
+			if len(actors) == 0:
+				print('the subplan of intention frame {} in plan {} will have no consistent consenting actors'.format(self.id, PLAN.id))
+			if len(actors) > 1:
+				pass
+				#could keep them like dis: self.actors = actors
+				
+		""" NOTE: replace all actor arguments with intender? Think about how to handle this """
+		if not self.intender is None:
+			for step in self.subplan:
+				neighbs = PLAN.getNeighborsByLabel(step, 'actor-of')
+				if len(neighbs) == 0:
+					print('a happening {} is in intention frame {} of plan {}'.format(step.id, self.id, PLAN.id))
+				if len(neighbs) == 1:
+					self.intender.combine(neighbs.pop())
+				if len(neighbs) > 1:
+					#print('2 consenting actors in step {} in intention frame {} of plan {}'.format(step.id, self.id, PLAN.id))
+					#figure out which one to merge
+					same_neighb = {nb for nb in neighbs if nb.id == self.intender.id}
+					if len(same_neighb) > 0:
+						continue
+						
+					{nb for nb in neighbs if nb.isConsistent(self.intender)}
+					for nb in neighbs:
+						if nb.id != self.intender.id:
+							if nb.isConsistent(self.intender)
+					PLAN.edges.add(Edge(step, self.intender, 'actor-of'))
+					#
+			
 		return self
+	
 				
 					
 		
