@@ -378,16 +378,38 @@ class PlanElementGraph(ElementGraph):
 	
 	def isInternallyConsistent(self):
 		""" 
-			Work your way up the chain from steps:
+			With respect to constraint sources
+			With respect to orderings (no cycles)
+			With respect to causal links (?)
+			With respect to intention frame elements
+				consenting actors
+				causal antecedence of sat
 			
-			1) For each step in the plan, create element graph.
-			2) For each constraint with source = step, create constraint graph
-			3) Check if equivalent
-			
-			
-				
 		"""
 		return super(PlanElementGraph,self).isInternallyConsistent()
+		
+	def detectFlaws(self):
+		self.detectOpenPreconditionFlaws()
+		self.detectThreatenedCausalLinkFlaws()
+		self.detectUnsatisfiedIntentionFrameFlaws()
+		self.detectIntentFlaws()
+		self.detectOpenMotivationFlaws()
+		return self
+		
+	def detectOpenPreconditionFlaws(self):
+		pass
+		
+	def detectThreatenedCausalLinkFlaws(self):
+		pass
+	
+	def detectUnsatisfiedIntentionFrameFlaws(self):
+		pass
+		
+	def detectIntentFlaws(self):
+		pass
+		
+	def detectOpenMotivationFlaws(self):
+		pass
 
 	def rInstantiate(self, remaining = None, operators = None, complete_plans = None):
 		if remaining == None:

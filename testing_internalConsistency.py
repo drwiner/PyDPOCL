@@ -91,6 +91,8 @@ example_item = 		Argument(id=115,		type='var', 			arg_pos_dict={})
 example_actor = 	Actor(id=117, 			type='actor',			arg_pos_dict={})
 
 
+#frame = IntentionFrameElement(id=118, type = 'IntentionFrame', sat = example)
+
 example_edge5 = Edge(example,	 example_e3, 	'effect-of')
 
 
