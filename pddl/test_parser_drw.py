@@ -22,3 +22,24 @@ problem = parse('D:\python-workspace\story-elements\domain.pddl','D:\python-work
         # self.initial_state = init
         # self.goal = goal
 		
+""" Domain attributes"""
+        # self.name = name
+        # self.types = types
+        # self.predicates = predicates
+        # self.actions = actions
+        # self.constants = constants
+		
+""" Predicate attributes"""
+        # self.name = name
+        # self.signature = signature
+		
+""" Action attributes"""
+        # self.name = name
+        # self.signature = signature
+        # self.precondition = precondition
+        # self.effect = effect
+		
+print('\ndomain predicates')
+problem.domain.predicates
+print('\ndomain actions')
+problem.domain.actions
