@@ -17,41 +17,22 @@ def parse(domain_file, problem_file):
 def rGetFormulaElements(formula):
 	#BASE CASE
 	if formula.type == 1 or formula.type == 2:
-		print(formula.key.name)
+		print(formula.key.name, end= " ")
 		return 
-		
-	print(formula.key, end= " ")
+	
+	#INDUCTION
+	if not formula.key == 'and':
+		print(formula.key, end= " ")
+	
 	for child in formula.children:
 		rGetFormulaElements(child)
+	print('\n')
 		
 	
-domain_file = 'domain.pddl'
+#domain_file = 'domain.pddl'
 #problem = parse('domain.pddl','task02.pddl')
-""" Problem attributes"""
-		# self.name = name
-		# self.domain = domain
-		# self.objects = objects
-		# self.initial_state = init
-		# self.goal = goal
-		
-""" Domain attributes"""
-		# self.name = name
-		# self.types = types
-		# self.predicates = predicates
-		# self.actions = actions
-		# self.constants = constants
-		
-""" Predicate attributes"""
-		# self.name = name
-		# self.signature = signature
-		
-""" Action attributes"""
-		#self._visitorName = 'visit_action_stmt'
-		# self.name = name
-		# self.parameters = parameters  # a list of parameters
-		# self.precond = precond
-		# self.effect  = effect
-		
+#domain_file = 'ark-domain_syntactic_sugar.pddl'
+domain_file = 'domain_elevators.pddl'	
 
 
 print('\n')	
@@ -70,7 +51,12 @@ for action in domain.actions:
 	rGetFormulaElements(action.effect.formula)
 	
 	print('\n &&&&&&& prerequisite \n')
-	rGetFormulaElements(action.prereq.formula)
+	if not action.prereq is None:
+		rGetFormulaElements(action.prereq.formula)
+		
+	print('\n ^^^^^^^ AGENT \n')
+	if not action.agents is None:
+		rGetFormulaElements(action.agents.formula)
 	
 	print('\n\n parameters \n')
 	for p in action.parameters:

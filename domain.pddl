@@ -26,13 +26,13 @@
            :effect (and (movie-rewound)
                         ;; Let's assume that the movie is 2 hours long
                         (not (counter-at-zero)))
-		   :prerequisite (None ?x))
+		   :prerequisite (?x))
 
   (:action reset-counter
            :parameters ()
            :precondition (and)
            :effect (counter-at-zero)
-		   :prerequisite (chips ?x))
+		   :prerequisite (not))
 
   ;;; Get the food and snacks for the movie
   (:action get-chips

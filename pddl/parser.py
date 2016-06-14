@@ -77,7 +77,7 @@ class Type(Visitable):
 
 		Keyword arguments:
 		name -- the name of the type
-		parent -- a string that denotes the Typ instance that is the parent of
+		parent -- a string that denotes the Type instance that is the parent of
 				  this type or None
 		"""
 		self._visitorName = 'visit_type'
@@ -160,6 +160,12 @@ class PrereqStmt(Visitable):
 	def __init__(self, formula):
 		self._visitorName = 'visit_prereq_stmt'
 		self.formula = formula #formula
+		
+class AgentsStmt(Visitable):
+	"""This class represents the AST node for a pddl prerequisite."""
+	def __init__(self, formula):
+		self._visitorName = 'visit_prereq_stmt'
+		self.formula = formula #formula
 
 class EffectStmt(Visitable):
 	"""This class represents the AST node for a pddl action effect."""
@@ -201,7 +207,7 @@ class Formula(Visitable):
 class ActionStmt(Visitable):
 	"""This class represents the AST node for a pddl action."""
 
-	def __init__(self, name, parameters, precond, effect, prereq):
+	def __init__(self, name, parameters, precond, effect, prereq = None, agents = None):
 		""" Construct a new Action.
 
 		Keyword arguments:
@@ -218,6 +224,7 @@ class ActionStmt(Visitable):
 		# --> should be checked when traversing the tree
 		self.effect  = effect
 		self.prereq = prereq
+		self.agents = agents
 
 
 class PredicatesStmt(Visitable):
@@ -606,6 +613,9 @@ def parse_effect_stmt(it):
 	
 def parse_prereq_stmt(it):
 	return _parse_precondition_or_effect(it, ':prerequisite', PrereqStmt)
+	
+def parse_agents_stmt(it):
+	return _parse_precondition_or_effect(it, ':agents', AgentsStmt)
 
 def parse_action_stmt(iter):
 	"""
@@ -622,8 +632,15 @@ def parse_action_stmt(iter):
 	param = parse_parameters(iter)
 	pre = parse_precondition_stmt(iter)
 	eff = parse_effect_stmt(iter)
-	prereq = parse_prereq_stmt(iter)
-	return ActionStmt(name, param, pre, eff, prereq)
+	try:
+		prereq = parse_prereq_stmt(iter)
+		return ActionStmt(name, param, pre, eff, prereq)
+	except:
+		try:
+			Agents = parse_variable(iter)
+			return ActionStmt(name, param, pre, eff, agents=Agents)
+		except:
+			return ActionStmt(name, param, pre, eff)
 
 
 def parse_predicates_stmt(iter):
