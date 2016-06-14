@@ -154,7 +154,12 @@ class PreconditionStmt(Visitable):
 		"""
 		self._visitorName = 'visit_precondition_stmt'
 		self.formula = formula	# a Formula
-
+		
+class PrereqStmt(Visitable):
+	"""This class represents the AST node for a pddl prerequisite."""
+	def __init__(self, formula):
+		self._visitorName = 'visit_prereq_stmt'
+		self.formula = formula #formula
 
 class EffectStmt(Visitable):
 	"""This class represents the AST node for a pddl action effect."""
@@ -192,10 +197,11 @@ class Formula(Visitable):
 		self.type = type  # a Type
 
 
+
 class ActionStmt(Visitable):
 	"""This class represents the AST node for a pddl action."""
 
-	def __init__(self, name, parameters, precond, effect):
+	def __init__(self, name, parameters, precond, effect, prereq):
 		""" Construct a new Action.
 
 		Keyword arguments:
@@ -211,6 +217,7 @@ class ActionStmt(Visitable):
 		# right now also a Formula << EffectStmt
 		# --> should be checked when traversing the tree
 		self.effect  = effect
+		self.prereq = prereq
 
 
 class PredicatesStmt(Visitable):
@@ -596,6 +603,9 @@ def parse_precondition_stmt(it):
 def parse_effect_stmt(it):
 	return _parse_precondition_or_effect(it, ':effect', EffectStmt)
 
+	
+def parse_prereq_stmt(it):
+	return _parse_precondition_or_effect(it, ':prerequisite', PrereqStmt)
 
 def parse_action_stmt(iter):
 	"""
@@ -612,7 +622,8 @@ def parse_action_stmt(iter):
 	param = parse_parameters(iter)
 	pre = parse_precondition_stmt(iter)
 	eff = parse_effect_stmt(iter)
-	return ActionStmt(name, param, pre, eff)
+	prereq = parse_prereq_stmt(iter)
+	return ActionStmt(name, param, pre, eff, prereq)
 
 
 def parse_predicates_stmt(iter):

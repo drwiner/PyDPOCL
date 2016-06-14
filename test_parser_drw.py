@@ -1,4 +1,5 @@
 from pddl.parser import Parser
+from PlanElementGraph import *
 
 def parseDomain(domain_file):
 	parser = Parser(domain_file)
@@ -19,13 +20,13 @@ def rGetFormulaElements(formula):
 		print(formula.key.name)
 		return 
 		
-	print(formula.key)
+	print(formula.key, end= " ")
 	for child in formula.children:
 		rGetFormulaElements(child)
 		
 	
 domain_file = 'domain.pddl'
-problem = parse('domain.pddl','task02.pddl')
+#problem = parse('domain.pddl','task02.pddl')
 """ Problem attributes"""
 		# self.name = name
 		# self.domain = domain
@@ -45,17 +46,13 @@ problem = parse('domain.pddl','task02.pddl')
 		# self.signature = signature
 		
 """ Action attributes"""
+		#self._visitorName = 'visit_action_stmt'
 		# self.name = name
-		# self.signature = signature
-		# self.precondition = precondition
-		# self.effect = effect
+		# self.parameters = parameters  # a list of parameters
+		# self.precond = precond
+		# self.effect  = effect
 		
-print('\ndomain predicates:\n')
-for p in problem.domain.predicates:
-	print(p)
-print('\ndomain types:\n')
-for t in problem.domain.types:
-	print(t)
+
 
 print('\n')	
 domain = parseDomain(domain_file)
@@ -64,10 +61,20 @@ print(domain.name)
 print('\ndomain action effect types:\n')
 for action in domain.actions:
 	#print(type(action))
-	print('\n effects \n')
-	rGetFormulaElements(action.effect.formula)
-	print('\n preconditions \n')
+	print('[[[[[{}]]]]]'.format(action.name))
+	
+	print('\n ------- preconditions \n')
 	rGetFormulaElements(action.precond.formula)
-		
-
+	
+	print('\n +++++++ effects \n')
+	rGetFormulaElements(action.effect.formula)
+	
+	print('\n &&&&&&& prerequisite \n')
+	rGetFormulaElements(action.prereq.formula)
+	
+	print('\n\n parameters \n')
+	for p in action.parameters:
+		print(p.name, end=" ")
+	#print(action.parameters)
+	print('\n\n\n')
 		
