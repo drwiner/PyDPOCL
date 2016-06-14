@@ -637,7 +637,7 @@ def parse_action_stmt(iter):
 		return ActionStmt(name, param, pre, eff, prereq)
 	except:
 		try:
-			Agents = parse_variable(iter)
+			Agents = parse_agents_stmt(iter)
 			return ActionStmt(name, param, pre, eff, agents=Agents)
 		except:
 			return ActionStmt(name, param, pre, eff)

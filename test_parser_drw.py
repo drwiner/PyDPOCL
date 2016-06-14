@@ -54,7 +54,7 @@ for action in domain.actions:
 	if not action.prereq is None:
 		rGetFormulaElements(action.prereq.formula)
 		
-	print('\n ^^^^^^^ AGENT \n')
+	print('\n ^^^^^^^ agents \n')
 	if not action.agents is None:
 		rGetFormulaElements(action.agents.formula)
 	
