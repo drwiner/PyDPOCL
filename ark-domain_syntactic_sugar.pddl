@@ -4,7 +4,7 @@
 ;;; Originally used to test the Glaive Narrative Planner
 ;;;
 (define (domain indiana-jones-ark)
-  (:requirements)
+  (:requirements :adl :domain-axioms :intentionality)
   (:types character place item - object
           weapon - item
 		  ark - item)
@@ -77,6 +77,7 @@
                        (has ?taker ?item))
     :agents       (?taker))
 	
+	
   ;; One character takes an item from a corpse
   (:action take-from-corpse
     :parameters   (?taker - character ?item - item ?victim - character ?place - place)
@@ -89,6 +90,7 @@
 	:effect       (and (not (has ?victim ?item))
                        (has ?taker ?item))
     :agents       (?taker))
+
 
   ;; A character opens the Ark.
   (:action open-ark
@@ -106,4 +108,19 @@
 	:effect       (not (open ?ark)))
 
   ;; When a character has a weapon, they are armed.
+   ;; When a character has a weapon, they are armed.
+  ; (:axiom
+    ; :vars    (?character - character)
+    ; :context (and (not (armed ?character))
+                  ; (exists (?w - weapon)
+                          ; (has ?character ?w)))
+    ; :implies (armed ?character))
+
+  ; ;; When a character does not have a weapon, they are unarmed.
+  ; (:axiom
+    ; :vars    (?character - character)
+    ; :context (and (armed ?character)
+                  ; (forall (?w - weapon)
+                          ; (not (has ?character ?w))))
+    ; :implies (not (armed ?character)))
 )
