@@ -13,6 +13,17 @@ def parse(domain_file, problem_file):
 
 	return problem
 	
+def rGetFormulaElements(formula):
+	#BASE CASE
+	if formula.type == 1 or formula.type == 2:
+		print(formula.key.name)
+		return 
+		
+	print(formula.key)
+	for child in formula.children:
+		rGetFormulaElements(child)
+		
+	
 domain_file = 'domain.pddl'
 problem = parse('domain.pddl','task02.pddl')
 """ Problem attributes"""
@@ -52,5 +63,11 @@ print(type(domain))
 print(domain.name)
 print('\ndomain action effect types:\n')
 for action in domain.actions:
-	for formula in action.effect.formula.children:
-		print(formula.name)
+	#print(type(action))
+	print('\n effects \n')
+	rGetFormulaElements(action.effect.formula)
+	print('\n preconditions \n')
+	rGetFormulaElements(action.precond.formula)
+		
+
+		

@@ -210,7 +210,7 @@ class ActionStmt(Visitable):
 		self.precond = precond	# right now: a Formula << PreconditionStmt
 		# right now also a Formula << EffectStmt
 		# --> should be checked when traversing the tree
-		self.effect = effect
+		self.effect  = effect
 
 
 class PredicatesStmt(Visitable):
