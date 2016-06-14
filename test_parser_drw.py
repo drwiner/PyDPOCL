@@ -32,8 +32,8 @@ def rGetFormulaElements(formula):
 #domain_file = 'domain.pddl'
 #problem = parse('domain.pddl','task02.pddl')
 #domain_file = 'ark-domain_syntactic_sugar.pddl'
-domain_file = 'domain_elevators.pddl'	
-
+#domain_file = 'domain_elevators.pddl'	
+domain_file = 'ark-domain.pddl'
 
 print('\n')	
 domain = parseDomain(domain_file)

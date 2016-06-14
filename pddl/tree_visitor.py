@@ -370,8 +370,7 @@ class TraversePDDLDomain(PDDLVisitor):
                                                 for c2 in formula.children]))
                 # Check whether predicate was defined.
                 if not c.key in self._predicates:
-                    raise SemanticError('Error unknown predicate ' + c.key +
-                                        ' used in precondition of action')
+                    raise SemanticError('Error unknown predicate ' + c.key + ' used in precondition of action')
                 # Call helper.
                 self.add_precond(precond, c)
         else:
