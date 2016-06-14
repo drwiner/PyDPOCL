@@ -4,17 +4,19 @@
 ;;; Originally used to test the Glaive Narrative Planner
 ;;;
 (define (domain indiana-jones-ark)
-  (:requirements :adl :domain-axioms :intentionality)
-  (:types character place - object
-          weapon - item)
-  (:constants ark - item)
-  (:predicates (open ark)
+  (:requirements)
+  (:types character place item - object
+          weapon - item
+		  ark - item)
+;  (:constants ark - item)
+  (:predicates (open ?ark - ark)
                (alive ?character - character)
                (armed ?character - character)
                (burried ?item - item ?place - place)
                (knows-location ?character - character ?item - item ?place - place)
                (at ?character - character ?place - place)
-               (has ?character - character ?item - item))
+               (has ?character - character ?item - item)
+			   (= ?ob - object ?ob2 - object))
 
   ;; A character travels from one place to another.
   (:action travel
@@ -90,30 +92,18 @@
 
   ;; A character opens the Ark.
   (:action open-ark
-    :parameters   (?character - character)
+    :parameters   (?character - character ?ark - ark)
 	:precondition (and (alive ?character)
-                       (has ?character ark))
-	:effect       (and (open ark)
+                       (has ?character ?ark))
+	:effect       (and (open ?ark)
                        (not (alive ?character)))
     :agents       (?character))
 
   ;; The Ark closes.
   (:action close-ark
-	:precondition (open ark)
-	:effect       (not (open ark)))
+	:parameters (?ark - ark)
+	:precondition (open ?ark)
+	:effect       (not (open ?ark)))
 
   ;; When a character has a weapon, they are armed.
-  (:axiom
-    :vars    (?character - character)
-    :context (and (not (armed ?character))
-                  (exists (?w - weapon)
-                          (has ?character ?w)))
-    :implies (armed ?character))
-
-  ;; When a character does not have a weapon, they are unarmed.
-  (:axiom
-    :vars    (?character - character)
-    :context (and (armed ?character)
-                  (forall (?w - weapon)
-                          (not (has ?character ?w))))
-    :implies (not (armed ?character))))
+)
