@@ -42,25 +42,28 @@ print(domain.name)
 print('\ndomain action effect types:\n')
 for action in domain.actions:
 	#print(type(action))
-	print('[[[[[{}]]]]]'.format(action.name))
+	print('\t\t\t[[[[[{}]]]]]'.format(action.name))
 	
-	print('\n ------- preconditions \n')
+	print('\n parameters \n')
+	for p in action.parameters:
+		print(p.name, end=" ")
+	print('\n')
+	
+	print('\n ------- preconditions -------\n')
 	rGetFormulaElements(action.precond.formula)
 	
-	print('\n +++++++ effects \n')
+	print('\n \t+++++++ effects +++++++\n')
 	rGetFormulaElements(action.effect.formula)
 	
-	print('\n &&&&&&& prerequisite \n')
+	print('\n &&&&&&& prerequisite &&&&&&&\n')
 	if not action.prereq is None:
 		rGetFormulaElements(action.prereq.formula)
 		
-	print('\n ^^^^^^^ agents \n')
+	print('\n ^^^^^^^ agents ^^^^^^^\n')
 	if not action.agents is None:
 		rGetFormulaElements(action.agents.formula)
 	
-	print('\n\n parameters \n')
-	for p in action.parameters:
-		print(p.name, end=" ")
+	
 	#print(action.parameters)
 	print('\n\n\n')
 		
