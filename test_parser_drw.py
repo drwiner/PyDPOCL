@@ -1,4 +1,6 @@
 from pddl.parser import Parser
+from math import floor
+import random
 from PlanElementGraph import *
 
 def parseDomain(domain_file):
@@ -27,6 +29,12 @@ def rGetFormulaElements(formula):
 	for child in formula.children:
 		rGetFormulaElements(child)
 	print('\n')
+	
+def domainToOperatorGraphs(domain_file):
+	domain = parseDomain(domain_file)
+	start_id = floor(random.random()*10000)
+	for action in domain.actions:
+		op = Operator(id = start_id, type = 'Action', name = action.name, num_args = len(action.parameters) instantiated = True)
 		
 	
 #domain_file = 'domain.pddl'
