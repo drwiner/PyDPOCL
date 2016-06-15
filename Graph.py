@@ -82,7 +82,21 @@ class Graph(Element):
 				print('Element {id} = {truth}{name},\ttype = {type}'.format(id=element.id, truth='not ' if element.executed==False else '', name=element.name, type=element.type))
 			else:
 				print('Element {} = {},\ttype = {}'.format(element.id, element.name, element.type))
-			
+	
+	def print_graph_names(self):
+		print('ElementGraph {}:'.format(self.name))
+		for edge in self.edges:
+			print('Edge {} --{}--> {}'.format(edge.source.name, edge.label, edge.sink.name))
+			#edge.source.print_element()
+			#edge.sink.print_element()
+		for element in self.elements:
+			if type(element) is Literal:
+				print('Element {truth}{name},\ttype = {type}'.format(truth='not ' if not element.truth else '', name=element.name, type=element.type))
+			elif type(element) is Operator:
+				print('Element {truth}{name},\ttype = {type}'.format(truth='not ' if element.executed==False else '', name=element.name, type=element.type))
+			else:
+				print('Element {} ,\ttype = {}'.format(element.name, element.type))
+	
 	def hasEdgeIdentity(self, edge):
 		""" Returns set of edges s.t. (source.id, label, sink.id) in self.edges"""
 		return self.getEdgesByIdsAndLabel(edge.source.id, edge.sink.id, edge.label)

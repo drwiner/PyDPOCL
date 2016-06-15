@@ -1,4 +1,5 @@
 from ElementGraph import *
+import uuid
 
 class Belief(ElementGraph):
 	def __init__(self, id, type, name=None, \
@@ -26,7 +27,7 @@ class Action(ElementGraph):
 			Constraints = set()
 
 		if root_element is None:
-			root_element = Operator(id + 201,type='Action')
+			root_element = Operator(uuid.uuid1(200),type='Action')
 			
 		super(Action,self).__init__(id,type_graph,name,Elements,root_element,Edges,Constraints)
 
