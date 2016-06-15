@@ -86,7 +86,12 @@ class Graph(Element):
 	def print_graph_names(self):
 		print('ElementGraph {}:'.format(self.name))
 		for edge in self.edges:
-			print('Edge {} --{}--> {}'.format(edge.source.name, edge.label, edge.sink.name))
+			if type(edge.sink) is Literal:
+				print('Edge {} --{}--> {}-{}'.format(edge.source.name, edge.label, edge.sink.truth, edge.sink.name))
+			if type(edge.source) is Literal:
+				print('Edge {}-{} --{}--> {}'.format(edge.source.truth, edge.source.name, edge.label,edge.sink.name))
+			else:
+				print('Edge {} --{}--> {}'.format(edge.source.name, edge.label,edge.sink.name))
 			#edge.source.print_element()
 			#edge.sink.print_element()
 		for element in self.elements:
