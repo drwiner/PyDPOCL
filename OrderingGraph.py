@@ -31,7 +31,9 @@ class OrderingGraph(Graph):
 			
 	######       rDetect       ####################
 	def rDetectCycle(self, original_element, element = None, visited = None):
-		""" Returns true if cycle detected. otherwise, returns visited elements"""
+		""" Returns true if cycle detected. otherwise, returns visited elements
+
+		"""
 		if visited == None:
 			visited = set()
 			
@@ -56,6 +58,19 @@ class OrderingGraph(Graph):
 			#Descendants.add(edge.sink)
 			visited = self.rDetectCycle(edge.sink, visited)
 		return visited
+		
+	def foundPath(self,start, finish):
+		""" Returns if there is path start to finish (1) finish to start (2) or none at all (0)"""
+		visited = self.rDetectCycle(start)
+		if visited:
+			if finish in visited:
+				return 1
+		visited2 = self.rDetectCycle(finish)
+		if visited2:
+			if start in visited2:
+				return 2
+		return 0
+		
 		
 class CausalLinkGraph(OrderingGraph):
 	def __init__(self, id, type = None, name = None, Elements = None , Edges = None, Constraints = None):
