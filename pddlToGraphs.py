@@ -82,8 +82,9 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 			
 	return elements, edges
 	
+""" Get a precondition, effect, or set of prerequisites from pddl operator to element graph""""
 def getFormulaGraph(formula, current_id = None, parent = None, relationship = None, elements = None, edges = None):
-
+	
 	if parent == None:
 		parent = Element(id = uuid.uuid1(current_id), type = None)
 		current_id += 1
@@ -120,6 +121,7 @@ def rPrintFormulaElements(formula):
 
 	print('\n')
 		
+""" Convert pddl file to set of operator graphs"""
 def domainToOperatorGraphs(domain_file):
 	domain = parseDomain(domain_file)
 	start_id = floor(random.random()*100)
@@ -127,6 +129,7 @@ def domainToOperatorGraphs(domain_file):
 	for action in domain.actions:
 		start_id += 1
 		op_id = uuid.uuid1(start_id)
+		#Element types correspond to their type of graph
 		op = Operator(id = op_id, type = 'Action', name = action.name, num_args = len(action.parameters), instantiated = True)
 		
 		op_graph =			Action(	id = uuid.uuid1(start_id),\
