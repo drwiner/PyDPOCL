@@ -1,12 +1,7 @@
 from OrderingGraph import *
 
-""" Represent plans as element graphs.
-
-	An open precondition flaw is a tuple <step element, precondition element>
-		where precondition element is a literal element, 
-		there is a precondition edge from the step element to the precondition element,
-		and there is no causal link in the graph from another step to the precondition element with label 'effect'
-
+""" 
+	Flaws for element graphs
 """
 
 def detectThreatenedCausalLinks(graph):
@@ -47,6 +42,14 @@ def detectThreatenedCausalLinks(graph):
 	
 
 def addOpenPreconditionFlaws(graph, step):
+	"""
+	An open precondition flaw is a tuple <step element, precondition element>
+		where precondition element is a literal element, 
+		there is a precondition edge from the step element to the precondition element,
+		and there is no causal link in the graph from another step to the precondition element with label 'effect'
+		It's important to consider this last point 
+			because with this approach, you could instantiate an element which already has some preconditions in causal links
+	"""
 	new_flaws = set()
 	preconditions = graph.getNeighborsByLabel(step, 'precond')
 	new_flaws.update({(step,precondition) for precondition in preconditions})
