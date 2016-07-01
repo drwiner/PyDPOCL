@@ -71,6 +71,14 @@ class OrderingGraph(Graph):
 				return 2
 		return 0
 		
+	def isPath(self, start, finish):
+		"""Returns True if path from start to Finish, False otherwise"""
+		visited = self.rDetectCycle(start)
+		if visited:
+			if finish in visited:
+				return True
+		return False
+		
 		
 class CausalLinkGraph(OrderingGraph):
 	def __init__(self, id, type = None, name = None, Elements = None , Edges = None, Constraints = None):
