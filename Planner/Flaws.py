@@ -28,13 +28,7 @@ def detectThreatenedCausalLinks(graph):
 	
 
 def addOpenPreconditionFlaws(graph, step):
-	"""
-		for each precondition edge with step as the source,
-			found = false
-			For each causal link with step as the sink,
-				If the precondition is the condition of the causal link,
-					found = true
-					break
-			if found,
-				
-	"""
+	new_flaws = set()
+	preconditions = graph.getNeighborsByLabel(step, 'precond')
+	new_flaws.update({(step,precondition) for precondition in preconditions})
+	return new_flaws
