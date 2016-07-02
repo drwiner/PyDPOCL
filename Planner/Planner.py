@@ -30,9 +30,11 @@ from Flaws import *
 class PlanSpacePlanner:
 
 	graphs = {} #graphs, will be limited to fringe
-	
+
 	def __init__(self, start_set, end_set, op_graphs, objects):
 		#Assumes these parameters are already read from file
+		
+		self.op_graphs = opgraphs
 		
 		init_graph = PlanElementGraph(uuid.uuid1(0)):
 		
@@ -61,11 +63,22 @@ class PlanSpacePlanner:
 		
 		graph.flaws.append(addOpenPreconditionFlaws(graph, dummy_final))
 		
-	def goalPlanning(self, graph):
-		#First, determine if graph is internally consistent (TODO)
+	def goalPlanning(self, graph, flaw):
+		graph_copy = copy.deepcopy(graph)
+		step, precondition = flaw.flaw
+		#First try Reuse
 		
-		#Next, select Flaw
-		flaw = self.selectFlaw
+		#Then try new Step
+		for op in self.op_graphs:
+			for eff in op.getNeighborsByLabel(root, 'effect-of')
+				if precondition.isConsistent(eff):
+					
+		pass
+		
+	def reuse(self, graph, flaw):
+		s_need, pre = flaw.flaw
+		for step in graph.Steps:
+			if graph.OrderingGraph.isPath()
 	
 	def selectFlaw(self, graph)
 		return graph.flaws.pop()
@@ -75,9 +88,19 @@ class PlanSpacePlanner:
 			Recursively, given graph, for each flaw, for each way to resolve flaw, create new graphs and rPOCL on it
 		"""
 		
-		#BASE CASE
-			#Graph is not internally consistent, then fail
+		#BASE CASES
+		if not graph.isInternallyConsistent:
+			return
+		if len(graph.flaws) == 0:
+			return graph
 			
 		#INDUCTION
-			self.selectFlaw(graph)
+		flaw = self.selectFlaw(graph)
+		if flaw.name = 'opf':
+			graphs = goalPlanning(self, graph)
+		if flaw.name = 'tclf':
+			pass
+		
+		for g in graphs:
+			self.rPOCL(g)
 		
