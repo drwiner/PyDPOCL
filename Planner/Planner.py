@@ -77,12 +77,14 @@ class PlanSpacePlanner:
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(root, 'effect-of')
 				if precondition.isConsistent(eff):
-					""" TODO: make easy instantiate operator graph as step, change id"""
+					""" TODO: make easy instantiate operator graph as step, """
 					graph_copy = copy.deepcopy(graph)
 					
-					new_step_op = copy.deepcopy(op) #Need this to change IDs of all child elements
-					new_step_op.id = uuid.uuid1(1)
-					graph_copy.elements.add(new_step_op.id)
+					new_step_op = op.makeCopyFromId(start_from = 1,old_element_id = eff.id) #
+					graph_copy.elements.add(new_step_op)
+					
+					
+					
 					
 					graph_copy.edges.add(CausalLink(new_step_op, s_need, precondition))
 					fringe.add(new_step_op)

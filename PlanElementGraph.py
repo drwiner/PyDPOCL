@@ -86,7 +86,7 @@ class Action(ElementGraph):
 								# Edges = elementGraph.rGetDescendantEdges(element),\
 								# Constraints = elementGraph.rGetDescendantConstraints(element))
 	
-	def makeCopyFromID(self, start_from, increment = None):
+	def makeCopyFromID(self, start_from, increment = None, old_element_id = None):
 		"""
 			Makes copy of step-induced subgraph and changes ids
 				Includes, updating the argument list
@@ -96,17 +96,23 @@ class Action(ElementGraph):
 		new_self = self.copyGen()
 		old_id = self.id
 		new_self.id = start_from
-		start_from += increment
+		
 		for element in new_self.elements:
-			element.id = start_from
-			start_from = start_from + increment
+			if not old_element_id is None:
+				if element.id == old_element_id:
+					oei = old_element_id
+			element.id = uuid.uuid1(start_from)
 			
 		new_id = new_self.root.id
 		for i, arg in new_self.Args.items():
 			for id,pos in arg.arg_pos_dict.items():
 				if id == old_id:
 					arg.arg_pos_dict[new_id] = arg.arg_pos_dict.pop(old_id)
-		return new_self
+					
+		if old_element_id is None:
+			return new_self
+		else:
+			return new_self, oei
 	
 											
 
