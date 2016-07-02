@@ -82,7 +82,7 @@ class PlanSpacePlanner:
 					
 					new_step_op, nei = op.makeCopyFromId(start_from = 1,old_element_id = eff.id)
 					
-					Effect  = new_steop_op.getElementGraphFromElementId(nei)
+					Effect  = new_step_op.getElementGraphFromElementId(nei)
 					Effect.absolve(Precondition) ##TODO: 
 					"""
 						Challenge: 
@@ -95,18 +95,20 @@ class PlanSpacePlanner:
 							also add ordering edges from dummy source and to dummy sink
 					"""
 					
-					for element in new_step_op.elements:
-						graph_copy.elements.add(element)
-					for edge in new_steop_op.edges:
-						if edge.sink is effect:
-							graph_copy.edges.add(Edge(edge.source, precondition, edge.label))
-						elif edge.source is effect:
-							graph_copy.edges.add(Edge(precondition, edge.sink, edge.label))
-						else:
-							graph_copy.edges.add(edge)
-					#But, not done here, also need to "combine/merge" all arguments in the precondition, and 
+					
+					# for element in new_step_op.elements:
+						# graph_copy.elements.add(element)
+					# for edge in new_steop_op.edges:
+						# if edge.sink is effect:
+							# graph_copy.edges.add(Edge(edge.source, precondition, edge.label))
+						# elif edge.source is effect:
+							# graph_copy.edges.add(Edge(precondition, edge.sink, edge.label))
+						# else:
+							# graph_copy.edges.add(edge)
+							
 					
 					graph_copy.edges.add(CausalLink(new_step_op, s_need, precondition))
+					#graph_copy.OrderingGraph.addEdge(new_step_op, dumm)
 					fringe.add(new_step_op)
 		
 	def reuse(self, graph, flaw):
