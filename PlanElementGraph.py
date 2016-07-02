@@ -97,11 +97,13 @@ class Action(ElementGraph):
 		old_id = self.id
 		new_self.id = start_from
 		
+		found = False
 		for element in new_self.elements:
-			if not old_element_id is None:
-				if element.id == old_element_id:
-					oei = old_element_id
 			element.id = uuid.uuid1(start_from)
+			if not old_element_id is None and not found:
+				if element.id == old_element_id:
+					found = True
+					nei = element.id
 			
 		new_id = new_self.root.id
 		for i, arg in new_self.Args.items():
@@ -112,7 +114,7 @@ class Action(ElementGraph):
 		if old_element_id is None:
 			return new_self
 		else:
-			return new_self, oei
+			return new_self, nei
 	
 											
 

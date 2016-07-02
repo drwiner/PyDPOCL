@@ -80,11 +80,8 @@ class PlanSpacePlanner:
 					""" TODO: make easy instantiate operator graph as step, """
 					graph_copy = copy.deepcopy(graph)
 					
-					new_step_op = op.makeCopyFromId(start_from = 1,old_element_id = eff.id) #
+					new_step_op = op.makeCopyFromId(start_from = 1,old_element_id = eff.id) 
 					graph_copy.elements.add(new_step_op)
-					
-					
-					
 					
 					graph_copy.edges.add(CausalLink(new_step_op, s_need, precondition))
 					fringe.add(new_step_op)
