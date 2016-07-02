@@ -64,30 +64,50 @@ class PlanSpacePlanner:
 		graph.flaws.append(addOpenPreconditionFlaws(graph, dummy_final))
 		
 	def goalPlanning(self, graph, flaw):
-		graph_copy = copy.deepcopy(graph)
+		results = self.reuse(graph, flaw)
+		results.update(self.newStep(graph, flaw))
+		return results
 		
-		fringe = set()
-
-		#First try Reuse
-		result = self.reuse(graph, flaw)
-
-		
+	def newStep(self, graph, flaw):
+		s_need, precondition = flaw.flaw
+		Precondition = graph.getElementGraphFromElementId(precondition.id)
 		
 		#Then try new Step
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(root, 'effect-of')
-				if precondition.isConsistent(eff):
+				Effect = op_graph.getElementGraphFromElementId(eff.id)
+				if Effect.canAbsolve(Precondition):
 					""" TODO: make easy instantiate operator graph as step, """
 					graph_copy = copy.deepcopy(graph)
 					
 					new_step_op, nei = op.makeCopyFromId(start_from = 1,old_element_id = eff.id)
-					effect = next(iter(element for element in new_step_op.elements if element.id == nei))
-					effect.combine(precondition) """ TODO, all incoming edges to precondition, should now go to effect, all outoging edges from precondition, now come from effect."""
-					graph_copy.elements.add(new_step_op)
+					
+					Effect  = new_steop_op.getElementGraphFromElementId(nei)
+					Effect.absolve(Precondition) ##TODO: 
+					"""
+						Challenge: 
+							effect absolves the precondition (i.e., all possible unifications)
+							merge/swap precondition with effect, repoint all outoing/incoming edges
+								Make sure to indicate which elements are replaced
+							Add remaining elements and edges of new_step_op
+							
+						Then, remember to add causal link and ordering edges
+							also add ordering edges from dummy source and to dummy sink
+					"""
+					
+					for element in new_step_op.elements:
+						graph_copy.elements.add(element)
+					for edge in new_steop_op.edges:
+						if edge.sink is effect:
+							graph_copy.edges.add(Edge(edge.source, precondition, edge.label))
+						elif edge.source is effect:
+							graph_copy.edges.add(Edge(precondition, edge.sink, edge.label))
+						else:
+							graph_copy.edges.add(edge)
+					#But, not done here, also need to "combine/merge" all arguments in the precondition, and 
 					
 					graph_copy.edges.add(CausalLink(new_step_op, s_need, precondition))
 					fringe.add(new_step_op)
-		pass
 		
 	def reuse(self, graph, flaw):
 		s_need, pre = flaw.flaw
