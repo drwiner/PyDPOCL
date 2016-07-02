@@ -34,7 +34,7 @@ def detectThreatenedCausalLinks(graph):
 				break
 			
 			#Is condition consistent?
-			effects = graph.getNeighborsByLabel(step, 'effect')	
+			effects = graph.getNeighborsByLabel(step, 'effect-of')	
 			problem_effects = {eff for eff in effects if eff.isConsistent(reverse_dependency)}
 			detectedThreatenedCausalLinks.update({(step,pe) for pe in problem_effects})
 
@@ -51,6 +51,6 @@ def addOpenPreconditionFlaws(graph, step):
 			because with this approach, you could instantiate an element which already has some preconditions in causal links
 	"""
 	new_flaws = set()
-	preconditions = graph.getNeighborsByLabel(step, 'precond')
+	preconditions = graph.getNeighborsByLabel(step, 'precond-of')
 	new_flaws.update({(step,precondition) for precondition in preconditions})
 	return new_flaws

@@ -29,13 +29,19 @@ from Flaws import *
 
 class PlanSpacePlanner:
 	flaws = [] #TODO, sorted by heuristic value
+	graphs = {} #graph which are still legal
 	def __init__(self, start_set, end_set, op_graphs, objects):
 		#Assumes these parameters are already read from file
-		self.start_state = start_set
-		self.end_state = end_set
-		self.createDummy(start_set, end_set)
 		
+		init_graph = PlanElementGraph(uuid.uuid1(0)):
+		
+		#create special dummy step for init_graph and add to graphs {}		
+		createDummy(init_graph, start_set, end_set)
 	
-	def createDummy(self, start_set, end_set):
-		#create
+	def createDummy(self, graph, start_set, end_set):
+		"""
+			Create step typed element DI, with effect edges to each condition of start_set
+			Create step typed element DG, with precondition edges to each condition of end_set
+			Add ordering 
+		"""
 		pass
