@@ -71,6 +71,7 @@ class PlanSpacePlanner:
 	def newStep(self, graph, flaw):
 		s_need, precondition = flaw.flaw
 		Precondition = graph.getElementGraphFromElementId(precondition.id)
+		results = set()
 		
 		#Then try new Step
 		for op in self.op_graphs:
@@ -78,12 +79,23 @@ class PlanSpacePlanner:
 				Effect = op_graph.getElementGraphFromElementId(eff.id)
 				if Effect.canAbsolve(Precondition):
 					""" TODO: make easy instantiate operator graph as step, """
-					graph_copy = copy.deepcopy(graph)
 					
-					new_step_op, nei = op.makeCopyFromId(start_from = 1,old_element_id = eff.id)
 					
-					Effect  = new_step_op.getElementGraphFromElementId(nei)
-					Effect.absolve(Precondition) ##TODO: 
+					step_op, nei = op.makeCopyFromId(start_from = 1,old_element_id = eff.id)
+					#nei : new element id, to easily access element from graph
+					
+					Effect  = step_op.getElementGraphFromElementId(nei)
+					Effect_absorbtions = Effect.getInstantiations(Precondition)
+					#could be more than one way to unify effect with precondition
+					
+					for eff_abs in Effect_absorptions: 
+						new_step_op = copy.deepcopy(step_op)
+						new_step_op.mergeGraph(eff_abs)
+						
+						#new step instance (from operator) is ready to be included in graph_copy
+						graph_copy = copy.deepcopy(graph)
+						
+						
 					"""
 						Challenge: 
 							effect absolves the precondition (i.e., all possible unifications)
@@ -96,8 +108,8 @@ class PlanSpacePlanner:
 					"""
 					
 					
-					# for element in new_step_op.elements:
-						# graph_copy.elements.add(element)
+					for element in new_step_op.elements:
+						graph_copy.elements.add(element)
 					# for edge in new_steop_op.edges:
 						# if edge.sink is effect:
 							# graph_copy.edges.add(Edge(edge.source, precondition, edge.label))

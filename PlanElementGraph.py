@@ -175,7 +175,7 @@ class Action(ElementGraph):
 			Plan.id = id 
 			id += 1
 			Plan.mergeGraph(instance)
-			action = Plan.getElementGraphFromElementId(self.id, Action)
+			#action = Plan.getElementGraphFromElementId(self.id, Action)
 			#if not operator.canAbsolve(action):
 			#	print('Original Plan {}: constraints of partial step {} are detected in operator {}'.format(PLAN.id, self.id, operator.id))
 			#	continue

@@ -50,7 +50,15 @@ class ElementGraph(Graph):
 	def getElementGraphFromElementId(self, element_id, Type):
 		return self.getElementGraphFromElement(self.getElementById(element_id),Type)
 		
-	def mergeGraph(self, other):		
+	def mergeGraph(self, other):
+		"""
+			Plan.mergeGraph(instance), where instance is "other". 
+					Other is a graph where some elements in the graph are "replacing" elements in self
+					
+			Operator_clone.mergeGraph(Effect) where the Effect is a Condition which has instantiated a precondition of S_{need}
+					Effect has some elements (arguments) which replaced elements in the operator clone
+					This method will merge the originals in the operator giving them the extra properties in the replacees of Effect 
+		"""
 		for element in other.elements:
 			if element.replaced_id != -1:
 				existing_element = self.getElementById(element.replaced_id)
@@ -69,7 +77,7 @@ class ElementGraph(Graph):
 			existing_edges = {E for E in self.edges if E.source.id == source.id and E.sink.id == sink.id and E.label == edge.label}
 			#existing_edges = self.getEdgesByIdsAndLabel(source.id, sink.id, edge.label)
 			if len(existing_edges) > 1 :
-				print('multipled edges {}--{}--> {}; in plan {} trying to merge {}'.format(edge.source.replaced_id, edge.label, edge.sink.replaced_id, self.id, other.id))
+				print('multiple edges {}--{}--> {}; in plan {} trying to merge {}'.format(edge.source.replaced_id, edge.label, edge.sink.replaced_id, self.id, other.id))
 			if len(existing_edges) == 0:
 				self.edges.add(Edge(source, sink, edge.label))
 				
@@ -77,8 +85,12 @@ class ElementGraph(Graph):
 
 		
 	def getInstantiations(self, other):
-		""" self is operator, other is partial step 'Action'"""
-		print('{}x{}.get Instances given partial step ({}x{})'.format(self.id, self.type, other.id, other.type))
+		""" self is operator, other is partial step 'Action'
+			self is effect, other is precondition of existing step
+			Returns all possible ways to unify self and other, 
+				may result in changes to self
+		"""
+		print('{}x{}.get Instances given partial element graph ({}x{})'.format(self.id, self.type, other.id, other.type))
 		#print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)')
 		#operator = self.copyGen()
 		
