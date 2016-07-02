@@ -28,20 +28,56 @@ from Flaws import *
 """
 
 class PlanSpacePlanner:
-	flaws = [] #TODO, sorted by heuristic value
-	graphs = {} #graph which are still legal
+
+	graphs = {} #graphs, will be limited to fringe
+	
 	def __init__(self, start_set, end_set, op_graphs, objects):
 		#Assumes these parameters are already read from file
 		
 		init_graph = PlanElementGraph(uuid.uuid1(0)):
 		
 		#create special dummy step for init_graph and add to graphs {}		
-		createDummy(init_graph, start_set, end_set)
+		self.setup(init_graph, start_set, end_set)
+		graphs.add(init_graph)
 	
-	def createDummy(self, graph, start_set, end_set):
+	def setup(self, graph, start_set, end_set):
 		"""
 			Create step typed element DI, with effect edges to each condition of start_set
 			Create step typed element DG, with precondition edges to each condition of end_set
-			Add ordering 
+			Add ordering from DI to DG
 		"""
-		pass
+		
+		dummy_start = Operator(uuid.uuid1(1), type='Action', name='dummy start', is_orphan = False, executed = True, instantiated = True)
+		graph.elements.add(dummy_start)
+		for i in start_set:
+			graph.edges.add(Edge(dummy_start, i, 'effect-of'))
+			
+		dummy_final = Operator(uuid.uuid1(1), type='Action', name='dummy final', is_orphan = False, executed = True, instantiated = True)
+		graph.elements.add(dummy_final)
+		for g in end_set:
+			graph.edges.add(Edge(dummy_final, g, 'precond-of'))
+			
+		graph.OrderingGraph.addOrdering(dummy_start, dummy_final)
+		
+		graph.flaws.append(addOpenPreconditionFlaws(graph, dummy_final))
+		
+	def goalPlanning(self, graph):
+		#First, determine if graph is internally consistent (TODO)
+		
+		#Next, select Flaw
+		flaw = self.selectFlaw
+	
+	def selectFlaw(self, graph)
+		return graph.flaws.pop()
+		
+	def rPOCL(self, graph)
+		"""
+			Recursively, given graph, for each flaw, for each way to resolve flaw, create new graphs and rPOCL on it
+		"""
+		
+		#BASE CASE
+			#Graph is not internally consistent, then fail
+			
+		#INDUCTION
+			self.selectFlaw(graph)
+		

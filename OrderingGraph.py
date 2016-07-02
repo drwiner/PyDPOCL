@@ -10,6 +10,9 @@ class OrderingGraph(Graph):
 	def isInternallyConsistent(self):
 		if self.detectCycle():
 			return False
+			
+	def addOrdering(self, source, sink):
+		self.edges.add(Ordering(source, sink))
 		
 	def detectCycle(self, V = None):
 		if V == None:

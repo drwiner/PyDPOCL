@@ -274,6 +274,7 @@ class PlanElementGraph(ElementGraph):
 			Constraints = set()
 		
 		self.updatePlan(Elements,Edges,Constraints)
+		self.flaws = [] #sort by heuristic via Planner.py
 		
 		if planElement is None:
 			planElement = PlanElement(id =id, type=type_graph,name=name)

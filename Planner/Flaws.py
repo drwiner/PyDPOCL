@@ -4,6 +4,11 @@ from OrderingGraph import *
 	Flaws for element graphs
 """
 
+class Flaw:
+	def __init__(self, tuple, name):
+		self.name = name
+		self.flaw = tuple
+
 def detectThreatenedCausalLinks(graph):
 	"""
 	A threatened causal link flaw is a tuple <causal link edge, threatening step element>
@@ -36,7 +41,7 @@ def detectThreatenedCausalLinks(graph):
 			#Is condition consistent?
 			effects = graph.getNeighborsByLabel(step, 'effect-of')	
 			problem_effects = {eff for eff in effects if eff.isConsistent(reverse_dependency)}
-			detectedThreatenedCausalLinks.update({(step,pe) for pe in problem_effects})
+			detectedThreatenedCausalLinks.update({Flaw((step,pe),'tclf') for pe in problem_effects})
 
 	return detectedThreatenedCausalLinks
 	
@@ -52,5 +57,5 @@ def addOpenPreconditionFlaws(graph, step):
 	"""
 	new_flaws = set()
 	preconditions = graph.getNeighborsByLabel(step, 'precond-of')
-	new_flaws.update({(step,precondition) for precondition in preconditions})
+	new_flaws.update({Flaw((step,precondition),'opf') for precondition in preconditions})
 	return new_flaws
