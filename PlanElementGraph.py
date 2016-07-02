@@ -87,6 +87,10 @@ class Action(ElementGraph):
 								# Constraints = elementGraph.rGetDescendantConstraints(element))
 	
 	def makeCopyFromID(self, start_from, increment = None):
+		"""
+			Makes copy of step-induced subgraph and changes ids
+				Includes, updating the argument list
+		"""
 		if increment == None:
 			increment = 1
 		new_self = self.copyGen()

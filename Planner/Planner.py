@@ -65,14 +65,27 @@ class PlanSpacePlanner:
 		
 	def goalPlanning(self, graph, flaw):
 		graph_copy = copy.deepcopy(graph)
-		step, precondition = flaw.flaw
+		
+		fringe = set()
+
 		#First try Reuse
+		result = self.reuse(graph, flaw)
+
+		
 		
 		#Then try new Step
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(root, 'effect-of')
 				if precondition.isConsistent(eff):
+					""" TODO: make easy instantiate operator graph as step, change id"""
+					graph_copy = copy.deepcopy(graph)
 					
+					new_step_op = copy.deepcopy(op) #Need this to change IDs of all child elements
+					new_step_op.id = uuid.uuid1(1)
+					graph_copy.elements.add(new_step_op.id)
+					
+					graph_copy.edges.add(CausalLink(new_step_op, s_need, precondition))
+					fringe.add(new_step_op)
 		pass
 		
 	def reuse(self, graph, flaw):
