@@ -88,31 +88,20 @@ class PlanSpacePlanner:
 			for eff in op.getNeighborsByLabel(root, 'effect-of')
 				Effect = op_graph.getElementGraphFromElementId(eff.id)
 				if Effect.canAbsolve(Precondition):
-					""" TODO: make easy instantiate operator graph as step, """
-					
-					
 					step_op, nei = op.makeCopyFromId(start_from = 1,old_element_id = eff.id)
 					#nei : new element id, to easily access element from graph
 					
 					Effect  = step_op.getElementGraphFromElementId(nei)
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
-					"""
-						Explanation: For each element in Effect_absorbtions, 
-						element.replaced_id is the element in Precondition which it is matched on
-					"""
 					#could be more than one way to unify effect with precondition
 
 					for eff_abs in Effect_absorptions: 
 						graph_copy = copy.deepcopy(graph)
 						graph_copy.mergeGraph(eff_abs) 
-						""" 
-							Explanation: eff_abs includes elements where replaced_id != -1, 
-							therefore restricting the possible ways to merge eff_abs into graph
-								(by finding the replaced element ("replacee") by its id (stored in replaced_id)
-								 and merging element (in eff_abs) to the replacee)
-						"""
+						
 						new_step_op = copy.deepcopy(step_op)
 						graph_copy.mergeGraph(new_step_op)
+						graph_copy.addStep(new_step_op.root.id, s_need.id) #adds causal link and ordering constraints
 						results.add(graph_copy)
 						#add graph to children
 		return results
@@ -124,20 +113,39 @@ class PlanSpacePlanner:
 			iterates through existing steps, and effects of those steps, and asks if any can absolve the precondition of the flaw
 		"""
 		s_need, pre = flaw.flaw
+		Precondition = graph.getElementGraphFromElementId(pre.id)
 		for step in graph.Steps:
 			if graph.OrderingGraph.isPath(s_need, step):
 				#step cannot be ordered before s_need
 				continue
-			if 
+			for eff in graph.getNeighborsByLabel(step, 'effect-of'):
+				Effect = graph.getElementGraphFromElementId(eff.id)
+				if Effect.canAbsolve(Precondition):
+					Effect_absorbtions = Effect.getInstantiations(Precondition)
+					for eff_abs in Effect_absorptions: 
+						graph_copy = copy.deepcopy(graph)
+						graph_copy.mergeGraph(eff_abs)
+						
+						#For each source in step that is element.id, if  elementGC.replaced_+id in graph_copy == element.id,
+							#then, remove edge
+						#For each edge in step that goes to an element.id, if elementGC.replaced_id in graph_copy == element.id,
+							#then, replace sink with elementGC
+						
+
+						new_step_op = copy.deepcopy(step_op)
+						graph_copy.mergeGraph(new_step_op)
+						graph_copy.addStep(new_step_op.root) #adds causal link and ordering constraints
+						results.add(graph_copy)
 	
 	def selectFlaw(self, graph)
 		return graph.flaws.pop()
 		
-	def addStep(self, graph):
+	def addStep(self, s_add_id, s_need_id):
 		"""
 			when a step is added/reused, 
 			add causal link and ordering edges (including to dummy steps)
 		"""
+		pass
 		
 	def rPOCL(self, graph)
 		"""
