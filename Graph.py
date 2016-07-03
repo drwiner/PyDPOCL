@@ -130,7 +130,13 @@ class Graph(Element):
 			if element.id == id:
 				return element
 		return None
-		
+	
+	def getElementByReplacedId(self, id):
+		for element in self.elements:
+			if element.replaced_id == id:
+				return element
+		return None
+	
 	def addConstraint(self, edge):
 		if edge not in self.constraints:
 			self.constraints.add(edge)
