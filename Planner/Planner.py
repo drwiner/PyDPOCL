@@ -69,6 +69,16 @@ class PlanSpacePlanner:
 		return results
 		
 	def newStep(self, graph, flaw):
+		"""
+			iterates through all operators, instantiating a step with effect that can absolve precondition of step in flaw
+			returns set of graphs which resolve the flaw
+			
+			method details:
+				"get instantiations": given two graphs, returns a set of unifications by accounting-for/absolving all edges in second with edges in first
+				"mergeGraph": 	given two graphs where the second had replaced some of the elements of the first,
+								the first graph merges the second one back in, tracking the elements it replaced
+		"""
+		
 		s_need, precondition = flaw.flaw
 		Precondition = graph.getElementGraphFromElementId(precondition.id)
 		results = set()
@@ -109,6 +119,8 @@ class PlanSpacePlanner:
 	
 		
 	def reuse(self, graph, flaw):
+		"""
+		"""
 		s_need, pre = flaw.flaw
 		for step in graph.Steps:
 			if graph.OrderingGraph.isPath()
