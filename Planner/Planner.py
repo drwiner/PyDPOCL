@@ -87,10 +87,11 @@ class PlanSpacePlanner:
 					Effect  = step_op.getElementGraphFromElementId(nei)
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
 					#could be more than one way to unify effect with precondition
-					
+					new_step_prospects = set()
 					for eff_abs in Effect_absorptions: 
 						new_step_op = copy.deepcopy(step_op)
 						new_step_op.mergeGraph(eff_abs)
+						new_step_prospects.add(new_step_op)
 						
 						#new step instance (from operator) is ready to be included in graph_copy
 						graph_copy = copy.deepcopy(graph)
