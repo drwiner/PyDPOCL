@@ -114,6 +114,7 @@ class PlanSpacePlanner:
 		"""
 		s_need, pre = flaw.flaw
 		Precondition = graph.getElementGraphFromElementId(pre.id)
+		results = set()
 		for step in graph.Steps:
 			if graph.OrderingGraph.isPath(s_need, step):
 				#step cannot be ordered before s_need
@@ -145,9 +146,8 @@ class PlanSpacePlanner:
 							
 						graph_copy.addStep(s_need.id, step.root.id) #adds causal link and ordering constraints
 						results.add(graph_copy)
+		return results
 	
-	def selectFlaw(self, graph)
-		return graph.flaws.pop()
 		
 	def addStep(self, s_add_id, s_need_id):
 		"""
@@ -158,22 +158,29 @@ class PlanSpacePlanner:
 		
 	def rPOCL(self, graph)
 		"""
-			Recursively, given graph, for each flaw, for each way to resolve flaw, create new graphs and rPOCL on it
+			Recursively, given graph, 
+				for each flaw, 
+				for each way to resolve flaw, 
+				create new graphs and rPOCL on it
 		"""
 		
 		#BASE CASES
 		if not graph.isInternallyConsistent:
-			return
+			return None
 		if len(graph.flaws) == 0:
 			return graph
 			
 		#INDUCTION
-		flaw = self.selectFlaw(graph)
+		flaw = graph.flaws.pop()
 		if flaw.name = 'opf':
-			graphs = goalPlanning(self, graph)
+			results = goalPlanning(self, graph)
 		if flaw.name = 'tclf':
 			pass
 		
-		for g in graphs:
-			self.rPOCL(g)
-		
+		for g in results:
+			result = self.rPOCL(g) 
+			if not result is None:
+				return result
+				
+		print('no solutions found?')
+		return None
