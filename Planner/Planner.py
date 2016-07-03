@@ -140,14 +140,10 @@ class PlanSpacePlanner:
 						
 						for edge in incoming:
 							new_sink = graph_copy.getElementByReplacedId(edge.sink.id)
+							graph_copy.elements.remove(edge.sink)
 							graph_copy.replaceWith(edge.sink,new_sink)
-									
-						
-						
-
-						#new_step_op = copy.deepcopy(step_op)
-						#graph_copy.mergeGraph(new_step_op)
-						graph_copy.addStep(new_step_op.root) #adds causal link and ordering constraints
+							
+						graph_copy.addStep(s_need.id, step.root.id) #adds causal link and ordering constraints
 						results.add(graph_copy)
 	
 	def selectFlaw(self, graph)
