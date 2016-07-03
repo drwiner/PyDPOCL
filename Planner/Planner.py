@@ -86,43 +86,27 @@ class PlanSpacePlanner:
 					
 					Effect  = step_op.getElementGraphFromElementId(nei)
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
+					"""
+						Explanation: For each element in Effect_absorbtions, 
+						element.replaced_id is the element in Precondition which it is matched on
+					"""
 					#could be more than one way to unify effect with precondition
-					new_step_prospects = set()
+
 					for eff_abs in Effect_absorptions: 
-						new_step_op = copy.deepcopy(step_op)
-						new_step_op.mergeGraph(eff_abs)
-						new_step_prospects.add(new_step_op)
-						
-						#new step instance (from operator) is ready to be included in graph_copy
 						graph_copy = copy.deepcopy(graph)
-						
-						
-					"""
-						Challenge: 
-							effect absolves the precondition (i.e., all possible unifications)
-							merge/swap precondition with effect, repoint all outoing/incoming edges
-								Make sure to indicate which elements are replaced
-							Add remaining elements and edges of new_step_op
-							
-						Then, remember to add causal link and ordering edges
-							also add ordering edges from dummy source and to dummy sink
-					"""
-					
-					
-					for element in new_step_op.elements:
-						graph_copy.elements.add(element)
-					# for edge in new_steop_op.edges:
-						# if edge.sink is effect:
-							# graph_copy.edges.add(Edge(edge.source, precondition, edge.label))
-						# elif edge.source is effect:
-							# graph_copy.edges.add(Edge(precondition, edge.sink, edge.label))
-						# else:
-							# graph_copy.edges.add(edge)
-							
-					
-					graph_copy.edges.add(CausalLink(new_step_op, s_need, precondition))
-					#graph_copy.OrderingGraph.addEdge(new_step_op, dumm)
-					fringe.add(new_step_op)
+						graph_copy.mergeGraph(eff_abs) 
+						""" 
+							Explanation: eff_abs includes elements where replaced_id != -1, 
+							therefore restricting the possible ways to merge eff_abs into graph
+								(by finding the replaced element ("replacee") by its id (stored in replaced_id)
+								 and merging element (in eff_abs) to the replacee)
+						"""
+						new_step_op = copy.deepcopy(step_op)
+						graph_copy.mergeGraph(new_step_op)
+						results.add(graph_copy)
+						#add graph to children
+		return results
+	
 		
 	def reuse(self, graph, flaw):
 		s_need, pre = flaw.flaw

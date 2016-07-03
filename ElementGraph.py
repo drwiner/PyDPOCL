@@ -52,17 +52,26 @@ class ElementGraph(Graph):
 		
 	def mergeGraph(self, other):
 		"""
+			For each element in other to include in self, if its a replacer, merge it into self
+			Otherwise, add that element to self
+			For each edge in other to include in self, if its in self do nothing, otherwise add it
+		
 			Plan.mergeGraph(instance), where instance is "other". 
 					Other is a graph where some elements in the graph are "replacing" elements in self
 					
-			Operator_clone.mergeGraph(Effect) where the Effect is a Condition which has instantiated a precondition of S_{need}
+			Precondition.mergeGraph(Effect) where the Effect is a Condition which has instantiated a precondition of S_{need}
 					Effect has some elements (arguments) which replaced elements in the operator clone
-					This method will merge the originals in the operator giving them the extra properties in the replacees of Effect 
+					This method will merge the originals in the operator giving them the extra properties in the replacees of Effect
+					
+			Graph.mergeGraph(new_operator) where new_operator has replaced some elements in graph.
+					Then, if its a new element, add it. If its a replacer, merge it. 
+					For each edge in new_operator, if 
 		"""
 		for element in other.elements:
 			if element.replaced_id != -1:
 				existing_element = self.getElementById(element.replaced_id)
 				existing_element.merge(element)
+				existing_element.replaced_id = element.id
 			else:
 				#############################################################################
 				if type(element) is Operator:
