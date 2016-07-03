@@ -82,7 +82,7 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 			
 	return elements, edges
 	
-""" Get a precondition, effect, or set of prerequisites from pddl operator to element graph""""
+""" Get a precondition, effect, or set of prerequisites from pddl operator to element graph"""
 def getFormulaGraph(formula, current_id = None, parent = None, relationship = None, elements = None, edges = None):
 	
 	if parent == None:

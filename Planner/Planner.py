@@ -10,8 +10,8 @@ from Flaws import *
 	(3) Create open precondition flaws for each element in goal
 	(4) Select Flaw based on heuristic
 	(5) Support the following operations pertaining to resolving open precondition flaws:
-		(5.A) Determine if an operator graph has an effect which is consistent with precondition in flaw
-		(5.B) Determine if an existing step has an effect which is consistent with precondition in flaw (if there is no ordering path from s_need to s_new)
+		(5.A) Determine if an operator graph has an effect which is consistent/can-absolve with precondition in flaw
+		(5.B) Determine if an existing step has an effect which is consistent/can-absolve with precondition in flaw (if there is no ordering path from s_need to s_new)
 	(6) Support the following operations pertaining to resolving a threatened causal link flaw:
 		(6.A) Trivially, adding ordering edges
 		(6.B) Not as trivially, add bindings to prevent effect from co-designating with precondition.
@@ -126,10 +126,22 @@ class PlanSpacePlanner:
 						graph_copy = copy.deepcopy(graph)
 						graph_copy.mergeGraph(eff_abs)
 						
-						#For each source in step that is element.id, if  elementGC.replaced_+id in graph_copy == element.id,
-							#then, remove edge
-						#For each edge in step that goes to an element.id, if elementGC.replaced_id in graph_copy == element.id,
-							#then, replace sink with elementGC
+						"""
+							Task: find all edges where the sink has a replaced_id in replace_ids
+							All edges in graph with sink which is element in 
+						"""
+						replace_ids = {element.id for element in eff_abs}
+						#All Edges which have sink whose id was not a replace_id nor whose id = its own replace id
+						#May need to get element subgraph from step if step is not type Action
+						incoming = {edge for edge in graph_copy.edges \
+							if edge.sink.replaced_id in replace_ids \
+							and not edge.sink.replaced_id == element.id\
+							and not edge.source.id in replace_ids}
+						
+						for edge in incoming:
+							graph_copy.replaceWith(edge.sink,step.)
+									
+						
 						
 
 						#new_step_op = copy.deepcopy(step_op)
