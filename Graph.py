@@ -135,6 +135,16 @@ class Graph(Element):
 		if edge not in self.constraints:
 			self.constraints.add(edge)
 			
+	def replaceWith(self, element, other):
+		if self.getElementById(other.id) is None:
+			self.elements.add(other)
+		self.elements.remove(element)
+		for outgoing in self.getIncidentEdges(element):
+			outgoing.source = other
+		for incoming in  {edge for edge in self.edges if edge.sink.id == element.id}
+			incoming.sink = other
+		return self
+			
 	def getEdgesByIdsAndLabel(self, source_id, sink_id, label):
 		return {edge for edge in self.edges if edge.source.id == source_id and edge.sink.id == sink_id and edge.label == label}
 		

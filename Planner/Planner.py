@@ -132,8 +132,8 @@ class PlanSpacePlanner:
 							#then, replace sink with elementGC
 						
 
-						new_step_op = copy.deepcopy(step_op)
-						graph_copy.mergeGraph(new_step_op)
+						#new_step_op = copy.deepcopy(step_op)
+						#graph_copy.mergeGraph(new_step_op)
 						graph_copy.addStep(new_step_op.root) #adds causal link and ordering constraints
 						results.add(graph_copy)
 	
