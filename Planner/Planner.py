@@ -120,13 +120,24 @@ class PlanSpacePlanner:
 		
 	def reuse(self, graph, flaw):
 		"""
+			returns set of graphs which resolve flaw by reusing a step in the plan, if possible
+			iterates through existing steps, and effects of those steps, and asks if any can absolve the precondition of the flaw
 		"""
 		s_need, pre = flaw.flaw
 		for step in graph.Steps:
-			if graph.OrderingGraph.isPath()
+			if graph.OrderingGraph.isPath(s_need, step):
+				#step cannot be ordered before s_need
+				continue
+			if 
 	
 	def selectFlaw(self, graph)
 		return graph.flaws.pop()
+		
+	def addStep(self, graph):
+		"""
+			when a step is added/reused, 
+			add causal link and ordering edges (including to dummy steps)
+		"""
 		
 	def rPOCL(self, graph)
 		"""
