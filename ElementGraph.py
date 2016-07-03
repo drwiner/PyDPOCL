@@ -108,12 +108,6 @@ class ElementGraph(Graph):
 
 	
 	def absolve(self, other, Remaining = None, Available = None, Collected = None):
-		if Remaining == None:
-			Remaining = set()
-		if Available == None:
-			Available = set()
-		if Collected == None:
-			Collected = set()
 		""" Every edge from other must be consistent with some edge in self.
 			An edge from self cannot account for more than one edge from other? 
 				
@@ -124,6 +118,14 @@ class ElementGraph(Graph):
 				
 				Returns: Set of copies of Operator which absolve the step (i.e. merge)
 		"""
+		
+		if Remaining == None:
+			Remaining = set()
+		if Available == None:
+			Available = set()
+		if Collected == None:
+			Collected = set()
+		
 		if len(Remaining)  == 0:
 			Collected.add(self)
 			return Collected
