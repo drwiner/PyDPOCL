@@ -140,6 +140,7 @@ class PlanSpacePlanner:
 							and not edge.source.id in replace_ids}
 						
 						for edge in incoming:
+											# or is this getElementById(edge.sink.replaced_id)
 							new_sink = graph_copy.getElementByReplacedId(edge.sink.id)
 							graph_copy.elements.remove(edge.sink)
 							graph_copy.replaceWith(edge.sink,new_sink)
