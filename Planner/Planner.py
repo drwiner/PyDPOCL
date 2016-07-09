@@ -186,13 +186,25 @@ class PlanSpacePlanner:
 			Restriction: Add non-codesignation constraints to prevent unification of effect with condition.id of causal link
 		"""
 		results = set()
-		#create copies for each 
-		graph_copy = copy.deepcopy(graph)
-		
 		threat, effect, causal_link = flaw.flaw
+		
 		#Promotion
+		promotion = copy.deepcopy(graph)
+		promotion.OrderinGraph.addEdge(causal_link.sink, threat)
+		if promotion.OrderingGraph.isInternallyConsistent():
+			results.add(promotion)
+			
 		#Demotion
+		demotion = copy.deepcopy(graph)
+		demotion.OrderingGraph.addEdge(threat, causal_link.source)
+		if demotion.OrderingGraph.isInternallyConsistent():
+			results.add(demotion)
+			
 		#Restriction
+		"""
+			1) find Condition of causal link based on causal_link.id
+			2) 
+		""""
 		return results
 		
 	def rPOCL(self, graph)
