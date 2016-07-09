@@ -202,8 +202,12 @@ class PlanSpacePlanner:
 			
 		#Restriction
 		"""
-			1) find Condition of causal link based on causal_link.id
-			2) 
+			1) find literal of causal link based on causal_link.id, to compare to ?effect
+			2) For each consistent but not equivalent edge, 
+				for each non-equivalent attribute,
+					create new child where child has a "non-codesignation constraint"
+					Can this be represented as a constraint so that if its detected, we can fail?
+					This is something that requires elaborating on constraints
 		""""
 		return results
 		
