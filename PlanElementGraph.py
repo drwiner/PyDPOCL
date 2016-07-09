@@ -287,6 +287,8 @@ class PlanElementGraph(ElementGraph):
 		
 		self.updatePlan(Elements,Edges,Constraints)
 		self.flaws = [] #sort by heuristic via Planner.py
+		self.initial_dummy_step = None
+		self.final_dummy_step = None
 		
 		if planElement is None:
 			planElement = PlanElement(id =id, type=type_graph,name=name)

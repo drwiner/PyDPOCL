@@ -41,7 +41,7 @@ def detectThreatenedCausalLinks(graph):
 			#Is condition consistent?
 			effects = graph.getNeighborsByLabel(step, 'effect-of')	
 			problem_effects = {eff for eff in effects if eff.isConsistent(reverse_dependency)}
-			detectedThreatenedCausalLinks.update({Flaw((step,pe),'tclf') for pe in problem_effects})
+			detectedThreatenedCausalLinks.update({Flaw((step,pe,causal_link),'tclf') for pe in problem_effects})
 
 	return detectedThreatenedCausalLinks
 	

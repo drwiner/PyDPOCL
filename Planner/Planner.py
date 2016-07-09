@@ -53,9 +53,11 @@ class PlanSpacePlanner:
 		graph.elements.add(dummy_start)
 		for i in start_set:
 			graph.edges.add(Edge(dummy_start, i, 'effect-of'))
-			
+		graph.initial_dummy_step = dummy_start
+		
 		dummy_final = Operator(uuid.uuid1(1), type='Action', name='dummy final', is_orphan = False, executed = True, instantiated = True)
 		graph.elements.add(dummy_final)
+		graph.final_dummy_step = dummy_final
 		for g in end_set:
 			graph.edges.add(Edge(dummy_final, g, 'precond-of'))
 			
@@ -101,7 +103,7 @@ class PlanSpacePlanner:
 						
 						new_step_op = copy.deepcopy(step_op)
 						graph_copy.mergeGraph(new_step_op)
-						graph_copy.addStep(new_step_op.root.id, s_need.id) #adds causal link and ordering constraints
+						self.addStep(graph_copy, new_step_op.root.id, s_need.id, eff_abs.id) #adds causal link and ordering constraints
 						results.add(graph_copy)
 						#add graph to children
 		return results
@@ -124,38 +126,74 @@ class PlanSpacePlanner:
 				if Effect.canAbsolve(Precondition):
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
 					for eff_abs in Effect_absorptions: 
+						"""	for each effect which can absolve the precondition, 
+							and each possible way to unify the effect and precondition,
+								1) Create a new child graph.
+								2) Replace effect with eff_abs, which is unified with the precondition
+								3) "Redirect" all edges going to precondition, to go to effect instead
+						"""
+						#1 Create new child graph
 						graph_copy = copy.deepcopy(graph)
+						#2 Replace effect with eff_abs, which is unified with the precondition
 						graph_copy.mergeGraph(eff_abs)
 						
-						"""
-							Task: find all edges where the sink has a replaced_id in replace_ids
-							All edges in graph with sink which is element in 
-						"""
+						#3) "Redirect Task"": find all edges where the sink has a replaced_id in replace_ids
+
 						replace_ids = {element.id for element in eff_abs}
 						#All Edges which have sink whose id was not a replace_id nor whose id = its own replace id
 						#May need to get element subgraph from step if step is not type Action
 						incoming = {edge for edge in graph_copy.edges \
 							if edge.sink.replaced_id in replace_ids \
 							and not edge.sink.replaced_id == element.id\
-							and not edge.source.id in replace_ids}
-						
+							and not edge.source.id in replace_ids}					
 						for edge in incoming:
-											# or is this getElementById(edge.sink.replaced_id)
 							new_sink = graph_copy.getElementByReplacedId(edge.sink.id)
 							graph_copy.elements.remove(edge.sink)
 							graph_copy.replaceWith(edge.sink,new_sink)
 							
-						graph_copy.addStep(s_need.id, step.root.id) #adds causal link and ordering constraints
+						self.addStep(graph_copy, s_need.id, step.root.id, eff_abs.id)
 						results.add(graph_copy)
 		return results
 	
 		
-	def addStep(self, s_add_id, s_need_id):
+	def addStep(self, graph, s_add_id, s_need_id, condition_id, new=None):
 		"""
 			when a step is added/reused, 
 			add causal link and ordering edges (including to dummy steps)
+			If step is new, add open precondition flaws for each precondition
+				NOTE!	Open precondition flaws ought to reference the precondition "id", 
+							and not contain itself a data structure
+						Because, what if properties of the precondition are refined? 
 		"""
-		pass
+		if new == None:
+			new = False
+		graph.OrderingGraph.addEdge(graph.initial_dummy_step.id, s_add_id)
+		graph.OrderingGraph.addEdge(s_add_id, graph.final_dummy_step.id)
+		graph.OrderingGraph.addEdge(graph.initial_dummy_step.id, s_need_id)
+		graph.OrderingGraph.addEdge(s_need_id, graph.final_dummy_step.id)
+		graph.OrderingGraph.addEdge(s_add_id,s_need_id)
+		graph.CausalLinkGraph.addEdge(s_add_id, s_need_id, condition_id)
+		if new:
+			new_flaws = addOpenPreconditionFlaws(graph, graph.getElementById(s_add_id))
+			graph.flaws.update(new_flaws)
+				
+		return graph
+		
+	def resolveThreatenedCausalLinkFlaw(graph, flaw):
+		"""
+			Promotion: Add ordering from sink to threat, and check if cycle
+			Demotion: Add ordering from threat to source, and check if cycle
+			Restriction: Add non-codesignation constraints to prevent unification of effect with condition.id of causal link
+		"""
+		results = set()
+		#create copies for each 
+		graph_copy = copy.deepcopy(graph)
+		
+		threat, effect, causal_link = flaw.flaw
+		#Promotion
+		#Demotion
+		#Restriction
+		return results
 		
 	def rPOCL(self, graph)
 		"""
@@ -175,7 +213,22 @@ class PlanSpacePlanner:
 		flaw = graph.flaws.pop()
 		if flaw.name = 'opf':
 			results = goalPlanning(self, graph)
+			for result in results:
+				#Detect Threatened causal link flaws here.
+				new_flaws = detectThreatenedCausalLinks(result)
+				result.flaws.update(new_flaws)
+				
 		if flaw.name = 'tclf':
+			"""
+				Promotion: Add ordering from sink to threat, and check if cycle
+				Demotion: Add ordering from threat to source, and check if cycle
+				Restriction: Add non-codesignation constraints to prevent unification of effect with condition.id of causal link
+			"""
+			threat, effect, causal_link = flaw.flaw
+			#Promotion
+			#Demotion
+			#Restriction
+				
 			pass
 		
 		for g in results:
