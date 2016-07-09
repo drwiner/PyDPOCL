@@ -208,7 +208,11 @@ class PlanSpacePlanner:
 					create new child where child has a "non-codesignation constraint"
 					Can this be represented as a constraint so that if its detected, we can fail?
 					This is something that requires elaborating on constraints
-		""""
+		"""
+		condition = graph.getElementById(causal_link.condition_id)
+		restrictions = graph.addNonCodesignationConstraints(effect, condition)
+			#TODO: method addNonCodesignationConstraints
+		results.update(restrictions)
 		return results
 		
 	def rPOCL(self, graph)
