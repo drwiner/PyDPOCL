@@ -232,24 +232,13 @@ class PlanSpacePlanner:
 		#INDUCTION
 		flaw = graph.flaws.pop()
 		if flaw.name = 'opf':
-			results = goalPlanning(self, graph)
-			for result in results:
-				#Detect Threatened causal link flaws here.
-				new_flaws = detectThreatenedCausalLinks(result)
-				result.flaws.update(new_flaws)
-				
+			results = self.goalPlanning(graph)
 		if flaw.name = 'tclf':
-			"""
-				Promotion: Add ordering from sink to threat, and check if cycle
-				Demotion: Add ordering from threat to source, and check if cycle
-				Restriction: Add non-codesignation constraints to prevent unification of effect with condition.id of causal link
-			"""
-			threat, effect, causal_link = flaw.flaw
-			#Promotion
-			#Demotion
-			#Restriction
-				
-			pass
+			results = self.resolveThreatenedCausalLinkFlaw(graph,flaw)
+			
+		for result in results:
+			new_flaws = detectThreatenedCausalLinks(result)
+			result.flaws.update(new_flaws)
 		
 		for g in results:
 			result = self.rPOCL(g) 
