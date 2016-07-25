@@ -212,6 +212,7 @@ class PlanSpacePlanner:
 		condition = graph.getElementById(causal_link.condition_id)
 		restrictions = graph.addNonCodesignationConstraints(effect, condition)
 			#TODO: method addNonCodesignationConstraints
+			#Whenever a possible merge, disclude candidates if non-codesignation constraint.
 		results.update(restrictions)
 		return results
 		
