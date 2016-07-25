@@ -272,19 +272,32 @@ if __name__ == '__main__':#start_set, end_set, op_graphs, objects
 	objects = 'Indy Sapito bridge cliff1 cliff2'.split()
 	Args = {ob_name: Argument(id = uuid.uuid1(1), type= 'arg', name = ob_name) for ob_name in objects}
 	at_indy_cliff1 = Literal(id = uuid.uuid1(1), type = 'Condition', name = 'at', num_args = 2, truth = True)
-	at_indy_cliff1_C =			Action(	id = uuid.uuid1(1),\
-							type_graph = 'Condition', \
-							name = 'at',\
-							root_element = at_indy_cliff1)
 	e1 = Edge(at_indy_cliff1, Args['Indy'], 'first-arg')
 	e2 = Edge(at_indy_cliff1, Args['cliff1'], 'sec-arg')
-	at_indy_cliff1_C.edges.update({e1, e2})
+	at_indy_cliff1_C =		Action(	id = uuid.uuid1(1),\
+							type_graph = 'Condition', \
+							name = 'at',\
+							root_element = at_indy_cliff1,\
+							Elements = {at_indy_cliff1, Args['Indy'], Args['cliff1']},\
+							Edges = {e1,e2})
 	at_sapito_cliff1 = Literal(id = uuid.uuid1(1), type = 'Condition', name = 'at', num_args = 2, truth = True)
-	e3 = Edge(at_indy_cliff1, Args['Sapito'], 'first-arg')
-	e4 = Edge(at_indy_cliff1, Args['cliff1'], 'sec-arg')
+	e3 = Edge(at_sapito_cliff1, Args['Sapito'], 'first-arg')
+	e4 = Edge(at_sapito_cliff1, Args['cliff1'], 'sec-arg')
+	at_sapito_cliff1_C =	Action(	id = uuid.uuid1(1),\
+							type_graph = 'Condition', \
+							name = 'at',\
+							root_element = at_sapito_cliff1,\
+							Elements = {at_sapito_cliff1, Args['Sapito'], Args['cliff1']},\
+							Edges = {e3,e4})
 	adj_cliff1_bridge = Literal(id = uuid.uuid1(1), type = 'Condition', name = 'adj', num_args = 2, truth = True)
 	e5 = Edge(adj_cliff1_bridge, Args['cliff1'], 'first-arg')
 	e6 = Edge(adj_cliff1_bridge, Args['bridge'], 'sec-arg')
+	adj_cliff1_bridge_C =	Action(	id = uuid.uuid1(1),\
+							type_graph = 'Condition', \
+							name = 'adj',\
+							root_element = at_sapito_cliff1,\
+							Elements = {adj_cliff1_bridge, Args['cliff1'], Args['bridge']},\
+							Edges = {e5,e6})
 	adj_bridge_cliff2 = Literal(id = uuid.uuid1(1), type = 'Condition', name = 'adj', num_args = 2, truth = True)
 	e7 = Edge(adj_bridge_cliff2, Args['bridge'], 'first-arg')
 	e8 = Edge(adj_bridge_cliff2, Args['cliff2'], 'sec-arg')
@@ -294,7 +307,7 @@ if __name__ == '__main__':#start_set, end_set, op_graphs, objects
 	e10 = Edge(alive_indy, Args['sapito'], 'first-arg')
 	elements = {alive_indy, alive_sapito, adj_cliff1_bridge, adj_bridge_cliff2, at_indy_cliff1, at_sapito_cliff1}.union(arg for arg in Args.values())
 	edges = {e1,e2, e3, e4, e5, e6, e7, e8, e9, e10}
-	Init = ElementGraph(name = 'Init',type_graph = 'ElementGraph', Elements = elements, Edges = edges)
+	
 	
 	at_indy_cliff2 = Litera(id = uuid.uuid1(1), type = 'Condition', name = '
 	#PlanSpacePlanner()
