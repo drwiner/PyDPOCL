@@ -3,7 +3,7 @@ from math import floor
 import random
 import uuid
 import collections
-from PlanElementGraph import *
+from Planner.Flaws import *
 
 ARGLABELS = ['first-arg', 'sec-arg','third-arg', 'fourth-arg', 'fifth-arg']
 

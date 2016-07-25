@@ -34,7 +34,7 @@ def domainToOperatorGraphs(domain_file):
 	domain = parseDomain(domain_file)
 	start_id = floor(random.random()*10000)
 	for action in domain.actions:
-		op = Operator(id = start_id, type = 'Action', name = action.name, num_args = len(action.parameters) instantiated = True)
+		op = Operator(id = start_id, type = 'Action', name = action.name, num_args = len(action.parameters), instantiated = True)
 		
 	
 #domain_file = 'domain.pddl'
@@ -52,22 +52,22 @@ for action in domain.actions:
 	#print(type(action))
 	print('\t\t\t[[[[[{}]]]]]'.format(action.name))
 	
-	print('\n parameters \n')
+	print(' parameters ')
 	for p in action.parameters:
 		print(p.name, end=" ")
-	print('\n')
+	print('')
 	
-	print('\n ------- preconditions -------\n')
+	print(' ------- preconditions -------')
 	rGetFormulaElements(action.precond.formula)
 	
-	print('\n \t+++++++ effects +++++++\n')
+	print(' \t+++++++ effects +++++++')
 	rGetFormulaElements(action.effect.formula)
 	
-	print('\n &&&&&&& prerequisite &&&&&&&\n')
+	print(' &&&&&&& prerequisite &&&&&&&')
 	if not action.prereq is None:
 		rGetFormulaElements(action.prereq.formula)
 		
-	print('\n ^^^^^^^ agents ^^^^^^^\n')
+	print(' ^^^^^^^ agents ^^^^^^^')
 	if not action.agents is None:
 		rGetFormulaElements(action.agents.formula)
 	

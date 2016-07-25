@@ -147,7 +147,7 @@ class Graph(Element):
 		self.elements.remove(element)
 		for outgoing in self.getIncidentEdges(element):
 			outgoing.source = other
-		for incoming in  {edge for edge in self.edges if edge.sink.id == element.id}
+		for incoming in (edge for edge in self.edges if edge.sink.id == element.id):
 			incoming.sink = other
 		return self
 			
