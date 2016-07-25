@@ -6,7 +6,7 @@ import collections
 from Planner.Flaws import *
 
 ARGLABELS = ['first-arg', 'sec-arg','third-arg', 'fourth-arg', 'fifth-arg']
-
+	
 
 def parseDomain(domain_file):
 	parser = Parser(domain_file)
@@ -54,9 +54,14 @@ def makeLit(formula, current_id, parent, relationship, elements, edges, bit = No
 	current_id += 1
 	elements.add(lit)
 	edges.add(Edge(parent,lit,relationship))
-	return lit , formula
+	return lit, formula
 
 def getSubFormulaGraph(formula, current_id = None, parent = None, relationship = None, elements = None, edges = None):
+	if elements ==None:
+		elements = set()
+	if edges == None:
+		edges = set()
+		
 	if formula.key == 'not':
 		formula = next(iter(formula.children))
 		if formula.key == 'intends':
@@ -85,16 +90,16 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 	
 """ Get a precondition, effect, or set of prerequisites from pddl operator to element graph"""
 def getFormulaGraph(formula, current_id = None, parent = None, relationship = None, elements = None, edges = None):
-	
+	if current_id == None:
+		current_id = 1
 	if parent == None:
 		parent = Element(id = uuid.uuid1(current_id), type = None)
 		current_id += 1
 	if edges == None:
 		edges = set()
 	if elements == None:
-		elements = []
-	if current_id == None:
-		current_id = 1
+		elements = set() #why is this list?
+	
 		
 	if formula.key == 'and':
 		for child in formula.children:
@@ -123,8 +128,7 @@ def rPrintFormulaElements(formula):
 	print('\n')
 		
 """ Convert pddl file to set of operator graphs"""
-def domainToOperatorGraphs(domain_file):
-	domain = parseDomain(domain_file)
+def domainToOperatorGraphs(domain):
 	start_id = floor(random.random()*100)
 	opGraphs = set()
 	for action in domain.actions:
@@ -155,59 +159,78 @@ def domainToOperatorGraphs(domain_file):
 		##getFormulaGraph(action.agents.formula, start_id, parent = op, relationship = 'actor-of', elements = op_graph.elements,edges= op_graph.edges)
 		opGraphs.add(op_graph)
 	return opGraphs
-		
-		
+	
+""" Convert pddl problem file to usable structures"""
+def problemToGraphs(problem):
+	"""
+		Returns a dictionary:
+		Keys: 'arg', 'init', 'goal'
+		Values: arg dictionary, (elements, edges), (elements, edges)
+	"""
+	Args = {object.name: Argument(id = uuid.uuid1(1), name = object.name, type = object.typeName) for object in problem.objects}
+	#Initial state
+	#for condition in problem_initial_state:
+	init_elements = set()
+	init_edges = set()
+	for condition in problem.init.predicates:
+		condition_id = uuid.uuid1(2)
+		lit = Literal(id = condition_id, type = 'Condition', name = condition.name, num_args = len(condition.parameters))
+		init_elements.add(lit)
+		for p in condition.parameters:
+			init_edges.add(Edge(lit, Args[p],'effect-of'))
+	goal_elements, goal_edges = getFormulaGraph(problem.goal.formula)
+	return {'args': Args, 'init': (init_elements, init_edges), 'goal':(goal_elements, goal_edges)}
+	
+import sys	
+if __name__ ==  '__main__':
+	num_args = len(sys.argv)
+	if num_args >1:
+		domain_file = sys.argv[1]
+		if num_args > 2:
+			problem_file = sys.argv[2]		
+	else:
+		domain_file = 'domains/mini-indy-domain.pddl'
+		problem_file = 'domains/mini-indy-problem.pddl'
+	
+	parser = Parser(domain_file, problem_file)
+	domain, dom = parser.parse_domain_drw()
+	problem, v = parser.parse_problem_drw(dom)
+	op_graphs = domainToOperatorGraphs(domain)
+	for opgraph in op_graphs:
+		opgraph.print_graph_names()
+		print('\n')
+	
+	struc = problemToGraphs(problem)
+	
 	
 #domain_file = 'domain.pddl'
 #problem = parse('domain.pddl','task02.pddl')
 #domain_file = 'ark-domain_syntactic_sugar.pddl'
-domain_file = 'domains/mini-indy-domain.pddl'
+	#domain_file = 'domains/mini-indy-domain.pddl'
+	#problem_file = 'domains/mini-indy-problem.pddl'
 #domain_file = 'domain_elevators.pddl'	
 #domain_file = 'ark-domain.pddl'
 
-print('\n')	
+	print('\n')	
 # domain = parseDomain(domain_file)
 # print(type(domain))
 # print(domain.name)
 # print('\ndomain action effect types:\n')
 
-# for action in domain.actions:
-	# #print(type(action))
-	# print('\t\t\t[[[[[{}]]]]]'.format(action.name))
-	
-	# print('\n parameters \n')
-	# for p in action.parameters:
-		# print(p.name, end=" -")
-		# for t in p.types:
-			# print(t, end = " ")
-	# print('\n')
-	
-	# print('\n ------- preconditions -------\n')
-	# #collected = 
-	# rPrintFormulaElements(action.precond.formula)
-	# #print('test\n')
-	# #print(len(collected))
-	
-	# print('\n \t+++++++ effects +++++++\n')
-	# rPrintFormulaElements(action.effect.formula)
-	
-	# print('\n &&&&&&& prerequisite &&&&&&&\n')
-	# if not action.prereq is None:
-		# rPrintFormulaElements(action.prereq.formula)
+
+
 		
-	# print('\n ^^^^^^^ agents ^^^^^^^\n')
-	# if not action.agents is None:
-		# rPrintFormulaElements(action.agents.formula)
-	
-	
-	# #print(action.parameters)
-	# print('\n\n\n')
+#parser = Parser(domain_file, problem_file)
+#domain = parser.parse_domain()
+#problem = parser.parse_problem(domain)
+
+
 		
-opGraphs = domainToOperatorGraphs(domain_file)
-print(len(opGraphs))
-for opgraph in opGraphs:
-	opgraph.print_graph_names()
-	print('\n')
+#opGraphs = domainToOperatorGraphs(domain_file)
+#print(len(opGraphs))
+#for opgraph in opGraphs:
+#	opgraph.print_graph_names()
+#	print('\n')
 	
 #domain_file = '
 #problem_file = 'domains/mini-indy-problem.pddl'

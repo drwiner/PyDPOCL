@@ -841,7 +841,7 @@ class Parser(object):
 		# and traverse the AST
 		domAST.accept(visitor)
 		# finally return the pddl.Domain
-		return domAST
+		return (domAST, visitor.domain)
 
 	def parse_problem(self, dom, read_from_file=True):
 		"""
@@ -865,6 +865,29 @@ class Parser(object):
 		probAST.accept(visitor)
 		# finally return the pddl.Problem
 		return visitor.get_problem()
+		
+	def parse_problem_drw(self, dom, read_from_file=True):
+		"""
+		Method that parses a problem, this method will be called from outside
+		the parser.
+
+		Keyword arguments:
+		read_from_file -- defines whether the input should be read from a file
+						  or directly from the input string
+		"""
+		if read_from_file:
+			with open(self.probFile, encoding='utf-8') as file:
+				self.probInput = self._read_input(file)
+		else:
+			input = self.probInput.split('\n')
+			self.probInput = self._read_input(input)
+		probAST = parse_problem_def(self.probInput)
+		# initialize the translation visitor
+		visitor = TraversePDDLProblem(dom)
+		# and traverse the AST
+		probAST.accept(visitor)
+		# finally return the pddl.Problem
+		return (probAST, visitor.get_problem())
 
 	# some setter and getter functions
 	def set_domain_file(self, fname):

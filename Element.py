@@ -82,6 +82,9 @@ class Element:
 	def print_element(self):
 		print('(',self.id, self.type, self.name,')')
 		
+	def __repr__(self):
+		return '({} {} {})'format(self.id, self.type, self.name)
+		
 class InternalElement(Element):
 	"""Internal Element is an Element with a possibly unimportant name, and a number of arguments
 			Plus, a dictionary mapping ids of superordinate elements to 'roles'
@@ -221,6 +224,12 @@ class Operator(InternalElement):
 		#print('executed:',self.executed,', orphan=',self.is_orphan,'(',self.id, self.type, self.name,')')
 		for key,value in self.roles.items():
 			print('\t id={}, role={}'.format(key, value))
+			
+	def __repr__(self):
+		st = 'executed: {}, orphan: {}, ({}, {}, {})'.format(self.executed, self.is_orphan, self.name, self.type, self.id)
+		for key,value in self.roles.items():
+			st.append('\t id={}, role={}'.format(key,value))
+		return st
 
 		
 class Literal(InternalElement):
@@ -271,6 +280,7 @@ class Literal(InternalElement):
 			
 	def print_element(self):
 		print(self.truth, '(',self.id, self.type, self.name,')')
+		
 		
 class Argument(Element):
 	""" An Argument Element is an element with a dictionary mapping operator ids to positions 
