@@ -248,3 +248,17 @@ class PlanSpacePlanner:
 				
 		print('no solutions found?')
 		return None
+		
+
+import sys
+if __name__ == '__main__':#start_set, end_set, op_graphs, objects
+	#Get init, goal, operators, constants
+	"""
+		sys.argv[1] Domain
+		sys.argv[2] constants
+		sys.argv[3] Init
+		sys.argv[4] Goal
+		sys.argv[5] Operators
+	"""
+	#PlanSpacePlanner()
+	pass
