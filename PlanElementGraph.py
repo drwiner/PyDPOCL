@@ -269,7 +269,16 @@ class Ordering(Edge):
 		super(Ordering, self).__init__(action1,action2,'<')
 		
 class PlanElementGraph(ElementGraph):
-
+	"""
+		Plan element graph = Plan
+		is-a element graph
+		has-a set of flaws
+		has-a set of action elements
+		has-a ordering graph
+		has-a causal graph
+		has-a constraint graph which encodes inequality constraints
+		has-a dummy init and dummy goal step
+	"""
 	def __init__(self,id,type_graph =None,name=None, \
 				Elements = None, \
 				planElement = None, \
