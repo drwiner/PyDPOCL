@@ -42,7 +42,7 @@ class OrderingGraph(Graph):
 			
 		#Base Case 1
 		if not element is None:
-			if element is original_element
+			if element is original_element:
 				return True
 			
 		#Runs on first time
@@ -87,5 +87,5 @@ class CausalLinkGraph(OrderingGraph):
 	def __init__(self, id, type = None, name = None, Elements = None , Edges = None, Constraints = None):
 		if type == None:
 			type = 'causal link graph'
-		super(CausalLinkGraph,self).__init__(id,type,name,Elements,Edges,Constraints):
+		super(CausalLinkGraph,self).__init__(id,type,name,Elements,Edges,Constraints)
 	

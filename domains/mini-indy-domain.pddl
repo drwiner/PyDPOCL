@@ -4,11 +4,12 @@
   (:predicates (alive ?character - character)
                (adj ?loc1 - location ?loc2 - location)
 			   (at ?character - character ?location - location)
+			   (equals ?anything1 ?anything2)
 			   (high-up ?location - location))
 
   (:action move
     :parameters   (?character - character ?from - location ?to - location)
-	:precondition (and (not (= ?from ?to))
+	:precondition (and (not (equals ?from ?to))
                        (alive ?character)
                        (at ?character ?from))
 	:effect       (and (not (at ?character ?from))

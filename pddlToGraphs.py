@@ -7,6 +7,7 @@ from Planner.Flaws import *
 
 ARGLABELS = ['first-arg', 'sec-arg','third-arg', 'fourth-arg', 'fifth-arg']
 
+
 def parseDomain(domain_file):
 	parser = Parser(domain_file)
 	domain = parser.parse_domain_drw()
@@ -159,7 +160,8 @@ def domainToOperatorGraphs(domain_file):
 	
 #domain_file = 'domain.pddl'
 #problem = parse('domain.pddl','task02.pddl')
-domain_file = 'ark-domain_syntactic_sugar.pddl'
+#domain_file = 'ark-domain_syntactic_sugar.pddl'
+domain_file = 'domains/mini-indy-domain.pddl'
 #domain_file = 'domain_elevators.pddl'	
 #domain_file = 'ark-domain.pddl'
 
@@ -206,3 +208,7 @@ print(len(opGraphs))
 for opgraph in opGraphs:
 	opgraph.print_graph_names()
 	print('\n')
+	
+#domain_file = '
+#problem_file = 'domains/mini-indy-problem.pddl'
+#problem = parse(domain_file, problem_file)
