@@ -237,6 +237,20 @@ def problemToGraphs(problem):
 	
 	return {'args': Args, 'init': init_graph, 'goal':goal_graph}
 	
+def parseDomainAndProblemToGraphs(domain_file, problem_file):
+	""" Returns tuple 
+			1) Operator Graphs
+			2) Object Elements
+			3) Init dummy Action
+			4) Goal dummy Action
+	"""
+	parser = Parser(domain_file, problem_file)
+	domain, dom = parser.parse_domain_drw()
+	problem, v = parser.parse_problem_drw(dom)
+	op_graphs = domainToOperatorGraphs(domain)
+	strucDict = problemToGraphs(problem)
+	return (op_graphs, strucDict['args'].values(), strucDict['init'], strucDict['goal'])
+	
 import sys	
 if __name__ ==  '__main__':
 	num_args = len(sys.argv)
@@ -265,7 +279,7 @@ if __name__ ==  '__main__':
 	strucDict['init'].print_graph_names()
 	print('\ngoal\n')
 	strucDict['goal'].print_graph_names()
-	
+
 	
 #domain_file = 'domain.pddl'
 #problem = parse('domain.pddl','task02.pddl')
