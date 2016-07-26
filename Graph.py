@@ -52,6 +52,8 @@ class Edge:
 		
 	def print_edge(self):
 		print('Edge {} --{}--> {}'.format(self.source.id, self.label, self.sink.id))
+	def __repr__(self):
+		return 'Edge {} --{}--> {}'.format(self.source, self.label, self.sink)
 
 class Graph(Element):
 	"""A graph is an element with elements, edges, and constraints"""

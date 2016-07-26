@@ -109,35 +109,44 @@ def getFormulaGraph(formula, current_id = None, parent = None, relationship = No
 		
 	return elements, edges
 	
+def getSubFormulaNoParent(formula, objects):
+	lit = None
+	elements = set()
+	edges = set()
+	if formula.key == 'not':
+		formula = next(iter(formula.children))
+		if formula.key == 'intends':
+			pass
+		else:
+			lit = Literal(id = uuid.uuid1(12), type = 'Condition',  name = formula.key, num_args = len(formula.children), truth = False)
+			elements.add(lit)
+	elif formula.key == 'intends':
+		pass
+	elif formula.type >0:
+		pass
+	else:
+		lit = Literal(id = uuid.uuid1(13), type = 'Condition',  name = formula.key, num_args = len(formula.children), truth = True)
+		elements.add(lit)
+	for i, child in enumerate(formula.children):
+		#children are list
+		arg = next(ob_element for ob_name, ob_element in objects.items() if child.key == ob_name)
+		edges.add(Edge(lit, arg, ARGLABELS[i]))
+	return (elements, edges)
+	
 def getGoalSet(goal_formula, objects):
 	""" Returns set of goal literals """
 	goal_elements = set()
 	goal_edges = set()
 	if goal_formula.key == 'and':
 		for child in goal_formula.children:
-			if child.key == 'not':
-				child = next(iter(child.children))
-				if child.key == 'intends':
-					pass
-				else:
-					goal_elements.add(Literal(id = uuid.uuid1(12), type = 'Condition',  name = child.key, num_args = len(child.children), truth = False))
-			elif child.key == 'intends':
-				pass
-			elif child.type >0:
-				pass
-			else:
-				goal_elements.add(Literal(id = uuid.uuid1(13), type = 'Condition',  name = child.key, num_args = len(child.children), truth = True))
+			elements, edges = getSubFormulaNoParent(child, objects)
+			goal_elements.update(elements)
+			goal_edges.update(edges)
+	else:
+		elements, edges = getSubFormulaNoParent(goal_formula, objects)
+		goal_elements.update(elements)
+		goal_edges.update(edges)
 				
-		for i, grandchild in enumerate(child.children):
-			#children are list
-			arg = next(ob_element for ob_name, ob_element in objects.items() if grandchild.key.name == ob_name)
-			if relationship == 'actor-of':
-				goal_edges.add(Edge(child, arg, 'actor-of'))
-			elif lit.name == '=':
-				goal_edges.add(Edge(lit, arg, 'arg-of'))
-			else:
-				goal_edges.add(Edge(lit, arg, ARGLABELS[i]))
-			
 	return (goal_elements, goal_edges)
 	
 		
@@ -203,14 +212,30 @@ def problemToGraphs(problem):
 	#for condition in problem_initial_state:
 	init_elements = set()
 	init_edges = set()
+	init_op = Operator(id = uuid.uuid1(4), type = 'Action', name = 'dummy_init', num_args = 0, instantiated = True)
+	init_graph =			Action(	id = uuid.uuid1(5),\
+							type_graph = 'Action', \
+							name = 'dummy_init',\
+							root_element = init_op)
 	for condition in problem.init.predicates:
 		condition_id = uuid.uuid1(2)
-		lit = Literal(id = condition_id, type = 'Condition', name = condition.name, num_args = len(condition.parameters))
-		init_elements.add(lit)
-		for p in condition.parameters:
-			init_edges.add(Edge(lit, Args[p],'effect-of'))
-	goal_tuple = getGoalSet(problem.goal.formula, Args)
-	return {'args': Args, 'init': (init_elements, init_edges), 'goal':goal_tuple}
+		lit = Literal(id = condition_id, type = 'Condition', name = condition.name, num_args = len(condition.parameters), truth = True)
+		init_graph.elements.add(lit)
+		init_graph.edges.add(Edge(init_op, lit, 'effect-of'))
+		for i,p in enumerate(condition.parameters):
+			init_graph.edges.add(Edge(lit, Args[p],ARGLABELS[i]))
+	
+	goal_elements, goal_edges = getGoalSet(problem.goal.formula, Args)
+	goal_op = Operator(id = uuid.uuid1(4), type = 'Action', name = 'dummy_goal', num_args = 0, instantiated = True)
+	goal_graph =			Action(	id = uuid.uuid1(5),\
+							type_graph = 'Action', \
+							name = 'dummy_goal',\
+							root_element = goal_op)
+	goal_graph.elements.update(goal_elements)
+	goal_graph.edges.update(goal_edges)
+	goal_graph.edges.update({Edge(goal_op, goal_lit, 'precond-of') for goal_lit in goal_elements})
+	
+	return {'args': Args, 'init': init_graph, 'goal':goal_graph}
 	
 import sys	
 if __name__ ==  '__main__':
@@ -231,7 +256,15 @@ if __name__ ==  '__main__':
 		opgraph.print_graph_names()
 		print('\n')
 	
-	struc = problemToGraphs(problem)
+	strucDict = problemToGraphs(problem)
+	print('\nargs \n')
+	Args = strucDict['args']
+	for argElement in Args.values():
+		print(argElement)
+	print('\ninit\n')
+	strucDict['init'].print_graph_names()
+	print('\ngoal\n')
+	strucDict['goal'].print_graph_names()
 	
 	
 #domain_file = 'domain.pddl'
