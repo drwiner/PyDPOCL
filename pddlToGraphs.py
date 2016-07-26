@@ -109,6 +109,37 @@ def getFormulaGraph(formula, current_id = None, parent = None, relationship = No
 		
 	return elements, edges
 	
+def getGoalSet(goal_formula, objects):
+	""" Returns set of goal literals """
+	goal_elements = set()
+	goal_edges = set()
+	if goal_formula.key == 'and':
+		for child in goal_formula.children:
+			if child.key == 'not':
+				child = next(iter(child.children))
+				if child.key == 'intends':
+					pass
+				else:
+					goal_elements.add(Literal(id = uuid.uuid1(12), type = 'Condition',  name = child.key, num_args = len(child.children), truth = False))
+			elif child.key == 'intends':
+				pass
+			elif child.type >0:
+				pass
+			else:
+				goal_elements.add(Literal(id = uuid.uuid1(13), type = 'Condition',  name = child.key, num_args = len(child.children), truth = True))
+				
+		for i, grandchild in enumerate(child.children):
+			#children are list
+			arg = next(ob_element for ob_name, ob_element in objects.items() if grandchild.key.name == ob_name)
+			if relationship == 'actor-of':
+				goal_edges.add(Edge(child, arg, 'actor-of'))
+			elif lit.name == '=':
+				goal_edges.add(Edge(lit, arg, 'arg-of'))
+			else:
+				goal_edges.add(Edge(lit, arg, ARGLABELS[i]))
+			
+	return (goal_elements, goal_edges)
+	
 		
 def rPrintFormulaElements(formula):
 		
@@ -178,8 +209,8 @@ def problemToGraphs(problem):
 		init_elements.add(lit)
 		for p in condition.parameters:
 			init_edges.add(Edge(lit, Args[p],'effect-of'))
-	goal_elements, goal_edges = getFormulaGraph(problem.goal.formula)
-	return {'args': Args, 'init': (init_elements, init_edges), 'goal':(goal_elements, goal_edges)}
+	goal_tuple = getGoalSet(problem.goal.formula, Args)
+	return {'args': Args, 'init': (init_elements, init_edges), 'goal':goal_tuple}
 	
 import sys	
 if __name__ ==  '__main__':
