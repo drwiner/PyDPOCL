@@ -28,6 +28,7 @@ from pddlToGraphs import *
 	(7) Detect Threatened Causal Link Flaws
 	(8) Recursive Invocation (but, log status of plan first)
 """
+import collections
 
 class PlanSpacePlanner:
 
@@ -44,7 +45,16 @@ class PlanSpacePlanner:
 		
 		#create special dummy step for init_graph and add to graphs {}		
 		self.setup(init_graph, init_action, goal_action)
-		self.graphs = {init_graph}
+		self._frontier = [init_graph]
+		
+	def __len__(self):
+		return len(self._frontier)
+	
+	def __getitem__(self, position):
+		return self._frontier[position]
+		
+	def __setitem__(self, graph, position):
+		self._frontier[position] = graph
 	
 	def setup(self, graph, start_action, end_action):
 		"""
@@ -228,14 +238,19 @@ class PlanSpacePlanner:
 		flaw = graph.flaws.pop()
 		
 		if flaw.name == 'opf':
-			results = self.goalPlanning(graph)
+			results = self.reuse(graph, flaw)
+			results.update(self.newStep(graph, flaw))
+			
 		if flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(graph,flaw)
 			
 		for result in results:
 			new_flaws = detectThreatenedCausalLinks(result)
 			result.flaws.update(new_flaws)
+			
+		self._frontier += results
 		
+		#replace this with choosing highest ranked graph
 		for g in results:
 			result = self.rPOCL(g) 
 			if not result is None:
