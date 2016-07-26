@@ -1,4 +1,4 @@
-from PlanElementGraph import *
+from ElementGraph import *
 
 class OrderingGraph(Graph):
 	
@@ -12,7 +12,10 @@ class OrderingGraph(Graph):
 			return False
 			
 	def addOrdering(self, source, sink):
-		self.edges.add(Ordering(source, sink))
+		self.edges.add(Edge(source, sink, '<'))
+		
+	def addEdge(self, source, sink):
+		self.addOrdering(source, sink)
 		
 	def detectCycle(self, V = None):
 		if V == None:

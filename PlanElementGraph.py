@@ -1,4 +1,4 @@
-from ElementGraph import *
+from OrderingGraph import *
 import uuid
 
 class Belief(ElementGraph):
@@ -298,6 +298,7 @@ class PlanElementGraph(ElementGraph):
 		self.flaws = [] #sort by heuristic via Planner.py
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
+		self.OrderingGraph = OrderingGraph(id = uuid.uuid1(5))
 		
 		if planElement is None:
 			planElement = PlanElement(id =id, type=type_graph,name=name)

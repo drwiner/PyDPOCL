@@ -31,8 +31,6 @@ from pddlToGraphs import *
 
 class PlanSpacePlanner:
 
-	graphs = {} #graphs, will be limited to fringe
-
 	def __init__(self, op_graphs, objects, init_action, goal_action):
 		#Assumes these parameters are already read from file
 		
@@ -46,7 +44,7 @@ class PlanSpacePlanner:
 		
 		#create special dummy step for init_graph and add to graphs {}		
 		self.setup(init_graph, init_action, goal_action)
-		graphs.add(init_graph)
+		self.graphs = {init_graph}
 	
 	def setup(self, graph, start_action, end_action):
 		"""
@@ -259,5 +257,5 @@ if __name__ ==  '__main__':
 		problem_file = 'domains/mini-indy-problem.pddl'
 	
 	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
-	search = PlanSpacePlanner(operators, objects, initAction, goalAction)
+	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	

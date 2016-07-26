@@ -1,4 +1,4 @@
-from OrderingGraph import *
+from PlanElementGraph import *
 
 """ 
 	Flaws for element graphs

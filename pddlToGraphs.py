@@ -3,7 +3,7 @@ from math import floor
 import random
 import uuid
 import collections
-from Planner.Flaws import *
+from Flaws import *
 
 ARGLABELS = ['first-arg', 'sec-arg','third-arg', 'fourth-arg', 'fifth-arg']
 	
