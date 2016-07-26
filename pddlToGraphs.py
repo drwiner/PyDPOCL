@@ -249,7 +249,7 @@ def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	problem, v = parser.parse_problem_drw(dom)
 	op_graphs = domainToOperatorGraphs(domain)
 	strucDict = problemToGraphs(problem)
-	return (op_graphs, strucDict['args'].values(), strucDict['init'], strucDict['goal'])
+	return (op_graphs, set(strucDict['args'].values()), strucDict['init'], strucDict['goal'])
 	
 import sys	
 if __name__ ==  '__main__':

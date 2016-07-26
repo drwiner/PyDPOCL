@@ -33,38 +33,32 @@ class PlanSpacePlanner:
 
 	graphs = {} #graphs, will be limited to fringe
 
-	def __init__(self, start_set, end_set, op_graphs, objects):
+	def __init__(self, op_graphs, objects, init_action, goal_action):
 		#Assumes these parameters are already read from file
 		
-		self.op_graphs = opgraphs
+		self.op_graphs = op_graphs
+		self.objects = objects
 		
-		init_graph = PlanElementGraph(uuid.uuid1(0)):
+		
+		init_graph = PlanElementGraph(uuid.uuid1(0), Elements = objects | init_action.elements | goal_action.elements, Edges = init_action.edges | goal_action.edges)
+		init_graph.initial_dummy_step = init_action
+		init_graph.final_dummy_step = goal_action
 		
 		#create special dummy step for init_graph and add to graphs {}		
-		self.setup(init_graph, start_set, end_set)
+		self.setup(init_graph, init_action, goal_action)
 		graphs.add(init_graph)
 	
-	def setup(self, graph, start_set, end_set):
+	def setup(self, graph, start_action, end_action):
 		"""
 			Create step typed element DI, with effect edges to each condition of start_set
 			Create step typed element DG, with precondition edges to each condition of end_set
 			Add ordering from DI to DG
 		"""
 		
-		dummy_start = Operator(uuid.uuid1(1), type='Action', name='dummy start', is_orphan = False, executed = True, instantiated = True)
-		graph.elements.add(dummy_start)
-		for i in start_set:
-			graph.edges.add(Edge(dummy_start, i, 'effect-of'))
-		graph.initial_dummy_step = dummy_start
-		
-		dummy_final = Operator(uuid.uuid1(1), type='Action', name='dummy final', is_orphan = False, executed = True, instantiated = True)
-		graph.elements.add(dummy_final)
-		graph.final_dummy_step = dummy_final
-		for g in end_set:
-			graph.edges.add(Edge(dummy_final, g, 'precond-of'))
+		dummy_start = start_action.root
+		dummy_final = end_action.root
 			
 		graph.OrderingGraph.addOrdering(dummy_start, dummy_final)
-		
 		graph.flaws.append(addOpenPreconditionFlaws(graph, dummy_final))
 		
 	def goalPlanning(self, graph, flaw):
@@ -252,63 +246,16 @@ class PlanSpacePlanner:
 		return None
 		
 
-import sys
-if __name__ == '__main__':#start_set, end_set, op_graphs, objects
+import sys	
+if __name__ ==  '__main__':
+	num_args = len(sys.argv)
+	if num_args >1:
+		domain_file = sys.argv[1]
+		if num_args > 2:
+			problem_file = sys.argv[2]		
+	else:
+		domain_file = 'domains/mini-indy-domain.pddl'
+		problem_file = 'domains/mini-indy-problem.pddl'
 	
-	#Get init, goal, operators, constants
-	"""
-		sys.argv[1] Domain
-		sys.argv[2] constants
-		sys.argv[3] Init
-		sys.argv[4] Goal
-		sys.argv[5] Operators
-	"""
-	if sys.argv[1] is None:
-		domain_file = 'ark-domain_syntactic_sugar.pddl'
-	if sys.argv[2] is None:
-		objects = {'Indy', 'Sapito', '}
-	opGraphs = domainToOperatorGraphs(domain_file)
-
-	objects = 'Indy Sapito bridge cliff1 cliff2'.split()
-	Args = {ob_name: Argument(id = uuid.uuid1(1), type= 'arg', name = ob_name) for ob_name in objects}
-	at_indy_cliff1 = Literal(id = uuid.uuid1(1), type = 'Condition', name = 'at', num_args = 2, truth = True)
-	e1 = Edge(at_indy_cliff1, Args['Indy'], 'first-arg')
-	e2 = Edge(at_indy_cliff1, Args['cliff1'], 'sec-arg')
-	at_indy_cliff1_C =		Action(	id = uuid.uuid1(1),\
-							type_graph = 'Condition', \
-							name = 'at',\
-							root_element = at_indy_cliff1,\
-							Elements = {at_indy_cliff1, Args['Indy'], Args['cliff1']},\
-							Edges = {e1,e2})
-	at_sapito_cliff1 = Literal(id = uuid.uuid1(1), type = 'Condition', name = 'at', num_args = 2, truth = True)
-	e3 = Edge(at_sapito_cliff1, Args['Sapito'], 'first-arg')
-	e4 = Edge(at_sapito_cliff1, Args['cliff1'], 'sec-arg')
-	at_sapito_cliff1_C =	Action(	id = uuid.uuid1(1),\
-							type_graph = 'Condition', \
-							name = 'at',\
-							root_element = at_sapito_cliff1,\
-							Elements = {at_sapito_cliff1, Args['Sapito'], Args['cliff1']},\
-							Edges = {e3,e4})
-	adj_cliff1_bridge = Literal(id = uuid.uuid1(1), type = 'Condition', name = 'adj', num_args = 2, truth = True)
-	e5 = Edge(adj_cliff1_bridge, Args['cliff1'], 'first-arg')
-	e6 = Edge(adj_cliff1_bridge, Args['bridge'], 'sec-arg')
-	adj_cliff1_bridge_C =	Action(	id = uuid.uuid1(1),\
-							type_graph = 'Condition', \
-							name = 'adj',\
-							root_element = at_sapito_cliff1,\
-							Elements = {adj_cliff1_bridge, Args['cliff1'], Args['bridge']},\
-							Edges = {e5,e6})
-	adj_bridge_cliff2 = Literal(id = uuid.uuid1(1), type = 'Condition', name = 'adj', num_args = 2, truth = True)
-	e7 = Edge(adj_bridge_cliff2, Args['bridge'], 'first-arg')
-	e8 = Edge(adj_bridge_cliff2, Args['cliff2'], 'sec-arg')
-	alive_indy = Literal(id = uuid.uuid1(1), type = 'Condition', name = 'alive', num_args = 1, truth = True)
-	e9 = Edge(alive_indy, Args['Indy'], 'first-arg')
-	alive_sapito = Literal(id = uuid.uuid1(1), type = 'Condition', name = 'alive', num_args = 1, truth = True)
-	e10 = Edge(alive_indy, Args['sapito'], 'first-arg')
-	elements = {alive_indy, alive_sapito, adj_cliff1_bridge, adj_bridge_cliff2, at_indy_cliff1, at_sapito_cliff1}.union(arg for arg in Args.values())
-	edges = {e1,e2, e3, e4, e5, e6, e7, e8, e9, e10}
+	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
 	
-	
-	at_indy_cliff2 = Litera(id = uuid.uuid1(1), type = 'Condition', name = '
-	#PlanSpacePlanner()
-	pass
