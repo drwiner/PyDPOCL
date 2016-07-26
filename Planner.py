@@ -83,7 +83,7 @@ class PlanSpacePlanner:
 		
 		#Then try new Step
 		for op in self.op_graphs:
-			for eff in op.getNeighborsByLabel(root, 'effect-of')
+			for eff in op.getNeighborsByLabel(root, 'effect-of'):
 				Effect = op_graph.getElementGraphFromElementId(eff.id)
 				if Effect.canAbsolve(Precondition):
 					step_op, nei = op.makeCopyFromId(start_from = 1,old_element_id = eff.id)
@@ -212,7 +212,7 @@ class PlanSpacePlanner:
 		results.update(restrictions)
 		return results
 		
-	def rPOCL(self, graph)
+	def rPOCL(self, graph):
 		"""
 			Recursively, given graph, 
 				for each flaw, 
@@ -228,9 +228,10 @@ class PlanSpacePlanner:
 			
 		#INDUCTION
 		flaw = graph.flaws.pop()
-		if flaw.name = 'opf':
+		
+		if flaw.name == 'opf':
 			results = self.goalPlanning(graph)
-		if flaw.name = 'tclf':
+		if flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(graph,flaw)
 			
 		for result in results:
@@ -258,4 +259,5 @@ if __name__ ==  '__main__':
 		problem_file = 'domains/mini-indy-problem.pddl'
 	
 	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
+	search = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	
