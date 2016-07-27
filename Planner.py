@@ -121,7 +121,6 @@ class PlanSpacePlanner:
 		s_need, pre = flaw.flaw
 		Precondition = graph.getElementGraphFromElementId(pre.id,Condition)
 		results = set()
-		relevant_steps = {step for }
 		for step in (st for st in graph.Steps if not st.isEquivalent(s_need)):
 			if graph.OrderingGraph.isPath(s_need, step):
 				#step cannot be ordered before s_need
