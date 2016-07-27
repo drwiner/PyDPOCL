@@ -98,6 +98,7 @@ class Action(ElementGraph):
 		new_self = self.copyGen()
 		old_id = self.id
 		new_self.id = start_from
+		nei = -1
 		
 		found = False
 		for element in new_self.elements:
@@ -113,10 +114,9 @@ class Action(ElementGraph):
 				if id == old_id:
 					arg.arg_pos_dict[new_id] = arg.arg_pos_dict.pop(old_id)
 					
-		if old_element_id is None:
-			return new_self
-		else:
-			return new_self, nei
+
+		return new_self, nei
+
 	
 											
 

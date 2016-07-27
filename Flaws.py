@@ -1,5 +1,5 @@
-from Planner import *
-
+from pddlToGraphs import *
+import collections
 """ 
 	Flaws for element graphs
 """
@@ -8,6 +8,19 @@ class Flaw:
 	def __init__(self, tuple, name):
 		self.name = name
 		self.flaw = tuple
+		
+class FlawLibrary:
+	def __init__(self):
+		self._flaws = []
+	
+	def __getitem__(self, position):
+		return self._flaws[position]
+		
+	def __len__(self):
+		return len(self_flaws)
+	
+	def __setitem__(self, flaw, position):
+		self._flaws[position] = flaw
 
 def detectThreatenedCausalLinks(graph):
 	"""

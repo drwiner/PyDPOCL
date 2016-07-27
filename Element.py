@@ -13,11 +13,12 @@
 """ 
 class Element:
 	"""Element is a token or label"""
-	def __init__(self, id, type = None, name = None):
+	def __init__(self, id, type = None, name = None, arg_name = None):
 		self.id = id
 		self.type = type
 		#Optional:
 		self.name = name
+		self.arg_name = arg_name
 		
 	def isConsistent(self, other):
 		""" Returns True if self and other have same name or unassigned"""
@@ -94,8 +95,8 @@ class InternalElement(Element):
 									frame.id	: 'initial'
 									frame.id	: 'source'
 	"""
-	def __init__(self, id, type, name = None, num_args = None, roles = None):
-		super(InternalElement,self).__init__(id,type,name)
+	def __init__(self, id, type, name = None, arg_name = None, num_args = None, roles = None):
+		super(InternalElement,self).__init__(id,type,name, arg_name)
 		if num_args == None:
 			num_args = 0
 		if roles == None:
@@ -183,7 +184,7 @@ class InternalElement(Element):
 		
 class Operator(InternalElement):
 	""" An operator element is an internal element with an executed status and orphan status"""
-	def __init__(self, id, type, name = None, num_args = None, roles = None, is_orphan = None, executed = None, instantiated = None):
+	def __init__(self, id, type, name = None, arg_name = None, num_args = None, roles = None, is_orphan = None, executed = None, instantiated = None):
 		if instantiated == None:
 			instantiated = False
 		if is_orphan is None:
@@ -192,7 +193,7 @@ class Operator(InternalElement):
 			num_args = 0
 		if roles == None:
 			roles = {}
-		super(Operator,self).__init__(id,type,name, num_args, roles)
+		super(Operator,self).__init__(id,type,name, arg_name, num_args,  roles)
 		self.executed = executed
 		self.is_orphan = is_orphan
 		self.instantiated = instantiated
@@ -235,12 +236,12 @@ class Operator(InternalElement):
 class Literal(InternalElement):
 	""" A Literal element is an internal element with a truth status
 	"""
-	def __init__(self, id, type, name = None, num_args = None, roles = None,truth = None):
+	def __init__(self, id, type, name = None, arg_name = None, num_args = None, roles = None,truth = None):
 		if num_args == None:
 			num_args = 0
 		if roles == None:
 			roles = {}
-		super(Literal,self).__init__(id,type,name, num_args, roles)
+		super(Literal,self).__init__(id,type,name, arg_name, num_args, roles)
 		self.truth = truth
 
 	def isConsistent(self, other):
@@ -290,10 +291,10 @@ class Argument(Element):
 		 
 	"""
 	
-	def __init__(self, id, type, name= None, arg_pos_dict = None):
+	def __init__(self, id, type, name= None, arg_pos_dict = None, arg_name = None):
 		if arg_pos_dict == None:
 			arg_pos_dict = {}
-		super(Argument,self).__init__(id,type,name)
+		super(Argument,self).__init__(id,type,name, arg_name)
 		#arg_pos_dict is a mapping from operator.ids to positions
 		self.arg_pos_dict = arg_pos_dict
 		
@@ -375,13 +376,13 @@ class Actor(Argument):
 				for the actor that matches the intention frame's intender
 		When we merge 2 actors, we merge the orphan_dicts with preference for True
 	"""
-	def __init__(self, id, type, name= None, arg_pos_dict = None, orphan_dict = None):
+	def __init__(self, id, type, name= None, arg_name = None, arg_pos_dict = None, orphan_dict = None):
 		if arg_pos_dict == None:
 			arg_pos_dict = {}
 		if orphan_dict == None:
 			orphan_dict = {}
 			
-		super(Actor,self).__init__(id,type,name, arg_pos_dict)
+		super(Actor,self).__init__(id,type,name, arg_pos_dict, arg_name)
 		self.orphan_dict=  orphan_dict
 		
 	def merge(self, other):
@@ -401,7 +402,7 @@ class Actor(Argument):
 
 class PlanElement(Element):
 
-	def __init__(self,id,type=None, name=None,\
+	def __init__(self,id,type=None, name=None, arg_name = None\
 				#Steps=None, \
 				#Orderings=None,  \
 				#CausalLinks=None, \
@@ -419,7 +420,7 @@ class PlanElement(Element):
 		# if IntentionFrames == None:
 			# IntentionFrames = set()
 			
-		super(PlanElement,self).__init__(id,type,name)
+		super(PlanElement,self).__init__(id,type,name, arg_name)
 		
 		# self.Steps = Steps
 		# self.Orderings = Orderings
@@ -427,13 +428,13 @@ class PlanElement(Element):
 		# self.IntentionFrames = IntentionFrames
 		
 class IntentionFrameElement(Element):
-	def __init__(self, id, type_graph=None, name= None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = None):
+	def __init__(self, id, type_graph=None, name= None, arg_name = None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = None):
 		if steps == None:
 			steps = set()
 		if type_graph == None:
 			type_graph='IntentionFrame'
 			
-		super(IntentionFrameElement,self).__init__(id,type_graph,name)
+		super(IntentionFrameElement,self).__init__(id,type_graph,name, arg_name)
 		
 		self.ms = ms
 		self.motivation = motivation
@@ -528,7 +529,7 @@ class IntentionFrameElement(Element):
 					
 		
 class Motivation(Literal):
-	def __init__(self, id, type=None, name=None, num_args = None, truth = None, intender=None, goal=None):
+	def __init__(self, id, type=None, name=None, arg_name = None, num_args = None, truth = None, intender=None, goal=None):
 		if num_args == None:
 			num_args = 1
 		if name == None:
@@ -537,7 +538,7 @@ class Motivation(Literal):
 			type = 'motivation'
 		if truth == None:
 			truth = True
-		super(Motivation,self).__init__(id=id,type=type,name=name,num_args=num_args,truth =truth)
+		super(Motivation,self).__init__(id=id,type=type,name=name,arg_name = arg_name, num_args=num_args,truth =truth)
 		
 			
 		self.actor = intender

@@ -1,5 +1,5 @@
-#from Flaws import *
-from pddlToGraphs import *
+from Flaws import *
+#from pddlToGraphs import *
 
 
 """
@@ -92,9 +92,9 @@ class PlanSpacePlanner:
 		#Then try new Step
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
-				Effect = op_graph.getElementGraphFromElementId(eff.id, Condition)
+				Effect = op.getElementGraphFromElementId(eff.id, Condition)
 				if Effect.canAbsolve(Precondition):
-					step_op, nei = op.makeCopyFromId(start_from = 1,old_element_id = eff.id)
+					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.id)
 					#nei : new element id, to easily access element from graph
 					
 					Effect  = step_op.getElementGraphFromElementId(nei, Condition)
@@ -220,7 +220,6 @@ class PlanSpacePlanner:
 		results.update(restrictions)
 		return results
 		
-import bisect
 
 	def rPOCL(self, graph):
 		"""

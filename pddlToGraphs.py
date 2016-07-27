@@ -3,7 +3,8 @@ from math import floor
 import random
 import uuid
 import collections
-from Flaws import *
+from PlanElementGraph import *
+#from Flaws import *
 
 ARGLABELS = ['first-arg', 'sec-arg','third-arg', 'fourth-arg', 'fifth-arg']
 	
@@ -61,7 +62,8 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 		elements = set()
 	if edges == None:
 		edges = set()
-		
+	
+	'''make new literal representing subformula'''
 	if formula.key == 'not':
 		formula = next(iter(formula.children))
 		if formula.key == 'intends':
@@ -75,10 +77,12 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 	else:
 		lit, formula = makeLit(formula, current_id, parent, relationship, elements, edges, True)
 	
-	
+	'''for each variable, find existing argument in action parameters and add Edge'''
 	for i, child in enumerate(formula.children):
 		#children are list
-		arg = next(element for element in elements if child.key.name == element.name)
+		#print(child.key.name)
+		arg = next(element for element in elements if child.key.name == element.arg_name)
+		
 		if relationship == 'actor-of':
 			edges.add(Edge(parent, arg, 'actor-of'))
 		elif lit.name == '=':
@@ -185,15 +189,16 @@ def domainToOperatorGraphs(domain):
 		
 		start_id += 1
 		#args = {}
+		'''First, create elements for all action parameters (variables)'''
 		for i, parameter in enumerate(action.parameters):
 			#parameters are list
 			if 'character' in parameter.types:
-				op_graph.elements.add(Actor(id = uuid.uuid1(start_id), type = 'character', name = None, arg_pos_dict={op_id : i}))
+				op_graph.elements.add(Actor(id = uuid.uuid1(start_id), type = 'character', arg_name = parameter.name, arg_pos_dict={op_id : i}))
 			elif 'actor' in parameter.types:
-				op_graph.elements.add(Actor(id = uuid.uuid1(start_id), type = 'actor', name = None, arg_pos_dict={op_id : i}))
+				op_graph.elements.add(Actor(id = uuid.uuid1(start_id), type = 'actor', arg_name = parameter.name, arg_pos_dict={op_id : i}))
 			else:
-				arg_type = parameter.types.pop()
-				op_graph.elements.add(Argument(id = uuid.uuid1(start_id), 	type=arg_type, name=None, arg_pos_dict=	{op_id :  i}))
+				arg_type = next(iter(parameter.types))
+				op_graph.elements.add(Argument(id = uuid.uuid1(start_id), 	type=arg_type, arg_name=parameter.name, arg_pos_dict=	{op_id :  i}))
 			start_id += 1
 		
 		getFormulaGraph(action.precond.formula, start_id, parent = op, relationship = 'precond-of',elements= op_graph.elements, edges=op_graph.edges)
