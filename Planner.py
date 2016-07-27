@@ -91,7 +91,7 @@ class PlanSpacePlanner:
 		
 		#Then try new Step
 		for op in self.op_graphs:
-			for eff in op.getNeighborsByLabel(root, 'effect-of'):
+			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
 				Effect = op_graph.getElementGraphFromElementId(eff.id, Condition)
 				if Effect.canAbsolve(Precondition):
 					step_op, nei = op.makeCopyFromId(start_from = 1,old_element_id = eff.id)
