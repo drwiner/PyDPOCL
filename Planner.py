@@ -67,7 +67,7 @@ class PlanSpacePlanner:
 		dummy_final = end_action.root
 			
 		graph.OrderingGraph.addOrdering(dummy_start, dummy_final)
-		graph.flaws.append(addOpenPreconditionFlaws(graph, dummy_final))
+		graph.flaws.update(addOpenPreconditionFlaws(graph, dummy_final))
 		
 	def goalPlanning(self, graph, flaw):
 		results = self.reuse(graph, flaw)
@@ -86,18 +86,18 @@ class PlanSpacePlanner:
 		"""
 		
 		s_need, precondition = flaw.flaw
-		Precondition = graph.getElementGraphFromElementId(precondition.id)
+		Precondition = graph.getElementGraphFromElementId(precondition.id, Condition)
 		results = set()
 		
 		#Then try new Step
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(root, 'effect-of'):
-				Effect = op_graph.getElementGraphFromElementId(eff.id)
+				Effect = op_graph.getElementGraphFromElementId(eff.id, Condition)
 				if Effect.canAbsolve(Precondition):
 					step_op, nei = op.makeCopyFromId(start_from = 1,old_element_id = eff.id)
 					#nei : new element id, to easily access element from graph
 					
-					Effect  = step_op.getElementGraphFromElementId(nei)
+					Effect  = step_op.getElementGraphFromElementId(nei, Condition)
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
 					#could be more than one way to unify effect with precondition
 
@@ -119,14 +119,15 @@ class PlanSpacePlanner:
 			iterates through existing steps, and effects of those steps, and asks if any can absolve the precondition of the flaw
 		"""
 		s_need, pre = flaw.flaw
-		Precondition = graph.getElementGraphFromElementId(pre.id)
+		Precondition = graph.getElementGraphFromElementId(pre.id,Condition)
 		results = set()
-		for step in graph.Steps:
+		relevant_steps = {step for }
+		for step in (st for st in graph.Steps if not st.isEquivalent(s_need)):
 			if graph.OrderingGraph.isPath(s_need, step):
 				#step cannot be ordered before s_need
-				continue
+				break
 			for eff in graph.getNeighborsByLabel(step, 'effect-of'):
-				Effect = graph.getElementGraphFromElementId(eff.id)
+				Effect = graph.getElementGraphFromElementId(eff.id, Condition)
 				if Effect.canAbsolve(Precondition):
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
 					for eff_abs in Effect_absorptions: 
@@ -220,6 +221,8 @@ class PlanSpacePlanner:
 		results.update(restrictions)
 		return results
 		
+import bisect
+
 	def rPOCL(self, graph):
 		"""
 			Recursively, given graph, 
@@ -229,7 +232,7 @@ class PlanSpacePlanner:
 		"""
 		
 		#BASE CASES
-		if not graph.isInternallyConsistent:
+		if not graph.isInternallyConsistent():
 			return None
 		if len(graph.flaws) == 0:
 			return graph
@@ -247,11 +250,12 @@ class PlanSpacePlanner:
 		for result in results:
 			new_flaws = detectThreatenedCausalLinks(result)
 			result.flaws.update(new_flaws)
-			
-		self._frontier += results
+
+		#self._frontier += results
 		
 		#replace this with choosing highest ranked graph
 		for g in results:
+			#result = self._frontier.pop()
 			result = self.rPOCL(g) 
 			if not result is None:
 				return result

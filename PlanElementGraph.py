@@ -19,8 +19,7 @@ class Belief(ElementGraph):
 
 class Action(ElementGraph):
 	def __init__(self,id,type_graph,name=None,Elements = None, root_element = None, Edges = None,Constraints = None):
-		if Elements == None:
-			Elements = set()
+		
 		if Edges == None:
 			Edges = set()
 		if Constraints == None:
@@ -28,6 +27,9 @@ class Action(ElementGraph):
 
 		if root_element is None:
 			root_element = Operator(uuid.uuid1(200),type='Action')
+			
+		if Elements == None:
+			Elements = {root_element}
 			
 		super(Action,self).__init__(id,type_graph,name,Elements,root_element,Edges,Constraints)
 
@@ -295,7 +297,7 @@ class PlanElementGraph(ElementGraph):
 			Constraints = set()
 		
 		self.updatePlan(Elements,Edges,Constraints)
-		self.flaws = [] #sort by heuristic via Planner.py
+		self.flaws = set() #sort by heuristic via Planner.py
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
 		self.OrderingGraph = OrderingGraph(id = uuid.uuid1(5))

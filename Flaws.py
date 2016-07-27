@@ -1,4 +1,4 @@
-from PlanElementGraph import *
+from Planner import *
 
 """ 
 	Flaws for element graphs
