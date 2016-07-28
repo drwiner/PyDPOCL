@@ -1,4 +1,5 @@
 from OrderingGraph import *
+from collections import deque
 import uuid
 
 class Belief(ElementGraph):
@@ -297,7 +298,7 @@ class PlanElementGraph(ElementGraph):
 			Constraints = set()
 		
 		self.updatePlan(Elements,Edges,Constraints)
-		self.flaws = [] #sort by heuristic via Planner.py
+		self.flaws = deque() #sort by heuristic?
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
 		self.OrderingGraph = OrderingGraph(id = uuid.uuid1(5))

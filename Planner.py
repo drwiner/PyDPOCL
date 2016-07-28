@@ -232,7 +232,8 @@ class PlanSpacePlanner:
 			return graph
 			
 		#INDUCTION
-		flaw = graph.flaws[0] #always from bottom
+		flaw = graph.flaws[0] #always from bottom, keep sorted?
+		del(graph.flaws[0])
 		
 		if flaw.name == 'opf':
 			results = self.reuse(graph, flaw)
