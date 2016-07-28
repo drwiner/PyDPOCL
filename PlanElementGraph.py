@@ -297,7 +297,7 @@ class PlanElementGraph(ElementGraph):
 			Constraints = set()
 		
 		self.updatePlan(Elements,Edges,Constraints)
-		self.flaws = set() #sort by heuristic via Planner.py
+		self.flaws = [] #sort by heuristic via Planner.py
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
 		self.OrderingGraph = OrderingGraph(id = uuid.uuid1(5))

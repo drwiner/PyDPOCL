@@ -67,12 +67,8 @@ class PlanSpacePlanner:
 		dummy_final = end_action.root
 			
 		graph.OrderingGraph.addOrdering(dummy_start, dummy_final)
-		graph.flaws.update(addOpenPreconditionFlaws(graph, dummy_final))
+		graph.flaws += addOpenPreconditionFlaws(graph, dummy_final)
 		
-	def goalPlanning(self, graph, flaw):
-		results = self.reuse(graph, flaw)
-		results.update(self.newStep(graph, flaw))
-		return results
 		
 	def newStep(self, graph, flaw):
 		"""
@@ -179,7 +175,7 @@ class PlanSpacePlanner:
 		graph.CausalLinkGraph.addEdge(s_add_id, s_need_id, condition_id)
 		if new:
 			new_flaws = addOpenPreconditionFlaws(graph, graph.getElementById(s_add_id))
-			graph.flaws.update(new_flaws)
+			graph.flaws += new_flaws
 				
 		return graph
 		
@@ -236,7 +232,7 @@ class PlanSpacePlanner:
 			return graph
 			
 		#INDUCTION
-		flaw = graph.flaws.pop()
+		flaw = graph.flaws[0] #always from bottom
 		
 		if flaw.name == 'opf':
 			results = self.reuse(graph, flaw)
@@ -247,7 +243,7 @@ class PlanSpacePlanner:
 			
 		for result in results:
 			new_flaws = detectThreatenedCausalLinks(result)
-			result.flaws.update(new_flaws)
+			result.flaws += new_flaws
 
 		#self._frontier += results
 		

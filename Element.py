@@ -385,6 +385,19 @@ class Actor(Argument):
 		super(Actor,self).__init__(id,type,name, arg_pos_dict, arg_name)
 		self.orphan_dict=  orphan_dict
 		
+	def isConsistent(self, other):
+		""" isConsistent if for every other.id in arg_pos_dict, 
+			either	A) there is no id in self
+					B) the same id is there and the position is the same
+		"""
+		if not super(Actor,self).isConsistent(other):
+			return False
+		
+		if type(other) == Argument:
+			return False
+			
+		return True
+		
 	def merge(self, other):
 		if super(Actor,self).merge(other) is None:
 			return None
