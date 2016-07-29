@@ -101,15 +101,23 @@ class PlanSpacePlanner:
 					Effect  = step_op.getElementGraphFromElementId(nei, Condition)
 					
 					#could be more than one way to unify effect with precondition
+					#Effect_absorbtions' graphs' elements' replaced_ids assigned Precondition's ids
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
-					
 			
-					for eff_abs in Effect_absorptions: 
+					for eff_abs in Effect_absorbtions: 
 						graph_copy = copy.deepcopy(graph)
-						graph_copy.mergeGraph(eff_abs) #what did this do?
+						
+						#First, find elements of Precondition (in graph_copy) and mergeFrom elements of eff_abs
+						#Also, add elements in eff_abs not present in Precondition
+						graph_copy.mergeGraph(eff_abs)
 						
 						new_step_op = copy.deepcopy(step_op)
+						
+						#Second, find elements of eff_abs in graph_copy, which have ids from Effect 
+						#		and merge elements of new_step's Effect (which have same ids has Effect)
+						#Also, add elements in new_step_op which are not Effect
 						graph_copy.mergeGraph(new_step_op)
+						
 						self.addStep(graph_copy, new_step_op.root.id, s_need.id, eff_abs.id) #adds causal link and ordering constraints
 						results.add(graph_copy)
 						#add graph to children
@@ -184,6 +192,8 @@ class PlanSpacePlanner:
 			new_flaws = addOpenPreconditionFlaws(graph, graph.getElementById(s_add_id))
 			graph.flaws += new_flaws
 				
+		#Good time as ever to updatePlan
+		graph.updatePlan()
 		return graph
 		
 	def resolveThreatenedCausalLinkFlaw(graph, flaw):

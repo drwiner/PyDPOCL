@@ -69,15 +69,14 @@ class ElementGraph(Graph):
 					For each edge in new_operator, if 
 		"""
 		for element in other.elements:
+			if not hasattr(element, 'replaced_id'):
+				element.replaced_id = -1
+				
 			if element.replaced_id != -1:
-				existing_element = self.getElementById(element.replaced_id)
-				existing_element.merge(element)
-				existing_element.replaced_id = element.id
+					existing_element = self.getElementById(element.replaced_id)
+					existing_element.merge(element)
+					existing_element.replaced_id = element.id
 			else:
-				#############################################################################
-				if type(element) is Operator:
-					print('element {} is type operator but replaced_id = -1'.format(element.id))
-				#############################################################################
 				self.elements.add(element)
 				element.replaced_id = element.id
 		

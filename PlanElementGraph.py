@@ -315,6 +315,7 @@ class PlanElementGraph(ElementGraph):
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
 		self.OrderingGraph = OrderingGraph(id = uuid.uuid1(5))
+		self.CausalLinkGraph = CausalLinkGraph(id = uuid.uuid1(6))
 		
 		if planElement is None:
 			planElement = PlanElement(id =id, type=type_graph,name=name)

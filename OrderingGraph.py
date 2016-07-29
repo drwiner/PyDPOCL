@@ -10,6 +10,7 @@ class OrderingGraph(Graph):
 	def isInternallyConsistent(self):
 		if self.detectCycle():
 			return False
+		return True
 			
 	def addOrdering(self, source, sink):
 		self.edges.add(Edge(source, sink, '<'))
@@ -92,3 +93,5 @@ class CausalLinkGraph(OrderingGraph):
 			type = 'causal link graph'
 		super(CausalLinkGraph,self).__init__(id,type,name,Elements,Edges,Constraints)
 	
+	def addEdge(self, source, sink, condition_id):
+		self.edges.add(Edge(source, sink, condition_id))
