@@ -17,3 +17,7 @@ results = planner.newStep(graph, flaw)
 
 
 graph = results.pop()
+
+results.update(planner.reuse(graph,flaw))
+
+print(graph.OrderingGraph)

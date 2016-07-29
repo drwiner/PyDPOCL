@@ -227,10 +227,10 @@ class Operator(InternalElement):
 			print('\t id={}, role={}'.format(key, value))
 			
 	def __repr__(self):
-		st = 'executed: {}, orphan: {}, ({}, {}, {})'.format(self.executed, self.is_orphan, self.name, self.type, self.id)
-		for key,value in self.roles.items():
-			st.append('\t id={}, role={}'.format(key,value))
-		return st
+		return 'operator({}, {}, {})'.format(self.executed, self.name, self.id)
+		#for key,value in self.roles.items():
+		#	st.append('\t id={}, role={}'.format(key,value))
+		#return st
 
 		
 class Literal(InternalElement):

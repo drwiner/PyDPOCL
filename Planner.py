@@ -40,8 +40,8 @@ class PlanSpacePlanner:
 		
 		
 		init_graph = PlanElementGraph(uuid.uuid1(0), Elements = objects | init_action.elements | goal_action.elements, Edges = init_action.edges | goal_action.edges)
-		init_graph.initial_dummy_step = init_action
-		init_graph.final_dummy_step = goal_action
+		init_graph.initial_dummy_step = init_action.root
+		init_graph.final_dummy_step = goal_action.root
 		
 		#create special dummy step for init_graph and add to graphs {}		
 		self.setup(init_graph, init_action, goal_action)
@@ -67,7 +67,9 @@ class PlanSpacePlanner:
 		dummy_final = end_action.root
 			
 		graph.OrderingGraph.addOrdering(dummy_start, dummy_final)
-		graph.flaws += addOpenPreconditionFlaws(graph, dummy_final)
+		
+		#Add initial Open precondition flaws for dummy step
+		graph.flaws += (Flaw((dummy_final, prec), 'opf') for prec in graph.getNeighborsByLabel(dummy_final, 'precond-of'))
 		
 		
 	def newStep(self, graph, flaw):
@@ -118,7 +120,7 @@ class PlanSpacePlanner:
 						#Also, add elements in new_step_op which are not Effect
 						graph_copy.mergeGraph(new_step_op)
 						
-						self.addStep(graph_copy, new_step_op.root.id, s_need.id, eff_abs.id, new = True) #adds causal link and ordering constraints
+						self.addStep(graph_copy, new_step_op.root, s_need, eff_abs.id, new = True) #adds causal link and ordering constraints
 						results.add(graph_copy)
 						#add graph to children
 		return results
@@ -166,37 +168,33 @@ class PlanSpacePlanner:
 							graph_copy.elements.remove(edge.sink)
 							graph_copy.replaceWith(edge.sink,new_sink)
 							
-						self.addStep(graph_copy, s_need.id, step.root.id, eff_abs.id, new = False)
+						self.addStep(graph_copy, s_need, step.root, eff_abs.id, new = False)
 						results.add(graph_copy)
 		return results
 	
 		
-	def addStep(self, graph, s_add_id, s_need_id, condition_id, new=None):
+	def addStep(self, graph, s_add, s_need, condition_id, new=None):
 		"""
 			when a step is added/reused, 
 			add causal link and ordering edges (including to dummy steps)
 			If step is new, add open precondition flaws for each precondition
-				NOTE!	Open precondition flaws ought to reference the precondition "id", 
-							and not contain itself a data structure
-						Because, what if properties of the precondition are refined? 
 		"""
 		if new == None:
 			new = False
-		graph.OrderingGraph.addEdge(graph.initial_dummy_step.id, s_add_id)
-		graph.OrderingGraph.addEdge(s_add_id, graph.final_dummy_step.id)
-		graph.OrderingGraph.addEdge(graph.initial_dummy_step.id, s_need_id)
-		graph.OrderingGraph.addEdge(s_need_id, graph.final_dummy_step.id)
-		graph.OrderingGraph.addEdge(s_add_id,s_need_id)
-		graph.CausalLinkGraph.addEdge(s_add_id, s_need_id, condition_id)
+		graph.OrderingGraph.addEdge(graph.initial_dummy_step, s_add)
+		graph.OrderingGraph.addEdge(s_add, graph.final_dummy_step)
+		graph.OrderingGraph.addEdge(graph.initial_dummy_step, s_need)
+		graph.OrderingGraph.addEdge(s_need, graph.final_dummy_step)
+		graph.OrderingGraph.addEdge(s_add,s_need)
+		graph.CausalLinkGraph.addEdge(s_add, s_need, condition_id)
 
 		if new:
-			step = graph.getElementById(s_add_id)
-			preconditions = graph.getNeighborsByLabel(step, 'precond-of')
+			preconditions = graph.getNeighborsByLabel(s_add, 'precond-of')
 			noncodesg = {prec for prec in preconditions if prec.name == 'equals' and not prec.truth}
 			for prec in noncodesg:
 				item1, item2 = tuple(graph.getNeighbors(prec))
-				graph.add(Edge(item1, item2, 'neq'))
-			graph.flaws += ((Flaw(step, prec), 'opf') for prec in preconditions if not prec in noncodesg)
+				graph.edges.add(Edge(item1, item2, 'neq'))
+			graph.flaws += (Flaw((s_add, prec), 'opf') for prec in preconditions if not prec in noncodesg)
 				
 		#Good time as ever to updatePlan
 		graph.updatePlan()

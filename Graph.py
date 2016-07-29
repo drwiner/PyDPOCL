@@ -25,6 +25,11 @@ class Edge:
 			return True
 		return False
 		
+	def __eq__(self, other):
+		if self.source.id == other.source.id and self.sink.id == other.sink.id and self.label == other.label:
+			return True
+		return False
+		
 	def merge(self, other):
 		"""Merges source and sink"""
 
@@ -51,7 +56,7 @@ class Edge:
 		#self.sink.print_element()
 		
 	def print_edge(self):
-		print('Edge {} --{}--> {}'.format(self.source.id, self.label, self.sink.id))
+		print('Edge {} --{}--> {}'.format(self.source, self.label, self.sink))
 	def __repr__(self):
 		return 'Edge {} --{}--> {}'.format(self.source, self.label, self.sink)
 

@@ -161,6 +161,18 @@ class Action(ElementGraph):
 			return False
 			
 		return prospects
+		
+	def __repr__(self):
+		str = '\n({}'.format(self.root.name)
+
+		for i in range(1,self.root.num_args+1):
+			if i not in self.Args:
+				str +=' __ '
+			else:
+				str += '({}:{}) '.format(self.Args[i].name, self.Args[i].type)
+		
+		str += ')'
+		return str
 
 	def print_action(self):
 		print('\n({}'.format(self.root.name),end = " ")

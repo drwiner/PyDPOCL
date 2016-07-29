@@ -63,7 +63,7 @@ class OrderingGraph(Graph):
 		#Induction
 		for edge in incidentEdges:
 			#Descendants.add(edge.sink)
-			visited = self.rDetectCycle(edge.sink, visited)
+			visited = self.rDetectCycle(edge.sink, visited = visited)
 		return visited
 		
 	def foundPath(self,start, finish):
@@ -80,11 +80,17 @@ class OrderingGraph(Graph):
 		
 	def isPath(self, start, finish):
 		"""Returns True if path from start to Finish, False otherwise"""
-		visited = self.rDetectCycle(start)
+		visited = self.rDetectCycle(start) 
 		if visited:
 			if finish in visited:
 				return True
 		return False
+		
+	def __repr__(self):
+		output = ''
+		for edge in self.edges:
+			output += edge
+		return output
 		
 		
 class CausalLinkGraph(OrderingGraph):
