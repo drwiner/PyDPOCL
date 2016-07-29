@@ -118,7 +118,7 @@ class PlanSpacePlanner:
 						#Also, add elements in new_step_op which are not Effect
 						graph_copy.mergeGraph(new_step_op)
 						
-						self.addStep(graph_copy, new_step_op.root.id, s_need.id, eff_abs.id) #adds causal link and ordering constraints
+						self.addStep(graph_copy, new_step_op.root.id, s_need.id, eff_abs.id, new = True) #adds causal link and ordering constraints
 						results.add(graph_copy)
 						#add graph to children
 		return results
@@ -166,7 +166,7 @@ class PlanSpacePlanner:
 							graph_copy.elements.remove(edge.sink)
 							graph_copy.replaceWith(edge.sink,new_sink)
 							
-						self.addStep(graph_copy, s_need.id, step.root.id, eff_abs.id)
+						self.addStep(graph_copy, s_need.id, step.root.id, eff_abs.id, new = False)
 						results.add(graph_copy)
 		return results
 	
@@ -188,9 +188,15 @@ class PlanSpacePlanner:
 		graph.OrderingGraph.addEdge(s_need_id, graph.final_dummy_step.id)
 		graph.OrderingGraph.addEdge(s_add_id,s_need_id)
 		graph.CausalLinkGraph.addEdge(s_add_id, s_need_id, condition_id)
+
 		if new:
-			new_flaws = addOpenPreconditionFlaws(graph, graph.getElementById(s_add_id))
-			graph.flaws += new_flaws
+			step = graph.getElementById(s_add_id)
+			preconditions = graph.getNeighborsByLabel(step, 'precond-of')
+			noncodesg = {prec for prec in preconditions if prec.name == 'equals' and not prec.truth}
+			for prec in noncodesg:
+				item1, item2 = tuple(graph.getNeighbors(prec))
+				graph.add(Edge(item1, item2, 'neq'))
+			graph.flaws += ((Flaw(step, prec), 'opf') for prec in preconditions if not prec in noncodesg)
 				
 		#Good time as ever to updatePlan
 		graph.updatePlan()

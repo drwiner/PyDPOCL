@@ -9,7 +9,10 @@ class Flaw:
 		self.name = name
 		self.flaw = tuple
 		
-class FlawLibrary:
+	def __repr__(self):
+		return '{}, {}'.format(self.name, self.flaw)
+		
+class FlawLibrary(collections.deque):
 	def __init__(self):
 		self._flaws = []
 	
@@ -59,16 +62,14 @@ def detectThreatenedCausalLinks(graph):
 	return detectedThreatenedCausalLinks
 	
 
-def addOpenPreconditionFlaws(graph, step):
-	"""
-	An open precondition flaw is a tuple <step element, precondition element>
-		where precondition element is a literal element, 
-		there is a precondition edge from the step element to the precondition element,
-		and there is no causal link in the graph from another step to the precondition element with label 'effect'
-		It's important to consider this last point 
-			because with this approach, you could instantiate an element which already has some preconditions in causal links
-	"""
-	new_flaws = set()
-	preconditions = graph.getNeighborsByLabel(step, 'precond-of')
-	new_flaws.update({Flaw((step,precondition),'opf') for precondition in preconditions})
-	return new_flaws
+
+"""
+An open precondition flaw is a tuple <step element, precondition element>
+	where precondition element is a literal element, 
+	there is a precondition edge from the step element to the precondition element,
+	and there is no causal link in the graph from another step to the precondition element with label 'effect'
+	It's important to consider this last point 
+		because with this approach, you could instantiate an element which already has some preconditions in causal links
+		
+		********Consider above for resolve "uninstantiated step flaw"
+"""
