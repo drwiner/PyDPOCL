@@ -214,7 +214,9 @@ def problemToGraphs(problem):
 		Keys: 'arg', 'init', 'goal'
 		Values: arg dictionary, (elements, edges), (elements, edges)
 	"""
-	Args = {object.name: Argument(id = uuid.uuid1(1), name = object.name, type = object.typeName) for object in problem.objects}
+	Args = {object.name: Argument(id = uuid.uuid1(1), name = object.name, type = object.typeName) for object in problem.objects if not object.typeName.lower() in {'character', 'actor'}}
+	Args.update({object.name: Actor(id = uuid.uuid1(1), name = object.name, type = object.typeName) for object in problem.objects if object.typeName.lower() in {'character', 'actor'}})
+
 	#Initial state
 	#for condition in problem_initial_state:
 	init_elements = set()
@@ -242,7 +244,7 @@ def problemToGraphs(problem):
 	goal_graph.edges.update(goal_edges)
 	goal_graph.edges.update({Edge(goal_op, goal_lit, 'precond-of') for goal_lit in goal_elements})
 	
-	return {'args': Args, 'init': init_graph, 'goal':goal_graph}
+	return (Args, init_graph, goal_graph)
 	
 def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	""" Returns tuple 
@@ -255,8 +257,8 @@ def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	domain, dom = parser.parse_domain_drw()
 	problem, v = parser.parse_problem_drw(dom)
 	op_graphs = domainToOperatorGraphs(domain)
-	strucDict = problemToGraphs(problem)
-	return (op_graphs, set(strucDict['args'].values()), strucDict['init'], strucDict['goal'])
+	args, init, goal = problemToGraphs(problem)
+	return (op_graphs, set(args.values()), init, goal)
 	
 import sys	
 if __name__ ==  '__main__':

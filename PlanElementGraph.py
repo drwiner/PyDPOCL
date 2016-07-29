@@ -101,13 +101,26 @@ class Action(ElementGraph):
 		new_self.id = start_from
 		nei = -1
 		
-		found = False
+		#While changing IDs, look for the element which used to have old_element.id and let 'nei' = new element id
+		if not old_element_id is None:
+			ole = {element for element in new_self.elements if element.id == old_element_id}
+			if not ole:
+				print('could not find old element id {} in old Action {}'.format(old_element_id, self.id))
+			else:
+				old_element = ole.pop()
+		
 		for element in new_self.elements:
 			element.id = uuid.uuid1(start_from)
-			if not old_element_id is None and not found:
-				if element.id == old_element_id:
-					found = True
-					nei = element.id
+		
+		if not old_element_id is None:
+			nei = old_element.id
+		
+		# for element in new_self.elements:
+			# element.id = uuid.uuid1(start_from)
+			# if not old_element_id is None and not found:
+				# if element.id == old_element_id:
+					# found = True
+					# nei = element.id
 			
 		new_id = new_self.root.id
 		for i, arg in new_self.Args.items():

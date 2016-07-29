@@ -53,6 +53,7 @@ class ElementGraph(Graph):
 	def mergeGraph(self, other):
 		"""
 			For each element in other to include in self, if its a replacer, merge it into self
+					A relacer element 'replacer' is one such that replacer.replaced_id == some element id in self
 			Otherwise, add that element to self
 			For each edge in other to include in self, if its in self do nothing, otherwise add it
 		

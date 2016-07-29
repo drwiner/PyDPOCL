@@ -385,29 +385,30 @@ class Actor(Argument):
 		super(Actor,self).__init__(id,type,name, arg_pos_dict, arg_name)
 		self.orphan_dict=  orphan_dict
 		
-	def isConsistent(self, other):
-		""" isConsistent if for every other.id in arg_pos_dict, 
-			either	A) there is no id in self
-					B) the same id is there and the position is the same
-		"""
-		if not super(Actor,self).isConsistent(other):
-			return False
+	# def isConsistent(self, other):
+		# """ isConsistent if for every other.id in arg_pos_dict, 
+			# either	A) there is no id in self
+					# B) the same id is there and the position is the same
+		# """
+		# if not super(Actor,self).isConsistent(other):
+			# return False
 		
-		if type(other) == Argument:
-			return False
+		# if type(other) == Argument:
+			# return False
 			
-		return True
+		# return True
 		
 	def merge(self, other):
 		if super(Actor,self).merge(other) is None:
 			return None
 			
-		for operatorID, status in other.orphan_dict.items():
-			if operatorID not in self.orphan_dict:
-				self.orphan_dict[operatorID] = status
-			elif status != self.orphan_dict[operatorID]:
-				#One of them must be True if they are unequal
-				self.orphan_dict[operatorID] = True
+		if type(other) == Actor:
+			for operatorID, status in other.orphan_dict.items():
+				if operatorID not in self.orphan_dict:
+					self.orphan_dict[operatorID] = status
+				elif status != self.orphan_dict[operatorID]:
+					#One of them must be True if they are unequal
+					self.orphan_dict[operatorID] = True
 				
 		self.arg_pos_dict.update(other.arg_pos_dict)
 		

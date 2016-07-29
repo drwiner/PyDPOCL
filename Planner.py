@@ -88,18 +88,25 @@ class PlanSpacePlanner:
 		#Then try new Step
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
+				#Condition graph of operator
 				Effect = op.getElementGraphFromElementId(eff.id, Condition)
+				
+				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
 				if Effect.canAbsolve(Precondition):
-					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.id)
-					#nei : new element id, to easily access element from graph
 					
+					#nei : new element id, to easily access element from graph
+					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.id)
+					
+					#Condition graph of copied operator for Effect
 					Effect  = step_op.getElementGraphFromElementId(nei, Condition)
-					Effect_absorbtions = Effect.getInstantiations(Precondition)
+					
 					#could be more than one way to unify effect with precondition
-
+					Effect_absorbtions = Effect.getInstantiations(Precondition)
+					
+			
 					for eff_abs in Effect_absorptions: 
 						graph_copy = copy.deepcopy(graph)
-						graph_copy.mergeGraph(eff_abs) 
+						graph_copy.mergeGraph(eff_abs) #what did this do?
 						
 						new_step_op = copy.deepcopy(step_op)
 						graph_copy.mergeGraph(new_step_op)
@@ -232,8 +239,7 @@ class PlanSpacePlanner:
 			return graph
 			
 		#INDUCTION
-		flaw = graph.flaws[0] #always from bottom, keep sorted?
-		del(graph.flaws[0])
+		flaw = graph.flaws.pop() 
 		
 		if flaw.name == 'opf':
 			results = self.reuse(graph, flaw)
