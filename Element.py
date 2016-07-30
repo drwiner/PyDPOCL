@@ -240,7 +240,11 @@ class Operator(InternalElement):
 			print('\t id={}, role={}'.format(key, value))
 			
 	def __repr__(self):
-		return 'operator({}, {}, {})'.format(self.executed, self.name, self.id)
+		if self.executed is None:
+			exe = ''
+		else:
+			exe = self.executed
+		return 'operator({}, {}, {})'.format(exe, self.name, self.id)
 		#for key,value in self.roles.items():
 		#	st.append('\t id={}, role={}'.format(key,value))
 		#return st
@@ -291,6 +295,9 @@ class Literal(InternalElement):
 			self.truth = other.truth
 			
 		return self
+		
+	def __repr__(self):
+		return '{} {} {}-{}'.format(self.id, self.type, self.truth, self.name)
 			
 	def print_element(self):
 		print(self.truth, '(',self.id, self.type, self.name,')')
@@ -328,12 +335,20 @@ class Argument(Element):
 			
 		return True
 	
+	'''	Should this be a thing? 
+		Unnecessary restrictions, may have explicit 'neq'
+	'''
 	def isConsistentArgPosDict(self, other):
 		for id, pos in other.arg_pos_dict.items():
 			if id in self.arg_pos_dict:
 				if other.arg_pos_dict[id] != self.arg_pos_dict[id]:
 					return False
 		return True
+		
+	def updateArgPos(self, old_op_id, new_op_id):
+		for id, pos in self.arg_pos_dict.items():
+			if id == old_op_id:
+				id = 
 	
 	def isEquivalent(self, other):
 		""" isEquivalent if for all shared keys, the value is the same.

@@ -245,6 +245,9 @@ class Condition(ElementGraph):
 			print(str, end=" ") 
 		print(')')
 		
+	def __repr__(self):
+		return self.root
+		
 		
 class CausalLink(Edge):
 	""" A causal link is an edge, s.t. the source and sink are actions, and the condition is itself an edge between a dummy element
