@@ -337,6 +337,7 @@ class Argument(Element):
 	
 	'''	Should this be a thing? 
 		Unnecessary restrictions, may have explicit 'neq'
+		Where is arg-pos-dict used? 
 	'''
 	def isConsistentArgPosDict(self, other):
 		for id, pos in other.arg_pos_dict.items():
@@ -348,7 +349,7 @@ class Argument(Element):
 	def updateArgPos(self, old_op_id, new_op_id):
 		for id, pos in self.arg_pos_dict.items():
 			if id == old_op_id:
-				id = 
+				
 	
 	def isEquivalent(self, other):
 		""" isEquivalent if for all shared keys, the value is the same.
