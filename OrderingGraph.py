@@ -87,10 +87,11 @@ class OrderingGraph(Graph):
 		return False
 		
 	def __repr__(self):
-		output = ''
+		output = '{'
 		for edge in self.edges:
-			output += edge
-		return output
+			output.append('{}-{} --{}--> {}-{}'.format(edge.source.name, edge.source.type, edge.label, edge.sink.name, edge.sink.type))
+		output.append(['}'])
+		return '\n'.join(output)
 		
 		
 class CausalLinkGraph(OrderingGraph):

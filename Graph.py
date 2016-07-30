@@ -26,9 +26,17 @@ class Edge:
 		return False
 		
 	def __eq__(self, other):
+		if other is None:
+			return False
 		if self.source.id == other.source.id and self.sink.id == other.sink.id and self.label == other.label:
 			return True
 		return False
+		
+	def __ne__(self, other):
+		return (not self.__eq__(other))
+		
+	def __hash__(self):
+		return hash((self.source.id, self.sink.id, self.label))
 		
 	def merge(self, other):
 		"""Merges source and sink"""

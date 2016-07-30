@@ -289,12 +289,6 @@ class CausalLink(Edge):
 	def threatenedBy(self,action):
 		action_orderings = getOrderingsWith(action)	
 		
-class Ordering(Edge):
-	def __init__(self,action1,action2):
-		if not action1.type == 'Action' or not action2.type == 'Action':
-			print('cannot order non-actions')
-			return None
-		super(Ordering, self).__init__(action1,action2,'<')
 		
 class PlanElementGraph(ElementGraph):
 	"""

@@ -55,6 +55,19 @@ class Element:
 		if self.isEquivalent(other) and other.isEquivalent(self):
 			return True
 		return False
+		
+	def __eq__(self, other):
+		if other is None:
+			return False
+		if self.id == other.id:
+			return True
+		return False
+		
+	def __ne__(self, other):
+		return (not self.__eq__(other))
+		
+	def __hash__(self):
+		return hash(self.id)
 			
 	def merge(self, other):
 		"""merge returns self with non-None properties of other,

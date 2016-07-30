@@ -181,10 +181,16 @@ class PlanSpacePlanner:
 		"""
 		if new == None:
 			new = False
-		graph.OrderingGraph.addEdge(graph.initial_dummy_step, s_add)
-		graph.OrderingGraph.addEdge(s_add, graph.final_dummy_step)
-		graph.OrderingGraph.addEdge(graph.initial_dummy_step, s_need)
-		graph.OrderingGraph.addEdge(s_need, graph.final_dummy_step)
+			
+		if not s_add == graph.initial_dummy_step:
+			graph.OrderingGraph.addEdge(graph.initial_dummy_step, s_add)
+			graph.OrderingGraph.addEdge(graph.initial_dummy_step, s_need)
+			
+		if not s_need == graph.final_dummy_step:
+			graph.OrderingGraph.addEdge(s_add, graph.final_dummy_step)
+			graph.OrderingGraph.addEdge(s_need, graph.final_dummy_step)
+			
+		#Always add this ordering
 		graph.OrderingGraph.addEdge(s_add,s_need)
 		graph.CausalLinkGraph.addEdge(s_add, s_need, condition_id)
 

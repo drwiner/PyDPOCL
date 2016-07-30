@@ -17,6 +17,9 @@ results = planner.newStep(graph, flaw)
 
 
 graph = results.pop()
+OG = graph.OrderingGraph
+s_need, pre = flaw.flaw
+s_need == graph.finaly_dummy_step
 
 results.update(planner.reuse(graph,flaw))
 
