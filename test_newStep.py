@@ -14,9 +14,22 @@ flaw = graph.flaws.pop()
 
 
 results = planner.newStep(graph, flaw)
+graph = results.pop()
+flaw = graph.flaws.pop()
+results = planner.newStep(graph,flaw)
+graph = results.pop()
+detectThreatenedCausalLinks(graph)
+
+
+results.update(planner.newStep(graph, flaw))
+
+
 
 
 graph = results.pop()
+copy.deepcopy(graph.edges)
+flaw = graph.flaws.pop()
+
 OG = graph.OrderingGraph
 s_need, pre = flaw.flaw
 s_need == graph.final_dummy_step

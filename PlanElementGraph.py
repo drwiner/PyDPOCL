@@ -112,9 +112,6 @@ class Action(ElementGraph):
 		
 		if not old_element_id is None:
 			nei = old_element.ID
-			
-		#Wipe non-equality constraints clean
-		new_self.neqs = set()
 		
 		
 		# for element in new_self.elements:

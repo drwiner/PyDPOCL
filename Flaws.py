@@ -36,8 +36,8 @@ def detectThreatenedCausalLinks(graph):
 	"""
 	
 	detectedThreatenedCausalLinks = set()
-	for causal_link in graph.CausalLinks:
-		dependency = causal_link.condition
+	for causal_link in graph.CausalLinkGraph.edges:
+		dependency = graph.getElementById(causal_link.label)
 		reverse_dependency = copy.deepcopy(dependency)
 		#Reverse the truth status of the dependency
 		if reverse_dependency.truth == True:
