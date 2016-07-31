@@ -196,9 +196,12 @@ class PlanSpacePlanner:
 
 		if new:
 			preconditions = graph.getNeighborsByLabel(s_add, 'precond-of')
-			noncodesg = {prec for prec in preconditions if prec.name == 'equals' and not prec.truth}
+			equalNames = {'equals', 'equal', '='}
+			noncodesg = {prec for prec in preconditions if prec.name in equalNames and not prec.truth}
 			for prec in noncodesg:
 				item1, item2 = tuple(graph.getNeighbors(prec))
+				item1.neqs.add(item2.id)
+				item2.neqs.add(item1.id)
 				graph.edges.add(Edge(item1, item2, 'neq'))
 			graph.flaws += (Flaw((s_add, prec), 'opf') for prec in preconditions if not prec in noncodesg)
 				

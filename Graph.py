@@ -395,22 +395,13 @@ def rDetectConsistentEdgeGraph(Remaining = None, Available = None):
 	""" Returns True if all remaining edges can be assigned a consistent non-used edge in self """
 	if len(Remaining)  == 0:
 		return True
-		
-	# #No solution if there are more edges remaining then there are available edges
-	# if len(Remaining) > len(Available):
-		# return False
 
 	other_edge = Remaining.pop()
 	print('remaining ', len(Remaining))
-	#print('available ', len(Available))
+
 	for prospect in Available:
-		#print('prospect ,', prospect.source.id, ' ', 	prospect.label, ' ', 	prospect.sink.id)
-		#print('other_edge ,', other_edge.source.id, ' ', other_edge.label, ' ', 	other_edge.sink.id)
 		if prospect.isConsistent(other_edge):
-			if rDetectConsistentEdgeGraph(	Remaining, \
-											{item \
-												for item in Available - {prospect}\
-											}):
+			if rDetectConsistentEdgeGraph(	Remaining, {item for item in Available - {prospect}}):
 				return True
 	return False
 	

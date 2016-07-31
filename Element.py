@@ -48,13 +48,12 @@ class Element:
 		if not self.type is None:
 			if self.type != other.type:
 				return False
+		else:
+			if not other.type is None:
+				return False
 				
 		return True
 		
-	def isEqual(self, other):
-		if self.isEquivalent(other) and other.isEquivalent(self):
-			return True
-		return False
 		
 	def __eq__(self, other):
 		if other is None:
@@ -132,12 +131,21 @@ class InternalElement(Element):
 		if not self.name is None:
 			if self.name != other.name:
 				return False
+		else:
+			if not other.name is None:
+				return False
 				
-		# must be num_args if there is no name
-		if not other.name is None:
-			if self.num_args == 0:
-				if self.num_args != other.num_args:
-					return False
+		if self.num_args != other.num_args:
+			return False
+		
+		
+		# if not other.name is None:
+			# if other.num_args > 0:
+				# if self.num_args != other.num_args:
+					# return False
+			# if self.num_args == 0:
+				# if self.num_args != other.num_args:
+					# return False
 					
 						
 		if not self.isConsistentRoleDict(other):
@@ -278,6 +286,9 @@ class Literal(InternalElement):
 		if not self.truth is None:
 			if self.truth != other.truth:
 				return False
+		else:
+			if not other.truth is None:
+				return False
 				
 			
 		return True
@@ -304,75 +315,71 @@ class Literal(InternalElement):
 		
 		
 class Argument(Element):
-	""" An Argument Element is an element with a dictionary mapping operator ids to positions 
-		Bindings are stored on arguments. 
-			An argument can take at most 1 position per operator id.
+	""" An Argument Element is an element with non-equality constraints 'neqs'. 
 			A Merge makes a codesignation between two arguments.
-		 
 	"""
 	
-	def __init__(self, id, type, name= None, arg_pos_dict = None, arg_name = None):
-		if arg_pos_dict == None:
-			arg_pos_dict = {}
+	def __init__(self, id, type, name= None, neqs = None, arg_name = None):
+		if neqs == None:
+			neqs = set()
 		super(Argument,self).__init__(id,type,name, arg_name)
 		#arg_pos_dict is a mapping from operator.ids to positions
-		self.arg_pos_dict = arg_pos_dict
+		self.neqs = neqs
 		
 	def isConsistent(self, other):
-		""" isConsistent if for every other.id in arg_pos_dict, 
-			either	A) there is no id in self
-					B) the same id is there and the position is the same
+		""" isConsistent if arguments have no conflicting attributes and no neq conflicts
 		"""
 		if not super(Argument,self).isConsistent(other):
 			return False
-		
-		#Trivially, true if other has no arg_pos_dicts to speak of
-		if len(other.arg_pos_dict) == 0:
-			return True
 			
-		if not self.isConsistentArgPosDict(other):
+		if not self.isConsistentNeqs(other):
 			return False
 			
 		return True
 	
-	'''	Should this be a thing? 
-		Unnecessary restrictions, may have explicit 'neq'
-		Where is arg-pos-dict used? 
-	'''
-	def isConsistentArgPosDict(self, other):
-		for id, pos in other.arg_pos_dict.items():
-			if id in self.arg_pos_dict:
-				if other.arg_pos_dict[id] != self.arg_pos_dict[id]:
-					return False
+
+	def isConsistentNeqs(self, other):
+		# for id, pos in other.arg_pos_dict.items():
+			# if id in self.arg_pos_dict:
+				# if other.arg_pos_dict[id] != self.arg_pos_dict[id]:
+					# return False
+					
+		if len(x for x in self.neqs if x.id == other.id) > 0:
+			return False
+			
+		if len(y for y in other.neqs if y.id == self.id) > 0:
+			return False
+			
 		return True
-		
-	def updateArgPos(self, old_op_id, new_op_id):
-		for id, pos in self.arg_pos_dict.items():
-			if id == old_op_id:
 				
 	
 	def isEquivalent(self, other):
-		""" isEquivalent if for all shared keys, the value is the same.
-		"""
-		""" equivalent if for super equivalent and 
-			for every id:pos in other, id in self and id: pos
-			BUT cannot be equivalent if it has no arg_pos_dict
+		""" 
+			'equivalent' arguments are consistent and have been assigned the same name
+			
 		"""
 		if not super(Argument,self).isEquivalent(other):
 			return False
+		
+		#consistency 
+		if not self.name is None:
+			if other.name != self.name:
+				return False
+		else:
+			if not other.name is None:
+				return False
+		
+		#	
+		#if len(other.arg_pos_dict) == 0:
+		#	return False
 			
-		if len(other.arg_pos_dict) == 0:
+		if not self.isConsistentNeqs(other):
 			return False
 			
-		if not self.isConsistentArgPosDict(other):
-			return False
+		
 				
 		return True
 		
-	def isEqual(self,other):
-		if self.isEquivalent(other) and other.isEquivalent(self):
-			return True
-		return False
 		
 	def merge(self, other):
 		""" Merging arguments:
@@ -382,13 +389,12 @@ class Argument(Element):
 		if super(Argument,self).merge(other) is None:
 			return None
 		
-		self.arg_pos_dict.update(other.arg_pos_dict)
+		self.neqs.update(other.neqs)
 		return self
 		
 	def print_element(self):
 		print('(',self.id, self.type, self.name,')')
-		for key,value in self.arg_pos_dict.items():
-			print("\t op.id=", key,":","pos=",value)
+	
 
 class Actor(Argument):
 	""" An actor is an argument such that 
@@ -405,13 +411,13 @@ class Actor(Argument):
 				for the actor that matches the intention frame's intender
 		When we merge 2 actors, we merge the orphan_dicts with preference for True
 	"""
-	def __init__(self, id, type, name= None, arg_name = None, arg_pos_dict = None, orphan_dict = None):
-		if arg_pos_dict == None:
-			arg_pos_dict = {}
+	def __init__(self, id, type, name= None, arg_name = None, neqs = None, orphan_dict = None):
+		if neqs == None:
+			neqs = set
 		if orphan_dict == None:
 			orphan_dict = {}
 			
-		super(Actor,self).__init__(id,type,name, arg_pos_dict, arg_name)
+		super(Actor,self).__init__(id,type,name, neqs, arg_name)
 		self.orphan_dict=  orphan_dict
 		
 	# def isConsistent(self, other):
@@ -438,8 +444,6 @@ class Actor(Argument):
 				elif status != self.orphan_dict[operatorID]:
 					#One of them must be True if they are unequal
 					self.orphan_dict[operatorID] = True
-				
-		self.arg_pos_dict.update(other.arg_pos_dict)
 		
 		return self
 
@@ -561,8 +565,10 @@ class IntentionFrameElement(Element):
 		""" NOTE: combine all actors """
 		if not self.intender is None:
 			#Can we just access all actors in plan willy nillier than this?
-			for step in self.subplan:
-				{self.intender.combine(nb) for nb in PLAN.getNeighborsByLabel(step, 'actor-of') if self.id in nb.arg_pos_dict}
+			pass
+			
+			#for step in self.subplan:
+			#	{self.intender.combine(nb) for nb in PLAN.getNeighborsByLabel(step, 'actor-of') if self.id in nb.arg_pos_dict}
 				#WHEN adding a step to an intention frame, make sure to update actors with new arg_pos_dict for intention frame
 				
 			

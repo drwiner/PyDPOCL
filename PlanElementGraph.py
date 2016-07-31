@@ -1,6 +1,7 @@
 from OrderingGraph import *
 from collections import deque
 import uuid
+import random
 
 class Belief(ElementGraph):
 	def __init__(self, id, type, name=None, \
@@ -35,8 +36,8 @@ class Action(ElementGraph):
 		super(Action,self).__init__(id,type_graph,name,Elements,root_element,Edges,Constraints)
 
 		""" Get Action arguments by position"""											
-		self.Args = {}
-		self.updateArgs()
+		#self.Args = {}
+		#self.updateArgs()
 				
 		""" Get consenting actors"""
 		self.consenting_actors = set()			
@@ -45,21 +46,21 @@ class Action(ElementGraph):
 		#print('num_CONSENTING actors = {} in action {}'.format(len(self.consenting_actors),self.id))
 		
 		""" Determine if Action is an orphan"""
-		self.isOrphan()
+		#self.isOrphan()
 				
 
 	def updateActionParams(self):
 		self.updateConsentingActors()
-		self.updateArgs()
-		self.isOrphan()
+		#self.updateArgs()
+		#self.isOrphan()
 				
-	def updateArgs(self):
+	# def updateArgs(self):
 
-		for arg in self.elements:
-			if type(arg) == Argument or type(arg) == Actor:
-				for op_id, pos in arg.arg_pos_dict.items():
-					if op_id == self.root.id:
-						self.Args[pos] = arg
+		# for arg in self.elements:
+			# if type(arg) == Argument or type(arg) == Actor:
+				# for op_id, pos in arg.arg_pos_dict.items():
+					# if op_id == self.root.id:
+						# self.Args[pos] = arg
 						
 	def updateConsentingActors(self,scratch = None):
 		if scratch == None:
@@ -71,13 +72,13 @@ class Action(ElementGraph):
 											if edge.source is self.root \
 											and edge.label == 'actor-of'})
 											
-	def isOrphan(self):
-		for actor in self.consenting_actors:
-			if self.root.id not in actor.orphan_dict:
-				actor.orphan_dict[self.root.id] = True
-				self.is_orphan = True
-			elif actor.orphan_dict[self.root.id] == True:
-				self.is_orphan = True
+	# def isOrphan(self):
+		# for actor in self.consenting_actors:
+			# if self.root.id not in actor.orphan_dict:
+				# actor.orphan_dict[self.root.id] = True
+				# self.is_orphan = True
+			# elif actor.orphan_dict[self.root.id] == True:
+				# self.is_orphan = True
 				
 	# @classmethod
 	# def makeElementGraph(cls, elementGraph, element):
@@ -89,13 +90,11 @@ class Action(ElementGraph):
 								# Edges = elementGraph.rGetDescendantEdges(element),\
 								# Constraints = elementGraph.rGetDescendantConstraints(element))
 	
-	def makeCopyFromID(self, start_from, increment = None, old_element_id = None):
+	def makeCopyFromID(self, start_from, old_element_id = None):
 		"""
 			Makes copy of step-induced subgraph and changes ids
-				Includes, updating the argument list
+			Non-equality constraints wiped
 		"""
-		if increment == None:
-			increment = 1
 		new_self = self.copyGen()
 		old_id = self.id
 		new_self.id = start_from
@@ -114,6 +113,10 @@ class Action(ElementGraph):
 		
 		if not old_element_id is None:
 			nei = old_element.id
+			
+		#Wipe non-equality constraints clean
+		new_self.neqs = set()
+		
 		
 		# for element in new_self.elements:
 			# element.id = uuid.uuid1(start_from)
@@ -122,11 +125,11 @@ class Action(ElementGraph):
 					# found = True
 					# nei = element.id
 			
-		new_id = new_self.root.id
-		for i, arg in new_self.Args.items():
-			for id,pos in arg.arg_pos_dict.items():
-				if id == old_id:
-					arg.arg_pos_dict[new_id] = arg.arg_pos_dict.pop(old_id)
+		#new_id = new_self.root.id
+		# for i, arg in new_self.Args.items():
+			# for id,pos in arg.arg_pos_dict.items():
+				# if id == old_id:
+					# arg.arg_pos_dict[new_id] = arg.arg_pos_dict.pop(old_id)
 					
 
 		return new_self, nei
@@ -162,21 +165,10 @@ class Action(ElementGraph):
 			
 		return prospects
 		
-	def __repr__(self):
-		str = '\n({}'.format(self.root.name)
-
-		for i in range(1,self.root.num_args+1):
-			if i not in self.Args:
-				str +=' __ '
-			else:
-				str += '({}:{}) '.format(self.Args[i].name, self.Args[i].type)
-		
-		str += ')'
-		return str
 
 	def print_action(self):
 		print('\n({}'.format(self.root.name),end = " ")
-
+		self.Args = []''' temporary, no Args list'''
 		for i in range(1,self.root.num_args+1):
 			if i not in self.Args:
 				print('__',end = " ")
@@ -184,37 +176,6 @@ class Action(ElementGraph):
 				print('({}:{})'.format(self.Args[i].type,self.Args[i].id),end = " ")
 		
 		print(')')
-		
-				
-	def instantiate(self, operator, PLAN):
-		""" instantiates self as operator in PLAN
-			RETURNS a set of plans, one for each instantiation which is internally consistent
-			- To instantiate a step as an operator, 
-							1) make a copy of operator with new IDs
-							2) operator.absolve(step)
-							3) swap operator for step in plan
-		"""
-		
-		instances = operator.getInstantiations(self)
-		plans = set()
-		id = PLAN.id + 1
-		for instance in instances:
-			Plan = PLAN.copyGen()
-			Plan.id = id 
-			id += 1
-			Plan.mergeGraph(instance)
-			#action = Plan.getElementGraphFromElementId(self.id, Action)
-			#if not operator.canAbsolve(action):
-			#	print('Original Plan {}: constraints of partial step {} are detected in operator {}'.format(PLAN.id, self.id, operator.id))
-			#	continue
-			if Plan.isInternallyConsistent():
-				Plan.updateIntentionFrameAttributes()
-				print('adding plan {}'.format(Plan.id))
-				plans.add(Plan)
-			print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-		return plans
-		
-		
 		
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
@@ -248,49 +209,6 @@ class Condition(ElementGraph):
 	def __repr__(self):
 		return self.root
 		
-		
-class CausalLink(Edge):
-	""" A causal link is an edge, s.t. the source and sink are actions, and the condition is itself an edge between a dummy element
-		and the dependency literal element, rather than just a label"""
-	def __init__(self, id, type_graph, name=None, action1 = None, action2 = None, condition = None):
-		super(CausalLink,self).__init__(source=action1,sink=action2,label=condition.id)
-		self.id = id
-		self.type = type_graph
-		self.name = name
-		self.dependency = condition #A literal element#
-		
-	def isInternallyConsistent(self):
-		effects = 	{egde.sink \
-						for edge in self.edges \
-							if edge.label == 'effect-of' \
-							and edge.sink.id == self.condition.id\
-					}
-					
-		if len(effects) == 0:
-			return False
-		if len(effects) > 1:
-			print('multiple effects with dependency id?')
-			return False
-			
-		preconditions = {edge.sink \
-							for edge in self.edges \
-								if edge.label == 'precond-of' \
-								and edge.sink.id == self.condition.id\
-						}
-						
-		if len(preconditions) == 0:
-			return False
-		if len(preconditions) >1:
-			print('multiple preconditions with dependecy id?')
-			return False
-			
-		return True
-		
-	
-	#def possiblyThreatenedBy(self,action):
-	
-	def threatenedBy(self,action):
-		action_orderings = getOrderingsWith(action)	
 		
 		
 class PlanElementGraph(ElementGraph):
@@ -333,14 +251,7 @@ class PlanElementGraph(ElementGraph):
 		#Edges.update( {Edge(planElement,IF, 'frame-of') for IF in self.IntentionFrames})
 		#Edges.update( {Edge(planElement,step, 'step-of') for step in self.Steps})
 									
-		super(PlanElementGraph,self).__init__(\
-												id,\
-												type_graph,\
-												name,\
-												Elements,planElement,\
-												Edges,\
-												Constraints\
-											)
+		super(PlanElementGraph,self).__init__(id,type_graph,name,Elements,planElement,Edges,Constraints)
 		
 		
 		self.updateIntentionFrameAttributes()
@@ -359,8 +270,8 @@ class PlanElementGraph(ElementGraph):
 		if Constraints is None:
 			Constraints = self.constraints
 		self.Steps = {element for element in Elements if type(element) is Operator}
-		self.Orderings = {edge for edge in Constraints if type(edge) is Ordering}
-		self.Causal_Links = {edge for edge in Edges if type(edge) is CausalLink}
+		self.Orderings = self.OrderingGraph.edges
+		self.Causal_Links = self.CausalLinkGraph.edges
 		self.IntentionFrames = {element for element in Elements if type(element) is IntentionFrameElement}
 		return self
 											
@@ -428,119 +339,21 @@ class PlanElementGraph(ElementGraph):
 		return self.rPickActorFromSteps(remaining_steps, potential_actors)
 	
 	
-	def isInternallyConsistent(self):
-		""" 
-			With respect to constraint sources
-			With respect to orderings (no cycles)
-			With respect to causal links (?)
-			With respect to intention frame elements
-				consenting actors
-				causal antecedence of sat
+	def instantiatePartialStep(self, partial, operator_choices, complete_steps = None):
+		if operator_choices == None:
+			return None
+		if partial == None:
+			return None
+		if complete_steps == None:
+			complete_steps = set()
 			
-		"""
-		return super(PlanElementGraph,self).isInternallyConsistent()
-		
-	def detectFlaws(self):
-		self.detectOpenPreconditionFlaws()
-		self.detectThreatenedCausalLinkFlaws()
-		self.detectUnsatisfiedIntentionFrameFlaws()
-		self.detectIntentFlaws()
-		self.detectOpenMotivationFlaws()
-		return self
-		
-	def detectOpenPreconditionFlaws(self):
-		pass
-		
-	def detectThreatenedCausalLinkFlaws(self):
-		pass
-	
-	def detectUnsatisfiedIntentionFrameFlaws(self):
-		pass
-		
-	def detectIntentFlaws(self):
-		pass
-		
-	def detectOpenMotivationFlaws(self):
-		pass
-
-	def rInstantiate(self, remaining = None, operators = None, complete_plans = None):
-		if remaining == None:
-			remaining = set()
-		if operators == None:
-			operators = set()
-		if complete_plans == None:
-			complete_plans = set()
-		"""	Recursively instantiate a step in self with some operator
-			Return set of plans with all steps instantiated
-			
-			plan.rInstantiate(steps_Ids, {operator_1, operator_2})
-		"""
-		self.updatePlan()
-		#remaining = {step for step in self.Steps if not step.instantiated}
-		print('rInstantiate: {},\t remaining: {}'.format(self.id, len(remaining)))
-		
-		#BASE CASE
-		if len(remaining) == 0:
-			complete_plans.add(self)
-			print('\nsuccess!, adding new plan {}\n'.format(self.id))
-			return complete_plans
-		else:
-			print('rInstantiate remainings List:')
-			for r in remaining:
-				print('\t\t\t {}'.format(r))
-			print('\n')
-			
-		#INDUCTION
-		step_id = remaining.pop()
-		new_plans = set()
-		new_ids = {step_id + n + 35 for n in range(1,len(operators)+10)}
-		print('\nids:')
-		for d in new_ids:
-			print(d, end= " ")
-		print('\n')
-		
-		""" instantiate with every operator"""
-		for op in operators:
-			new_id = new_ids.pop()
-			new_self = self.copyGen()
-			new_self.id = self.id + new_id
-			step = new_self.getElementGraphFromElementId(step_id, Action)
-			op_clone = op.makeCopyFromID(new_id,1)
-			#print('\n Plan {} ___instantiating_{}__with operator clone {}\n'.format(new_self.id, step_id, op_clone.id))
-			print('\n Plan {} Attempting instantiation with step {} and op clone {} formally {}\n'.format(new_self.id, step.id,op_clone.id,op.id))
-			new_ps = step.instantiate(op_clone, new_self) 
-			print('\n returned {} new plans originally from {}\n'.format(len(new_ps), self.id))
-			for p in new_ps:
-				p.print_plan()
-				print('\n')
-			print('end new plans')
-			new_plans.update(new_ps)
-			#print('{} new plans from instantiating {} from operator {}-{} in plan {}'.format(len(new_ps),step.id, op.id, op.root.name, self.id))
-			
-		""" If completely empty, then this branch terminates"""
-		if len(new_plans) == 0:
-			return set()
-		
-		completed_plans_before= len(complete_plans)
-		
-		""" For each version, continue with remaining steps, choosing any operator"""
-		for plan in new_plans:
-			print('\ncalling rInstantiate with new_plan {}, now with remaining:'.format(plan.id),end = " ")
-			for r in remaining:
-				print('\t {}'.format(r), end= ", ")
-			print('\n')
-			#rem = {rem_id for rem_id in remaining}
-			complete_plans.update(plan.rInstantiate({rem_id for rem_id in remaining}, operators, complete_plans))
-		
-		""" if no path returns a plan, then this branch terminates"""
-		if completed_plans_before >= len(complete_plans):
-			return set()
-			
-		#Each return from rInstantiate is a set of unique plans with all steps instantiated
-		#for plan in new_plans:
-			#complete_plans = plan.rInstantiate(operators,complete_plans)
-		
-		return complete_plans
+		rnd =floor(random.random()*100)
+		Step = new_self.getElementGraphFromElementId(partial.id, Action)
+		operatorClones = {op.makeCopyFromID(rnd) for op in operator_choices}
+		for op in operatorClones:
+			#nStep = Step.copyGen()
+			complete_steps.update(op.getInstantiations(Step))
+		return complete_steps
 
 	
 	def print_plan(self):

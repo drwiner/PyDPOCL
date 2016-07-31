@@ -1,7 +1,5 @@
 from pddl.parser import Parser
 from math import floor
-import random
-import uuid
 import collections
 from PlanElementGraph import *
 #from Flaws import *
@@ -85,7 +83,7 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 		
 		if relationship == 'actor-of':
 			edges.add(Edge(parent, arg, 'actor-of'))
-		elif lit.name == '=':
+		elif lit.name == '=' or lit.name == 'equals' or lit.name == 'equal':
 			edges.add(Edge(lit, arg, 'arg-of'))
 		else:
 			edges.add(Edge(lit, arg, ARGLABELS[i]))
@@ -193,12 +191,12 @@ def domainToOperatorGraphs(domain):
 		for i, parameter in enumerate(action.parameters):
 			#parameters are list
 			if 'character' in parameter.types:
-				op_graph.elements.add(Actor(id = uuid.uuid1(start_id), type = 'character', arg_name = parameter.name, arg_pos_dict={op_id : i}))
+				op_graph.elements.add(Actor(id = uuid.uuid1(start_id), type = 'character', arg_name = parameter.name))#, #arg_pos_dict={op_id : i}))
 			elif 'actor' in parameter.types:
-				op_graph.elements.add(Actor(id = uuid.uuid1(start_id), type = 'actor', arg_name = parameter.name, arg_pos_dict={op_id : i}))
+				op_graph.elements.add(Actor(id = uuid.uuid1(start_id), type = 'actor', arg_name = parameter.name))#, arg_pos_dict={op_id : i}))
 			else:
 				arg_type = next(iter(parameter.types))
-				op_graph.elements.add(Argument(id = uuid.uuid1(start_id), 	type=arg_type, arg_name=parameter.name, arg_pos_dict=	{op_id :  i}))
+				op_graph.elements.add(Argument(id = uuid.uuid1(start_id), 	type=arg_type, arg_name=parameter.name))#, arg_pos_dict=	{op_id :  i}))
 			start_id += 1
 		
 		getFormulaGraph(action.precond.formula, start_id, parent = op, relationship = 'precond-of',elements= op_graph.elements, edges=op_graph.edges)

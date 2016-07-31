@@ -67,6 +67,7 @@ class ElementGraph(Graph):
 			Graph.mergeGraph(new_operator) where new_operator has replaced some elements in graph.
 					Then, if its a new element, add it. If its a replacer, merge it. 
 					For each edge in new_operator, if 
+					
 		"""
 		for element in other.elements:
 			if not hasattr(element, 'replaced_id'):
@@ -106,7 +107,7 @@ class ElementGraph(Graph):
 		for element in self.elements:
 			element.replaced_id = -1
 					#operator.absolve(partial, partial.edges, operator.available_edges)
-		completed = self.absolve(other, copy.deepcopy(other.edges), self.edges)
+		completed = self.absolve(copy.deepcopy(other.edges), self.edges)
 		if len(completed) == 0:
 			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other.id, self.id))
 			
@@ -116,7 +117,7 @@ class ElementGraph(Graph):
 		return completed	
 
 	
-	def absolve(self, other, Remaining = None, Available = None, Collected = None):
+	def absolve(self, Remaining = None, Available = None, Collected = None):
 		""" Every edge from other must be consistent with some edge in self.
 			An edge from self cannot account for more than one edge from other? 
 				
@@ -147,8 +148,8 @@ class ElementGraph(Graph):
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
 			#	print('\nstep {} edge {} --{}--> {} matches {} --{}--> {}\n'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
-				new_self=  self.assimilate(other, prospect, other_edge)
-				Collected.update(new_self.absolve(other, {copy.deepcopy(rem) for rem in Remaining}, Available, Collected))					
+				new_self=  self.assimilate(prospect, other_edge)
+				Collected.update(new_self.absolve({copy.deepcopy(rem) for rem in Remaining}, Available, Collected))					
 		
 		if len(Collected) == 0:
 			return set()
@@ -159,7 +160,7 @@ class ElementGraph(Graph):
 			return set()
 		
 	
-	def assimilate(self, other, old_edge, other_edge):
+	def assimilate(self, old_edge, other_edge):
 		"""	Provided with old_edge consistent with other_edge
 			Merges source and sinks
 			Self is usually operator, other is partial step
