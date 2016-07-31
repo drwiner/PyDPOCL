@@ -4,7 +4,7 @@ import uuid
 import random
 
 class Belief(ElementGraph):
-	def __init__(self, id, typ, name=None, \
+	def __init__(self, ID, typ, name=None, \
 				Elements = None, \
 				root_element=None, \
 				Edges = None, \
@@ -17,10 +17,10 @@ class Belief(ElementGraph):
 		if Constraints == None:
 			Constraints = set()
 		
-		super(Belief, self).__init__(id,typ,name,Elements, root_element, Edges, Constraints)
+		super(Belief, self).__init__(ID,typ,name,Elements, root_element, Edges, Constraints)
 
 class Action(ElementGraph):
-	def __init__(self,id,type_graph,name=None,Elements = None, root_element = None, Edges = None,Constraints = None):
+	def __init__(self,ID,type_graph,name=None,Elements = None, root_element = None, Edges = None,Constraints = None):
 		
 		if Edges == None:
 			Edges = set()
@@ -33,7 +33,7 @@ class Action(ElementGraph):
 		if Elements == None:
 			Elements = {root_element}
 			
-		super(Action,self).__init__(id,type_graph,name,Elements,root_element,Edges,Constraints)
+		super(Action,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Constraints)
 
 		""" Get Action arguments by position"""											
 		#self.Args = {}
@@ -95,23 +95,23 @@ class Action(ElementGraph):
 			Non-equality constraints wiped
 		"""
 		new_self = self.copyGen()
-		old_id = self.id
-		new_self.id = start_from
+		old_id = self.ID
+		new_self.ID = start_from
 		nei = -1
 		
 		#While changing IDs, look for the element which used to have old_element.id and let 'nei' = new element id
 		if not old_element_id is None:
-			ole = {element for element in new_self.elements if element.id == old_element_id}
+			ole = {element for element in new_self.elements if element.ID == old_element_id}
 			if not ole:
-				print('could not find old element id {} in old Action {}'.format(old_element_id, self.id))
+				print('could not find old element id {} in old Action {}'.format(old_element_id, self.ID))
 			else:
 				old_element = ole.pop()
 		
 		for element in new_self.elements:
-			element.id = uuid.uuid1(start_from)
+			element.ID = uuid.uuid1(start_from)
 		
 		if not old_element_id is None:
-			nei = old_element.id
+			nei = old_element.ID
 			
 		#Wipe non-equality constraints clean
 		new_self.neqs = set()
@@ -173,16 +173,16 @@ class Action(ElementGraph):
 			if i not in self.Args:
 				print('__',end = " ")
 			else:
-				print('({}:{})'.format(self.Args[i].typ,self.Args[i].id),end = " ")
+				print('({}:{})'.format(self.Args[i].typ,self.Args[i].ID),end = " ")
 		
 		print(')')
 		
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
-	def __init__(self,id,type_graph,name=None,\
+	def __init__(self,ID,type_graph,name=None,\
 		Elements=None, root_element = None, Edges = None, Constraints = None):
 		
-		super(Condition,self).__init__(id,type_graph,name,Elements,root_element,Edges,Constraints)
+		super(Condition,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Constraints)
 		self.labels = ['first-arg','sec-arg','third-arg','fourth-arg']
 		
 	def getArgList(self):
@@ -202,7 +202,7 @@ class Condition(ElementGraph):
 				str = '__'
 			else:
 				this_arg = arg.pop()
-				str = this_arg.id
+				str = this_arg.ID
 			print(str, end=" ") 
 		print(')')
 		
@@ -222,7 +222,7 @@ class PlanElementGraph(ElementGraph):
 		has-a constraint graph which encodes inequality constraints
 		has-a dummy init and dummy goal step
 	"""
-	def __init__(self,id,type_graph =None,name=None, \
+	def __init__(self,ID,type_graph =None,name=None, \
 				Elements = None, \
 				planElement = None, \
 				Edges = None, \
@@ -237,8 +237,8 @@ class PlanElementGraph(ElementGraph):
 		if Constraints == None:
 			Constraints = set()
 		
-		self.OrderingGraph = OrderingGraph(id = uuid.uuid1(5))
-		self.CausalLinkGraph = CausalLinkGraph(id = uuid.uuid1(6))
+		self.OrderingGraph = OrderingGraph(ID = uuid.uuid1(5))
+		self.CausalLinkGraph = CausalLinkGraph(ID = uuid.uuid1(6))
 		self.updatePlan(Elements,Edges,Constraints)
 		self.flaws = deque() #sort by heuristic?
 		self.initial_dummy_step = None
@@ -246,13 +246,13 @@ class PlanElementGraph(ElementGraph):
 		
 		
 		if planElement is None:
-			planElement = PlanElement(id =id, typ=type_graph,name=name)
+			planElement = PlanElement(ID =ID, typ=type_graph,name=name)
 		
 
 		#Edges.update( {Edge(planElement,IF, 'frame-of') for IF in self.IntentionFrames})
 		#Edges.update( {Edge(planElement,step, 'step-of') for step in self.Steps})
 									
-		super(PlanElementGraph,self).__init__(id,type_graph,name,Elements,planElement,Edges,Constraints)
+		super(PlanElementGraph,self).__init__(ID,type_graph,name,Elements,planElement,Edges,Constraints)
 		
 		self.updateIntentionFrameAttributes()
 	
@@ -279,10 +279,10 @@ class PlanElementGraph(ElementGraph):
 		""" Given subseteq of step elements in plan, return set of consistent actors (i.e. an actor that could be a consenting actor in each)
 		"""
 		step = next(iter(subseteq))
-		print('step {} used for starting actors'.format(step.id))
+		print('step {} used for starting actors'.format(step.ID))
 		Step = self.getElementGraphFromElement(step,Action)
 		S = copy.deepcopy(subseteq)
-		S = S - {action for action in S if action.id == step.id}
+		S = S - {action for action in S if action.ID == step.ID}
 		return self.rPickActorFromSteps(remaining_steps = S, potential_actors = Step.consenting_actors)
 			
 	def rPickActorFromSteps(self, remaining_steps = None, potential_actors = None):
@@ -314,7 +314,7 @@ class PlanElementGraph(ElementGraph):
 		step = remaining_steps.pop()
 		step.print_element()
 		print('above was chosen\n')
-		step = self.getElementGraphFromElementId(step.id,Action)
+		step = self.getElementGraphFromElementID(step.ID,Action)
 		
 		to_remove = set()
 		to_add = set()
@@ -334,7 +334,7 @@ class PlanElementGraph(ElementGraph):
 			else:
 				to_add.update(prospects)
 		
-		potential_actors = potential_actors - to_remove
+		potential_actors -= to_remove
 		potential_actors.update(to_add)
 		return self.rPickActorFromSteps(remaining_steps, potential_actors)
 	
@@ -348,7 +348,7 @@ class PlanElementGraph(ElementGraph):
 			complete_steps = set()
 			
 		rnd =floor(random.random()*100)
-		Step = new_self.getElementGraphFromElementId(partial.id, Action)
+		Step = new_self.getElementGraphFromElementID(partial.ID, Action)
 		operatorClones = {op.makeCopyFromID(rnd) for op in operator_choices}
 		for op in operatorClones:
 			#nStep = Step.copyGen()
@@ -359,7 +359,7 @@ class PlanElementGraph(ElementGraph):
 	def print_plan(self):
 		self.updatePlan()
 		print('\n----------------')
-		print('PLAN', self.id)
+		print('PLAN', self.ID)
 		print('________________')
 
 		print('steps:')
@@ -369,9 +369,9 @@ class PlanElementGraph(ElementGraph):
 			edge.print_edge()
 		print('frames:')
 		for frame in self.IntentionFrames:
-			print('frame id {}:'.format(frame.id), end=" ")
+			print('frame ID {}:'.format(frame.ID), end=" ")
 			Goal = self.getElementGraphFromElement(frame.goal, Condition)
-			Goal.print_graph(motive=True,actor_id = frame.intender.id)
+			Goal.print_graph(motive=True,actor_id = frame.intender.ID)
 		print('Constraints:')
 		for c in self.constraints:
 			c.print_edge()

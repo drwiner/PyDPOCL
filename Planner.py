@@ -84,23 +84,23 @@ class PlanSpacePlanner:
 		"""
 		
 		s_need, precondition = flaw.flaw
-		Precondition = graph.getElementGraphFromElementId(precondition.id, Condition)
+		Precondition = graph.getElementGraphFromElementID(precondition.ID, Condition)
 		results = set()
 		
 		#Then try new Step
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
 				#Condition graph of operator
-				Effect = op.getElementGraphFromElementId(eff.id, Condition)
+				Effect = op.getElementGraphFromElementID(eff.ID, Condition)
 				
 				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
 				if Effect.canAbsolve(Precondition):
 					
 					#nei : new element id, to easily access element from graph
-					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.id)
+					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.ID)
 					
 					#Condition graph of copied operator for Effect
-					Effect  = step_op.getElementGraphFromElementId(nei, Condition)
+					Effect  = step_op.getElementGraphFromElementID(nei, Condition)
 					
 					#could be more than one way to unify effect with precondition
 					#Effect_absorbtions' graphs' elements' replaced_ids assigned Precondition's ids
@@ -120,7 +120,7 @@ class PlanSpacePlanner:
 						#Also, add elements in new_step_op which are not Effect
 						graph_copy.mergeGraph(new_step_op)
 						
-						self.addStep(graph_copy, new_step_op.root, s_need, eff_abs.id, new = True) #adds causal link and ordering constraints
+						self.addStep(graph_copy, new_step_op.root, s_need, eff_abs.ID, new = True) #adds causal link and ordering constraints
 						results.add(graph_copy)
 						#add graph to children
 		return results
@@ -132,14 +132,14 @@ class PlanSpacePlanner:
 			iterates through existing steps, and effects of those steps, and asks if any can absolve the precondition of the flaw
 		"""
 		s_need, pre = flaw.flaw
-		Precondition = graph.getElementGraphFromElementId(pre.id,Condition)
+		Precondition = graph.getElementGraphFromElementID(pre.ID,Condition)
 		results = set()
 		for step in (st for st in graph.Steps if not st.isEquivalent(s_need)):
 			if graph.OrderingGraph.isPath(s_need, step):
 				#step cannot be ordered before s_need
 				break
 			for eff in graph.getNeighborsByLabel(step, 'effect-of'):
-				Effect = graph.getElementGraphFromElementId(eff.id, Condition)
+				Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
 				if Effect.canAbsolve(Precondition):
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
 					for eff_abs in Effect_absorptions: 
@@ -156,19 +156,19 @@ class PlanSpacePlanner:
 						
 						#3) "Redirect Task"": find all edges where the sink has a replaced_id in replace_ids
 
-						replace_ids = {element.id for element in eff_abs}
+						replace_ids = {element.ID for element in eff_abs}
 						#All Edges which have sink whose id was not a replace_id nor whose id = its own replace id
 						#May need to get element subgraph from step if step is not type Action
 						incoming = {edge for edge in graph_copy.edges \
 							if edge.sink.replaced_id in replace_ids \
-							and not edge.sink.replaced_id == element.id\
-							and not edge.source.id in replace_ids}					
+							and not edge.sink.replaced_id == element.ID\
+							and not edge.source.ID in replace_ids}					
 						for edge in incoming:
-							new_sink = graph_copy.getElementByReplacedId(edge.sink.id)
+							new_sink = graph_copy.getElementByReplacedId(edge.sink.ID)
 							graph_copy.elements.remove(edge.sink)
 							graph_copy.replaceWith(edge.sink,new_sink)
 							
-						self.addStep(graph_copy, s_need, step.root, eff_abs.id, new = False)
+						self.addStep(graph_copy, s_need, step.root, eff_abs.ID, new = False)
 						results.add(graph_copy)
 		return results
 	
@@ -198,14 +198,14 @@ class PlanSpacePlanner:
 			prc_edges = graph.getIncidentEdgesByLabel(s_add, 'precond-of')
 			#preconditions = graph.getNeighborsByLabel(s_add, 'precond-of')
 			equalNames = {'equals', 'equal', '='}
-			noncodesg = {prec for prec in prc_edges if prec.sink.name in equalNames and not prec.truth}
+			noncodesg = {prec for prec in prc_edges if prec.sink.name in equalNames and not prec.sink.truth}
 			for prec in noncodesg:
 				item1Edge, item2Edge = tuple(graph.getIncidentEdges(prec.sink))
 				#item1, item2 = tuple(graph.getNeighbors(prec.sink))
-				item1 = item1Edge.sink
-				item2 = item2Edge.sink
-				item1.neqs.add(item2)
-				item2.neqs.add(item1)
+
+				#This constraint/restriction prevents item1Edge.sink and item2Edge.sink from becoming a legal merge
+				graph.constraints.add(Edge(item1Edge.source, item2Edge.sink, item1Edge.label))
+				
 				#Remove outgoing edges and '=' Literal element
 				graph.edges.remove(item1Edge)
 				graph.edges.remove(item2Edge)
@@ -214,7 +214,7 @@ class PlanSpacePlanner:
 			#Remove equality precondition edges
 			graph.edges -= noncodesg
 
-			graph.flaws += (Flaw((s_add, prec), 'opf') for prec in preconditions if not prec in noncodesg)
+			graph.flaws += (Flaw((s_add, prec.sink), 'opf') for prec in prc_edges if not prec in noncodesg)
 				
 		#Good time as ever to updatePlan
 		graph.updatePlan()

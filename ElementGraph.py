@@ -3,7 +3,7 @@ from Graph import *
 class ElementGraph(Graph):
 	"""An element graph is a graph with a root element"""
 	
-	def __init__(self,id,type_graph,name=None, Elements = None, root_element = None, Edges = None, Constraints = None):
+	def __init__(self,ID,type_graph,name=None, Elements = None, root_element = None, Edges = None, Constraints = None):
 		if Elements == None:
 			Elements = set()
 		if Edges == None:
@@ -12,7 +12,7 @@ class ElementGraph(Graph):
 			Constraints = set()
 			
 		super(ElementGraph,self).__init__(\
-											id,\
+											ID,\
 											type_graph,\
 											name,\
 											Elements,\
@@ -20,6 +20,7 @@ class ElementGraph(Graph):
 											Constraints\
 										)
 		self.root = root_element		
+		self.neqs = set()
 		
 	def copyGen(self):
 		return copy.deepcopy(self)
@@ -27,13 +28,13 @@ class ElementGraph(Graph):
 	def copyWithNewIDs(self, from_this_num):
 		new_self= self.copyGen()
 		for element in new_self.elements:
-			element.id = from_this_num 
+			element.ID = from_this_num 
 			from_this_num = from_this_num+1
 		return new_self
 
 	@classmethod
 	def makeElementGraph(cls, elementGraph, element):
-		return cls(				element.id, \
+		return cls(				element.ID, \
 								element.typ, \
 								name=None,\
 								Elements = elementGraph.rGetDescendants(element),\
@@ -43,17 +44,17 @@ class ElementGraph(Graph):
 					
 		
 	def getElementGraphFromElement(self, element, Type):
-		if self.root.id == element.id:
+		if self.root.ID == element.ID:
 			return self.copyGen()
 		return Type.makeElementGraph(self,element)
 		
-	def getElementGraphFromElementId(self, element_id, Type):
-		return self.getElementGraphFromElement(self.getElementById(element_id),Type)
+	def getElementGraphFromElementID(self, element_ID, Type):
+		return self.getElementGraphFromElement(self.getElementById(element_ID),Type)
 		
 	def mergeGraph(self, other):
 		"""
 			For each element in other to include in self, if its a replacer, merge it into self
-					A relacer element 'replacer' is one such that replacer.replaced_id == some element id in self
+					A relacer element 'replacer' is one such that replacer.replaced_ID == some element ID in self
 			Otherwise, add that element to self
 			For each edge in other to include in self, if its in self do nothing, otherwise add it
 		
@@ -70,24 +71,24 @@ class ElementGraph(Graph):
 					
 		"""
 		for element in other.elements:
-			if not hasattr(element, 'replaced_id'):
-				element.replaced_id = -1
+			if not hasattr(element, 'replaced_ID'):
+				element.replaced_ID = -1
 				
-			if element.replaced_id != -1:
-					existing_element = self.getElementById(element.replaced_id)
+			if element.replaced_ID != -1:
+					existing_element = self.getElementById(element.replaced_ID)
 					existing_element.merge(element)
-					existing_element.replaced_id = element.id
+					existing_element.replaced_ID = element.ID
 			else:
 				self.elements.add(element)
-				element.replaced_id = element.id
+				element.replaced_ID = element.ID
 		
 		for edge in other.edges:
-			source = self.getElementById(edge.source.replaced_id)
-			sink = self.getElementById(edge.sink.replaced_id)
-			existing_edges = {E for E in self.edges if E.source.id == source.id and E.sink.id == sink.id and E.label == edge.label}
-			#existing_edges = self.getEdgesByIdsAndLabel(source.id, sink.id, edge.label)
+			source = self.getElementById(edge.source.replaced_ID)
+			sink = self.getElementById(edge.sink.replaced_ID)
+			existing_edges = {E for E in self.edges if E.source.ID == source.ID and E.sink.ID == sink.ID and E.label == edge.label}
+			#existing_edges = self.getEdgesByIDsAndLabel(source.ID, sink.ID, edge.label)
 			if len(existing_edges) > 1 :
-				print('multiple edges {}--{}--> {}; in plan {} trying to merge {}'.format(edge.source.replaced_id, edge.label, edge.sink.replaced_id, self.id, other.id))
+				print('multiple edges {}--{}--> {}; in plan {} trying to merge {}'.format(edge.source.replaced_ID, edge.label, edge.sink.replaced_ID, self.ID, other.ID))
 			if len(existing_edges) == 0:
 				self.edges.add(Edge(source, sink, edge.label))
 				
@@ -100,16 +101,16 @@ class ElementGraph(Graph):
 			Returns all possible ways to unify self and other, 
 				may result in changes to self
 		"""
-		print('{}x{}.get Instances given partial element graph ({}x{})'.format(self.id, self.typ, other.id, other.typ))
+		print('{}x{}.get Instances given partial element graph ({}x{})'.format(self.ID, self.typ, other.ID, other.typ))
 		#print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)')
 		#operator = self.copyGen()
 		
 		for element in self.elements:
-			element.replaced_id = -1
+			element.replaced_ID = -1
 					#operator.absolve(partial, partial.edges, operator.available_edges)
 		completed = self.absolve(copy.deepcopy(other.edges), self.edges)
 		if len(completed) == 0:
-			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other.id, self.id))
+			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other.ID, self.ID))
 			
 		for element_graph in completed:
 			# element_graph.updateActionParams() #only will work if this is action
@@ -142,14 +143,16 @@ class ElementGraph(Graph):
 			
 
 		other_edge = Remaining.pop()
-		#print('{}.absolve({})... {} --{}--> {} needs replacement \n'.format(self.id, other.id, other_edge.source.id, other_edge.label, other_edge.sink.id))
+		#print('{}.absolve({})... {} --{}--> {} needs replacement \n'.format(self.ID, other.ID, other_edge.source.ID, other_edge.label, other_edge.sink.ID))
 		num_collected_before = len(Collected)
 		
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
-			#	print('\nstep {} edge {} --{}--> {} matches {} --{}--> {}\n'.format(other.id, other_edge.source.id, other_edge.label, other_edge.sink.id, prospect.source.id, prospect.label, prospect.sink.id))
+				#check if constraints violated?
+			#	print('\nstep {} edge {} --{}--> {} matches {} --{}--> {}\n'.format(other.ID, other_edge.source.ID, other_edge.label, other_edge.sink.ID, prospect.source.ID, prospect.label, prospect.sink.ID))
 				new_self=  self.assimilate(prospect, other_edge)
-				Collected.update(new_self.absolve({copy.deepcopy(rem) for rem in Remaining}, Available, Collected))					
+				if new_self.isInternallyConsistent():
+					Collected.update(new_self.absolve({copy.deepcopy(rem) for rem in Remaining}, Available, Collected))					
 		
 		if len(Collected) == 0:
 			return set()
@@ -158,20 +161,30 @@ class ElementGraph(Graph):
 			return Collected
 		else:
 			return set()
+			
+
+			
+	def legalMerge(self, element, other):
+		'''element in self, is other on neq list?'''
+		if not element.isConsistent(other):
+			return False
+		if other.ID in self.neqs[element.ID]:
+			return False
+		return True
 		
 	
 	def assimilate(self, old_edge, other_edge):
-		"""	Provided with old_edge consistent with other_edge
+		"""	ProvIDed with old_edge consistent with other_edge
 			Merges source and sinks
 			Self is usually operator, other is partial step
 		"""
 
 		new_self = self.copyGen()
-		self_source = new_self.getElementById(old_edge.source.id)			#source from new_self
+		self_source = new_self.getElementById(old_edge.source.ID)			#source from new_self
 		self_source.merge(other_edge.source)								#source merge
-		self_source.replaced_id = other_edge.source.id
-		self_sink = new_self.getElementById(old_edge.sink.id)				#sink from new_self
-		self_sink.replaced_id = other_edge.sink.id
+		self_source.replaced_ID = other_edge.source.ID
+		self_sink = new_self.getElementById(old_edge.sink.ID)				#sink from new_self
+		self_sink.replaced_ID = other_edge.sink.ID
 		self_sink.merge(other_edge.sink)									#sink merge
 		return new_self
 		
@@ -180,7 +193,7 @@ def extractElementsubGraphFromElement(G, element, Type):
 	Edges = G.rGetDescendantEdges(element, set())
 	Elements = G.rGetDescendants(element, set())
 	Constraints = G.rGetDescendantConstraints(element, set())
-	return Type(	element.id,\
+	return Type(	element.ID,\
 					type_graph = element.typ, \
 					name=element.name, \
 					Elements = Elements, \

@@ -2,10 +2,10 @@ from ElementGraph import *
 
 class OrderingGraph(Graph):
 	
-	def __init__(self, id, typ = None, name = None, Elements = None, Edges = None, Constraints= None):
+	def __init__(self, ID, typ = None, name = None, Elements = None, Edges = None, Constraints= None):
 		if typ == None:
 			typ = 'ordering graph'
-		super(OrderingGraph,self).__init__(id,typ,name,Elements,Edges,Constraints)
+		super(OrderingGraph,self).__init__(ID,typ,name,Elements,Edges,Constraints)
 		
 	def isInternallyConsistent(self):
 		if self.detectCycle():
@@ -95,10 +95,10 @@ class OrderingGraph(Graph):
 		
 		
 class CausalLinkGraph(OrderingGraph):
-	def __init__(self, id, typ = None, name = None, Elements = None , Edges = None, Constraints = None):
+	def __init__(self, ID, typ = None, name = None, Elements = None , Edges = None, Constraints = None):
 		if typ == None:
 			typ = 'causal link graph'
-		super(CausalLinkGraph,self).__init__(id,typ,name,Elements,Edges,Constraints)
+		super(CausalLinkGraph,self).__init__(ID,typ,name,Elements,Edges,Constraints)
 	
 	def addEdge(self, source, sink, condition_id):
 		self.edges.add(Edge(source, sink, condition_id))

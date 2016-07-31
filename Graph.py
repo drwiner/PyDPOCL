@@ -20,15 +20,10 @@ class Edge:
 			return True
 		return False
 		
-	def isEqual(self, other):
-		if self.isEquivalent(other) and other.isEquivalent(self):
-			return True
-		return False
-		
 	def __eq__(self, other):
 		if other is None:
 			return False
-		if self.source.id == other.source.id and self.sink.id == other.sink.id and self.label == other.label:
+		if self.source.ID == other.source.ID and self.sink.ID == other.sink.ID and self.label == other.label:
 			return True
 		return False
 		
@@ -36,12 +31,12 @@ class Edge:
 		return (not self.__eq__(other))
 		
 	def __hash__(self):
-		return hash((self.source.id, self.sink.id, self.label))
+		#print(self.source.ID)
+		return hash((self.source.ID, self.sink.ID, self.label))
 		
 	def merge(self, other):
 		"""Merges source and sink"""
 
-		#Assume edges are consistent
 		if not self.isConsistent(other):
 			return None
 			
@@ -70,7 +65,7 @@ class Edge:
 
 class Graph(Element):
 	"""A graph is an element with elements, edges, and constraints"""
-	def __init__(self, id, typ, name = None, \
+	def __init__(self, ID, typ, name = None, \
 		Elements = None, Edges = None, Constraints = None):
 		if Elements == None:
 			Elements = set()
@@ -79,24 +74,24 @@ class Graph(Element):
 		if Constraints == None:
 			Constraints = set()
 		
-		super(Graph,self).__init__(id,typ,name)
+		super(Graph,self).__init__(ID,typ,name)
 		self.elements = Elements
 		self.edges = Edges;
 		self.constraints = Constraints
 		
 	def print_graph(self):
-		print('ElementGraph {}:'.format(self.id))
+		print('ElementGraph {}:'.format(self.ID))
 		for edge in self.edges:
-			print('Edge {} --{}--> {}'.format(edge.source.id, edge.label, edge.sink.id))
+			print('Edge {} --{}--> {}'.format(edge.source.ID, edge.label, edge.sink.ID))
 			#edge.source.print_element()
 			#edge.sink.print_element()
 		for element in self.elements:
 			if type(element) is Literal:
-				print('Element {id} = {truth}{name},\ttype = {type}'.format(id=element.id, truth='not ' if not element.truth else '', name=element.name, type=element.typ))
+				print('Element {ID} = {truth}{name},\ttype = {type}'.format(ID=element.ID, truth='not ' if not element.truth else '', name=element.name, type=element.typ))
 			elif type(element) is Operator:
-				print('Element {id} = {truth}{name},\ttype = {type}'.format(id=element.id, truth='not ' if element.executed==False else '', name=element.name, type=element.typ))
+				print('Element {ID} = {truth}{name},\ttype = {type}'.format(ID=element.ID, truth='not ' if element.executed==False else '', name=element.name, type=element.typ))
 			else:
-				print('Element {} = {},\ttype = {}'.format(element.id, element.name, element.typ))
+				print('Element {} = {},\ttype = {}'.format(element.ID, element.name, element.typ))
 	
 	def print_graph_names(self):
 		print('ElementGraph {}:'.format(self.name))
@@ -118,37 +113,37 @@ class Graph(Element):
 				print('Element {} ,\ttype = {}'.format(element.name, element.typ))
 	
 	def hasEdgeIdentity(self, edge):
-		""" Returns set of edges s.t. (source.id, label, sink.id) in self.edges"""
-		return self.getEdgesByIdsAndLabel(edge.source.id, edge.sink.id, edge.label)
+		""" Returns set of edges s.t. (source.ID, label, sink.ID) in self.edges"""
+		return self.getEdgesByIdsAndLabel(edge.source.ID, edge.sink.ID, edge.label)
 		
 	def hasConstraintIdentity(self, edge):
-		return self.getConstraintsByIdsAndLabel(edge.source.id, edge.sink.id, edge.label)
+		return self.getConstraintsByIdsAndLabel(edge.source.ID, edge.sink.ID, edge.label)
 	
 	def addEdgeByIdentity(self, edge):
 		""" Assumes edge not in Graph
-			Finds elements with edge.source.id and edge.sink.id
+			Finds elements with edge.source.ID and edge.sink.ID
 			Adds edge between them with edge.label
 		"""
-		source = self.getElementById(edge.source.id)
-		sink = self.getElementById(edge.sink.id)
+		source = self.getElementById(edge.source.ID)
+		sink = self.getElementById(edge.sink.ID)
 		label = edge.label
 		self.edges.add(Edge(source, sink, label))
 		
 	def addConstraintByIdentity(self, edge):
-		source = self.getElementById(edge.source.id)
-		sink = self.getElementById(edge.sink.id)
+		source = self.getElementById(edge.source.ID)
+		sink = self.getElementById(edge.sink.ID)
 		label = edge.label
 		self.constraints.add(Edge(source, sink, label))
 	
-	def getElementById(self, id):
+	def getElementById(self, ID):
 		for element in self.elements:
-			if element.id == id:
+			if element.ID == ID:
 				return element
 		return None
 	
-	def getElementByReplacedId(self, id):
+	def getElementByReplacedId(self, ID):
 		for element in self.elements:
-			if element.replaced_id == id:
+			if element.replaced_id == ID:
 				return element
 		return None
 	
@@ -157,35 +152,35 @@ class Graph(Element):
 			self.constraints.add(edge)
 			
 	def replaceWith(self, element, other):
-		if self.getElementById(other.id) is None:
+		if self.getElementById(other.ID) is None:
 			self.elements.add(other)
 		self.elements.remove(element)
 		for outgoing in self.getIncidentEdges(element):
 			outgoing.source = other
-		for incoming in (edge for edge in self.edges if edge.sink.id == element.id):
+		for incoming in (edge for edge in self.edges if edge.sink.ID == element.ID):
 			incoming.sink = other
 		return self
 			
 	def getEdgesByIdsAndLabel(self, source_id, sink_id, label):
-		return {edge for edge in self.edges if edge.source.id == source_id and edge.sink.id == sink_id and edge.label == label}
+		return {edge for edge in self.edges if edge.source.ID == source_id and edge.sink.ID == sink_id and edge.label == label}
 		
 	def getConstraintsByIdsAndLabel(self, source_id, sink_id, label):
-		return {edge for edge in self.constraints if edge.source.id == source_id and edge.sink.id == sink_id and edge.label == label}
+		return {edge for edge in self.constraints if edge.source.ID == source_id and edge.sink.ID == sink_id and edge.label == label}
 			
 	def getIncidentEdges(self, element):
-		return {edge for edge in self.edges if edge.source.id == element.id}
+		return {edge for edge in self.edges if edge.source.ID == element.ID}
 	def getNeighbors(self, element):
-		return {edge.sink for edge in self.edges if edge.source.id == element.id}
+		return {edge.sink for edge in self.edges if edge.source.ID == element.ID}
 	def getParents(self, element):
 		return set(edge.source for edge in self.edges if edge.sink is element)
 	def getNeighborsByLabel(self, element, label):
-		return {edge.sink for edge in self.edges if edge.source.id == element.id and edge.label == label}
+		return {edge.sink for edge in self.edges if edge.source.ID == element.ID and edge.label == label}
 	def getIncidentEdgesByLabel(self, element, label):
-		return {edge for edge in self.edges if edge.source.id == element.id and edge.label == label}
+		return {edge for edge in self.edges if edge.source.ID == element.ID and edge.label == label}
 	def getParentsByLabel(self, element, label):
 		return set(edge.source for edge in self.edges if edge.sink is element and edge.label is label)
 	def getConstraints(self, element):
-		return {edge for edge in self.constraints if edge.source.id == element.id}
+		return {edge for edge in self.constraints if edge.source.ID == element.ID}
 	def getConstraintsByLabel(self, element, label):
 		return set(edge for edge in self.constraints if edge.source is element and edge.label is label)
 	def getConstraintsByParent(self, element):
@@ -283,15 +278,15 @@ class Graph(Element):
 	def isInternallyConsistent(self):
 		constraint_sources = self.getConstraintSources()
 		for cs in constraint_sources:
-			suspects = {edge.source for edge in self.edges if edge.source.id == cs.id}
+			suspects = {edge.source for edge in self.edges if edge.source.ID == cs.ID}
 			if len(suspects) == 0:
-				print('no suspects for constraint source {}'.format(cs.id))
+				print('no suspects for constraint source {}'.format(cs.ID))
 				continue
 			cg = self.rGetDescendantConstraints(cs)
 			for sp in suspects:
 				sg = self.rGetDescendantEdges(sp)
 				if rDetectEquivalentEdgeGraph(copy.deepcopy(cg),copy.deepcopy(sg)):
-					print('suspect {} not consistent with constraints from source {}'.format(sp.id,cs.id))
+					print('suspect {} not consistent with constraints from source {}'.format(sp.ID,cs.ID))
 					return False
 
 		return True
@@ -345,13 +340,13 @@ class Graph(Element):
 		for cs in constraint_sources:
 			suspects = {edge.source for edge in self.edges if edge.source.isEquivalent(cs)}
 			if len(suspects) == 0:
-				print('no suspects for constraint source {}'.format(cs.id))
+				print('no suspects for constraint source {}'.format(cs.ID))
 				continue
 			cg = other.rGetDescendantConstraints(cs)
 			for sp in suspects:
 				sg = self.rGetDescendantEdges(sp)
 				if rDetectEquivalentEdgeGraph(copy.deepcopy(cg),copy.deepcopy(sg)):
-					print('suspect {} not consistent with constraints from source {}'.format(sp.id,cs.id))
+					print('suspect {} not consistent with constraints from source {}'.format(sp.ID,cs.ID))
 					return True
 
 		return False
@@ -365,7 +360,7 @@ class Graph(Element):
 							# if edge.source.isEquivalent(c.source)\
 						# }
 			# for suspect in suspects:
-				# print('suspect: (', suspect.id, 'has ', c.label, '-', c.sink.type, ')')
+				# print('suspect: (', suspect.ID, 'has ', c.label, '-', c.sink.type, ')')
 				# if self.constraintEquivalentWithElement(other, \
 														# suspect, \
 														# c.source\

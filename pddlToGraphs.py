@@ -24,10 +24,10 @@ def makeGoal(formula, current_id):
 	if formula.key == 'not':
 		formula = next(iter(formula.children))
 		num_children = len(formula.children)
-		lit = Literal(id = uuid.uuid1(current_id), typ = 'Condition',  name = formula.key, num_args = num_children, truth = False)
+		lit = Literal(ID = uuid.uuid1(current_id), typ = 'Condition',  name = formula.key, num_args = num_children, truth = False)
 	else:
 		num_children = len(formula.children)
-		lit = Literal(id = uuid.uuid1(current_id), typ = 'Condition',  name = formula.key, num_args = num_children, truth = True)
+		lit = Literal(ID = uuid.uuid1(current_id), typ = 'Condition',  name = formula.key, num_args = num_children, truth = True)
 	return lit
 	
 def makeMotive(formula, current_id, parent, relationship, elements, edges, bit = None):
@@ -39,7 +39,7 @@ def makeMotive(formula, current_id, parent, relationship, elements, edges, bit =
 	""" make goal"""
 	lit = makeGoal(formula, current_id)
 	current_id += 1
-	m = Motivation(id = uuid.uuid1(current_id), truth = bit, intender = character, goal=lit)
+	m = Motivation(ID = uuid.uuid1(current_id), truth = bit, intender = character, goal=lit)
 	elements.update(m,lit)
 	edges.update(Edge(m,lit,'goal-of'),Edge(m,CE,'intender-of'),Edge(parent,m,relationship))
 	current_id+=1
@@ -49,7 +49,7 @@ def makeLit(formula, current_id, parent, relationship, elements, edges, bit = No
 	if bit == None:
 		bit=  True
 	num_children = len(formula.children)
-	lit = Literal(id = uuid.uuid1(current_id), typ = 'Condition',  name = formula.key, num_args = num_children, truth = bit)
+	lit = Literal(ID = uuid.uuid1(current_id), typ = 'Condition',  name = formula.key, num_args = num_children, truth = bit)
 	current_id += 1
 	elements.add(lit)
 	edges.add(Edge(parent,lit,relationship))
@@ -95,7 +95,7 @@ def getFormulaGraph(formula, current_id = None, parent = None, relationship = No
 	if current_id == None:
 		current_id = 1
 	if parent == None:
-		parent = Element(id = uuid.uuid1(current_id), typ = None)
+		parent = Element(ID = uuid.uuid1(current_id), typ = None)
 		current_id += 1
 	if edges == None:
 		edges = set()
@@ -120,14 +120,14 @@ def getSubFormulaNoParent(formula, objects):
 		if formula.key == 'intends':
 			pass
 		else:
-			lit = Literal(id = uuid.uuid1(12), typ = 'Condition',  name = formula.key, num_args = len(formula.children), truth = False)
+			lit = Literal(ID = uuid.uuid1(12), typ = 'Condition',  name = formula.key, num_args = len(formula.children), truth = False)
 			elements.add(lit)
 	elif formula.key == 'intends':
 		pass
 	elif formula.type >0:
 		pass
 	else:
-		lit = Literal(id = uuid.uuid1(13), typ = 'Condition',  name = formula.key, num_args = len(formula.children), truth = True)
+		lit = Literal(ID = uuid.uuid1(13), typ = 'Condition',  name = formula.key, num_args = len(formula.children), truth = True)
 		elements.add(lit)
 	for i, child in enumerate(formula.children):
 		#children are list
@@ -177,9 +177,9 @@ def domainToOperatorGraphs(domain):
 		start_id += 1
 		op_id = uuid.uuid1(start_id)
 		#Element types correspond to their type of graph
-		op = Operator(id = op_id, typ = 'Action', name = action.name, num_args = len(action.parameters), instantiated = True)
+		op = Operator(ID = op_id, typ = 'Action', name = action.name, num_args = len(action.parameters), instantiated = True)
 		
-		op_graph =			Action(	id = uuid.uuid1(start_id),\
+		op_graph =			Action(	ID = uuid.uuid1(start_id),\
 							type_graph = 'Action', \
 							name = action.name,\
 							root_element = op)
@@ -191,12 +191,12 @@ def domainToOperatorGraphs(domain):
 		for i, parameter in enumerate(action.parameters):
 			#parameters are list
 			if 'character' in parameter.types:
-				op_graph.elements.add(Actor(id = uuid.uuid1(start_id), typ = 'character', arg_name = parameter.name))#, #arg_pos_dict={op_id : i}))
+				op_graph.elements.add(Actor(ID = uuid.uuid1(start_id), typ = 'character', arg_name = parameter.name))#, #arg_pos_dict={op_id : i}))
 			elif 'actor' in parameter.types:
-				op_graph.elements.add(Actor(id = uuid.uuid1(start_id), typ = 'actor', arg_name = parameter.name))#, arg_pos_dict={op_id : i}))
+				op_graph.elements.add(Actor(ID = uuid.uuid1(start_id), typ = 'actor', arg_name = parameter.name))#, arg_pos_dict={op_id : i}))
 			else:
 				arg_type = next(iter(parameter.types))
-				op_graph.elements.add(Argument(id = uuid.uuid1(start_id), 	typ=arg_type, arg_name=parameter.name))#, arg_pos_dict=	{op_id :  i}))
+				op_graph.elements.add(Argument(ID = uuid.uuid1(start_id), 	typ=arg_type, arg_name=parameter.name))#, arg_pos_dict=	{op_id :  i}))
 			start_id += 1
 		
 		getFormulaGraph(action.precond.formula, start_id, parent = op, relationship = 'precond-of',elements= op_graph.elements, edges=op_graph.edges)
@@ -212,29 +212,29 @@ def problemToGraphs(problem):
 		Keys: 'arg', 'init', 'goal'
 		Values: arg dictionary, (elements, edges), (elements, edges)
 	"""
-	Args = {object.name: Argument(id = uuid.uuid1(1), name = object.name, typ = object.typeName) for object in problem.objects if not object.typeName.lower() in {'character', 'actor'}}
-	Args.update({object.name: Actor(id = uuid.uuid1(1), name = object.name, typ = object.typeName) for object in problem.objects if object.typeName.lower() in {'character', 'actor'}})
+	Args = {object.name: Argument(ID = uuid.uuid1(1), name = object.name, typ = object.typeName) for object in problem.objects if not object.typeName.lower() in {'character', 'actor'}}
+	Args.update({object.name: Actor(ID = uuid.uuid1(1), name = object.name, typ = object.typeName) for object in problem.objects if object.typeName.lower() in {'character', 'actor'}})
 
 	#Initial state
 	#for condition in problem_initial_state:
 	init_elements = set()
 	init_edges = set()
-	init_op = Operator(id = uuid.uuid1(4), typ = 'Action', name = 'dummy_init', num_args = 0, instantiated = True)
-	init_graph =			Action(	id = uuid.uuid1(5),\
+	init_op = Operator(ID = uuid.uuid1(4), typ = 'Action', name = 'dummy_init', num_args = 0, instantiated = True)
+	init_graph =			Action(	ID = uuid.uuid1(5),\
 							type_graph = 'Action', \
 							name = 'dummy_init',\
 							root_element = init_op)
 	for condition in problem.init.predicates:
 		condition_id = uuid.uuid1(2)
-		lit = Literal(id = condition_id, typ = 'Condition', name = condition.name, num_args = len(condition.parameters), truth = True)
+		lit = Literal(ID = condition_id, typ = 'Condition', name = condition.name, num_args = len(condition.parameters), truth = True)
 		init_graph.elements.add(lit)
 		init_graph.edges.add(Edge(init_op, lit, 'effect-of'))
 		for i,p in enumerate(condition.parameters):
 			init_graph.edges.add(Edge(lit, Args[p],ARGLABELS[i]))
 	
 	goal_elements, goal_edges = getGoalSet(problem.goal.formula, Args)
-	goal_op = Operator(id = uuid.uuid1(4), typ = 'Action', name = 'dummy_goal', num_args = 0, instantiated = True)
-	goal_graph =			Action(	id = uuid.uuid1(5),\
+	goal_op = Operator(ID = uuid.uuid1(4), typ = 'Action', name = 'dummy_goal', num_args = 0, instantiated = True)
+	goal_graph =			Action(	ID = uuid.uuid1(5),\
 							type_graph = 'Action', \
 							name = 'dummy_goal',\
 							root_element = goal_op)

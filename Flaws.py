@@ -47,7 +47,7 @@ def detectThreatenedCausalLinks(graph):
 			
 		for step in graph.Steps:
 			#First, ignore steps which either are the source and sink of causal link, or which cannot be ordered between them
-			if step.id == causal_link.source.id or step.id == causal_link.sink.id:
+			if step.ID == causal_link.source.ID or step.ID == causal_link.sink.ID:
 				break
 			if graph.orderingGraph.isPath(causal_link.sink, step):
 				break
