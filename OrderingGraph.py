@@ -102,3 +102,7 @@ class CausalLinkGraph(OrderingGraph):
 	
 	def addEdge(self, source, sink, condition_id):
 		self.edges.add(Edge(source, sink, condition_id))
+		
+	def __repr__(self):
+		#for e in self.edges:
+		pass
