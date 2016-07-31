@@ -34,7 +34,7 @@ class ElementGraph(Graph):
 	@classmethod
 	def makeElementGraph(cls, elementGraph, element):
 		return cls(				element.id, \
-								element.type, \
+								element.typ, \
 								name=None,\
 								Elements = elementGraph.rGetDescendants(element),\
 								root_element = element,\
@@ -100,7 +100,7 @@ class ElementGraph(Graph):
 			Returns all possible ways to unify self and other, 
 				may result in changes to self
 		"""
-		print('{}x{}.get Instances given partial element graph ({}x{})'.format(self.id, self.type, other.id, other.type))
+		print('{}x{}.get Instances given partial element graph ({}x{})'.format(self.id, self.typ, other.id, other.typ))
 		#print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)')
 		#operator = self.copyGen()
 		
@@ -181,7 +181,7 @@ def extractElementsubGraphFromElement(G, element, Type):
 	Elements = G.rGetDescendants(element, set())
 	Constraints = G.rGetDescendantConstraints(element, set())
 	return Type(	element.id,\
-					type_graph = element.type, \
+					type_graph = element.typ, \
 					name=element.name, \
 					Elements = Elements, \
 					root_element = element,\

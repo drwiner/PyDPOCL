@@ -1,7 +1,7 @@
 
 """ Policies: 
 		element.id is unique across all data structures
-		element.type refers to the type of an elementgraph with that element as the root
+		element.typ refers to the typ of an elementgraph with that element as the root
 		element.name sometimes refers to the predicate name or operator name. otherwise None
 		num_args is 0 means that num_args is in essence None. If predicate with no args, then this will cause problems
 	Properties:
@@ -13,17 +13,17 @@
 """ 
 class Element:
 	"""Element is a token or label"""
-	def __init__(self, id, type = None, name = None, arg_name = None):
+	def __init__(self, id, typ = None, name = None, arg_name = None):
 		self.id = id
-		self.type = type
+		self.typ = typ
 		#Optional:
 		self.name = name
 		self.arg_name = arg_name
 		
 	def isConsistent(self, other):
 		""" Returns True if self and other have same name or unassigned"""
-		if not self.type is None and not other.type is None:
-			if self.type != other.type:
+		if not self.typ is None and not other.typ is None:
+			if self.typ != other.typ:
 				return False
 		if not self.name is None and not other.name is None:
 			if self.name != other.name:
@@ -45,11 +45,11 @@ class Element:
 					other's parameter cannot be None
 		"""
 		
-		if not self.type is None:
-			if self.type != other.type:
+		if not self.typ is None:
+			if self.typ != other.typ:
 				return False
 		else:
-			if not other.type is None:
+			if not other.typ is None:
 				return False
 				
 		return True
@@ -75,8 +75,8 @@ class Element:
 			return None
 		if self.isEqual(other):
 			return self
-		if self.type is None and not other.type is None:
-			self.type = other.type
+		if self.typ is None and not other.typ is None:
+			self.typ = other.typ
 		if self.name is None and not other.name is None:
 			self.name = other.name
 		return self
@@ -93,10 +93,10 @@ class Element:
 		return self
 			
 	def print_element(self):
-		print('(',self.id, self.type, self.name,')')
+		print('(',self.id, self.typ, self.name,')')
 		
 	def __repr__(self):
-		return '({} {} {})'.format(self.id, self.type, self.name)
+		return '({} {} {})'.format(self.id, self.typ, self.name)
 		
 class InternalElement(Element):
 	"""Internal Element is an Element with a possibly unimportant name, and a number of arguments
@@ -107,8 +107,8 @@ class InternalElement(Element):
 									frame.id	: 'initial'
 									frame.id	: 'source'
 	"""
-	def __init__(self, id, type, name = None, arg_name = None, num_args = None, roles = None):
-		super(InternalElement,self).__init__(id,type,name, arg_name)
+	def __init__(self, id, typ, name = None, arg_name = None, num_args = None, roles = None):
+		super(InternalElement,self).__init__(id,typ,name, arg_name)
 		if num_args == None:
 			num_args = 0
 		if roles == None:
@@ -156,7 +156,7 @@ class InternalElement(Element):
 	
 	def isConsistent(self, other):
 	
-		#If other has a type, then return False if they are not the same
+		#If other has a typ, then return False if they are not the same
 		if not super(InternalElement,self).isConsistent(other):
 			return False
 				
@@ -205,7 +205,7 @@ class InternalElement(Element):
 		
 class Operator(InternalElement):
 	""" An operator element is an internal element with an executed status and orphan status"""
-	def __init__(self, id, type, name = None, arg_name = None, num_args = None, roles = None, is_orphan = None, executed = None, instantiated = None):
+	def __init__(self, id, typ, name = None, arg_name = None, num_args = None, roles = None, is_orphan = None, executed = None, instantiated = None):
 		if instantiated == None:
 			instantiated = False
 		if is_orphan is None:
@@ -214,7 +214,7 @@ class Operator(InternalElement):
 			num_args = 0
 		if roles == None:
 			roles = {}
-		super(Operator,self).__init__(id,type,name, arg_name, num_args,  roles)
+		super(Operator,self).__init__(id,typ,name, arg_name, num_args,  roles)
 		self.executed = executed
 		self.is_orphan = is_orphan
 		self.instantiated = instantiated
@@ -242,8 +242,8 @@ class Operator(InternalElement):
 		return self
 		
 	def print_element(self):
-		print('executed: {}, orphan: {}, ({}, {}, {})'.format(self.executed, self.is_orphan, self.name, self.type, self.id))
-		#print('executed:',self.executed,', orphan=',self.is_orphan,'(',self.id, self.type, self.name,')')
+		print('executed: {}, orphan: {}, ({}, {}, {})'.format(self.executed, self.is_orphan, self.name, self.typ, self.id))
+		#print('executed:',self.executed,', orphan=',self.is_orphan,'(',self.id, self.typ, self.name,')')
 		for key,value in self.roles.items():
 			print('\t id={}, role={}'.format(key, value))
 			
@@ -261,12 +261,12 @@ class Operator(InternalElement):
 class Literal(InternalElement):
 	""" A Literal element is an internal element with a truth status
 	"""
-	def __init__(self, id, type, name = None, arg_name = None, num_args = None, roles = None,truth = None):
+	def __init__(self, id, typ, name = None, arg_name = None, num_args = None, roles = None,truth = None):
 		if num_args == None:
 			num_args = 0
 		if roles == None:
 			roles = {}
-		super(Literal,self).__init__(id,type,name, arg_name, num_args, roles)
+		super(Literal,self).__init__(id,typ,name, arg_name, num_args, roles)
 		self.truth = truth
 
 	def isConsistent(self, other):
@@ -308,10 +308,10 @@ class Literal(InternalElement):
 		return self
 		
 	def __repr__(self):
-		return '{} {} {}-{}'.format(self.id, self.type, self.truth, self.name)
+		return '{} {} {}-{}'.format(self.id, self.typ, self.truth, self.name)
 			
 	def print_element(self):
-		print(self.truth, '(',self.id, self.type, self.name,')')
+		print(self.truth, '(',self.id, self.typ, self.name,')')
 		
 		
 class Argument(Element):
@@ -319,10 +319,10 @@ class Argument(Element):
 			A Merge makes a codesignation between two arguments.
 	"""
 	
-	def __init__(self, id, type, name= None, neqs = None, arg_name = None):
+	def __init__(self, id, typ, name= None, neqs = None, arg_name = None):
 		if neqs == None:
 			neqs = set()
-		super(Argument,self).__init__(id,type,name, arg_name)
+		super(Argument,self).__init__(id,typ,name, arg_name)
 		#arg_pos_dict is a mapping from operator.ids to positions
 		self.neqs = neqs
 		
@@ -343,11 +343,14 @@ class Argument(Element):
 			# if id in self.arg_pos_dict:
 				# if other.arg_pos_dict[id] != self.arg_pos_dict[id]:
 					# return False
-					
-		if len(x for x in self.neqs if x.id == other.id) > 0:
+
+		print('{}  '.format(len(self.neqs)))
+		print('{}  '.format(len(other.neqs)))
+		
+		if len({x for x in self.neqs if x.id == other.id}) > 0:
 			return False
 			
-		if len(y for y in other.neqs if y.id == self.id) > 0:
+		if len({y for y in other.neqs if y.id == self.id}) > 0:
 			return False
 			
 		return True
@@ -391,12 +394,13 @@ class Argument(Element):
 		
 		self.neqs.update(other.neqs)
 		
-		{neq.neqs.add(self) for neq in other.neqs}
+		for neq in other.neqs:
+			neq.neqs.add(self)
 		
 		return self
 		
 	def print_element(self):
-		print('(',self.id, self.type, self.name,')')
+		print('(',self.id, self.typ, self.name,')')
 	
 
 class Actor(Argument):
@@ -414,13 +418,13 @@ class Actor(Argument):
 				for the actor that matches the intention frame's intender
 		When we merge 2 actors, we merge the orphan_dicts with preference for True
 	"""
-	def __init__(self, id, type, name= None, arg_name = None, neqs = None, orphan_dict = None):
+	def __init__(self, id, typ, name= None, arg_name = None, neqs = None, orphan_dict = None):
 		if neqs == None:
 			neqs = set
 		if orphan_dict == None:
 			orphan_dict = {}
 			
-		super(Actor,self).__init__(id,type,name, neqs, arg_name)
+		super(Actor,self).__init__(id,typ,name, neqs, arg_name)
 		self.orphan_dict=  orphan_dict
 		
 	# def isConsistent(self, other):
@@ -431,7 +435,7 @@ class Actor(Argument):
 		# if not super(Actor,self).isConsistent(other):
 			# return False
 		
-		# if type(other) == Argument:
+		# if typ(other) == Argument:
 			# return False
 			
 		# return True
@@ -452,14 +456,14 @@ class Actor(Argument):
 
 class PlanElement(Element):
 
-	def __init__(self,id,type=None, name=None, arg_name = None\
+	def __init__(self,id,typ=None, name=None, arg_name = None\
 				#Steps=None, \
 				#Orderings=None,  \
 				#CausalLinks=None, \
 				#IntentionFrames=None\
 				):
-		if type == None:
-			type = 'PlanElementGraph'
+		if typ == None:
+			typ = 'PlanElementGraph'
 		
 		# if Steps == None:
 			# Steps = set()
@@ -470,7 +474,7 @@ class PlanElement(Element):
 		# if IntentionFrames == None:
 			# IntentionFrames = set()
 			
-		super(PlanElement,self).__init__(id,type,name, arg_name)
+		super(PlanElement,self).__init__(id,typ,name, arg_name)
 		
 		# self.Steps = Steps
 		# self.Orderings = Orderings
@@ -478,7 +482,7 @@ class PlanElement(Element):
 		# self.IntentionFrames = IntentionFrames
 		
 class IntentionFrameElement(Element):
-	def __init__(self, id, type_graph=None, name= None, arg_name = None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = None):
+	def __init__(self, id, typ_graph=None, name= None, arg_name = None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = None):
 		if steps == None:
 			steps = set()
 		if type_graph == None:
@@ -581,16 +585,16 @@ class IntentionFrameElement(Element):
 					
 		
 class Motivation(Literal):
-	def __init__(self, id, type=None, name=None, arg_name = None, num_args = None, truth = None, intender=None, goal=None):
+	def __init__(self, id, typ=None, name=None, arg_name = None, num_args = None, truth = None, intender=None, goal=None):
 		if num_args == None:
 			num_args = 1
 		if name == None:
 			name = 'intends'
-		if type == None:
-			type = 'motivation'
+		if typ == None:
+			typ = 'motivation'
 		if truth == None:
 			truth = True
-		super(Motivation,self).__init__(id=id,type=type,name=name,arg_name = arg_name, num_args=num_args,truth =truth)
+		super(Motivation,self).__init__(id=id,typ=typ,name=name,arg_name = arg_name, num_args=num_args,truth =truth)
 		
 			
 		self.actor = intender

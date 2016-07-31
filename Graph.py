@@ -70,7 +70,7 @@ class Edge:
 
 class Graph(Element):
 	"""A graph is an element with elements, edges, and constraints"""
-	def __init__(self, id, type, name = None, \
+	def __init__(self, id, typ, name = None, \
 		Elements = None, Edges = None, Constraints = None):
 		if Elements == None:
 			Elements = set()
@@ -79,7 +79,7 @@ class Graph(Element):
 		if Constraints == None:
 			Constraints = set()
 		
-		super(Graph,self).__init__(id,type,name)
+		super(Graph,self).__init__(id,typ,name)
 		self.elements = Elements
 		self.edges = Edges;
 		self.constraints = Constraints
@@ -92,11 +92,11 @@ class Graph(Element):
 			#edge.sink.print_element()
 		for element in self.elements:
 			if type(element) is Literal:
-				print('Element {id} = {truth}{name},\ttype = {type}'.format(id=element.id, truth='not ' if not element.truth else '', name=element.name, type=element.type))
+				print('Element {id} = {truth}{name},\ttype = {type}'.format(id=element.id, truth='not ' if not element.truth else '', name=element.name, type=element.typ))
 			elif type(element) is Operator:
-				print('Element {id} = {truth}{name},\ttype = {type}'.format(id=element.id, truth='not ' if element.executed==False else '', name=element.name, type=element.type))
+				print('Element {id} = {truth}{name},\ttype = {type}'.format(id=element.id, truth='not ' if element.executed==False else '', name=element.name, type=element.typ))
 			else:
-				print('Element {} = {},\ttype = {}'.format(element.id, element.name, element.type))
+				print('Element {} = {},\ttype = {}'.format(element.id, element.name, element.typ))
 	
 	def print_graph_names(self):
 		print('ElementGraph {}:'.format(self.name))
@@ -111,11 +111,11 @@ class Graph(Element):
 			#edge.sink.print_element()
 		for element in self.elements:
 			if type(element) is Literal:
-				print('Element {truth}{name},\ttype = {type}'.format(truth='not ' if not element.truth else '', name=element.name, type=element.type))
+				print('Element {truth}{name},\ttype = {type}'.format(truth='not ' if not element.truth else '', name=element.name, type=element.typ))
 			elif type(element) is Operator:
-				print('Element {truth}{name},\ttype = {type}'.format(truth='not ' if element.executed==False else '', name=element.name, type=element.type))
+				print('Element {truth}{name},\ttype = {type}'.format(truth='not ' if element.executed==False else '', name=element.name, type=element.typ))
 			else:
-				print('Element {} ,\ttype = {}'.format(element.name, element.type))
+				print('Element {} ,\ttype = {}'.format(element.name, element.typ))
 	
 	def hasEdgeIdentity(self, edge):
 		""" Returns set of edges s.t. (source.id, label, sink.id) in self.edges"""

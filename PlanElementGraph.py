@@ -4,7 +4,7 @@ import uuid
 import random
 
 class Belief(ElementGraph):
-	def __init__(self, id, type, name=None, \
+	def __init__(self, id, typ, name=None, \
 				Elements = None, \
 				root_element=None, \
 				Edges = None, \
@@ -17,7 +17,7 @@ class Belief(ElementGraph):
 		if Constraints == None:
 			Constraints = set()
 		
-		super(Belief, self).__init__(id,type,name,Elements, root_element, Edges, Constraints)
+		super(Belief, self).__init__(id,typ,name,Elements, root_element, Edges, Constraints)
 
 class Action(ElementGraph):
 	def __init__(self,id,type_graph,name=None,Elements = None, root_element = None, Edges = None,Constraints = None):
@@ -28,7 +28,7 @@ class Action(ElementGraph):
 			Constraints = set()
 
 		if root_element is None:
-			root_element = Operator(uuid.uuid1(200),type='Action')
+			root_element = Operator(uuid.uuid1(200),typ='Action')
 			
 		if Elements == None:
 			Elements = {root_element}
@@ -167,12 +167,13 @@ class Action(ElementGraph):
 
 	def print_action(self):
 		print('\n({}'.format(self.root.name),end = " ")
-		self.Args = []''' temporary, no Args list'''
+		self.Args = []
+		''' temporary, no Args list'''
 		for i in range(1,self.root.num_args+1):
 			if i not in self.Args:
 				print('__',end = " ")
 			else:
-				print('({}:{})'.format(self.Args[i].type,self.Args[i].id),end = " ")
+				print('({}:{})'.format(self.Args[i].typ,self.Args[i].id),end = " ")
 		
 		print(')')
 		
@@ -236,15 +237,16 @@ class PlanElementGraph(ElementGraph):
 		if Constraints == None:
 			Constraints = set()
 		
+		self.OrderingGraph = OrderingGraph(id = uuid.uuid1(5))
+		self.CausalLinkGraph = CausalLinkGraph(id = uuid.uuid1(6))
 		self.updatePlan(Elements,Edges,Constraints)
 		self.flaws = deque() #sort by heuristic?
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
-		self.OrderingGraph = OrderingGraph(id = uuid.uuid1(5))
-		self.CausalLinkGraph = CausalLinkGraph(id = uuid.uuid1(6))
+		
 		
 		if planElement is None:
-			planElement = PlanElement(id =id, type=type_graph,name=name)
+			planElement = PlanElement(id =id, typ=type_graph,name=name)
 		
 
 		#Edges.update( {Edge(planElement,IF, 'frame-of') for IF in self.IntentionFrames})
