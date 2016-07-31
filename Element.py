@@ -390,6 +390,9 @@ class Argument(Element):
 			return None
 		
 		self.neqs.update(other.neqs)
+		
+		{neq.neqs.add(self) for neq in other.neqs}
+		
 		return self
 		
 	def print_element(self):

@@ -195,14 +195,25 @@ class PlanSpacePlanner:
 		graph.CausalLinkGraph.addEdge(s_add, s_need, condition_id)
 
 		if new:
-			preconditions = graph.getNeighborsByLabel(s_add, 'precond-of')
+			prc_edges = graph.getIncidentEdgesByLabel(s_add, 'precond-of')
+			#preconditions = graph.getNeighborsByLabel(s_add, 'precond-of')
 			equalNames = {'equals', 'equal', '='}
-			noncodesg = {prec for prec in preconditions if prec.name in equalNames and not prec.truth}
+			noncodesg = {prec for prec in prc_edges if prec.sink.name in equalNames and not prec.truth}
 			for prec in noncodesg:
-				item1, item2 = tuple(graph.getNeighbors(prec))
-				item1.neqs.add(item2.id)
-				item2.neqs.add(item1.id)
-				graph.edges.add(Edge(item1, item2, 'neq'))
+				item1Edge, item2Edge = tuple(graph.getIncidentEdges(prec.sink))
+				#item1, item2 = tuple(graph.getNeighbors(prec.sink))
+				item1 = item1Edge.sink
+				item2 = item2Edge.sink
+				item1.neqs.add(item2)
+				item2.neqs.add(item1)
+				#Remove outgoing edges and '=' Literal element
+				graph.edges.remove(item1Edge)
+				graph.edges.remove(item2Edge)
+				graph.elements.remove(prec.sink)
+				
+			#Remove equality precondition edges
+			graph.edges -= noncodesg
+
 			graph.flaws += (Flaw((s_add, prec), 'opf') for prec in preconditions if not prec in noncodesg)
 				
 		#Good time as ever to updatePlan

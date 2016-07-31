@@ -39,9 +39,8 @@ class Action(ElementGraph):
 		#self.Args = {}
 		#self.updateArgs()
 				
-		""" Get consenting actors"""
-		self.consenting_actors = set()			
-		self.updateConsentingActors()
+		""" Get consenting actors"""		
+		self.updateConsentingActors(scratch = True)
 											
 		#print('num_CONSENTING actors = {} in action {}'.format(len(self.consenting_actors),self.id))
 		
@@ -252,7 +251,6 @@ class PlanElementGraph(ElementGraph):
 		#Edges.update( {Edge(planElement,step, 'step-of') for step in self.Steps})
 									
 		super(PlanElementGraph,self).__init__(id,type_graph,name,Elements,planElement,Edges,Constraints)
-		
 		
 		self.updateIntentionFrameAttributes()
 	
