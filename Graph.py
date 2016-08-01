@@ -143,7 +143,7 @@ class Graph(Element):
 	
 	def getElementByReplacedId(self, ID):
 		for element in self.elements:
-			if element.replaced_id == ID:
+			if element.replaced_ID == ID:
 				return element
 		return None
 	

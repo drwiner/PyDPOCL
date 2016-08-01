@@ -166,7 +166,17 @@ class Action(ElementGraph):
 			
 		return prospects
 		
-
+	'''for debugging'''
+	def getConditions(self):
+		pres = {edge for edge in self.edges if edge.label == 'precond-of'}
+		effs = {edge for edge in self.edges if edge.label == 'effect-of'}
+		print('Preconditions:\n')
+		for pre in pres:
+			pre.sink
+		print('Effects:\n')
+		for eff in effs:
+			eff.sink
+		
 	def print_action(self):
 		print('\n({}'.format(self.root.name),end = " ")
 		self.updateArgs()
@@ -365,6 +375,10 @@ class PlanElementGraph(ElementGraph):
 			#nStep = Step.copyGen()
 			complete_steps.update(op.getInstantiations(Step))
 		return complete_steps
+		
+	'''for debugging'''
+	def getActions(self):
+		return list(self.getElementGraphFromElement(step,Action) for step in self.Steps)
 
 	
 	def print_plan(self):

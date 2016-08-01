@@ -43,7 +43,9 @@ class ElementGraph(Graph):
 								Constraints = elementGraph.rGetDescendantConstraints(element))
 					
 		
-	def getElementGraphFromElement(self, element, Type):
+	def getElementGraphFromElement(self, element, Type = None):
+		if Type == None:
+			Type = eval(element.typ)
 		if self.root.ID == element.ID:
 			return self.copyGen()
 		return Type.makeElementGraph(self,element)
