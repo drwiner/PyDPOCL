@@ -120,7 +120,7 @@ class PlanSpacePlanner:
 						#Also, add elements in new_step_op which are not Effect
 						graph_copy.mergeGraph(new_step_op)
 						
-						self.addStep(graph_copy, new_step_op.root, s_need, eff_abs.ID, new = True) #adds causal link and ordering constraints
+						self.addStep(graph_copy, new_step_op.root, s_need, eff_abs.root, new = True) #adds causal link and ordering constraints
 						results.add(graph_copy)
 						#add graph to children
 		return results
@@ -168,12 +168,12 @@ class PlanSpacePlanner:
 							graph_copy.elements.remove(edge.sink)
 							graph_copy.replaceWith(edge.sink,new_sink)
 							
-						self.addStep(graph_copy, s_need, step.root, eff_abs.ID, new = False)
+						self.addStep(graph_copy, s_need, step.root, eff_abs.root, new = False)
 						results.add(graph_copy)
 		return results
 	
 		
-	def addStep(self, graph, s_add, s_need, condition_id, new=None):
+	def addStep(self, graph, s_add, s_need, condition, new=None):
 		"""
 			when a step is added/reused, 
 			add causal link and ordering edges (including to dummy steps)
@@ -192,7 +192,7 @@ class PlanSpacePlanner:
 			
 		#Always add this ordering
 		graph.OrderingGraph.addEdge(s_add,s_need)
-		graph.CausalLinkGraph.addEdge(s_add, s_need, condition_id)
+		graph.CausalLinkGraph.addEdge(s_add, s_need, condition)
 
 		if new:
 			prc_edges = graph.getIncidentEdgesByLabel(s_add, 'precond-of')

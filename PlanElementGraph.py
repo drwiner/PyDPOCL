@@ -389,6 +389,8 @@ class PlanElementGraph(ElementGraph):
 		print('----------------\n')
 		
 	def __repr__(self):
-		return str([self.getElementGraphFromElement(step,Action) for step in self.Steps])
-			
+		steps =  str([self.getElementGraphFromElement(step,Action) for step in self.Steps])
+		orderings = self.OrderingGraph.__repr__()
+		links = self.CausalLinkGraph.__repr__()
+		return '*Steps: {' + steps + '} *Orderings: {' + orderings + '} *CausalLinks: {' + links + '}'
 		
