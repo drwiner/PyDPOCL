@@ -193,7 +193,7 @@ class Action(ElementGraph):
 	def __repr__(self):
 		self.updateArgs()
 		args = str([' {}-{} '.format(arg.name, arg.typ) for arg in self.Args])
-		return '{}-{}{}'.format(self.root.executed, self.root.name, self.typ) + args
+		return '{}-{}:"{}"'.format(self.root.executed, self.root.name, self.typ) + args
 		
 		
 class Condition(ElementGraph):

@@ -114,17 +114,14 @@ class PlanSpacePlanner:
 						graph_copy.mergeGraph(eff_abs)
 						
 						new_step_op = copy.deepcopy(step_op)
+						graph_elms = {elm for elm in graph_copy.elements if hasattr(elm, 'replaced_ID')}
 						
 						for step_elm in new_step_op.elements:
-							for graph_elm in graph_copy.elements:
-								if hasattr(graph_em, 'replaced_ID'):
-									if graph_elm.replaced_ID == step_elm.ID:
-										step_elm.replaced_ID = graph_elm.ID
-										break
-						
-						for element in new_step_op.elements:
-							if hasattr(element, 'replaced_ID'):
-								element.replaced_ID = element.ID
+							for graph_elm in graph_elms:
+								if graph_elm.replaced_ID == step_elm.ID:
+									step_elm.replaced_ID = graph_elm.ID
+									graph_elms.remove(graph_elm)
+									break
 						
 						#Second, find elements of eff_abs in graph_copy, which have ids from Effect 
 						#		and merge elements of new_step's Effect (which have same ids has Effect)
@@ -171,29 +168,21 @@ class PlanSpacePlanner:
 						#All Edges which have sink whose id was not a replace_id nor whose id = its own replace id
 						#May need to get element subgraph from step if step is not type Action
 						
-						incomding = set()
-						for edge in graph_copy.edges:
-							if 'replaced_ID' in edge.sink.__dict__.keys():
-								if edge.sink.replaced_ID in replace_ids:
-									if edge.sink.ID != edge.sink.replaced_ID:
-										if not edge.source.ID in replace_IDs:
-											incoming.add(edge)
-						
-						candidates = {edge for edge in graph_copy.edges if 'replaced_ID' in edge.sink.__dict__.keys() and not 'replaced_ID' in edge.source.__dict__.keys()}
-						cddts = {edge for edge in candidates if edge.sink.replaced_ID in replace_ids and edge.sink.replaced_ID != edge.sink.ID}
+						incoming = {edge for edge in graph_copy.edges if hasattr(edge.sink, 'replaced_ID')}
+						incoming = {edge for edge in incoming if edge.sink.replaced_ID in replace_ids}
+						rmv = {edge for edge in incoming if hasattr(edge.source, 'replaced_ID')}
+						rmv = {edge for edge in rmv if edge.source.replaced_ID in replace_ids}
+						incoming -= rmv
 						
 						#cddts = {edge for edge in graph_copy.edges if 'replaced_ID' in edge.sink.__dict__.keys() and not edge.sink.replaced_ID == edge.sink.ID}
 						
-						incoming = {edge for edge in graph_copy.edges \
-							if edge.sink.replaced_ID in replace_ids \
-							and not edge.sink.replaced_ID == edge.sink.ID\
-							and not edge.source.ID in replace_ids}					
+						#incoming = {edge for edge in graph_copy.edges if edge.sink.replaced_ID in replace_ids and not edge.sink.replaced_ID == edge.sink.ID and not edge.source.ID in replace_ids}					
 						for edge in incoming:
 							new_sink = graph_copy.getElementByReplacedId(edge.sink.ID)
 							graph_copy.elements.remove(edge.sink)
 							graph_copy.replaceWith(edge.sink,new_sink)
 							
-						self.addStep(graph_copy, s_need, step.root, eff_abs.root, new = False)
+						self.addStep(graph_copy, s_need, step, eff_abs.root, new = False)
 						results.add(graph_copy)
 		return results
 	
