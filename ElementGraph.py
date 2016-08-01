@@ -51,6 +51,16 @@ class ElementGraph(Graph):
 	def getElementGraphFromElementID(self, element_ID, Type):
 		return self.getElementGraphFromElement(self.getElementById(element_ID),Type)
 		
+	def addNonCodesignationConstraints(self, elm1, elm2):
+		''' Adds a constraint edge to prevent elm1 from being a legal merge with elm2
+			Strategy depends that two preconditions or two effects of the same step could not be non-codesignated
+			Also does not take into account future edges which are given the same edge-label
+			TODO: more robust anti-merge strategy
+		'''
+		#could pick more specific edge. some edges could be 'unique' in that no other outgoing/incoming edge label is same
+		prnt = next(iter(edge for edge in self.edges if edge.sink.id == elm1.id))
+		self.constraints.add(Edge(prnt.source, elm2, prnt.label))
+		
 	def mergeGraph(self, other):
 		"""
 			For each element in other to include in self, if its a replacer, merge it into self
