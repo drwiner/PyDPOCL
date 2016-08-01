@@ -53,6 +53,13 @@ class Action(ElementGraph):
 		#self.updateArgs()
 		#self.isOrphan()
 				
+	def updateArgs(self):
+		argTyps = {Argument, Actor}
+		self.Args = set()
+		for element in self.rGetDescendants(self.root):
+			if type(element) in argTyps:
+				self.Args.add(element)
+
 	# def updateArgs(self):
 
 		# for arg in self.elements:
@@ -164,15 +171,22 @@ class Action(ElementGraph):
 
 	def print_action(self):
 		print('\n({}'.format(self.root.name),end = " ")
-		self.Args = []
+		self.updateArgs()
+		Args = list(self.Args)
 		''' temporary, no Args list'''
 		for i in range(1,self.root.num_args+1):
 			if i not in self.Args:
 				print('__',end = " ")
 			else:
-				print('({}:{})'.format(self.Args[i].typ,self.Args[i].ID),end = " ")
+				print('({}:{})'.format(Args[i].typ,Args[i].ID),end = " ")
 		
 		print(')')
+		
+	def __repr__(self):
+		self.updateArgs()
+		args = str([' {}-{} '.format(arg.name, arg.typ) for arg in self.Args])
+		return '{}-{}{}'.format(self.root.executed, self.root.name, self.typ) + args
+		
 		
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
