@@ -10,6 +10,7 @@ problem_file = 'domains/mini-indy-problem.pddl'
 operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
 planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 graph = planner[0]
+self = planner
 result = planner.rPOCL(graph)
 
 flaw = graph.flaws.pop()

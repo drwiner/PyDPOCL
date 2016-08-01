@@ -10,6 +10,7 @@
   (:action move
     :parameters   (?character - character ?from - location ?to - location)
 	:precondition (and (not (equals ?from ?to))
+					   (adj ?from ?to)
                        (alive ?character)
                        (at ?character ?from))
 	:effect       (and (not (at ?character ?from))
