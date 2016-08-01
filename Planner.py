@@ -150,7 +150,7 @@ class PlanSpacePlanner:
 				Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
 				if Effect.canAbsolve(Precondition):
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
-					for eff_abs in Effect_absorptions: 
+					for eff_abs in Effect_absorbtions: 
 						"""	for each effect which can absolve the precondition, 
 							and each possible way to unify the effect and precondition,
 								1) Create a new child graph.
@@ -176,13 +176,14 @@ class PlanSpacePlanner:
 						
 						#cddts = {edge for edge in graph_copy.edges if 'replaced_ID' in edge.sink.__dict__.keys() and not edge.sink.replaced_ID == edge.sink.ID}
 						
-						#incoming = {edge for edge in graph_copy.edges if edge.sink.replaced_ID in replace_ids and not edge.sink.replaced_ID == edge.sink.ID and not edge.source.ID in replace_ids}					
-						for edge in incoming:
-							new_sink = graph_copy.getElementByReplacedId(edge.sink.ID)
-							graph_copy.elements.remove(edge.sink)
-							graph_copy.replaceWith(edge.sink,new_sink)
+						#incoming = {edge for edge in graph_copy.edges if edge.sink.replaced_ID in replace_ids and not edge.sink.replaced_ID == edge.sink.ID and not edge.source.ID in replace_ids}	
+						uniqueSinks = {edge.sink for edge in incoming}
+
+						for snk in uniqueSinks:
+							new_sink = eff_abs.getElementByReplacedId(snk.ID)
+							graph_copy.replaceWith(snk,new_sink)
 							
-						self.addStep(graph_copy, s_need, step, eff_abs.root, new = False)
+						self.addStep(graph_copy, step, s_need, eff_abs.root, new = False)
 						results.add(graph_copy)
 		return results
 	
@@ -279,7 +280,8 @@ class PlanSpacePlanner:
 				for each way to resolve flaw, 
 				create new graphs and rPOCL on it
 		"""
-		
+		graph
+		print('num flaws: {} '.format(len(graph.flaws)))
 		#BASE CASES
 		if not graph.isInternallyConsistent():
 			return None
@@ -289,9 +291,20 @@ class PlanSpacePlanner:
 		#INDUCTION
 		flaw = graph.flaws.pop() 
 		
+		
+		
 		if flaw.name == 'opf':
+			print('opf')
+			s_need, pre = flaw.flaw
+			print(graph.getElementGraphFromElement(s_need,Action))
+			print(graph.getElementGraphFromElement(pre,Condition))
 			results = self.reuse(graph, flaw)
+			print('reuse results: {} '.format(len(results)))
 			results.update(self.newStep(graph, flaw))
+			print('newStep results: {} '.format(len(results)))
+			if len(results) == 0:
+				print('could not resolve opf')
+				return None
 			
 		if flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(graph,flaw)
@@ -299,17 +312,24 @@ class PlanSpacePlanner:
 		for result in results:
 			new_flaws = detectThreatenedCausalLinks(result)
 			result.flaws += new_flaws
+			print('detected tclfs: {} '.format(len(new_flaws)))
 
 		#self._frontier += results
 		
 		#replace this with choosing highest ranked graph
 		for g in results:
+			g
+			print('rPOCLing')
 			#result = self._frontier.pop()
 			result = self.rPOCL(g) 
 			if not result is None:
 				return result
-				
-		print('no solutions found?')
+		
+		print('no solutions found')
+		print('for debugging: \n')
+		for g in results:
+			g
+		print('end debugging \n')
 		return None
 		
 

@@ -143,8 +143,9 @@ class Graph(Element):
 	
 	def getElementByReplacedId(self, ID):
 		for element in self.elements:
-			if element.replaced_ID == ID:
-				return element
+			if hasattr(element, 'replaced_ID'):
+				if element.replaced_ID == ID:
+					return element
 		return None
 	
 	def addConstraint(self, edge):
@@ -152,11 +153,18 @@ class Graph(Element):
 			self.constraints.add(edge)
 			
 	def replaceWith(self, element, other):
+		#if they're the same, don't waste your time
+		if element == other:
+			return
+		#if it doesn't exist, just add it
 		if self.getElementById(other.ID) is None:
 			self.elements.add(other)
+		#remove old
 		self.elements.remove(element)
+		#find all edges coming from this old element, replace
 		for outgoing in self.getIncidentEdges(element):
 			outgoing.source = other
+		#find all edges incoming to old element, replace
 		for incoming in (edge for edge in self.edges if edge.sink.ID == element.ID):
 			incoming.sink = other
 		return self

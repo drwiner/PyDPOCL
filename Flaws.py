@@ -37,7 +37,7 @@ def detectThreatenedCausalLinks(graph):
 	
 	detectedThreatenedCausalLinks = set()
 	for causal_link in graph.CausalLinkGraph.edges:
-		dependency = graph.getElementById(causal_link.label)
+		dependency = causal_link.label
 		reverse_dependency = copy.deepcopy(dependency)
 		#Reverse the truth status of the dependency
 		if reverse_dependency.truth == True:
@@ -49,9 +49,9 @@ def detectThreatenedCausalLinks(graph):
 			#First, ignore steps which either are the source and sink of causal link, or which cannot be ordered between them
 			if step.ID == causal_link.source.ID or step.ID == causal_link.sink.ID:
 				break
-			if graph.orderingGraph.isPath(causal_link.sink, step):
+			if graph.OrderingGraph.isPath(causal_link.sink, step):
 				break
-			if graph.orderingGraph.isPath(step, causal_link.source):
+			if graph.OrderingGraph.isPath(step, causal_link.source):
 				break
 			
 			#Is condition consistent?
