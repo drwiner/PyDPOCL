@@ -126,6 +126,13 @@ class ElementGraph(Graph):
 			# element_graph.updateActionParams() #only will work if this is action
 			element_graph.constraints = copy.deepcopy(other.constraints)
 		return completed	
+		
+	def updateArgs(self):
+		argTyps = {Argument, Actor}
+		self.Args = set()
+		for element in self.rGetDescendants(self.root):
+			if type(element) in argTyps:
+				self.Args.add(element)
 
 	
 	def absolve(self, Remaining = None, Available = None, Collected = None):

@@ -18,6 +18,11 @@ class Belief(ElementGraph):
 			Constraints = set()
 		
 		super(Belief, self).__init__(ID,typ,name,Elements, root_element, Edges, Constraints)
+		
+	def __repr__(self):
+		self.updateArgs()
+		args = str([' {}-{} '.format(arg.name, arg.typ) for arg in self.Args])
+		return '{}-Bel-{}{}'.format(self.root.truth, self.root.name, self.typ) + args
 
 class Action(ElementGraph):
 	def __init__(self,ID,type_graph,name=None,Elements = None, root_element = None, Edges = None,Constraints = None):
@@ -52,13 +57,6 @@ class Action(ElementGraph):
 		self.updateConsentingActors()
 		#self.updateArgs()
 		#self.isOrphan()
-				
-	def updateArgs(self):
-		argTyps = {Argument, Actor}
-		self.Args = set()
-		for element in self.rGetDescendants(self.root):
-			if type(element) in argTyps:
-				self.Args.add(element)
 
 	# def updateArgs(self):
 
@@ -218,7 +216,9 @@ class Condition(ElementGraph):
 		print(')')
 		
 	def __repr__(self):
-		return self.root
+		self.updateArgs()
+		args = str([' {}-{} '.format(arg.name, arg.typ) for arg in self.Args])
+		return '{}-{}{}'.format(self.root.truth, self.root.name, self.typ) + args
 		
 		
 		
@@ -387,5 +387,8 @@ class PlanElementGraph(ElementGraph):
 		for c in self.constraints:
 			c.print_edge()
 		print('----------------\n')
-
+		
+	def __repr__(self):
+		return str([self.getElementGraphFromElement(step,Action) for step in self.Steps])
+			
 		
