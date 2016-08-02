@@ -307,9 +307,9 @@ class PlanSpacePlanner:
 		
 			if flaw.name == 'opf':
 				print('opf')
-				s_need, pre = flaw.flaw
-				print(graph.getElementGraphFromElement(s_need,Action))
-				print(graph.getElementGraphFromElement(pre,Condition))
+				#s_need, pre = flaw.flaw
+				#print(graph.getElementGraphFromElement(s_need,Action))
+				#print(graph.getElementGraphFromElement(pre,Condition))
 				results = self.reuse(graph, flaw)
 				print('reuse results: {} '.format(len(results)))
 				results.update(self.newStep(graph, flaw))
@@ -331,8 +331,8 @@ class PlanSpacePlanner:
 			#replace this with choosing highest ranked graph
 			#new_results = set()
 			for g in results:
-				print('rPOCLing')
-				print(g)
+				#print('rPOCLing')
+				#print(g)
 				#result = self._frontier.pop()
 				g.flaws.remove(flaw)
 				result = self.rPOCL(g)

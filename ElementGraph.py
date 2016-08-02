@@ -113,7 +113,7 @@ class ElementGraph(Graph):
 			Returns all possible ways to unify self and other, 
 				may result in changes to self
 		"""
-		print('{}x{}.get Instances given partial element graph ({}x{})'.format(self.ID, self.typ, other.ID, other.typ))
+		#print('{}x{}.get Instances given partial element graph ({}x{})'.format(self.ID, self.typ, other.ID, other.typ))
 		#print('ought to be 200xAction.possible_mergers(111xAction) or 3001xAction.possible_mergers(2111xAction)')
 		#operator = self.copyGen()
 		

@@ -54,6 +54,7 @@ if len(graph.flaws) == 0:
 #INDUCTION\
 graph.isInternallyConsistent()
 graph = results.pop()
+graph.isInternallyConsistent()
 flaw = graph.flaws.pop() 
 
 

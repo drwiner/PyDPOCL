@@ -288,13 +288,13 @@ class Graph(Element):
 		for cs in constraint_sources:
 			suspects = {edge.source for edge in self.edges if edge.source.ID == cs.ID}
 			if len(suspects) == 0:
-				print('no suspects for constraint source {}'.format(cs.ID))
+				#print('no suspects for constraint source {}'.format(cs.ID))
 				continue
 			cg = self.rGetDescendantConstraints(cs)
 			for sp in suspects:
 				sg = self.rGetDescendantEdges(sp)
 				if rDetectEquivalentEdgeGraph(copy.deepcopy(cg),copy.deepcopy(sg)):
-					print('suspect {} not consistent with constraints from source {}'.format(sp.ID,cs.ID))
+					#print('suspect {} not consistent with constraints from source {}'.format(sp.ID,cs.ID))
 					return False
 
 		return True
@@ -348,13 +348,13 @@ class Graph(Element):
 		for cs in constraint_sources:
 			suspects = {edge.source for edge in self.edges if edge.source.isEquivalent(cs)}
 			if len(suspects) == 0:
-				print('no suspects for constraint source {}'.format(cs.ID))
+				#print('no suspects for constraint source {}'.format(cs.ID))
 				continue
 			cg = other.rGetDescendantConstraints(cs)
 			for sp in suspects:
 				sg = self.rGetDescendantEdges(sp)
 				if rDetectEquivalentEdgeGraph(copy.deepcopy(cg),copy.deepcopy(sg)):
-					print('suspect {} not consistent with constraints from source {}'.format(sp.ID,cs.ID))
+					#print('suspect {} not consistent with constraints from source {}'.format(sp.ID,cs.ID))
 					return True
 
 		return False
@@ -400,7 +400,7 @@ def rDetectConsistentEdgeGraph(Remaining = None, Available = None):
 		return True
 
 	other_edge = Remaining.pop()
-	print('remaining ', len(Remaining))
+	#print('remaining ', len(Remaining))
 
 	for prospect in Available:
 		if prospect.isConsistent(other_edge):
@@ -423,8 +423,8 @@ def rDetectEquivalentEdgeGraph(Remaining = None, Available = None):
 		return False
 
 	other_edge = Remaining.pop()
-	print('constraints remaining ', len(Remaining))
-	other_edge.print_edge()
+	#print('constraints remaining ', len(Remaining))
+	#other_edge.print_edge()
 	for prospect in Available:
 		if prospect.isEquivalent(other_edge):
 			#print('\nequivalence detected: constraint (above) and operator edge:')
