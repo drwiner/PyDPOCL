@@ -142,15 +142,22 @@ class PlanSpacePlanner:
 		s_need, pre = flaw.flaw
 		Precondition = graph.getElementGraphFromElementID(pre.ID,Condition)
 		results = set()
-		for step in (st for st in graph.Steps if not st.isEquivalent(s_need)):
+		for step in graph.Steps: 
+			print(step)
+			if step == s_need:
+				continue
 			if graph.OrderingGraph.isPath(s_need, step):
 				#step cannot be ordered before s_need
-				break
+				continue
+			print('legal step')
 			for eff in graph.getNeighborsByLabel(step, 'effect-of'):
+				print(eff)
 				Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
 				if Effect.canAbsolve(Precondition):
+					print('legal eff')
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
 					for eff_abs in Effect_absorbtions: 
+						print(eff_abs)
 						"""	for each effect which can absolve the precondition, 
 							and each possible way to unify the effect and precondition,
 								1) Create a new child graph.
@@ -280,7 +287,7 @@ class PlanSpacePlanner:
 				for each way to resolve flaw, 
 				create new graphs and rPOCL on it
 		"""
-		graph
+		print(graph)
 		print('num flaws: {} '.format(len(graph.flaws)))
 		#BASE CASES
 		if not graph.isInternallyConsistent():
@@ -318,7 +325,6 @@ class PlanSpacePlanner:
 		
 		#replace this with choosing highest ranked graph
 		for g in results:
-			g
 			print('rPOCLing')
 			#result = self._frontier.pop()
 			result = self.rPOCL(g) 
@@ -328,7 +334,7 @@ class PlanSpacePlanner:
 		print('no solutions found')
 		print('for debugging: \n')
 		for g in results:
-			g
+			print(g)
 		print('end debugging \n')
 		return None
 		
