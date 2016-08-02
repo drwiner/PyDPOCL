@@ -97,7 +97,7 @@ class ElementGraph(Graph):
 		for edge in other.edges:
 			source = self.getElementById(edge.source.replaced_ID)
 			sink = self.getElementById(edge.sink.replaced_ID)
-			existing_edges = {E for E in self.edges if E.source.ID == source.ID and E.sink.ID == sink.ID and E.label == edge.label}
+			existing_edges = {E for E in self.edges if E.source == source and E.sink == sink and E.label == edge.label}
 			#existing_edges = self.getEdgesByIDsAndLabel(source.ID, sink.ID, edge.label)
 			if len(existing_edges) > 1 :
 				print('multiple edges {}--{}--> {}; in plan {} trying to merge {}'.format(edge.source.replaced_ID, edge.label, edge.sink.replaced_ID, self.ID, other.ID))
