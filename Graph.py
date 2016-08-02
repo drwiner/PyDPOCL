@@ -31,7 +31,6 @@ class Edge:
 		return (not self.__eq__(other))
 		
 	def __hash__(self):
-		#print(self.source.ID)
 		return hash((self.source.ID, self.sink.ID, self.label))
 		
 	def merge(self, other):
@@ -53,13 +52,6 @@ class Edge:
 		self.sink = sink
 		return self
 		
-	#def print_edge(self):
-		#self.source.print_element()
-		#print(self.label)
-		#self.sink.print_element()
-		
-	def print_edge(self):
-		print('Edge {} --{}--> {}'.format(self.source, self.label, self.sink))
 	def __repr__(self):
 		return 'Edge {} --{}--> {}'.format(self.source, self.label, self.sink)
 

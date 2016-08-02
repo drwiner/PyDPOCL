@@ -365,4 +365,8 @@ if __name__ ==  '__main__':
 	
 	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
+	graph = planner[0]
+	result = planner.rPOCL(graph)
+	print('\n\n\n')
+	print(result)
 	

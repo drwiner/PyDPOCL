@@ -4,12 +4,7 @@ import uuid
 import random
 
 class Belief(ElementGraph):
-	def __init__(self, ID, typ, name=None, \
-				Elements = None, \
-				root_element=None, \
-				Edges = None, \
-				Constraints = None\
-				):
+	def __init__(self, ID, typ, name=None,Elements = None, root_element=None,Edges = None, Constraints = None):
 		if Elements == None:
 			Elements = set()
 		if Edges == None:
@@ -39,11 +34,7 @@ class Action(ElementGraph):
 			Elements = {root_element}
 			
 		super(Action,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Constraints)
-
-		""" Get Action arguments by position"""											
-		#self.Args = {}
-		#self.updateArgs()
-				
+		
 		""" Get consenting actors"""		
 		self.updateConsentingActors(scratch = True)
 											
@@ -51,30 +42,13 @@ class Action(ElementGraph):
 		
 		""" Determine if Action is an orphan"""
 		#self.isOrphan()
-				
-
-	def updateActionParams(self):
-		self.updateConsentingActors()
-		#self.updateArgs()
-		#self.isOrphan()
-
-	# def updateArgs(self):
-
-		# for arg in self.elements:
-			# if type(arg) == Argument or type(arg) == Actor:
-				# for op_id, pos in arg.arg_pos_dict.items():
-					# if op_id == self.root.id:
-						# self.Args[pos] = arg
 						
 	def updateConsentingActors(self,scratch = None):
 		if scratch == None:
 			scratch = False
 		if scratch:
 			self.consenting_actors = set()
-		self.consenting_actors.update({edge.sink \
-										for edge in self.edges \
-											if edge.source is self.root \
-											and edge.label == 'actor-of'})
+		self.consenting_actors.update({edge.sink for edge in self.edges if edge.source is self.root	and edge.label == 'actor-of'})
 											
 	# def isOrphan(self):
 		# for actor in self.consenting_actors:
@@ -84,15 +58,6 @@ class Action(ElementGraph):
 			# elif actor.orphan_dict[self.root.id] == True:
 				# self.is_orphan = True
 				
-	# @classmethod
-	# def makeElementGraph(cls, elementGraph, element):
-		# return cls(				element.id, \
-								# element.type, \
-								# name=None,\
-								# Elements = elementGraph.rGetDescendants(element),\
-								# root_element = element,\
-								# Edges = elementGraph.rGetDescendantEdges(element),\
-								# Constraints = elementGraph.rGetDescendantConstraints(element))
 	
 	def makeCopyFromID(self, start_from, old_element_id = None):
 		"""
@@ -117,78 +82,39 @@ class Action(ElementGraph):
 		
 		if not old_element_id is None:
 			nei = old_element.ID
-		
-		
-		# for element in new_self.elements:
-			# element.id = uuid.uuid1(start_from)
-			# if not old_element_id is None and not found:
-				# if element.id == old_element_id:
-					# found = True
-					# nei = element.id
-			
-		#new_id = new_self.root.id
-		# for i, arg in new_self.Args.items():
-			# for id,pos in arg.arg_pos_dict.items():
-				# if id == old_id:
-					# arg.arg_pos_dict[new_id] = arg.arg_pos_dict.pop(old_id)
-					
 
 		return new_self, nei
-
-	
-											
+							
 
 	def isConsistentAntecedentFor(self, action):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
-		effects = 	{egde.sink \
-						for edge in self.edges \
-								if edge.label == 'effect-of'\
-					}
+		effects = 	{egde.sink for edge in self.edges if edge.label == 'effect-of'}
 				
 		if len(effects) == 0:
 			return False
 			
-		preconditions = {edge.sink \
-								for edge in self.edges \
-										if edge.label == 'precond-of'\
-						}
+		preconditions = {edge.sink for edge in self.edges if edge.label == 'precond-of'}
 		if len(preconditions) == 0:
 			return False
 			
-		prospects = {(eff,pre) \
-								for eff in effects \
-								for pre in preconditions \
-										if eff.isConsistent(pre)\
-					}
+		prospects = {(eff,pre) for eff in effects for pre in preconditions if eff.isConsistent(pre)}
 					
 		if len(prospects)  == 0:
 			return False
 			
 		return prospects
 		
-	'''for debugging'''
-	def getConditions(self):
-		pres = {edge for edge in self.edges if edge.label == 'precond-of'}
-		effs = {edge for edge in self.edges if edge.label == 'effect-of'}
-		print('Preconditions:\n')
-		for pre in pres:
-			pre.sink
-		print('Effects:\n')
-		for eff in effs:
-			eff.sink
+	# '''for debugging'''
+	# def getConditions(self):
+		# pres = {edge for edge in self.edges if edge.label == 'precond-of'}
+		# effs = {edge for edge in self.edges if edge.label == 'effect-of'}
+		# print('Preconditions:\n')
+		# for pre in pres:
+			# pre.sink
+		# print('Effects:\n')
+		# for eff in effs:
+			# eff.sink
 		
-	def print_action(self):
-		print('\n({}'.format(self.root.name),end = " ")
-		self.updateArgs()
-		Args = list(self.Args)
-		''' temporary, no Args list'''
-		for i in range(1,self.root.num_args+1):
-			if i not in self.Args:
-				print('__',end = " ")
-			else:
-				print('({}:{})'.format(Args[i].typ,Args[i].ID),end = " ")
-		
-		print(')')
 		
 	def __repr__(self):
 		self.updateArgs()
@@ -206,25 +132,7 @@ class Condition(ElementGraph):
 		
 	def getArgList(self):
 		return [self.getNeighborsByLabel(self.root, self.labels[i]) for i in range(self.root.num_args)]
-		
-	def print_graph(self, motive = None, actor_id = None):
-		if motive == None:
-			motive = False
-		if actor_id == None:
-			actor_id = -1
-		args = self.getArgList()
-		if motive:
-			print('intends {}'.format(actor_id), end=" ")
-		print('{truth}({name}'.format(truth='not' if not self.root.truth else '',name=self.root.name), end=" ")
-		for i, arg in enumerate(args):
-			if len(arg) == 0:
-				str = '__'
-			else:
-				this_arg = arg.pop()
-				str = this_arg.ID
-			print(str, end=" ") 
-		print(')')
-		
+			
 	def __repr__(self):
 		self.updateArgs()
 		args = str([' {}-{} '.format(arg.name, arg.typ) for arg in self.Args])
@@ -260,7 +168,7 @@ class PlanElementGraph(ElementGraph):
 		
 		self.OrderingGraph = OrderingGraph(ID = uuid.uuid1(5))
 		self.CausalLinkGraph = CausalLinkGraph(ID = uuid.uuid1(6))
-		self.updatePlan(Elements,Edges,Constraints)
+		self.updatePlan(Elements)
 		self.flaws = deque() #sort by heuristic?
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
@@ -282,14 +190,10 @@ class PlanElementGraph(ElementGraph):
 			#Keeps intention frame element attributes up to date
 			#Must be done after super instantation because needs edges
 	
-	def updatePlan(self, Elements = None,Edges = None,Constraints = None):
+	def updatePlan(self, Elements = None,Constraints = None):
 		""" Updating plans to have accurate top-level Sets"""
 		if Elements is None:
 			Elements = self.elements
-		if Edges is None:
-			Edges = self.edges
-		if Constraints is None:
-			Constraints = self.constraints
 		self.Steps = {element for element in Elements if type(element) is Operator}
 		self.Orderings = self.OrderingGraph.edges
 		self.Causal_Links = self.CausalLinkGraph.edges
@@ -310,7 +214,7 @@ class PlanElementGraph(ElementGraph):
 		if remaining_steps == None:
 			remaining_steps = set()
 		if potential_actors == None:
-			potential_actors = set()
+			return set()
 		""" Pick a step and for each actor in consenting_actors, 
 			if consistent with potential_actors, 
 			invoke rPickActorFromSteps(remaining_steps-{step},potential_actors+{actor})
@@ -331,24 +235,22 @@ class PlanElementGraph(ElementGraph):
 		if len(potential_actors) == 0:
 			return set()
 		
-		print('rpickActorFromSteps')
+
 		step = remaining_steps.pop()
-		step.print_element()
-		print('above was chosen\n')
+		print(step)
 		step = self.getElementGraphFromElementID(step.ID,Action)
 		
 		to_remove = set()
 		to_add = set()
 		for actor in potential_actors:
-			print('potential actor: ')
-			actor.print_element()
+			print('potential actor: {}'.format(actor))
 			print('prospects: ')
 			for p in step.consenting_actors:
-				p.print_element()
+				print(p)
 			prospects = {prospect for prospect in step.consenting_actors if actor.isConsistent(prospect)}
 			print('consistent prospects: ')
 			for p in prospects:
-				p.print_element()
+				print(p)
 			if len(prospects) == 0:
 				to_remove.add(actor)
 				#potential_actors.remove(actor)
@@ -380,27 +282,6 @@ class PlanElementGraph(ElementGraph):
 	def getActions(self):
 		return list(self.getElementGraphFromElement(step,Action) for step in self.Steps)
 
-	
-	def print_plan(self):
-		self.updatePlan()
-		print('\n----------------')
-		print('PLAN', self.ID)
-		print('________________')
-
-		print('steps:')
-		for step in self.Steps:
-			step.print_element()
-		for edge in self.edges:
-			edge.print_edge()
-		print('frames:')
-		for frame in self.IntentionFrames:
-			print('frame ID {}:'.format(frame.ID), end=" ")
-			Goal = self.getElementGraphFromElement(frame.goal, Condition)
-			Goal.print_graph(motive=True,actor_id = frame.intender.ID)
-		print('Constraints:')
-		for c in self.constraints:
-			c.print_edge()
-		print('----------------\n')
 		
 	def __repr__(self):
 		steps =  str([self.getElementGraphFromElement(step,Action) for step in self.Steps])

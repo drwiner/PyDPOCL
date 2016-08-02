@@ -245,7 +245,6 @@ class Operator(InternalElement):
 		
 	def print_element(self):
 		print('executed: {}, orphan: {}, ({}, {}, {})'.format(self.executed, self.is_orphan, self.name, self.typ, self.ID))
-		#print('executed:',self.executed,', orphan=',self.is_orphan,'(',self.ID, self.typ, self.name,')')
 		for key,value in self.roles.items():
 			print('\t ID={}, role={}'.format(key, value))
 			
@@ -255,9 +254,6 @@ class Operator(InternalElement):
 		else:
 			exe = self.executed
 		return 'operator({}, {}, {})'.format(exe, self.name, self.ID)
-		#for key,value in self.roles.items():
-		#	st.append('\t ID={}, role={}'.format(key,value))
-		#return st
 
 		
 class Literal(InternalElement):
@@ -312,46 +308,9 @@ class Literal(InternalElement):
 		
 		
 class Argument(Element):
-	""" An Argument Element is an element with non-equality constraints 'neqs'. 
-			A Merge makes a codesignation between two arguments.
-	"""
-	
-	def __init__(self, ID, typ, name= None, neqs = None, arg_name = None):
-		if neqs == None:
-			neqs = set()
-		super(Argument,self).__init__(ID,typ,name, arg_name)
-		#arg_pos_dict is a mapping from operator.ids to positions
-		self.neqs = neqs
-		
-	def isConsistent(self, other):
-		""" isConsistent if arguments have no conflicting attributes and no neq conflicts
-		"""
-		if not super(Argument,self).isConsistent(other):
-			return False
-			
-		if not self.isConsistentNeqs(other):
-			return False
-			
-		return True
-	
 
-	def isConsistentNeqs(self, other):
-		# for ID, pos in other.arg_pos_dict.items():
-			# if ID in self.arg_pos_dict:
-				# if other.arg_pos_dict[ID] != self.arg_pos_dict[ID]:
-					# return False
-
-		#print('{}  '.format(len(self.neqs)))
-		#print('{}  '.format(len(other.neqs)))
-		
-		if len({x for x in self.neqs if x.ID == other.ID}) > 0:
-			return False
-			
-		if len({y for y in other.neqs if y.ID == self.ID}) > 0:
-			return False
-			
-		return True
-				
+	def __init__(self, ID, typ, name= None, arg_name = None):
+		super(Argument,self).__init__(ID,typ,name, arg_name)		
 	
 	def isEquivalent(self, other):
 		""" 
@@ -361,43 +320,13 @@ class Argument(Element):
 		if not super(Argument,self).isEquivalent(other):
 			return False
 		
-		#consistency 
 		if not self.name is None:
 			if other.name != self.name:
 				return False
 		else:
 			if not other.name is None:
-				return False
-		
-		#	
-		#if len(other.arg_pos_dict) == 0:
-		#	return False
-			
-		if not self.isConsistentNeqs(other):
-			return False
-			
-		
-				
+				return False		
 		return True
-		
-		
-	def merge(self, other):
-		""" Merging arguments:
-				Assume self and other arg_pos_dicts are consistent/equivalent
-				Take all entries from other's arg_pos_dict
-		"""
-		if super(Argument,self).merge(other) is None:
-			return None
-		
-		#self.neqs.update(other.neqs)
-		
-		#for neq in other.neqs:
-		#	neq.neqs.add(self)
-		
-		return self
-		
-	def print_element(self):
-		print('(',self.ID, self.typ, self.name,')')
 		
 	def __repr__(self):
 		return '(Arg {}, {}, {})'.format(self.ID, self.typ, self.name)
@@ -418,25 +347,13 @@ class Actor(Argument):
 				for the actor that matches the intention frame's intender
 		When we merge 2 actors, we merge the orphan_dicts with preference for True
 	"""
-	def __init__(self, ID, typ, name= None, arg_name = None, neqs = None, orphan_dict = None):
+	def __init__(self, ID, typ, name= None, arg_name = None, orphan_dict = None):
 		if orphan_dict == None:
 			orphan_dict = {}
 			
-		super(Actor,self).__init__(ID,typ,name, neqs, arg_name)
+		super(Actor,self).__init__(ID,typ,name,arg_name)
 		self.orphan_dict=  orphan_dict
 		
-	# def isConsistent(self, other):
-		# """ isConsistent if for every other.ID in arg_pos_dict, 
-			# either	A) there is no ID in self
-					# B) the same ID is there and the position is the same
-		# """
-		# if not super(Actor,self).isConsistent(other):
-			# return False
-		
-		# if typ(other) == Argument:
-			# return False
-			
-		# return True
 		
 	def merge(self, other):
 		if super(Actor,self).merge(other) is None:
@@ -457,30 +374,11 @@ class Actor(Argument):
 
 class PlanElement(Element):
 
-	def __init__(self,ID,typ=None, name=None, arg_name = None\
-				#Steps=None, \
-				#Orderings=None,  \
-				#CausalLinks=None, \
-				#IntentionFrames=None\
-				):
+	def __init__(self,ID,typ=None, name=None, arg_name = None):
 		if typ == None:
 			typ = 'PlanElementGraph'
-		
-		# if Steps == None:
-			# Steps = set()
-		# if Orderings == None:
-			# Orderings = set()
-		# if CausalLinks == None:
-			# CausalLinks = set()
-		# if IntentionFrames == None:
-			# IntentionFrames = set()
 			
 		super(PlanElement,self).__init__(ID,typ,name, arg_name)
-		
-		# self.Steps = Steps
-		# self.Orderings = Orderings
-		# self.CausalLinks = CausalLinks
-		# self.IntentionFrames = IntentionFrames
 		
 class IntentionFrameElement(Element):
 	def __init__(self, ID, typ_graph=None, name= None, arg_name = None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = None):
