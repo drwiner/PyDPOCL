@@ -89,12 +89,15 @@ class PlanSpacePlanner:
 		
 		#Then try new Step
 		for op in self.op_graphs:
+			print(op)
 			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
+				print(eff)
 				#Condition graph of operator
 				Effect = op.getElementGraphFromElementID(eff.ID, Condition)
 				
 				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
 				if Effect.canAbsolve(Precondition):
+					print('legal eff')
 					
 					#nei : new element id, to easily access element from graph
 					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.ID)
@@ -107,6 +110,8 @@ class PlanSpacePlanner:
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
 			
 					for eff_abs in Effect_absorbtions: 
+						print('effect absorbs flaw')
+						print(eff_abs)
 						graph_copy = copy.deepcopy(graph)
 						
 						#First, find elements of Precondition (in graph_copy) and mergeFrom elements of eff_abs
@@ -157,6 +162,7 @@ class PlanSpacePlanner:
 					print('legal eff')
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
 					for eff_abs in Effect_absorbtions: 
+						print('effect absorbs flaw')
 						print(eff_abs)
 						"""	for each effect which can absolve the precondition, 
 							and each possible way to unify the effect and precondition,
@@ -324,12 +330,18 @@ class PlanSpacePlanner:
 		#self._frontier += results
 		
 		#replace this with choosing highest ranked graph
+		#new_results = set()
 		for g in results:
 			print('rPOCLing')
+			print(g)
 			#result = self._frontier.pop()
-			result = self.rPOCL(g) 
+			result = self.rPOCL(g)
+			print(result)
 			if not result is None:
+				#new_results.add(result)
 				return result
+		#for nr in new_results:
+			
 		
 		print('no solutions found')
 		print('for debugging: \n')
