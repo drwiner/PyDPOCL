@@ -9,6 +9,12 @@ class Flaw:
 		self.name = name
 		self.flaw = tuple
 		
+	def __hash__(self):
+		return hash((self.name, self.flaw))
+		
+	def __eq__(self, other):
+		return hash(self) == hash(other)
+		
 	def __repr__(self):
 		return '{}, {}'.format(self.name, self.flaw)
 		

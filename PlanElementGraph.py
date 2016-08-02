@@ -406,5 +406,5 @@ class PlanElementGraph(ElementGraph):
 		steps =  str([self.getElementGraphFromElement(step,Action) for step in self.Steps])
 		orderings = self.OrderingGraph.__repr__()
 		links = self.CausalLinkGraph.__repr__()
-		return '*Steps: \n{' + steps + '}\n *Orderings:\n {' + orderings + '} \n*CausalLinks:\n {' + links + '}'
+		return '*Steps: \n{' + steps + '}\n *Orderings:\n {' + orderings + '}\n *CausalLinks:\n {' + links + '}'
 		

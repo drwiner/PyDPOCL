@@ -302,44 +302,45 @@ class PlanSpacePlanner:
 			return graph
 			
 		#INDUCTION
-		flaw = graph.flaws.pop() 
+		#flaw = graph.flaws.pop() 
+		for flaw in graph.flaws:
 		
-		
-		
-		if flaw.name == 'opf':
-			print('opf')
-			s_need, pre = flaw.flaw
-			print(graph.getElementGraphFromElement(s_need,Action))
-			print(graph.getElementGraphFromElement(pre,Condition))
-			results = self.reuse(graph, flaw)
-			print('reuse results: {} '.format(len(results)))
-			results.update(self.newStep(graph, flaw))
-			print('newStep results: {} '.format(len(results)))
-			if len(results) == 0:
-				print('could not resolve opf')
-				return None
-			
-		if flaw.name == 'tclf':
-			results = self.resolveThreatenedCausalLinkFlaw(graph,flaw)
-			
-		for result in results:
-			new_flaws = detectThreatenedCausalLinks(result)
-			result.flaws += new_flaws
-			print('detected tclfs: {} '.format(len(new_flaws)))
+			if flaw.name == 'opf':
+				print('opf')
+				s_need, pre = flaw.flaw
+				print(graph.getElementGraphFromElement(s_need,Action))
+				print(graph.getElementGraphFromElement(pre,Condition))
+				results = self.reuse(graph, flaw)
+				print('reuse results: {} '.format(len(results)))
+				results.update(self.newStep(graph, flaw))
+				print('newStep results: {} '.format(len(results)))
+				if len(results) == 0:
+					print('could not resolve opf')
+					return None
+				
+			if flaw.name == 'tclf':
+				results = self.resolveThreatenedCausalLinkFlaw(graph,flaw)
+				
+			for result in results:
+				new_flaws = detectThreatenedCausalLinks(result)
+				result.flaws += new_flaws
+				print('detected tclfs: {} '.format(len(new_flaws)))
 
-		#self._frontier += results
-		
-		#replace this with choosing highest ranked graph
-		#new_results = set()
-		for g in results:
-			print('rPOCLing')
-			print(g)
-			#result = self._frontier.pop()
-			result = self.rPOCL(g)
-			print(result)
-			if not result is None:
-				#new_results.add(result)
-				return result
+			#self._frontier += results
+			
+			#replace this with choosing highest ranked graph
+			#new_results = set()
+			for g in results:
+				print('rPOCLing')
+				print(g)
+				#result = self._frontier.pop()
+				g.flaws.remove(flaw)
+				result = self.rPOCL(g)
+				#print(result)
+				if not result is None:
+					#new_results.add(result)
+					return result
+			results = set()
 		#for nr in new_results:
 			
 		
