@@ -178,36 +178,11 @@ class PlanSpacePlanner:
 						#3) "Redirect Task"": find all edges where the sink has a replaced_id in replace_ids
 
 						precondition_IDs = {element.ID for element in Precondition.elements}
-						eff_abs_IDs = {elm.ID for elm in eff_abs.elements}
-						#Get elm IDS for elms which were in Precondition...
-
-						''' incoming is all edges in graph_copy with sink in Precondition'''
-						incoming = {edge for edge in graph_copy.edges if hasattr(edge.sink, 'replaced_ID')}
-						incoming = {edge for edge in incoming if edge.sink.ID in precondition_IDs}
-						''' minus edges which have a source in Precondition'''
-						rmv = {edge for edge in incoming if hasattr(edge.source, 'replaced_ID')}
-						rmv = {edge for edge in rmv if edge.source.replaced_ID in precondition_IDs}
-						incoming -= rmv
-						''' leaving just those edges which have sinks in Precondition but not sources in Precondition'''
-						rmv = {edge for edge in incoming if edge.sink in eff_abs_IDs}
-						''' minus edges whose sinks carried over with eff_abs '''
-
-						
-						#cddts = {edge for edge in graph_copy.edges if 'replaced_ID' in edge.sink.__dict__.keys() and not edge.sink.replaced_ID == edge.sink.ID}
-						''' for each edge in graphy_copy with sink in Precondition,
-								if there exists an elm in eff_abs s.t. elm.replaced_ID == edge.sink.ID
-									if elm.ID != elm.replaced_ID:
-										then replace edge.sink with elm
-						'''
-						#incoming = {edge for edge in graph_copy.edges if edge.sink.replaced_ID in replace_ids and not edge.sink.replaced_ID == edge.sink.ID and not edge.source.ID in replace_ids}	
-						uniqueSinks = {edge.sink for edge in incoming}
-
-						for snk in uniqueSinks:
-							new_sink = eff_abs.getElementByReplacedId(snk.ID)
-							if new_sink is None:
-								print(eff_abs)
-								print(snk.replaced_ID)
-							graph_copy.replaceWith(snk,new_sink)
+						new_snk_cddts = {elm for elm in eff_abs.elements and not elm.ID in precondition_IDs}
+						#Get elm for elms which were in eff_abs but not in precondition (were replaced)
+						snk_swap_dict = {graph_copy.getElementByID(elm.replaced_ID):graph_copy.getElementByID(elm.ID) for elm in new_snk_cddts}
+						for old, new in snk_swap_dict.items():
+							graph_copy.replaceWith(old, new)
 							
 						self.addStep(graph_copy, step, s_need, eff_abs.root, new = False)
 						results.add(graph_copy)
