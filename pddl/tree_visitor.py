@@ -628,13 +628,13 @@ class TraversePDDLProblem(PDDLVisitor):
 			raise SemanticError('Error: NoneType predicate used in goal condition')		
 								
 		# Get predicate from the domain data structure.
-		predDef = self._domain.predicates[c.key]
+		predDef = self._domain.predicates[nextPredicate.key]
 		signature = list()
 		count = 0
 		# Check whether the predicate uses the correct signature.
 		if len(nextPredicate.children) != len(predDef.signature):
 			raise SemanticError('Error: wrong number of arguments for '
-								'predicate ' + c.key + ' in goal')
+								'predicate ' + nextPredicate.key + ' in goal')
 		for v in nextPredicate.children:
 			if isinstance(v.key, Variable):
 				signature.append((v.key.name, predDef.signature[count][1]))
