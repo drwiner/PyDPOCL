@@ -219,13 +219,13 @@ def problemToGraphs(problem):
 	#for condition in problem_initial_state:
 	init_elements = set()
 	init_edges = set()
-	init_op = Operator(ID = uuid.uuid1(4), typ = 'Action', name = 'dummy_init', num_args = 0, instantiated = True)
-	init_graph =			Action(	ID = uuid.uuid1(5),\
+	init_op = Operator(ID = uuid.uuid1(114), typ = 'Action', name = 'dummy_init', arg_name = 0, num_args = 0, instantiated = True)
+	init_graph =			Action(	ID = uuid.uuid1(115),\
 							type_graph = 'Action', \
 							name = 'dummy_init',\
 							root_element = init_op)
 	for condition in problem.init.predicates:
-		condition_id = uuid.uuid1(2)
+		condition_id = uuid.uuid1(20)
 		lit = Literal(ID = condition_id, typ = 'Condition', name = condition.name, num_args = len(condition.parameters), truth = True)
 		init_graph.elements.add(lit)
 		init_graph.edges.add(Edge(init_op, lit, 'effect-of'))
@@ -233,8 +233,8 @@ def problemToGraphs(problem):
 			init_graph.edges.add(Edge(lit, Args[p],ARGLABELS[i]))
 	
 	goal_elements, goal_edges = getGoalSet(problem.goal.formula, Args)
-	goal_op = Operator(ID = uuid.uuid1(4), typ = 'Action', name = 'dummy_goal', num_args = 0, instantiated = True)
-	goal_graph =			Action(	ID = uuid.uuid1(5),\
+	goal_op = Operator(ID = uuid.uuid1(114), typ = 'Action', name = 'dummy_goal', arg_name = 1, num_args = 0, instantiated = True)
+	goal_graph =			Action(	ID = uuid.uuid1(115),\
 							type_graph = 'Action', \
 							name = 'dummy_goal',\
 							root_element = goal_op)

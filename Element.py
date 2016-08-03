@@ -204,8 +204,10 @@ class InternalElement(Element):
 				return ID
 		return False
 		
+
 		
 class Operator(InternalElement):
+	stepnumber = 0
 	""" An operator element is an internal element with an executed status and orphan status"""
 	def __init__(self, ID, typ, name = None, arg_name = None, num_args = None, roles = None, is_orphan = None, executed = None, instantiated = None):
 		if instantiated == None:
@@ -216,7 +218,13 @@ class Operator(InternalElement):
 			num_args = 0
 		if roles == None:
 			roles = {}
-		super(Operator,self).__init__(ID,typ,name, arg_name, num_args,  roles)
+		if arg_name == None:
+			arg_name = Operator.stepnumber
+			Operator.stepnumber+=1
+		else:
+			Operator.stepnumber = arg_name + 1
+		
+		super(Operator,self).__init__(ID,typ,name, arg_name, num_args, roles)
 		self.executed = executed
 		self.is_orphan = is_orphan
 		self.instantiated = instantiated
@@ -250,10 +258,10 @@ class Operator(InternalElement):
 			
 	def __repr__(self):
 		if self.executed is None:
-			exe = ''
+			exe = 'ex'
 		else:
 			exe = self.executed
-		return 'operator({}, {}, {})'.format(exe, self.name, self.ID)
+		return 'operator({}-{}-{})'.format(exe, self.name, self.arg_name)
 
 		
 class Literal(InternalElement):

@@ -20,6 +20,7 @@ class Belief(ElementGraph):
 		return '{}-Bel-{}{}'.format(self.root.truth, self.root.name, self.typ) + args
 
 class Action(ElementGraph):
+	stepnumber = 2
 	def __init__(self,ID,type_graph,name=None,Elements = None, root_element = None, Edges = None,Constraints = None):
 		
 		if Edges == None:
@@ -69,6 +70,7 @@ class Action(ElementGraph):
 		new_self.ID = start_from
 		nei = -1
 		
+		
 		#While changing IDs, look for the element which used to have old_element.id and let 'nei' = new element id
 		if not old_element_id is None:
 			ole = {element for element in new_self.elements if element.ID == old_element_id}
@@ -79,6 +81,9 @@ class Action(ElementGraph):
 		
 		for element in new_self.elements:
 			element.ID = uuid.uuid1(start_from)
+			
+		new_self.root.arg_name = Action.stepnumber
+		Action.stepnumber+=1
 		
 		if not old_element_id is None:
 			nei = old_element.ID
@@ -119,7 +124,10 @@ class Action(ElementGraph):
 	def __repr__(self):
 		self.updateArgs()
 		args = str([' {}-{} '.format(arg.name, arg.typ) for arg in self.Args])
-		return '{}-{}:"{}"'.format(self.root.executed, self.root.name, self.typ) + args
+		exe = self.root.executed
+		if exe == None:
+			exe = 'ex'
+		return '{}-{}-{}'.format(exe, self.root.name, self.root.arg_name) + args
 		
 		
 class Condition(ElementGraph):

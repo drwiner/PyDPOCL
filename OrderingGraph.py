@@ -87,7 +87,7 @@ class OrderingGraph(Graph):
 		return False
 		
 	def __repr__(self):
-		return str(['{} < {}'.format(edge.source.name, edge.sink.name) for edge in self.edges])
+		return str(['{}-{} < {}-{}'.format(edge.source.name, edge.source.arg_name, edge.sink.name, edge.sink.arg_name) for edge in self.edges])
 		
 		
 class CausalLinkGraph(OrderingGraph):
@@ -100,4 +100,4 @@ class CausalLinkGraph(OrderingGraph):
 		self.edges.add(Edge(source, sink, condition))
 		
 	def __repr__(self):
-		return str(['{} --{}-{}--> {}'.format(edge.source.name, edge.label.truth, edge.label.name, edge.sink.name) for edge in self.edges])
+		return str(['{}-{} --{}-{}--> {}-{}'.format(edge.source.name, edge.source.arg_name, edge.label.truth, edge.label.name, edge.sink.name, edge.sink.arg_name) for edge in self.edges])
