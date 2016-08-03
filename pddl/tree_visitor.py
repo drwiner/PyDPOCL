@@ -605,28 +605,54 @@ class TraversePDDLProblem(PDDLVisitor):
 		goal -- a list of goals
 		c -- a formula representing a goal we want to add to the goal list
 		"""
+		from pddl.parser import Variable
+		nextPredicate = None
+		isNegative = False
+		
+		if c.key == 'not':
+			# This is a negative goal, only one child allowed.
+			if len(c.children) != 1:
+				raise SemanticError('Error not statement with multiple '
+									'children in goal condition')
+			nextPredicate = c.children[0]
+			isNegative = True
+		else:
+			nextPredicate = c
+		
 		# Check whether predicate was introduced in domain file.
-		if not c.key in self._domain.predicates:
+		if not nextPredicate.key in self._domain.predicates:
 			raise SemanticError('Error: unknown predicate ' + c.key +
 								' in goal definition')
+		
+		if nextPredicate == None:
+			raise SemanticError('Error: NoneType predicate used in goal condition')		
+								
 		# Get predicate from the domain data structure.
 		predDef = self._domain.predicates[c.key]
 		signature = list()
 		count = 0
 		# Check whether the predicate uses the correct signature.
-		if len(c.children) != len(predDef.signature):
+		if len(nextPredicate.children) != len(predDef.signature):
 			raise SemanticError('Error: wrong number of arguments for '
 								'predicate ' + c.key + ' in goal')
-		for v in c.children:
-			signature.append((v.key, predDef.signature[count][1]))
+		for v in nextPredicate.children:
+			if isinstance(v.key, Variable):
+				signature.append((v.key.name, predDef.signature[count][1]))
+			else:
+				signature.append((v.key, predDef.signature[count][1]))
 			count += 1
+
 		# Add the predicate to the goal.
-		goal.append(pddl.Predicate(c.key, signature))
+		#goal.append(pddl.Predicate(nextPredicate.key, signature))
+		if isNegative:
+			goal.dellist.add(pddl.Predicate(nextPredicate.key, signature))
+		else:
+			goal.addlist.add(pddl.Predicate(nextPredicate.key, signature))
 
 	def visit_goal_stmt(self, node):
 		""" Visits a PDDL-problem goal state statement."""
 		formula = node.formula
-		goal = list()
+		goal = pddl.Effect() #to enable delete list
 		# For now we only allow 'and' in the goal.
 		if formula.key == 'and':
 			for c in formula.children:

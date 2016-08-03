@@ -24,10 +24,10 @@ def makeGoal(formula, current_id):
 	if formula.key == 'not':
 		formula = next(iter(formula.children))
 		num_children = len(formula.children)
-		lit = Literal(ID = uuid.uuid1(current_id), typ = 'Condition',  name = formula.key, num_args = num_children, truth = False)
+		lit = Literal(ID = uuid.uuid1(current_id), typ = 'Condition', name = formula.key, num_args = num_children, truth = False)
 	else:
 		num_children = len(formula.children)
-		lit = Literal(ID = uuid.uuid1(current_id), typ = 'Condition',  name = formula.key, num_args = num_children, truth = True)
+		lit = Literal(ID = uuid.uuid1(current_id), typ = 'Condition', name = formula.key, num_args = num_children, truth = True)
 	return lit
 	
 def makeMotive(formula, current_id, parent, relationship, elements, edges, bit = None):
@@ -118,7 +118,6 @@ def getSubFormulaNoParent(formula, objects):
 	if formula.key == 'not':
 		formula = next(iter(formula.children))
 		if formula.key == 'intends':
-			pass
 		else:
 			lit = Literal(ID = uuid.uuid1(12), typ = 'Condition',  name = formula.key, num_args = len(formula.children), truth = False)
 			elements.add(lit)
