@@ -194,6 +194,9 @@ class PlanSpacePlanner:
 
 						for snk in uniqueSinks:
 							new_sink = eff_abs.getElementByReplacedId(snk.ID)
+							if new_sink is None:
+								print(eff_abs)
+								print(snk.replaced_ID)
 							graph_copy.replaceWith(snk,new_sink)
 							
 						self.addStep(graph_copy, step, s_need, eff_abs.root, new = False)
@@ -248,18 +251,18 @@ class PlanSpacePlanner:
 		graph.updatePlan()
 		return graph
 		
-	def resolveThreatenedCausalLinkFlaw(graph, flaw):
+	def resolveThreatenedCausalLinkFlaw(self, graph, flaw):
 		"""
 			Promotion: Add ordering from sink to threat, and check if cycle
 			Demotion: Add ordering from threat to source, and check if cycle
-			Restriction: Add non-codesignation constraints to prevent unification of effect with condition.id of causal link
+			Restriction: Add non-codesignation constraints to prevent unification of effect with condition of causal link
 		"""
 		results = set()
 		threat, effect, causal_link = flaw.flaw
 		
 		#Promotion
 		promotion = copy.deepcopy(graph)
-		promotion.OrderinGraph.addEdge(causal_link.sink, threat)
+		promotion.OrderingGraph.addEdge(causal_link.sink, threat)
 		if promotion.OrderingGraph.isInternallyConsistent():
 			results.add(promotion)
 			
@@ -278,11 +281,11 @@ class PlanSpacePlanner:
 					Can this be represented as a constraint so that if its detected, we can fail?
 					This is something that requires elaborating on constraints
 		"""
-		condition = graph.getElementById(causal_link.condition_id)
-		restrictions = graph.addNonCodesignationConstraints(effect, condition)
+		restriction = copy.deepcopy(graph)
+		restriction.addNonCodesignationConstraints(effect, causal_link.label)
 			#TODO: method addNonCodesignationConstraints
 			#Whenever a possible merge, disclude candidates if non-codesignation constraint.
-		results.update(restrictions)
+		results.add(restriction)
 		return results
 		
 
@@ -319,7 +322,7 @@ class PlanSpacePlanner:
 					return None
 				
 			if flaw.name == 'tclf':
-				results = self.resolveThreatenedCausalLinkFlaw(graph,flaw)
+				results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
 				
 			for result in results:
 				new_flaws = detectThreatenedCausalLinks(result)

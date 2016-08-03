@@ -118,6 +118,7 @@ def getSubFormulaNoParent(formula, objects):
 	if formula.key == 'not':
 		formula = next(iter(formula.children))
 		if formula.key == 'intends':
+			pass
 		else:
 			lit = Literal(ID = uuid.uuid1(12), typ = 'Condition',  name = formula.key, num_args = len(formula.children), truth = False)
 			elements.add(lit)
