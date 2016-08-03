@@ -177,18 +177,28 @@ class PlanSpacePlanner:
 						
 						#3) "Redirect Task"": find all edges where the sink has a replaced_id in replace_ids
 
-						replace_ids = {element.ID for element in eff_abs.elements}
-						#All Edges which have sink whose id was not a replace_id nor whose id = its own replace id
-						#May need to get element subgraph from step if step is not type Action
-						
+						precondition_IDs = {element.ID for element in Precondition.elements}
+						eff_abs_IDs = {elm.ID for elm in eff_abs.elements}
+						#Get elm IDS for elms which were in Precondition...
+
+						''' incoming is all edges in graph_copy with sink in Precondition'''
 						incoming = {edge for edge in graph_copy.edges if hasattr(edge.sink, 'replaced_ID')}
-						incoming = {edge for edge in incoming if edge.sink.replaced_ID in replace_ids}
+						incoming = {edge for edge in incoming if edge.sink.ID in precondition_IDs}
+						''' minus edges which have a source in Precondition'''
 						rmv = {edge for edge in incoming if hasattr(edge.source, 'replaced_ID')}
-						rmv = {edge for edge in rmv if edge.source.replaced_ID in replace_ids}
+						rmv = {edge for edge in rmv if edge.source.replaced_ID in precondition_IDs}
 						incoming -= rmv
+						''' leaving just those edges which have sinks in Precondition but not sources in Precondition'''
+						rmv = {edge for edge in incoming if edge.sink in eff_abs_IDs}
+						''' minus edges whose sinks carried over with eff_abs '''
+
 						
 						#cddts = {edge for edge in graph_copy.edges if 'replaced_ID' in edge.sink.__dict__.keys() and not edge.sink.replaced_ID == edge.sink.ID}
-						
+						''' for each edge in graphy_copy with sink in Precondition,
+								if there exists an elm in eff_abs s.t. elm.replaced_ID == edge.sink.ID
+									if elm.ID != elm.replaced_ID:
+										then replace edge.sink with elm
+						'''
 						#incoming = {edge for edge in graph_copy.edges if edge.sink.replaced_ID in replace_ids and not edge.sink.replaced_ID == edge.sink.ID and not edge.source.ID in replace_ids}	
 						uniqueSinks = {edge.sink for edge in incoming}
 

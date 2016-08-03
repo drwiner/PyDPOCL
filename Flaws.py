@@ -26,7 +26,7 @@ class FlawLibrary(collections.deque):
 		return self._flaws[position]
 		
 	def __len__(self):
-		return len(self_flaws)
+		return len(self._flaws)
 	
 	def __setitem__(self, flaw, position):
 		self._flaws[position] = flaw
@@ -53,7 +53,7 @@ def detectThreatenedCausalLinks(graph):
 			
 		for step in graph.Steps:
 			#First, ignore steps which either are the source and sink of causal link, or which cannot be ordered between them
-			if step.ID == causal_link.source.ID or step.ID == causal_link.sink.ID:
+			if step == causal_link.source or step == causal_link.sink:
 				break
 			if graph.OrderingGraph.isPath(causal_link.sink, step):
 				break

@@ -78,6 +78,7 @@ class ElementGraph(Graph):
 				existing_element.merge(element)
 				existing_element.replaced_ID = element.ID
 			else:
+				element.replaced_ID = element.ID
 				if no_add is None:
 					self.elements.add(element)
 					element.replaced_ID = element.ID
