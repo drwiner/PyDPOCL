@@ -11,14 +11,7 @@ class ElementGraph(Graph):
 		if Constraints == None:
 			Constraints = set()
 			
-		super(ElementGraph,self).__init__(\
-											ID,\
-											type_graph,\
-											name,\
-											Elements,\
-											Edges,\
-											Constraints\
-										)
+		super(ElementGraph,self).__init__(ID,type_graph,name,Elements,Edges,Constraints)
 		self.root = root_element		
 		self.neqs = set()
 		
@@ -45,7 +38,7 @@ class ElementGraph(Graph):
 		
 	def getElementGraphFromElement(self, element, Type = None):
 		if Type == None:
-			Type = eval(element.typ)
+			Type = element.typ
 		if self.root.ID == element.ID:
 			return self.copyGen()
 		return Type.makeElementGraph(self,element)
@@ -63,7 +56,7 @@ class ElementGraph(Graph):
 		prnt = next(iter(edge for edge in self.edges if edge.sink.id == elm1.id))
 		self.constraints.add(Edge(prnt.source, elm2, prnt.label))
 		
-	def mergeGraph(self, other):
+	def mergeGraph(self, other, no_add = None):
 		"""
 			For each element in other to include in self, if its a replacer, merge it into self
 					A relacer element 'replacer' is one such that replacer.replaced_ID == some element ID in self
@@ -91,8 +84,9 @@ class ElementGraph(Graph):
 					existing_element.merge(element)
 					existing_element.replaced_ID = element.ID
 			else:
-				self.elements.add(element)
-				element.replaced_ID = element.ID
+				if no_add is None:
+					self.elements.add(element)
+					element.replaced_ID = element.ID
 		
 		for edge in other.edges:
 			source = self.getElementById(edge.source.replaced_ID)
@@ -101,7 +95,8 @@ class ElementGraph(Graph):
 			if len(existing_edges) > 1 :
 				print('multiple edges {}--{}--> {}; in plan {} trying to merge {}'.format(edge.source.replaced_ID, edge.label, edge.sink.replaced_ID, self.ID, other.ID))
 			if len(existing_edges) == 0:
-				self.edges.add(Edge(source, sink, edge.label))
+				if no_add is None:
+					self.edges.add(Edge(source, sink, edge.label))
 				
 		return self
 
@@ -115,7 +110,9 @@ class ElementGraph(Graph):
 		
 		for element in self.elements:
 			element.replaced_ID = -1
-					#operator.absolve(partial, partial.edges, operator.available_edges)
+		for elm in other.elements:
+			elm.replaced_ID = -1
+					
 		completed = self.absolve(copy.deepcopy(other.edges), self.edges)
 		if len(completed) == 0:
 			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other.ID, self.ID))
@@ -178,7 +175,9 @@ class ElementGraph(Graph):
 	def assimilate(self, old_edge, other_edge):
 		"""	ProvIDed with old_edge consistent with other_edge
 			Merges source and sinks
-			Self is usually operator, other is partial step
+			Uses = {'new-step', 'effect'}
+			"new-step" Self is operator, old_edge is operator edge, other is partial step
+			"effect": self is plan-graph, old edge is effect edge, other is eff_abs 
 		"""
 
 		new_self = self.copyGen()

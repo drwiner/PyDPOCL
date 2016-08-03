@@ -173,7 +173,7 @@ class PlanSpacePlanner:
 						#1 Create new child graph
 						graph_copy = copy.deepcopy(graph)
 						#2 Replace effect with eff_abs, which is unified with the precondition
-						graph_copy.mergeGraph(eff_abs)
+						graph_copy.mergeGraph(eff_abs, no_add = True)
 						
 						#3) "Redirect Task"": find all edges where the sink has a replaced_id in replace_ids
 
