@@ -230,9 +230,9 @@ class Graph(Element):
 		""" A graph absolves another iff for each other.edge, there is a consistent self.edge
 		"""
 		if rDetectConsistentEdgeGraph(Remaining = copy.deepcopy(other.edges), Available = copy.deepcopy(self.edges)):
-			print('consistent without constraints')
+			#print('consistent without constraints')
 			if not self.equivalentWithConstraints(other):
-				print('consistent with constraints')
+				#print('consistent with constraints')
 				return True
 		return False
 		

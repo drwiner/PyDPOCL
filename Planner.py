@@ -282,38 +282,38 @@ class PlanSpacePlanner:
 		if seeBranches == True:
 			print(graph)
 
-		print('num flaws: {} '.format(len(graph.flaws)))
+		#print('num flaws: {} '.format(len(graph.flaws)))
 
 		#BASE CASES
 		if not graph.isInternallyConsistent():
-			print('branch terminated')
+			#print('branch terminated')
 			return None
 
 		if len(graph.flaws) == 0:
-			print('solution selected')
+			#print('solution selected')
 			return graph
 			
 		#INDUCTION
 		for flaw in graph.flaws:
 		
 			if flaw.name == 'opf':
-				print('opf')
+				#print('opf')
 				results = self.reuse(graph, flaw)
-				print('reuse results: {} '.format(len(results)))
+				#print('reuse results: {} '.format(len(results)))
 				results.update(self.newStep(graph, flaw))
-				print('newStep results: {} '.format(len(results)))
+				#print('newStep results: {} '.format(len(results)))
 				if len(results) == 0:
-					print('could not resolve opf')
+					#print('could not resolve opf')
 					return None
 				
 			if flaw.name == 'tclf':
-				print('tclf')
+				#print('tclf')
 				results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
 				
 			for result in results:
 				new_flaws = result.detectThreatenedCausalLinks()
 				result.flaws += new_flaws
-				print('detected tclfs: {} '.format(len(new_flaws)))
+				#print('detected tclfs: {} '.format(len(new_flaws)))
 
 			for g in results:
 				g.flaws.remove(flaw)
@@ -339,7 +339,7 @@ if __name__ ==  '__main__':
 	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	graph = planner[0]
-	result = planner.rPOCL(graph, seeBranches = True)
-	print('\n\n\n')
+	result = planner.rPOCL(graph, seeBranches = None)
+	#print('\n\n\n')
 	print(result)
 	
