@@ -31,42 +31,6 @@ class FlawLibrary(collections.deque):
 	def __setitem__(self, flaw, position):
 		self._flaws[position] = flaw
 
-def detectThreatenedCausalLinks(graph):
-	"""
-	A threatened causal link flaw is a tuple <causal link edge, threatening step element>
-		where if s --p--> t is a causal link edge and s_threat is the threatening step element,
-			then there is no ordering path from t to s_threat,
-			no ordering path from s_threat to s,
-			there is an effect edge from s_threat to a literal false-p',
-			and p' is consistent with p after flipping the truth attribute
-	"""
-	
-	detectedThreatenedCausalLinks = set()
-	for causal_link in graph.CausalLinkGraph.edges:
-		dependency = causal_link.label
-		reverse_dependency = copy.deepcopy(dependency)
-		#Reverse the truth status of the dependency
-		if reverse_dependency.truth == True:
-			reverse_dependency.truth = False
-		else:
-			reverse_dependency.truth = True
-			
-		for step in graph.Steps:
-			#First, ignore steps which either are the source and sink of causal link, or which cannot be ordered between them
-			if step == causal_link.source or step == causal_link.sink:
-				continue
-			if graph.OrderingGraph.isPath(causal_link.sink, step):
-				continue
-			if graph.OrderingGraph.isPath(step, causal_link.source):
-				continue
-			
-			#Is condition consistent?
-			effects = graph.getNeighborsByLabel(step, 'effect-of')	
-			problem_effects = {eff for eff in effects if eff.isConsistent(reverse_dependency)}
-			detectedThreatenedCausalLinks.update({Flaw((step,pe,causal_link),'tclf') for pe in problem_effects})
-
-	return detectedThreatenedCausalLinks
-	
 
 
 """

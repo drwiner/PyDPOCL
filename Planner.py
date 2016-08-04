@@ -309,7 +309,7 @@ class PlanSpacePlanner:
 				results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
 				
 			for result in results:
-				new_flaws = detectThreatenedCausalLinks(result)
+				new_flaws = result.detectThreatenedCausalLinks()
 				result.flaws += new_flaws
 				print('detected tclfs: {} '.format(len(new_flaws)))
 

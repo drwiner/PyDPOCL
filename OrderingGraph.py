@@ -28,7 +28,7 @@ class OrderingGraph(Graph):
 			if element in V:
 				continue
 				
-			visited = self.rDetectCycle(original_element=element)
+			visited = self.rDetectCycle(element)
 			
 			if visited == True:
 				return True
@@ -39,7 +39,7 @@ class OrderingGraph(Graph):
 
 			
 	######       rDetect       ####################
-	def rDetectCycle(self, original_element, element = None, visited = None):
+	def rDetectCycle(self, element, visited = None):
 		""" Returns true if cycle detected. otherwise, returns visited elements
 
 		"""
@@ -47,13 +47,8 @@ class OrderingGraph(Graph):
 			visited = set()
 			
 		#Base Case 1
-		if not element is None:
-			if element is original_element:
-				return True
-			
-		#Runs on first time
-		if element is None:
-			element = original_element
+		if element in visited:
+			return visited
 			
 		visited.add(element)
 		
@@ -97,6 +92,8 @@ class CausalLinkGraph(OrderingGraph):
 		if typ == None:
 			typ = 'causal link graph'
 		super(CausalLinkGraph,self).__init__(ID,typ,name,Elements,Edges,Constraints)
+		self.safeSteps = set()
+		self.safeConditions = set()
 	
 	def addEdge(self, source, sink, condition):
 		self.elements.add(source)
@@ -108,14 +105,14 @@ class CausalLinkGraph(OrderingGraph):
 
 import unittest
 class TestOrderingGraphMethods(unittest.TestCase):
-	Elms = [Element(id =0), Element(id=1), Element(id = 2), Element(id=3)]
-	edges = {Edge(Elms[0], Elms[1], '<'), Edge(Elms[0], Elms[2], '<'), Edge(Elms[0], Elms[3], '<'),
-			 Edge(Elms[2], Elms[1], '<'), Edge(Elms[3], Elms[1], '<')}
-	G = Graph(id = 10, typ = 'test', Elements = set(Elms), Edges = edges)
-	OG = OrderingGraph(G)
+
 
 	def test_detect_cycle(self):
-		pass
+		Elms = [Element(id=0), Element(id=1), Element(id=2), Element(id=3)]
+		edges = {Edge(Elms[0], Elms[1], '<'), Edge(Elms[0], Elms[2], '<'), Edge(Elms[0], Elms[3], '<'),
+				 Edge(Elms[2], Elms[1], '<'), Edge(Elms[3], Elms[1], '<')}
+		G = Graph(id=10, typ='test', Elements=set(Elms), Edges=edges)
+		OG = OrderingGraph(G)
 		#Graph.get
 		#OG.isPath()
 

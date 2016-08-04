@@ -149,7 +149,7 @@ class Graph(Element):
 		return {edge for edge in self.constraints if edge.source.ID == source_id and edge.sink.ID == sink_id and edge.label == label}
 			
 	def getIncidentEdges(self, element):
-		return {edge for edge in self.edges if edge.source.ID == element.ID}
+		return {edge for edge in self.edges if edge.source == element}
 	def getNeighbors(self, element):
 		return {edge.sink for edge in self.edges if edge.source.ID == element.ID}
 	def getParents(self, element):

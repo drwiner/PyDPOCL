@@ -11,7 +11,9 @@
 		 (alive Sapito)
 		 (high-up bridge)
         )
-  (:goal 	(and (at Indy cliff2) 
+  (:goal 	(and
+                 (at Indy cliff2)
+                 (alive Indy)
 				(not (alive Sapito))
 			)
 	)

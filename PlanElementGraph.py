@@ -194,7 +194,9 @@ class PlanElementGraph(ElementGraph):
 		self.updateIntentionFrameAttributes()
 	
 	def updateIntentionFrameAttributes(self):
-		{element.external_update(self) for element in self.elements if type(element) is IntentionFrameElement}
+		for element in self.elements:
+			if type(element) == IntentionFrameElement:
+				element.external_update(self)
 			#Keeps intention frame element attributes up to date
 			#Must be done after super instantation because needs edges
 	
@@ -290,7 +292,63 @@ class PlanElementGraph(ElementGraph):
 	def getActions(self):
 		return list(self.getElementGraphFromElement(step,Action) for step in self.Steps)
 
-		
+	def detectThreatenedCausalLinks(self):
+		"""
+		A threatened causal link flaw is a tuple <causal link edge, threatening step element>
+			where if s --p--> t is a causal link edge and s_threat is the threatening step element,
+				then there is no ordering path from t to s_threat,
+				no ordering path from s_threat to s,
+				there is an effect edge from s_threat to a literal false-p',
+				and p' is consistent with p after flipping the truth attribute
+		"""
+
+		detectedThreatenedCausalLinks = set()
+		for causal_link in self.CausalLinkGraph.edges:
+			dependency = self.getElementGraphFromElement(causal_link.label,Condition)
+			reverse_dependency = copy.deepcopy(dependency)
+			# Reverse the truth status of the dependency
+			if reverse_dependency.root.truth == True:
+				reverse_dependency.root.truth = False
+			else:
+				reverse_dependency.root.truth = True
+
+			for step in self.Steps:
+				if step in causal_link.safeSteps():
+					continue
+				# First, ignore steps which either are the source and sink of causal link, or which cannot be ordered
+				# between them
+				if step == causal_link.source or step == causal_link.sink:
+					continue
+				if self.OrderingGraph.isPath(causal_link.sink, step):
+					continue
+				if self.OrderingGraph.isPath(step, causal_link.source):
+					continue
+
+				# Is condition consistent?
+				num_edges = len(dependency.edges)
+				count = 0
+				effects = self.getNeighborsByLabel(step, 'effect-of')
+				for eff in effects:
+					if eff in causal_link.safeConditions:
+						continue
+					cond_graph = self.getElementGraphFromElement(eff, Condition)
+					if len(cond_graph.edges) > num_edges:
+						if cond_graph.canAbsolve(reverse_dependency):
+							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
+							count+=1
+						else:
+							causal_link.safeConditions.add(eff)
+					elif num_edges >= len(cond_graph.edges):
+						if reverse_dependency.canAbsolve(cond_graph):
+							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
+							count+=1
+						else:
+							causal_link.safeConditions.add(eff)
+				if count == 0:
+					causal_link.safeSteps.add(step)
+
+		return detectedThreatenedCausalLinks
+
 	def __repr__(self):
 		steps =  str([self.getElementGraphFromElement(step,Action) for step in self.Steps])
 		orderings = self.OrderingGraph.__repr__()
