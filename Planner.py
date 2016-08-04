@@ -86,8 +86,7 @@ class PlanSpacePlanner:
 		s_need, precondition = flaw.flaw
 		Precondition = graph.getElementGraphFromElementID(precondition.ID, Condition)
 		results = set()
-		
-		#Then try new Step
+
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
 				Effect = op.getElementGraphFromElementID(eff.ID, Condition)
@@ -124,6 +123,7 @@ class PlanSpacePlanner:
 						for elm in new_step_op.elements:
 							if elm in untouched_step_elms:
 								graph_copy.elements.add(elm)
+
 						# For each edge 'e1 --label--> e2 in new_step_op such that e1 not in eff_abs,
 							# if exists some e_p s.t. e_p.merge(sink), replace edge sink
 							# graph_copy.add(edge)
