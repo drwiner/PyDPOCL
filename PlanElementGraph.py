@@ -1,4 +1,5 @@
 from OrderingGraph import *
+from Flaws import *
 from collections import deque
 import uuid
 import random
@@ -304,6 +305,7 @@ class PlanElementGraph(ElementGraph):
 
 		detectedThreatenedCausalLinks = set()
 		for causal_link in self.CausalLinkGraph.edges:
+			nonThreats = self.CausalLinkGraph.nonThreats
 			dependency = self.getElementGraphFromElement(causal_link.label,Condition)
 			reverse_dependency = copy.deepcopy(dependency)
 			# Reverse the truth status of the dependency
@@ -313,15 +315,18 @@ class PlanElementGraph(ElementGraph):
 				reverse_dependency.root.truth = True
 
 			for step in self.Steps:
-				if step in causal_link.safeSteps():
+				if step in nonThreats[causal_link]:
 					continue
 				# First, ignore steps which either are the source and sink of causal link, or which cannot be ordered
 				# between them
 				if step == causal_link.source or step == causal_link.sink:
+					nonThreats[causal_link].add(step)
 					continue
 				if self.OrderingGraph.isPath(causal_link.sink, step):
+					nonThreats[causal_link].add(step)
 					continue
 				if self.OrderingGraph.isPath(step, causal_link.source):
+					nonThreats[causal_link].add(step)
 					continue
 
 				# Is condition consistent?
@@ -329,7 +334,7 @@ class PlanElementGraph(ElementGraph):
 				count = 0
 				effects = self.getNeighborsByLabel(step, 'effect-of')
 				for eff in effects:
-					if eff in causal_link.safeConditions:
+					if eff in nonThreats[causal_link]:
 						continue
 					cond_graph = self.getElementGraphFromElement(eff, Condition)
 					if len(cond_graph.edges) > num_edges:
@@ -337,15 +342,15 @@ class PlanElementGraph(ElementGraph):
 							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
 							count+=1
 						else:
-							causal_link.safeConditions.add(eff)
+							nonThreats[causal_link].add(eff)
 					elif num_edges >= len(cond_graph.edges):
 						if reverse_dependency.canAbsolve(cond_graph):
 							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
 							count+=1
 						else:
-							causal_link.safeConditions.add(eff)
+							nonThreats[causal_link].add(eff)
 				if count == 0:
-					causal_link.safeSteps.add(step)
+					nonThreats[causal_link].add(step)
 
 		return detectedThreatenedCausalLinks
 

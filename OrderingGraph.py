@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from ElementGraph import *
 
 class OrderingGraph(Graph):
@@ -92,8 +94,7 @@ class CausalLinkGraph(OrderingGraph):
 		if typ == None:
 			typ = 'causal link graph'
 		super(CausalLinkGraph,self).__init__(ID,typ,name,Elements,Edges,Constraints)
-		self.safeSteps = set()
-		self.safeConditions = set()
+		self.nonThreats = defaultdict(set)
 	
 	def addEdge(self, source, sink, condition):
 		self.elements.add(source)

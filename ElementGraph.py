@@ -14,7 +14,6 @@ class ElementGraph(Graph):
 
 		super(ElementGraph, self).__init__(ID, type_graph, name, Elements, Edges, Constraints)
 		self.root = root_element
-		self.neqs = set()
 
 	def copyGen(self):
 		return copy.deepcopy(self)

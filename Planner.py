@@ -1,5 +1,5 @@
-from Flaws import *
-#from pddlToGraphs import *
+#from Flaws import *
+from pddlToGraphs import *
 
 
 """
@@ -131,8 +131,8 @@ class PlanSpacePlanner:
 						#		and merge elements of new_step's Effect (which have same ids has Effect)
 						#Also, add elements in new_step_op which are not Effect
 						graph_copy.mergeGraph(new_step_op)
-						
-						self.addStep(graph_copy, new_step_op.root, s_need, eff_abs.root, new = True) #adds causal link and ordering constraints
+						condition = graph_copy.getElementById(Precondition.root.ID)
+						self.addStep(graph_copy, new_step_op.root, s_need, condition, new = True) #adds causal link and ordering constraints
 						results.add(graph_copy)
 						#add graph to children
 		return results
@@ -163,12 +163,6 @@ class PlanSpacePlanner:
 					for eff_abs in Effect_absorbtions: 
 						print('effect absorbs flaw')
 						print(eff_abs)
-						"""	for each effect which can absolve the precondition, 
-							and each possible way to unify the effect and precondition,
-								1) Create a new child graph.
-								2) Replace effect with eff_abs, which is unified with the precondition
-								3) "Redirect" all edges going to precondition, to go to effect instead
-						"""
 						#1 Create new child graph
 						graph_copy = copy.deepcopy(graph)
 						#2 Replace effect with eff_abs, which is unified with the precondition
@@ -182,8 +176,8 @@ class PlanSpacePlanner:
 						snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID):graph_copy.getElementById(elm.ID) for elm in new_snk_cddts}
 						for old, new in snk_swap_dict.items():
 							graph_copy.replaceWith(old, new)
-							
-						self.addStep(graph_copy, step, s_need, eff_abs.root, new = False)
+						condition = graph_copy.getElementById(eff_abs.root.ID)
+						self.addStep(graph_copy, step, s_need, condition, new = False)
 						results.add(graph_copy)
 		return results
 	
@@ -255,21 +249,12 @@ class PlanSpacePlanner:
 		demotion.OrderingGraph.addEdge(threat, causal_link.source)
 		if demotion.OrderingGraph.isInternallyConsistent():
 			results.add(demotion)
-			
-		#Restriction
-		"""
-			1) find literal of causal link based on causal_link.id, to compare to ?effect
-			2) For each consistent but not equivalent edge, 
-				for each non-equivalent attribute,
-					create new child where child has a "non-codesignation constraint" (keep a list in the plan of consistent neqs)
-					Can this be represented as a constraint so that if its detected, we can fail?
-					This is something that requires elaborating on constraints
-		"""
+
 		restriction = copy.deepcopy(graph)
 		restriction.addNonCodesignationConstraints(effect, causal_link.label)
-			#TODO: method addNonCodesignationConstraints
-			#Whenever a possible merge, disclude candidates if non-codesignation constraint.
 		results.add(restriction)
+
+
 		return results
 		
 

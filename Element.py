@@ -98,7 +98,7 @@ class Element:
 		print('(',self.ID, self.typ, self.name,')')
 		
 	def __repr__(self):
-		return '({} {} {})'.format(self.ID, self.typ, self.name)
+		return '({} {} {})'.format(self.typ, self.name)
 		
 class InternalElement(Element):
 	"""Internal Element is an Element with a possibly unimportant name, and a number of arguments

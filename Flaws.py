@@ -1,4 +1,4 @@
-from pddlToGraphs import *
+#from pddlToGraphs import *
 import collections
 """ 
 	Flaws for element graphs
