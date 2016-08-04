@@ -70,20 +70,7 @@ class Graph(Element):
 		self.elements = Elements
 		self.edges = Edges;
 		self.constraints = Constraints
-		
-	def print_graph(self):
-		print('ElementGraph {}:'.format(self.ID))
-		for edge in self.edges:
-			print('Edge {} --{}--> {}'.format(edge.source.ID, edge.label, edge.sink.ID))
-			#edge.source.print_element()
-			#edge.sink.print_element()
-		for element in self.elements:
-			if type(element) is Literal:
-				print('Element {ID} = {truth}{name},\ttype = {type}'.format(ID=element.ID, truth='not ' if not element.truth else '', name=element.name, type=element.typ))
-			elif type(element) is Operator:
-				print('Element {ID} = {truth}{name},\ttype = {type}'.format(ID=element.ID, truth='not ' if element.executed==False else '', name=element.name, type=element.typ))
-			else:
-				print('Element {} = {},\ttype = {}'.format(element.ID, element.name, element.typ))
+
 	
 	def print_graph_names(self):
 		print('ElementGraph {}:'.format(self.name))

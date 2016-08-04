@@ -111,7 +111,6 @@ class PlanSpacePlanner:
 			
 					for eff_abs in Effect_absorbtions: 
 						print('effect absorbs flaw')
-						print(eff_abs)
 						graph_copy = copy.deepcopy(graph)
 						
 						#First, find elements of Precondition (in graph_copy) and mergeFrom elements of eff_abs
@@ -178,9 +177,9 @@ class PlanSpacePlanner:
 						#3) "Redirect Task"": find all edges where the sink has a replaced_id in replace_ids
 
 						precondition_IDs = {element.ID for element in Precondition.elements}
-						new_snk_cddts = {elm for elm in eff_abs.elements and not elm.ID in precondition_IDs}
+						new_snk_cddts = {elm for elm in eff_abs.elements if not elm.ID in precondition_IDs}
 						#Get elm for elms which were in eff_abs but not in precondition (were replaced)
-						snk_swap_dict = {graph_copy.getElementByID(elm.replaced_ID):graph_copy.getElementByID(elm.ID) for elm in new_snk_cddts}
+						snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID):graph_copy.getElementById(elm.ID) for elm in new_snk_cddts}
 						for old, new in snk_swap_dict.items():
 							graph_copy.replaceWith(old, new)
 							

@@ -124,7 +124,7 @@ class ElementGraph(Graph):
 
 	def absolve(self, Remaining=None, Available=None, Collected=None):
 		""" Every edge from other must be consistent with some edge in self.
-			An edge from self cannot account for more than one edge from other? 
+			An edge from self cannot account for more than one edge from other.
 				
 				Remaining: edges left to account for in other
 				Available: edges in 'first' self, which cannot account for more than one edge

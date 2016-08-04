@@ -54,11 +54,11 @@ def detectThreatenedCausalLinks(graph):
 		for step in graph.Steps:
 			#First, ignore steps which either are the source and sink of causal link, or which cannot be ordered between them
 			if step == causal_link.source or step == causal_link.sink:
-				break
+				continue
 			if graph.OrderingGraph.isPath(causal_link.sink, step):
-				break
+				continue
 			if graph.OrderingGraph.isPath(step, causal_link.source):
-				break
+				continue
 			
 			#Is condition consistent?
 			effects = graph.getNeighborsByLabel(step, 'effect-of')	
