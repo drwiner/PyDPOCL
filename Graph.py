@@ -112,14 +112,21 @@ class Graph(Element):
 			self.constraints.add(edge)
 			
 	def replaceWith(self, oldsnk, newsnk):
+		''' removes oldsnk from self.elements, replaces all edges with snk = oldsnk with newsnk'''
 		if oldsnk == newsnk:
 			return
 		if self.getElementById(newsnk.ID) is None:
-			raise
+			raise NameError('newsnk replacer is not found in self')
 		if oldsnk in self.elements:
 			self.elements.remove(oldsnk)
 		for incoming in (edge for edge in self.edges if edge.sink == oldsnk):
 			incoming.sink = newsnk
+		#update constraint edges which might reference specific elements being replaced
+		for edge in self.constraints:
+			if edge.source == oldsnk:
+				edge.source = newsnk
+			if edge.sink == oldsnk:
+				edge.sink = newsnk
 		return self
 			
 	def getEdgesByIdsAndLabel(self, source_id, sink_id, label):
