@@ -3,7 +3,7 @@ from pddlToGraphs import *
 
 
 """
-	Algorithm for Plan-Space search of Story Plan
+	Algorithm for Plan-Graph-Space search of Story Plan
 """
 
 """
@@ -28,7 +28,7 @@ from pddlToGraphs import *
 	(7) Detect Threatened Causal Link Flaws
 	(8) Recursive Invocation (but, log status of plan first)
 """
-import collections
+
 
 class PlanSpacePlanner:
 
