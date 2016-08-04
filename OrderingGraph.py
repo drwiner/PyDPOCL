@@ -13,6 +13,8 @@ class OrderingGraph(Graph):
 		return True
 			
 	def addOrdering(self, source, sink):
+		self.elements.add(source)
+		self.elements.add(sink)
 		self.edges.add(Edge(source, sink, '<'))
 		
 	def addEdge(self, source, sink):
@@ -97,7 +99,26 @@ class CausalLinkGraph(OrderingGraph):
 		super(CausalLinkGraph,self).__init__(ID,typ,name,Elements,Edges,Constraints)
 	
 	def addEdge(self, source, sink, condition):
+		self.elements.add(source)
+		self.elements.add(sink)
 		self.edges.add(Edge(source, sink, condition))
 		
 	def __repr__(self):
 		return str(['{}-{} --{}-{}--> {}-{}'.format(edge.source.name, edge.source.arg_name, edge.label.truth, edge.label.name, edge.sink.name, edge.sink.arg_name) for edge in self.edges])
+
+import unittest
+class TestOrderingGraphMethods(unittest.TestCase):
+	Elms = [Element(id =0), Element(id=1), Element(id = 2), Element(id=3)]
+	edges = {Edge(Elms[0], Elms[1], '<'), Edge(Elms[0], Elms[2], '<'), Edge(Elms[0], Elms[3], '<'),
+			 Edge(Elms[2], Elms[1], '<'), Edge(Elms[3], Elms[1], '<')}
+	G = Graph(id = 10, typ = 'test', Elements = set(Elms), Edges = edges)
+	OG = OrderingGraph(G)
+
+	def test_detect_cycle(self):
+		pass
+		#Graph.get
+		#OG.isPath()
+
+if __name__ ==  '__main__':
+
+	unittest.main()
