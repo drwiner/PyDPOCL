@@ -89,15 +89,11 @@ class PlanSpacePlanner:
 		
 		#Then try new Step
 		for op in self.op_graphs:
-			print(op)
 			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
-				print(eff)
-				#Condition graph of operator
 				Effect = op.getElementGraphFromElementID(eff.ID, Condition)
 				
 				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
 				if Effect.canAbsolve(Precondition):
-					print('legal eff')
 					
 					#nei : new element id, to easily access element from graph
 					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.ID)
@@ -131,10 +127,14 @@ class PlanSpacePlanner:
 						#		and merge elements of new_step's Effect (which have same ids has Effect)
 						#Also, add elements in new_step_op which are not Effect
 						graph_copy.mergeGraph(new_step_op)
+
+						# adds causal link and ordering constraints
 						condition = graph_copy.getElementById(Precondition.root.ID)
-						self.addStep(graph_copy, new_step_op.root, s_need, condition, new = True) #adds causal link and ordering constraints
+						self.addStep(graph_copy, new_step_op.root, s_need, condition, new = True)
+
+						# add graph to children
 						results.add(graph_copy)
-						#add graph to children
+
 		return results
 	
 		
@@ -147,37 +147,42 @@ class PlanSpacePlanner:
 		Precondition = graph.getElementGraphFromElementID(pre.ID,Condition)
 		results = set()
 		for step in graph.Steps: 
-			print(step)
+
 			if step == s_need:
 				continue
 			if graph.OrderingGraph.isPath(s_need, step):
 				#step cannot be ordered before s_need
 				continue
-			print('legal step')
+
 			for eff in graph.getNeighborsByLabel(step, 'effect-of'):
-				print(eff)
+
 				Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
+
 				if Effect.canAbsolve(Precondition):
-					print('legal eff')
+
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
-					for eff_abs in Effect_absorbtions: 
-						print('effect absorbs flaw')
-						print(eff_abs)
+
+					for eff_abs in Effect_absorbtions:
 						#1 Create new child graph
 						graph_copy = copy.deepcopy(graph)
+
 						#2 Replace effect with eff_abs, which is unified with the precondition
 						graph_copy.mergeGraph(eff_abs, no_add = True)
 						
-						#3) "Redirect Task"": find all edges where the sink has a replaced_id in replace_ids
+						#3) "Redirect Task""
 
+						# Get elm for elms which were in eff_abs but not in precondition (were replaced)
 						precondition_IDs = {element.ID for element in Precondition.elements}
 						new_snk_cddts = {elm for elm in eff_abs.elements if not elm.ID in precondition_IDs}
-						#Get elm for elms which were in eff_abs but not in precondition (were replaced)
 						snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID):graph_copy.getElementById(elm.ID) for elm in new_snk_cddts}
 						for old, new in snk_swap_dict.items():
 							graph_copy.replaceWith(old, new)
+
+						# adds causal link and ordering constraints
 						condition = graph_copy.getElementById(eff_abs.root.ID)
 						self.addStep(graph_copy, step, s_need, condition, new = False)
+
+						# add graph to children
 						results.add(graph_copy)
 		return results
 	
@@ -209,8 +214,8 @@ class PlanSpacePlanner:
 			equalNames = {'equals', 'equal', '='}
 			noncodesg = {prec for prec in prc_edges if prec.sink.name in equalNames and not prec.sink.truth}
 			for prec in noncodesg:
+				# item1, item2 = tuple(graph.getNeighbors(prec.sink))
 				item1Edge, item2Edge = tuple(graph.getIncidentEdges(prec.sink))
-				#item1, item2 = tuple(graph.getNeighbors(prec.sink))
 
 				#This constraint/restriction prevents item1Edge.sink and item2Edge.sink from becoming a legal merge
 				graph.constraints.add(Edge(item1Edge.source, item2Edge.sink, item1Edge.label))
@@ -250,38 +255,40 @@ class PlanSpacePlanner:
 		if demotion.OrderingGraph.isInternallyConsistent():
 			results.add(demotion)
 
+		#Restriction
 		restriction = copy.deepcopy(graph)
 		restriction.addNonCodesignationConstraints(effect, causal_link.label)
 		results.add(restriction)
 
-
 		return results
 		
 
-	def rPOCL(self, graph):
+	def rPOCL(self, graph, seeBranches = None):
 		"""
 			Recursively, given graph, 
 				for each flaw, 
 				for each way to resolve flaw, 
 				create new graphs and rPOCL on it
 		"""
-		print(graph)
+		if seeBranches == True:
+			print(graph)
+
 		print('num flaws: {} '.format(len(graph.flaws)))
+
 		#BASE CASES
 		if not graph.isInternallyConsistent():
+			print('branch terminated')
 			return None
+
 		if len(graph.flaws) == 0:
+			print('solution selected')
 			return graph
 			
 		#INDUCTION
-		#flaw = graph.flaws.pop() 
 		for flaw in graph.flaws:
 		
 			if flaw.name == 'opf':
 				print('opf')
-				#s_need, pre = flaw.flaw
-				#print(graph.getElementGraphFromElement(s_need,Action))
-				#print(graph.getElementGraphFromElement(pre,Condition))
 				results = self.reuse(graph, flaw)
 				print('reuse results: {} '.format(len(results)))
 				results.update(self.newStep(graph, flaw))
@@ -291,6 +298,7 @@ class PlanSpacePlanner:
 					return None
 				
 			if flaw.name == 'tclf':
+				print('tclf')
 				results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
 				
 			for result in results:
@@ -298,29 +306,13 @@ class PlanSpacePlanner:
 				result.flaws += new_flaws
 				print('detected tclfs: {} '.format(len(new_flaws)))
 
-			#self._frontier += results
-			
-			#replace this with choosing highest ranked graph
-			#new_results = set()
 			for g in results:
-				#print('rPOCLing')
-				#print(g)
-				#result = self._frontier.pop()
 				g.flaws.remove(flaw)
-				result = self.rPOCL(g)
-				#print(result)
+				result = self.rPOCL(g,seeBranches)
 				if not result is None:
-					#new_results.add(result)
 					return result
-			results = set()
-		#for nr in new_results:
-			
 		
-		print('no solutions found')
-		print('for debugging: \n')
-		for g in results:
-			print(g)
-		print('end debugging \n')
+		print('branch terminated')
 		return None
 		
 
@@ -338,7 +330,7 @@ if __name__ ==  '__main__':
 	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	graph = planner[0]
-	result = planner.rPOCL(graph)
+	result = planner.rPOCL(graph, seeBranches = True)
 	print('\n\n\n')
 	print(result)
 	
