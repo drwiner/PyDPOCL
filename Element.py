@@ -378,7 +378,8 @@ class Actor(Argument):
 		return self
 		
 	def __repr__(self):
-		return '(Actor {}, {}, {})'.format(self.ID, self.typ, self.name)
+		id = str(self.ID)[19:23]
+		return '(Actor {}, {}, {})'.format(id, self.typ, self.name)
 
 class PlanElement(Element):
 

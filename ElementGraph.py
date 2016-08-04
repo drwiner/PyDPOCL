@@ -32,7 +32,7 @@ class ElementGraph(Graph):
 	def getElementGraphFromElement(self, element, Type=None):
 		if Type == None:
 			Type = element.typ
-		if self.root.ID == element.ID:
+		if self.root == element:
 			return self.copyGen()
 		return Type.makeElementGraph(self, element)
 

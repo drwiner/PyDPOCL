@@ -105,28 +105,34 @@ class PlanSpacePlanner:
 					#Effect_absorbtions' graphs' elements' replaced_ids assigned Precondition's ids
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
 			
-					for eff_abs in Effect_absorbtions: 
-						print('effect absorbs flaw')
+					for eff_abs in Effect_absorbtions:
 						graph_copy = copy.deepcopy(graph)
-						
-						#First, find elements of Precondition (in graph_copy) and mergeFrom elements of eff_abs
-						#Also, add elements in eff_abs not present in Precondition
-						graph_copy.mergeGraph(eff_abs)
-						
 						new_step_op = copy.deepcopy(step_op)
-						graph_elms = {elm for elm in graph_copy.elements if hasattr(elm, 'replaced_ID')}
-						
-						for step_elm in new_step_op.elements:
-							for graph_elm in graph_elms:
-								if graph_elm.replaced_ID == step_elm.ID:
-									step_elm.replaced_ID = graph_elm.ID
-									graph_elms.remove(graph_elm)
-									break
-						
-						#Second, find elements of eff_abs in graph_copy, which have ids from Effect 
-						#		and merge elements of new_step's Effect (which have same ids has Effect)
-						#Also, add elements in new_step_op which are not Effect
-						graph_copy.mergeGraph(new_step_op)
+
+						#For each element 'e_a' in eff_abs which replaced an element 'e_p' in Precondition,
+							# e_p.merge(e_a)
+						#For each element 'e_a' introduced by eff_abs,
+							# graph_copy.add(e_a)
+						#For each edge (a --label --> b) in eff_abs, if not edge (p --label--> d) in Precondition
+							# such that a.replaced_ID = p.ID and b.replaced_ID = d.ID, then graph_copy.add(edge)
+						graph_copy.mergeGraph(eff_abs)
+
+						#For each elm 'e_s' in new_step_op not in eff_abs,
+							# graph_copy.add(e_s)
+						untouched_step_elms = {elm for elm in new_step_op.elements if not elm.ID in {e.ID for e in
+																						 eff_abs.elements}}
+						for elm in new_step_op.elements:
+							if elm in untouched_step_elms:
+								graph_copy.elements.add(elm)
+						# For each edge 'e1 --label--> e2 in new_step_op such that e1 not in eff_abs,
+							# if exists some e_p s.t. e_p.merge(sink), replace edge sink
+							# graph_copy.add(edge)
+						for edge in new_step_op.edges:
+							if edge.source in untouched_step_elms:
+								if not edge.sink in untouched_step_elms:
+									e_abs = eff_abs.getElementById(edge.sink.ID)
+									edge.sink = graph_copy.getElementById(e_abs.replaced_ID)
+								graph_copy.edges.add(edge)
 
 						# adds causal link and ordering constraints
 						condition = graph_copy.getElementById(Precondition.root.ID)
@@ -155,6 +161,9 @@ class PlanSpacePlanner:
 				continue
 
 			for eff in graph.getNeighborsByLabel(step, 'effect-of'):
+
+				if not eff.isConsistent(pre):
+					continue
 
 				Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
 

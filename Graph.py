@@ -57,8 +57,7 @@ class Edge:
 
 class Graph(Element):
 	"""A graph is an element with elements, edges, and constraints"""
-	def __init__(self, ID, typ, name = None, \
-		Elements = None, Edges = None, Constraints = None):
+	def __init__(self, ID, typ, name = None, Elements = None, Edges = None, Constraints = None):
 		if Elements == None:
 			Elements = set()
 		if Edges == None:
@@ -68,28 +67,9 @@ class Graph(Element):
 		
 		super(Graph,self).__init__(ID,typ,name)
 		self.elements = Elements
-		self.edges = Edges;
+		self.edges = Edges
 		self.constraints = Constraints
 
-	
-	def print_graph_names(self):
-		print('ElementGraph {}:'.format(self.name))
-		for edge in self.edges:
-			if type(edge.sink) is Literal:
-				print('Edge {} --{}--> {}-{}'.format(edge.source.name, edge.label, edge.sink.truth, edge.sink.name))
-			if type(edge.source) is Literal:
-				print('Edge {}-{} --{}--> {}'.format(edge.source.truth, edge.source.name, edge.label,edge.sink.name))
-			else:
-				print('Edge {} --{}--> {}'.format(edge.source.name, edge.label,edge.sink.name))
-			#edge.source.print_element()
-			#edge.sink.print_element()
-		for element in self.elements:
-			if type(element) is Literal:
-				print('Element {truth}{name},\ttype = {type}'.format(truth='not ' if not element.truth else '', name=element.name, type=element.typ))
-			elif type(element) is Operator:
-				print('Element {truth}{name},\ttype = {type}'.format(truth='not ' if element.executed==False else '', name=element.name, type=element.typ))
-			else:
-				print('Element {} ,\ttype = {}'.format(element.name, element.typ))
 	
 	def hasEdgeIdentity(self, edge):
 		""" Returns set of edges s.t. (source.ID, label, sink.ID) in self.edges"""
@@ -321,46 +301,19 @@ class Graph(Element):
 		for cs in constraint_sources:
 			suspects = {edge.source for edge in self.edges if edge.source.isEquivalent(cs)}
 			if len(suspects) == 0:
-				#print('no suspects for constraint source {}'.format(cs.ID))
 				continue
 			cg = other.rGetDescendantConstraints(cs)
 			for sp in suspects:
 				sg = self.rGetDescendantEdges(sp)
 				if rDetectEquivalentEdgeGraph(copy.deepcopy(cg),copy.deepcopy(sg)):
-					#print('suspect {} not consistent with constraints from source {}'.format(sp.ID,cs.ID))
 					return True
 
 		return False
-		
-	# def old_equivalent_with_constraints(self, other):
-			
-		# for c in other.constraints:
-			# #First, narrow down edges to just those which are equivalent with constraint source
-			# suspects = {edge.source \
-							# for edge in self.edges \
-							# if edge.source.isEquivalent(c.source)\
-						# }
-			# for suspect in suspects:
-				# print('suspect: (', suspect.ID, 'has ', c.label, '-', c.sink.type, ')')
-				# if self.constraintEquivalentWithElement(other, \
-														# suspect, \
-														# c.source\
-														# ):
-					# return True
-		# return False	
-		
-	# def constraintEquivalentWithElement(self, other, self_element, constraint_element):
-		# """ Returns True if element and constraint have equivalent descendant edge graphs"""
-		# #Assumes self_element is equivalent with constraint_element, but just in case
-		# if not self_element.isEquivalent(constraint_element):
-			# return False
-		# print('equiv')
-		# descendant_edges = self.rGetDescendantEdges(self_element)
-		# constraints = other.rGetDescendantConstraints(constraint_element)
-		# for c in constraints:
-			# c.print_edge()
-		# #Equivalent if we can find an equivalent edge graph
-		# return rDetectEquivalentEdgeGraph(copy.deepcopy(constraints), copy.deepcopy(descendant_edges))
+
+	def __repr__(self):
+		edges = str([edge for edge in self.edges])
+		elms = str([elm for elm in self.elements])
+		return '\n' + edges + '\n\n_____\n\n ' + elms + '\n'
 		
 def rDetectConsistentEdgeGraph(Remaining = None, Available = None):
 	if Remaining == None:
@@ -396,18 +349,10 @@ def rDetectEquivalentEdgeGraph(Remaining = None, Available = None):
 		return False
 
 	other_edge = Remaining.pop()
-	#print('constraints remaining ', len(Remaining))
-	#other_edge.print_edge()
+
 	for prospect in Available:
 		if prospect.isEquivalent(other_edge):
-			#print('\nequivalence detected: constraint (above) and operator edge:')
-			#prospect.print_edge()
-			#print('\n')
-			if rDetectEquivalentEdgeGraph(	Remaining, \
-											{item \
-												for item in Available \
-													if not item is prospect\
-											}):
+			if rDetectEquivalentEdgeGraph(	Remaining, {item for item in Available 	if not item is prospect}):
 				return True
 
 	return False
