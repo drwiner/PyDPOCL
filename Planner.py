@@ -2,6 +2,7 @@
 from pddlToGraphs import *
 
 
+
 """
 	Algorithm for Plan-Graph-Space search of Story Plan
 """
@@ -31,6 +32,8 @@ from pddlToGraphs import *
 
 
 class PlanSpacePlanner:
+
+	searchLevel = 0
 
 	def __init__(self, op_graphs, objects, init_action, goal_action):
 		#Assumes these parameters are already read from file
@@ -272,15 +275,22 @@ class PlanSpacePlanner:
 		return results
 		
 
-	def rPOCL(self, graph, seeBranches = None):
+	def rPOCL(self, graph, seeBranches = None, fl = None):
 		"""
 			Recursively, given graph, 
 				for each flaw, 
 				for each way to resolve flaw, 
 				create new graphs and rPOCL on it
 		"""
+
 		if seeBranches == True:
 			print(graph)
+
+		if not fl is None:
+			fl.write('\n\n\n\n\n\n\n\n')
+			fl.write(str(graph))
+			fl.write('\nnum_flaws: {}'.format(len(graph.flaws)))
+			fl.write('\ninternally consistent: {}'.format(graph.isInternallyConsistent()))
 
 		#print('num flaws: {} '.format(len(graph.flaws)))
 
@@ -295,6 +305,7 @@ class PlanSpacePlanner:
 			
 		#INDUCTION
 		for flaw in graph.flaws:
+
 		
 			if flaw.name == 'opf':
 				#print('opf')
@@ -315,9 +326,13 @@ class PlanSpacePlanner:
 				result.flaws += new_flaws
 				#print('detected tclfs: {} '.format(len(new_flaws)))
 
+			if not fl is None:
+				fl.write('\n flaw: {}'.format(flaw))
+				for g in results:
+					fl.write('\n\n outcome : {}'.format(g))
 			for g in results:
 				g.flaws.remove(flaw)
-				result = self.rPOCL(g,seeBranches)
+				result = self.rPOCL(g,seeBranches, fl)
 				if not result is None:
 					return result
 		
@@ -335,11 +350,12 @@ if __name__ ==  '__main__':
 	else:
 		domain_file = 'domains/mini-indy-domain.pddl'
 		problem_file = 'domains/mini-indy-problem.pddl'
-	
+
+	f = open('workfile', 'w')
 	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	graph = planner[0]
-	result = planner.rPOCL(graph, seeBranches = None)
+	result = planner.rPOCL(graph, seeBranches = None, fl = f)
 	#print('\n\n\n')
 	print(result)
 	

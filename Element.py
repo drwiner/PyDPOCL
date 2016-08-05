@@ -93,12 +93,11 @@ class Element:
 		if self.merge(other) is None:
 			return None
 		return self
-			
-	def print_element(self):
-		print('(',self.ID, self.typ, self.name,')')
+
 		
 	def __repr__(self):
-		return '({} {} {})'.format(self.typ, self.name)
+		id = str(self.ID)[19:23]
+		return '({}-{}-{})'.format(id, self.typ, self.name)
 		
 class InternalElement(Element):
 	"""Internal Element is an Element with a possibly unimportant name, and a number of arguments
@@ -261,7 +260,8 @@ class Operator(InternalElement):
 			exe = 'ex'
 		else:
 			exe = self.executed
-		return 'operator({}-{}-{})'.format(exe, self.name, self.arg_name)
+		id = str(self.ID)[19:23]
+		return 'operator({}-{}-{}-)'.format(exe, self.name, self.arg_name, id)
 
 		
 class Literal(InternalElement):
@@ -309,10 +309,9 @@ class Literal(InternalElement):
 		return self
 		
 	def __repr__(self):
-		return '{} {} {}-{}'.format(self.ID, self.typ, self.truth, self.name)
-			
-	def print_element(self):
-		print(self.truth, '(',self.ID, self.typ, self.name,')')
+		id = str(self.ID)[19:23]
+		return '{}-{}-{}-{}'.format(self.typ, self.truth, self.name,id)
+
 		
 		
 class Argument(Element):
@@ -337,7 +336,8 @@ class Argument(Element):
 		return True
 		
 	def __repr__(self):
-		return '(Arg {}, {}, {})'.format(self.ID, self.typ, self.name)
+		id = str(self.ID)[19:23]
+		return '(Arg {}-{}-{})'.format(id, self.typ, self.name)
 	
 
 class Actor(Argument):
