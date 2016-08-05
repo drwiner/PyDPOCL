@@ -92,6 +92,10 @@ class PlanSpacePlanner:
 
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
+
+				if not eff.isConsistent(precondition):
+					continue
+
 				Effect = op.getElementGraphFromElementID(eff.ID, Condition)
 				
 				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
@@ -142,7 +146,7 @@ class PlanSpacePlanner:
 						self.addStep(graph_copy, new_step_op.root, s_need, condition, new = True)
 
 						# add graph to children
-						results.add(graph_copy)
+						results.add((graph_copy, 'newStep'))
 
 		return results
 	
@@ -195,7 +199,7 @@ class PlanSpacePlanner:
 						self.addStep(graph_copy, step, s_need, condition, new = False)
 
 						# add graph to children
-						results.add(graph_copy)
+						results.add((graph_copy,'reuse'))
 		return results
 	
 		
@@ -259,18 +263,18 @@ class PlanSpacePlanner:
 		promotion = copy.deepcopy(graph)
 		promotion.OrderingGraph.addEdge(causal_link.sink, threat)
 		if promotion.OrderingGraph.isInternallyConsistent():
-			results.add(promotion)
+			results.add((promotion, 'promotion'))
 			
 		#Demotion
 		demotion = copy.deepcopy(graph)
 		demotion.OrderingGraph.addEdge(threat, causal_link.source)
 		if demotion.OrderingGraph.isInternallyConsistent():
-			results.add(demotion)
+			results.add((demotion, 'demotion'))
 
 		#Restriction
 		restriction = copy.deepcopy(graph)
 		restriction.addNonCodesignationConstraints(effect, causal_link.label)
-		results.add(restriction)
+		results.add((restriction, 'restriction'))
 
 		return results
 		
@@ -289,7 +293,11 @@ class PlanSpacePlanner:
 		if not fl is None:
 			fl.write('\n\n\n\n\n\n\n\n')
 			fl.write(str(graph))
+			numOPFs = len([1 for flaw in graph.flaws if flaw.name == 'opf'])
+			numTCLFs = len([1 for flaw in graph.flaws if flaw.name == 'tclf'])
 			fl.write('\nnum_flaws: {}'.format(len(graph.flaws)))
+			fl.write('\nnum_OPFs: {}'.format(numOPFs))
+			fl.write('\nnum_TCLFs: {}'.format(numTCLFs))
 			fl.write('\ninternally consistent: {}'.format(graph.isInternallyConsistent()))
 
 		#print('num flaws: {} '.format(len(graph.flaws)))
@@ -308,29 +316,24 @@ class PlanSpacePlanner:
 
 		
 			if flaw.name == 'opf':
-				#print('opf')
 				results = self.reuse(graph, flaw)
-				#print('reuse results: {} '.format(len(results)))
 				results.update(self.newStep(graph, flaw))
-				#print('newStep results: {} '.format(len(results)))
 				if len(results) == 0:
 					#print('could not resolve opf')
 					return None
 				
 			if flaw.name == 'tclf':
-				#print('tclf')
 				results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
 				
-			for result in results:
+			for result, res in results:
 				new_flaws = result.detectThreatenedCausalLinks()
 				result.flaws += new_flaws
-				#print('detected tclfs: {} '.format(len(new_flaws)))
 
 			if not fl is None:
 				fl.write('\n flaw: {}'.format(flaw))
-				for g in results:
-					fl.write('\n\n outcome : {}'.format(g))
-			for g in results:
+				for g, res in results:
+					fl.write('\n\n outcome via {}:\n {}'.format(res, g))
+			for g, _ in results:
 				g.flaws.remove(flaw)
 				result = self.rPOCL(g,seeBranches, fl)
 				if not result is None:

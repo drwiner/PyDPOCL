@@ -261,7 +261,7 @@ class Operator(InternalElement):
 		else:
 			exe = self.executed
 		id = str(self.ID)[19:23]
-		return 'operator({}-{}-{}-)'.format(exe, self.name, self.arg_name, id)
+		return 'operator({}-{}-{}-{})'.format(exe, self.name, self.arg_name, id)
 
 		
 class Literal(InternalElement):
@@ -379,7 +379,7 @@ class Actor(Argument):
 		
 	def __repr__(self):
 		id = str(self.ID)[19:23]
-		return '(Actor {}, {}, {})'.format(id, self.typ, self.name)
+		return '(Actor {}-{}-{})'.format(id, self.typ, self.name)
 
 class PlanElement(Element):
 

@@ -94,7 +94,7 @@ class Action(ElementGraph):
 
 	def isConsistentAntecedentFor(self, action):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
-		effects = 	{egde.sink for edge in self.edges if edge.label == 'effect-of'}
+		effects = 	{edge.sink for edge in self.edges if edge.label == 'effect-of'}
 				
 		if len(effects) == 0:
 			return False
@@ -124,7 +124,7 @@ class Action(ElementGraph):
 		
 	def __repr__(self):
 		self.updateArgs()
-		args = str([' {}-{} '.format(arg.name, arg.typ) for arg in self.Args])
+		args = str(list(self.Args))
 		exe = self.root.executed
 		if exe == None:
 			exe = 'ex'
@@ -133,8 +133,7 @@ class Action(ElementGraph):
 		
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
-	def __init__(self,ID,type_graph,name=None,\
-		Elements=None, root_element = None, Edges = None, Constraints = None):
+	def __init__(self,ID,type_graph,name=None,Elements=None, root_element = None, Edges = None, Constraints = None):
 		
 		super(Condition,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Constraints)
 		self.labels = ['first-arg','sec-arg','third-arg','fourth-arg']
