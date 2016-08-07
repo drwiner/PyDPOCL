@@ -4,8 +4,7 @@
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Flaws.py" afterPath="$PROJECT_DIR$/Flaws.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlanElementGraph.py" afterPath="$PROJECT_DIR$/PlanElementGraph.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Planner.py" afterPath="$PROJECT_DIR$/Planner.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Graph.py" afterPath="$PROJECT_DIR$/Graph.py" />
     </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -60,11 +59,21 @@
       <file leaf-file-name="Flaws.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Flaws.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="816">
-              <caret line="133" column="61" selection-start-line="133" selection-start-column="61" selection-end-line="133" selection-end-column="61" />
+            <state relative-caret-position="635">
+              <caret line="68" column="32" selection-start-line="68" selection-start-column="32" selection-end-line="68" selection-end-column="32" />
               <folding>
                 <element signature="e#28#46#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Graph.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Graph.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="650">
+              <caret line="131" column="23" selection-start-line="131" selection-start-column="8" selection-end-line="131" selection-end-column="23" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -102,7 +111,7 @@
       <file leaf-file-name="PlanElementGraph.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="164">
+            <state relative-caret-position="1088">
               <caret line="179" column="49" selection-start-line="179" selection-start-column="49" selection-end-line="179" selection-end-column="49" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
@@ -135,13 +144,13 @@
         <option value="$PROJECT_DIR$/pddl/tree_visitor.py" />
         <option value="$PROJECT_DIR$/OrderingGraph.py" />
         <option value="$PROJECT_DIR$/ElementGraph.py" />
-        <option value="$PROJECT_DIR$/Graph.py" />
         <option value="$PROJECT_DIR$/domains/mini-indy-problem.pddl" />
         <option value="$PROJECT_DIR$/Element.py" />
         <option value="$PROJECT_DIR$/search/searchspace.py" />
         <option value="$PROJECT_DIR$/reuse_old" />
         <option value="$PROJECT_DIR$/PlanElementGraph.py" />
         <option value="$PROJECT_DIR$/Planner.py" />
+        <option value="$PROJECT_DIR$/Graph.py" />
         <option value="$PROJECT_DIR$/Flaws.py" />
       </list>
     </option>
@@ -195,7 +204,7 @@
     <panes />
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/OrderingGraph.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Graph.py" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Python" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
   </component>
@@ -472,7 +481,14 @@
       <option name="project" value="LOCAL" />
       <updated>1470555400975</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="evaluating new steps' effects based on consistency with open conditions and risk to undo open condition">
+      <created>1470586228807</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1470586228807</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -542,7 +558,8 @@
     <MESSAGE value="revised logging material to include revision strategy for each outcome, and added shortcut for newStep" />
     <MESSAGE value="exploring flaw selection strategies" />
     <MESSAGE value="getting ready for flaw selection" />
-    <option name="LAST_COMMIT_MESSAGE" value="getting ready for flaw selection" />
+    <MESSAGE value="evaluating new steps' effects based on consistency with open conditions and risk to undo open condition" />
+    <option name="LAST_COMMIT_MESSAGE" value="evaluating new steps' effects based on consistency with open conditions and risk to undo open condition" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -559,14 +576,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="636" column="60" selection-start-line="636" selection-start-column="60" selection-end-line="636" selection-end-column="60" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Graph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="98" column="32" selection-start-line="98" selection-start-column="32" selection-end-line="98" selection-end-column="32" />
           <folding />
         </state>
       </provider>
@@ -647,13 +656,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
+    <entry file="file://$PROJECT_DIR$/Graph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="179" column="49" selection-start-line="179" selection-start-column="49" selection-end-line="179" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="650">
+          <caret line="131" column="23" selection-start-line="131" selection-start-column="8" selection-end-line="131" selection-end-column="23" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -665,10 +672,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1088">
+          <caret line="179" column="49" selection-start-line="179" selection-start-column="49" selection-end-line="179" selection-end-column="49" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Flaws.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="816">
-          <caret line="133" column="61" selection-start-line="133" selection-start-column="61" selection-end-line="133" selection-end-column="61" />
+        <state relative-caret-position="635">
+          <caret line="68" column="32" selection-start-line="68" selection-start-column="32" selection-end-line="68" selection-end-column="32" />
           <folding>
             <element signature="e#28#46#0" expanded="true" />
           </folding>

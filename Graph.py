@@ -128,6 +128,9 @@ class Graph(Element):
 			if edge.sink == oldsnk:
 				edge.sink = newsnk
 		return self
+
+	def getEdgesByLabel(self, label):
+		return {edge for edge in self.edges if edge.label == label}
 			
 	def getEdgesByIdsAndLabel(self, source_id, sink_id, label):
 		return {edge for edge in self.edges if edge.source.ID == source_id and edge.sink.ID == sink_id and edge.label == label}

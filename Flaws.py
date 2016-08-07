@@ -1,8 +1,8 @@
 #from pddlToGraphs import *
 import collections
-import copy
-""" 
-	Flaws for element graphs
+import bisect
+"""
+	Flaws for plan element graphs
 """
 
 class Flaw:
@@ -11,7 +11,9 @@ class Flaw:
 		self.flaw = tuple
 		self.h = 1000
 		self.effort = 0
-		
+		self.cndts = 0
+		self.risks = 0
+
 	def __hash__(self):
 		return hash((self.name, self.flaw))
 		
@@ -21,11 +23,65 @@ class Flaw:
 	def __repr__(self):
 		return '{}, {}'.format(self.name, self.flaw)
 
+class Flawque(collections.deque):
+	""" A deque which pretends to be a set, and keeps everything sorted"""
+
+	def __init__(self):
+		super(collections.deque, self).__init__()
+	def add(self, item):
+		self.append(item)
+	def update(self, iter):
+		self.extend(iter)
+	def __getitem__(self, position):
+		x, _ = super(collections.deque,self).__getitem__(position)
+		return x
+
+class Flawque:
+	""" A deque which pretends to be a set, and keeps everything sorted"""
+
+	def __init__(self):
+		self._flaws = collections.deque()
+	def add(self, item):
+		self._flaws.append(item)
+	def update(self, iter):
+		self._flaws.extend(iter)
+	def __len__(self):
+		return len(self._flaws)
+	def __getitem__(self, position):
+		x, _ = self._flaws[position]
+		return x
+	def __contains__(self, item):
+		for x, _ in self._flaws:
+			if x == item:
+				return True
+		return False
+
+	def next(self,key=None):
+
+		if key==None:
+			current= 0
+			key = current.__lt__
+
+		contender = ('f', 0)
+
+		for flaw, val in self._flaws:
+			if key(val):
+				contender = flaw
+
+		#pop or not?
+		return contender
+
+	def __repr__(self):
+		return self._flaws
+
+
+
 
 class FlawLib():
 	def __init__(self):
 		"""TODO: need way to manage multiple sets which have preference ranking and different ordering criterion (
 		 LR/MW-first/LIFO)"""
+		self.typs = 'statics threats unsafe reusable nonreusable'.split()
 
 		#static = established by init
 		self.statics = set()
@@ -34,19 +90,22 @@ class FlawLib():
 		self.threats = set()
 
 		#unsafe = existing effect would undo
+		#		sorted by number of cndts
 		self.unsafe = collections.deque
 
 		#reusable = open conditions consistent with at least one existing effect
-		self.reusable = set()
+		#		sorted by number of cndts
+		self.reusable = collections.deque
 
 		#nonreusable = open conditions inconsistent with existing effect
-		self.nonreusable = set()
+		#		sorted by number of cndts
+		self.nonreusable = collections.deque
 
 		#cndts is a dictionary mapping open conditions to candidate action effects
 		self.cndts = collections.defaultdict(set)
 
 		#risks is a dictionary mapping open conditions to potential undoing (i.e., unsafe)
-		# 	Can we use this to limit search for threatened causal link flaws?
+		# 		Can we use this to limit search for threatened causal link flaws?
 		self.risks = collections.defaultdict(set)
 
 	def __len__(self):
@@ -116,65 +175,93 @@ class FlawLib():
 
 	def evalCndts(self, graph, action):
 		""" For each effect of Action, add to open-condition mapping if consistent"""
+
 		for eff in graph.getNeighborsByLabel(action, 'effect-of'):
 			Effect = graph.getElementGraphFromElementID(eff.ID)
 			for oc in self.OCs():
 				s_need, pre = oc.flaw
+
+				# fogetaboutit if effect cannot be established before s_need
 				if graph.OrderingGraph.isPath(action, s_need):
 					continue
-				if not pre.isConsistent(eff):
-					#check if "unsafe"
-					if pre.name == eff.name:
-						Precondition = graph.getElementGraphFromElementID(pre.ID)
-						Precondition.root.truth = not pre.truth
-						if Effect.canAbsolve(Precondition):
-							self.risks[oc].add(eff)
-							continue
-					else:
-						#effect is not a risk nor a candidate
-						continue
+
+				# if not eff.isConsistent(pre), eval if not-eff is consistent with pre.
+				if evalRisk(graph, eff, pre, Effect, self.risks.add):
+					continue
+
+				# check if Effect can match edges with Precondition, check against restrictions
 				Precondition = graph.getElementGraphFromElementID(pre.ID)
 				if Effect.canAbsolve(Precondition):
 					self.cndts[oc].add(eff)
 
-
 	def evalFlaw(self, graph, flaw):
 		''' for each effect of an existing step, check and update mapping to consistent effects'''
+
 		if flaw.name == 'tclf':
 			self.threats.add(flaw)
 			return
 
-		operateIfConsistent(graph, flaw, self.cndts[flaw].add)
+		#Determine existing Cdnts and Risks for this flaw
+		s_need, pre = flaw.flaw
+		Precondition = graph.getElementGraphFromElementID(pre.ID)
 
-		if len(self.cdnts[flaw]) > 0:
-			static = False
+		for edge in graph.getEdgesByLabel('effect-of'):
+
+			#fogetaboutit if effect cannot be established before s_need
+			if graph.OrderingGraph.isPath(edge.source, s_need):
+				continue
+
+			eff = edge.sink
+
+			#if not eff.isConsistent(pre), eval if not-eff is consistent with pre.
+			if evalRisk(graph, eff, pre, Precondition, self.risks.add):
+				continue
+
+			#check if Effect can match edges with Precondition, check against restrictions
+			Effect = graph.getElementGraphFromElementID(eff.ID)
+			if Effect.canAbsolve(Precondition):
+				self.cndts.add(eff)
+
+		#Bin flaw into right list
+		if len(self.cndts[flaw]) > 0:
+			flaw.cndts = len(self.cndts[flaw])
 			for eff in self.cndts[flaw]:
+
 				#check if static
 				parent = graph.getParentsByLabel(eff, 'effect-of')
 				if parent.name == 'initial_dummy_step':
 					self.statics.add(flaw)
-					static = True
-					break
+					return
 
-			if not static:
-				self.reusable.add(flaw)
-		else:
-			self.nonreusable.add(flaw)
+		if len(self.risks[flaw]) > 0:
+			flaw.risks = len(self.risks[flaw])
+			bisect.insort(flaw, self.unsafe)
 
-def operateIfConsistent(graph, flaw, operation):
-	s_need, pre = flaw.flaw
-	Precondition = graph.getElementGraphFromElementID(pre.ID)
-	for edge in graph.edges:
-		if edge.label != 'effect-of':
-			continue
-		eff = edge.sink
-		if graph.OrderingGraph.isPath(edge.source, s_need):
-			continue
-		if not eff.isConsistent(pre):
-			continue
-		Effect = graph.getElementGraphFromElementID(eff.ID)
-		if Effect.canAbsolve(Precondition):
-			operation(eff)
+		self.reusable.add(flaw)
+		self.nonreusable.add(flaw)
+
+def evalRisk(graph, eff, pre, ExistingGraph, operation):
+	""" Returns True if not consistent, returns False if consistent"""
+
+	if not eff.isConsistent(pre):
+
+		#if its not consistent but has same name, then they have different truths
+		if pre.name == eff.name:
+
+			#Leverages the fact that there is an Existing Graph, instead of rebuilding
+			if ExistingGraph.root == eff:
+				R = graph.getElementGraphFromElementID(pre.ID)
+			else:
+				R = graph.getElementGraphFromElementID(eff.ID)
+
+			#whichever it is, has to be opposite
+			R.root.truth = not eff.truth
+
+			#match edges if consistent, check against restrictions
+			if R.canAbsolve(ExistingGraph):
+				operation.add(eff)
+		return True
+	return False
 
 #
 # class Flaw(collections.deque):
