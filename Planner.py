@@ -33,8 +33,6 @@ from pddlToGraphs import *
 
 class PlanSpacePlanner:
 
-	searchLevel = 0
-
 	def __init__(self, op_graphs, objects, init_action, goal_action):
 		#Assumes these parameters are already read from file
 		
@@ -277,7 +275,41 @@ class PlanSpacePlanner:
 		results.add((restriction, 'restriction'))
 
 		return results
-		
+
+	def rankFlaws(self, graph):
+		tclfs = [flaw.flaw for flaw in graph.flaws if flaw.name == 'tclf']
+		opfs = [flaw.flaw for flaw in graph.flaws if flaw.name == 'opf']
+		#local open conditions--> belongs to most recently added action that still has open conditions
+			#let open conditions form a LIFO stack.
+		#unsafe open conditions --> there exists a step 's' with effect 'not (open condition)' and there is no
+			# ordering 's_need' < 's'
+		'''
+			Implementation of MW-Loc-Conf = {n,s}LR / {u}MW_add / {l}MW_add (Younes & Simmons, 2003, VHPOP, JAIR)
+			1, resolve all tclfs
+			2, find all unsafe open conditions and rank them by most-work-additive heuristic
+			3, find all local open conditions sorted and rank them by most-work-additive heuristic
+		'''
+
+		orderedOPFs = []
+		for opf in opfs:
+			s_need, pre = opf
+			Precondition = graph.getElementGraphFromElementID(pre.ID, Condition)
+			for step in graph.Steps:
+
+				#exclude steps ordered after flaw.s_need
+				if graph.OrderingGraph.isPath(s_need, step):
+					continue
+
+				for eff in graph.getNeighborsByLabel(step, 'effect-of'):
+					if not eff.isConsistent(pre):
+						continue
+
+					Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
+					if not Effect.canAbsolve(Precondition):
+						continue
+
+
+
 
 	def rPOCL(self, graph, seeBranches = None, fl = None):
 		"""
@@ -298,6 +330,8 @@ class PlanSpacePlanner:
 			fl.write('\nnum_flaws: {}'.format(len(graph.flaws)))
 			fl.write('\nnum_OPFs: {}'.format(numOPFs))
 			fl.write('\nnum_TCLFs: {}'.format(numTCLFs))
+			for i, flaw in enumerate(graph.flaws):
+				fl.write('\nflaw-{}: {}'.format(i, flaw))
 			fl.write('\ninternally consistent: {}'.format(graph.isInternallyConsistent()))
 
 		#print('num flaws: {} '.format(len(graph.flaws)))
@@ -310,7 +344,12 @@ class PlanSpacePlanner:
 		if len(graph.flaws) == 0:
 			#print('solution selected')
 			return graph
-			
+
+		tclfs = [flaw for flaw in graph.flaws if flaw.name == 'tclf']
+		opfs = [flaw for flaw in graph.flaws if flaw.name == 'opf']
+
+
+
 		#INDUCTION
 		for flaw in graph.flaws:
 
