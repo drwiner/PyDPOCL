@@ -358,4 +358,18 @@ class PlanElementGraph(ElementGraph):
 		orderings = self.OrderingGraph.__repr__()
 		links = self.CausalLinkGraph.__repr__()
 		return '*Steps: \n{' + steps + '}\n *Orderings:\n {' + orderings + '}\n *CausalLinks:\n {' + links + '}'
-		
+
+def operateIfConsistent(graph, flaw, operation):
+	s_need, pre = flaw.flaw
+	Precondition = graph.getElementGraphFromElementID(pre.ID)
+	for edge in graph.edges:
+		if edge.label != 'effect-of':
+			continue
+		eff = edge.sink
+		if graph.OrderingGraph.isPath(edge.source, s_need):
+			continue
+		if not eff.isConsistent(pre):
+			continue
+		Effect = graph.getElementGraphFromElementID(eff.ID)
+		if Effect.canAbsolve(Precondition):
+			operation(eff)

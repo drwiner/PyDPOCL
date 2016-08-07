@@ -147,58 +147,121 @@ class PlanSpacePlanner:
 						results.add((graph_copy, 'newStep'))
 
 		return results
-	
+
+	def operateIfConsistent(graph, flaw, operation):
+		s_need, pre = flaw.flaw
+		Precondition = graph.getElementGraphFromElementID(pre.ID)
+		for eff in graph.flawLib[flaw]:
+			Effect = graph.getElementGraphFromElementID(eff.ID)
+			if Effect.canAbsolve(Precondition):
+
+		#suggestions = graph.flawLib[flaw]
+		Precondition = graph.getElementGraphFromElementID(pre.ID)
+		for edge in graph.edges:
+			if edge.label != 'effect-of':
+				continue
+			eff = edge.sink
+			step = edge.source
+			if s_need == step:
+				continue
+			if graph.OrderingGraph.isPath(step, s_need):
+				continue
+			if not eff.isConsistent(pre):
+				continue
+			Effect = graph.getElementGraphFromElementID(eff.ID)
+			if Effect.canAbsolve(Precondition):
+				operation(eff)
+
+	def getOrbs(self, graph, flaw, Precondition):
+		eff_orbs = collections.defaultdict(set)
+		num_orbs = collections.defaultdict(int)
+
+		for eff in graph.flawLib[flaw]:
+			Effect = graph.getElementGraphFromElementID(eff.ID)
+			if Effect.canAbsolve(Precondition):
+				# returns all possible ways to unify Effect with Precondition
+				orbs = Effect.getInstantiations(Precondition)
+				eff_orbs[eff].update(orbs)
+				num_orbs[eff] += len(orbs)
+
+		return sorted(num_orbs.keys(), key=num_orbs.values())
 		
-	def reuse(self, graph, flaw):
+	def reuse(self, graph, flaw, cndt, id_match_set, orb):
 		"""
 			returns set of graphs which resolve flaw by reusing a step in the plan, if possible
 			iterates through existing steps, and effects of those steps, and asks if any can absolve the precondition of the flaw
 		"""
+		#absorb_set = set()
 		s_need, pre = flaw.flaw
-		Precondition = graph.getElementGraphFromElementID(pre.ID,Condition)
-		results = set()
-		for step in graph.Steps: 
 
-			if step == s_need:
-				continue
-			if graph.OrderingGraph.isPath(s_need, step):
-				#step cannot be ordered before s_need
-				continue
+		#rank effects by "effort" of resolving action (Most-Work-First)
+		graph_copy = copy.deepcopy(graph)
 
-			for eff in graph.getNeighborsByLabel(step, 'effect-of'):
+		# 2 Replace effect with eff_abs, which is unified with the precondition
+		graph_copy.mergeGraph(cndt, no_add=True)
 
-				if not eff.isConsistent(pre):
-					continue
+		# 3) "Redirect Task""
+		# Get elm for elms which were in eff_abs but not in precondition (were replaced)
+		new_snk_cddts = {elm for elm in cndt.elements if not elm.ID in id_match_set}
+		snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID): graph_copy.getElementById(elm.ID) for elm in
+						 new_snk_cddts}
+		for old, new in snk_swap_dict.items():
+			graph_copy.replaceWith(old, new)
 
-				Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
+		# adds causal link and ordering constraints
+		condition = graph_copy.getElementById(cndt.root.ID)
+		self.addStep(graph_copy, step, s_need, condition, new=False)
 
-				if Effect.canAbsolve(Precondition):
+		return (graph_copy, 'reuse')
 
-					Effect_absorbtions = Effect.getInstantiations(Precondition)
 
-					for eff_abs in Effect_absorbtions:
-						#1 Create new child graph
-						graph_copy = copy.deepcopy(graph)
-
-						#2 Replace effect with eff_abs, which is unified with the precondition
-						graph_copy.mergeGraph(eff_abs, no_add = True)
-						
-						#3) "Redirect Task""
-
-						# Get elm for elms which were in eff_abs but not in precondition (were replaced)
-						precondition_IDs = {element.ID for element in Precondition.elements}
-						new_snk_cddts = {elm for elm in eff_abs.elements if not elm.ID in precondition_IDs}
-						snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID):graph_copy.getElementById(elm.ID) for elm in new_snk_cddts}
-						for old, new in snk_swap_dict.items():
-							graph_copy.replaceWith(old, new)
-
-						# adds causal link and ordering constraints
-						condition = graph_copy.getElementById(eff_abs.root.ID)
-						self.addStep(graph_copy, step, s_need, condition, new = False)
-
-						# add graph to children
-						results.add((graph_copy,'reuse'))
-		return results
+	# def oldReuse(self, graph, flaw):
+	# 	results = set()
+	# 	s_need, pre = flaw.flaw
+	# 	Precondition = graph.getElementGraphFromElementID(pre.ID,Condition)
+	# 	results = set()
+	# 	for step in graph.Steps:
+	#
+	# 		if step == s_need:
+	# 			continue
+	# 		if graph.OrderingGraph.isPath(s_need, step):
+	# 			#step cannot be ordered before s_need
+	# 			continue
+	#
+	# 		for eff in graph.getNeighborsByLabel(step, 'effect-of'):
+	#
+	# 			if not eff.isConsistent(pre):
+	# 				continue
+	#
+	# 			Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
+	#
+	# 			if Effect.canAbsolve(Precondition):
+	#
+	# 				Effect_absorbtions = Effect.getInstantiations(Precondition)
+	#
+	# 				for eff_abs in Effect_absorbtions:
+	# 					#1 Create new child graph
+	# 					graph_copy = copy.deepcopy(graph)
+	#
+	# 					#2 Replace effect with eff_abs, which is unified with the precondition
+	# 					graph_copy.mergeGraph(eff_abs, no_add = True)
+	#
+	# 					#3) "Redirect Task""
+	#
+	# 					# Get elm for elms which were in eff_abs but not in precondition (were replaced)
+	# 					precondition_IDs = {element.ID for element in Precondition.elements}
+	# 					new_snk_cddts = {elm for elm in eff_abs.elements if not elm.ID in precondition_IDs}
+	# 					snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID):graph_copy.getElementById(elm.ID) for elm in new_snk_cddts}
+	# 					for old, new in snk_swap_dict.items():
+	# 						graph_copy.replaceWith(old, new)
+	#
+	# 					# adds causal link and ordering constraints
+	# 					condition = graph_copy.getElementById(eff_abs.root.ID)
+	# 					self.addStep(graph_copy, step, s_need, condition, new = False)
+	#
+	# 					# add graph to children
+	# 					results.add((graph_copy,'reuse'))
+	# 	return results
 	
 		
 	def addStep(self, graph, s_add, s_need, condition, new=None):
@@ -309,6 +372,10 @@ class PlanSpacePlanner:
 						continue
 
 
+	def PyPOCL(self, graph):
+		pass
+		#(1) select Flaw
+		#(2) select plan
 
 
 	def rPOCL(self, graph, seeBranches = None, fl = None):
@@ -348,7 +415,16 @@ class PlanSpacePlanner:
 		tclfs = [flaw for flaw in graph.flaws if flaw.name == 'tclf']
 		opfs = [flaw for flaw in graph.flaws if flaw.name == 'opf']
 
+		'''
+		s_need, pre = flaw.flaw
+		Precondition = graph.getElementGraphFromElementID(pre.ID)
 
+		#Get all refinements
+		cndts = self.getOrbs(graph, flaw, Precondition)
+
+		for cndt in cndts:
+			reuse(
+		'''
 
 		#INDUCTION
 		for flaw in graph.flaws:

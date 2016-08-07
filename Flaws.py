@@ -176,9 +176,6 @@ def rH_add(graph, Q):
 			return 0
 
 
-
-
-
 """
 An open precondition flaw is a tuple <step element, precondition element>
 	where precondition element is a literal element,
