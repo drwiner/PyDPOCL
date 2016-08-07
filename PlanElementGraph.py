@@ -177,7 +177,8 @@ class PlanElementGraph(ElementGraph):
 		self.OrderingGraph = OrderingGraph(ID = uuid.uuid1(5))
 		self.CausalLinkGraph = CausalLinkGraph(ID = uuid.uuid1(6))
 		self.updatePlan(Elements)
-		self.flaws = deque() #sort by heuristic?
+		#self.flaws = deque() #sort by heuristic?
+		self.flaws = FlawLib()
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
 		

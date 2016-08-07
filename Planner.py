@@ -70,7 +70,10 @@ class PlanSpacePlanner:
 		graph.OrderingGraph.addOrdering(dummy_start, dummy_final)
 		
 		#Add initial Open precondition flaws for dummy step
-		graph.flaws += (Flaw((dummy_final, prec), 'opf') for prec in graph.getNeighborsByLabel(dummy_final, 'precond-of'))
+		init_flaws = (Flaw((dummy_final, prec), 'opf') for prec in graph.getNeighborsByLabel(dummy_final, 'precond-of'))
+		for flaw in init_flaws:
+			#also inserts flaw
+			graph.flaws.evalFlaw(graph,flaw)
 		
 		
 	def newStep(self, graph, flaw):
@@ -214,55 +217,6 @@ class PlanSpacePlanner:
 
 		return (graph_copy, 'reuse')
 
-
-	# def oldReuse(self, graph, flaw):
-	# 	results = set()
-	# 	s_need, pre = flaw.flaw
-	# 	Precondition = graph.getElementGraphFromElementID(pre.ID,Condition)
-	# 	results = set()
-	# 	for step in graph.Steps:
-	#
-	# 		if step == s_need:
-	# 			continue
-	# 		if graph.OrderingGraph.isPath(s_need, step):
-	# 			#step cannot be ordered before s_need
-	# 			continue
-	#
-	# 		for eff in graph.getNeighborsByLabel(step, 'effect-of'):
-	#
-	# 			if not eff.isConsistent(pre):
-	# 				continue
-	#
-	# 			Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
-	#
-	# 			if Effect.canAbsolve(Precondition):
-	#
-	# 				Effect_absorbtions = Effect.getInstantiations(Precondition)
-	#
-	# 				for eff_abs in Effect_absorbtions:
-	# 					#1 Create new child graph
-	# 					graph_copy = copy.deepcopy(graph)
-	#
-	# 					#2 Replace effect with eff_abs, which is unified with the precondition
-	# 					graph_copy.mergeGraph(eff_abs, no_add = True)
-	#
-	# 					#3) "Redirect Task""
-	#
-	# 					# Get elm for elms which were in eff_abs but not in precondition (were replaced)
-	# 					precondition_IDs = {element.ID for element in Precondition.elements}
-	# 					new_snk_cddts = {elm for elm in eff_abs.elements if not elm.ID in precondition_IDs}
-	# 					snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID):graph_copy.getElementById(elm.ID) for elm in new_snk_cddts}
-	# 					for old, new in snk_swap_dict.items():
-	# 						graph_copy.replaceWith(old, new)
-	#
-	# 					# adds causal link and ordering constraints
-	# 					condition = graph_copy.getElementById(eff_abs.root.ID)
-	# 					self.addStep(graph_copy, step, s_need, condition, new = False)
-	#
-	# 					# add graph to children
-	# 					results.add((graph_copy,'reuse'))
-	# 	return results
-	
 		
 	def addStep(self, graph, s_add, s_need, condition, new=None):
 		"""
@@ -339,41 +293,16 @@ class PlanSpacePlanner:
 
 		return results
 
-	def rankFlaws(self, graph):
-		tclfs = [flaw.flaw for flaw in graph.flaws if flaw.name == 'tclf']
-		opfs = [flaw.flaw for flaw in graph.flaws if flaw.name == 'opf']
-		#local open conditions--> belongs to most recently added action that still has open conditions
-			#let open conditions form a LIFO stack.
-		#unsafe open conditions --> there exists a step 's' with effect 'not (open condition)' and there is no
-			# ordering 's_need' < 's'
-		'''
-			Implementation of MW-Loc-Conf = {n,s}LR / {u}MW_add / {l}MW_add (Younes & Simmons, 2003, VHPOP, JAIR)
-			1, resolve all tclfs
-			2, find all unsafe open conditions and rank them by most-work-additive heuristic
-			3, find all local open conditions sorted and rank them by most-work-additive heuristic
-		'''
-
-		orderedOPFs = []
-		for opf in opfs:
-			s_need, pre = opf
-			Precondition = graph.getElementGraphFromElementID(pre.ID, Condition)
-			for step in graph.Steps:
-
-				#exclude steps ordered after flaw.s_need
-				if graph.OrderingGraph.isPath(s_need, step):
-					continue
-
-				for eff in graph.getNeighborsByLabel(step, 'effect-of'):
-					if not eff.isConsistent(pre):
-						continue
-
-					Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
-					if not Effect.canAbsolve(Precondition):
-						continue
-
 
 	def PyPOCL(self, graph):
-		pass
+		if not graph.isInternallyConsistent():
+			#print('branch terminated')
+			return None
+
+		if len(graph.flaws) == 0:
+			#print('solution selected')
+			return graph
+
 		#(1) select Flaw
 		#(2) select plan
 
