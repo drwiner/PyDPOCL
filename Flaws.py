@@ -9,73 +9,63 @@ class Flaw:
 	def __init__(self, tuple, name):
 		self.name = name
 		self.flaw = tuple
-		self.h = 1000
-		self.effort = 0
 		self.cndts = 0
 		self.risks = 0
 
 	def __hash__(self):
-		return hash((self.name, self.flaw))
+		return hash(self.flaw)
 		
 	def __eq__(self, other):
 		return hash(self) == hash(other)
+
+	#For comparison via bisect
+	def __lt__(self, other):
+		return self.cndts < other.cndts
 		
 	def __repr__(self):
-		return '{}, {}'.format(self.name, self.flaw)
+		return 'Flaw(name={},tuple={})'.format(self.name, self.flaw)
 
-class Flawque(collections.deque):
-	""" A deque which pretends to be a set, and keeps everything sorted"""
-
-	def __init__(self):
-		super(collections.deque, self).__init__()
-	def add(self, item):
-		self.append(item)
-	def update(self, iter):
-		self.extend(iter)
-	def __getitem__(self, position):
-		x, _ = super(collections.deque,self).__getitem__(position)
-		return x
 
 class Flawque:
 	""" A deque which pretends to be a set, and keeps everything sorted"""
 
 	def __init__(self):
 		self._flaws = collections.deque()
-	def add(self, item):
-		self._flaws.append(item)
+
+	def add(self, flaw):
+		self.insert(flaw)
+		#self._flaws.append(item)
+
 	def update(self, iter):
-		self._flaws.extend(iter)
+		for flaw in iter:
+			self.insert(flaw)
+
+	def __contains__(self, item):
+		return item in self._flaws
+
 	def __len__(self):
 		return len(self._flaws)
+
+	def head(self):
+		return self._flaws.popleft()
+
+	def tail(self):
+		return self._flaws.pop()
+
+	def peek(self):
+		return self._flaws[-1]
+
+	def insert(self, flaw):
+		index = bisect.bisect_left(self._flaws, flaw)
+		self._flaws.rotate(-index)
+		self._flaws.appendleft(flaw)
+		self._flaws.rotate(index)
+
 	def __getitem__(self, position):
-		x, _ = self._flaws[position]
-		return x
-	def __contains__(self, item):
-		for x, _ in self._flaws:
-			if x == item:
-				return True
-		return False
-
-	def next(self,key=None):
-
-		if key==None:
-			current= 0
-			key = current.__lt__
-
-		contender = ('f', 0)
-
-		for flaw, val in self._flaws:
-			if key(val):
-				contender = flaw
-
-		#pop or not?
-		return contender
+		return self._flaws[position]
 
 	def __repr__(self):
-		return self._flaws
-
-
-
+		return str(self._flaws)
 
 class FlawLib():
 	def __init__(self):
@@ -91,15 +81,15 @@ class FlawLib():
 
 		#unsafe = existing effect would undo
 		#		sorted by number of cndts
-		self.unsafe = collections.deque
+		self.unsafe = Flawque()
 
 		#reusable = open conditions consistent with at least one existing effect
 		#		sorted by number of cndts
-		self.reusable = collections.deque
+		self.reusable = Flawque()
 
 		#nonreusable = open conditions inconsistent with existing effect
 		#		sorted by number of cndts
-		self.nonreusable = collections.deque
+		self.nonreusable = Flawque()
 
 		#cndts is a dictionary mapping open conditions to candidate action effects
 		self.cndts = collections.defaultdict(set)
@@ -194,7 +184,7 @@ class FlawLib():
 				if Effect.canAbsolve(Precondition):
 					self.cndts[oc].add(eff)
 
-	def evalFlaw(self, graph, flaw):
+	def insert(self, graph, flaw):
 		''' for each effect of an existing step, check and update mapping to consistent effects'''
 
 		if flaw.name == 'tclf':
@@ -223,22 +213,30 @@ class FlawLib():
 				self.cndts.add(eff)
 
 		#Bin flaw into right list
-		if len(self.cndts[flaw]) > 0:
-			flaw.cndts = len(self.cndts[flaw])
-			for eff in self.cndts[flaw]:
+		flaw.cndts = len(self.cndts[flaw])
+		flaw.risks = len(self.risks[flaw])
 
-				#check if static
+		# for any cndt, if establishing step is initial, then flaw is static {t}
+		if flaw.cndts > 0:
+			for eff in self.cndts[flaw]:
 				parent = graph.getParentsByLabel(eff, 'effect-of')
 				if parent.name == 'initial_dummy_step':
 					self.statics.add(flaw)
 					return
 
-		if len(self.risks[flaw]) > 0:
-			flaw.risks = len(self.risks[flaw])
-			bisect.insort(flaw, self.unsafe)
+		#if has risks, then unsafe
+		if flaw.risks > 0:
+			self.unsafe.insert(flaw)
+			return
 
-		self.reusable.add(flaw)
+		#if not static but has cndts, then reusable
+		if flaw.cndts > 0:
+			self.reusable.insert(flaw)
+			return
+
+		#last, must be nonreusable
 		self.nonreusable.add(flaw)
+
 
 def evalRisk(graph, eff, pre, ExistingGraph, operation):
 	""" Returns True if not consistent, returns False if consistent"""
