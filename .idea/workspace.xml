@@ -58,8 +58,8 @@
       <file leaf-file-name="Flaws.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Flaws.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="515">
-              <caret line="199" column="33" selection-start-line="199" selection-start-column="33" selection-end-line="199" selection-end-column="33" />
+            <state relative-caret-position="120">
+              <caret line="239" column="54" selection-start-line="239" selection-start-column="54" selection-end-line="239" selection-end-column="54" />
               <folding>
                 <element signature="e#28#46#0" expanded="true" />
               </folding>
@@ -494,7 +494,14 @@
       <option name="project" value="LOCAL" />
       <updated>1470600485240</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="  Flawque copmlete, insert Flaw into FlawLib complete">
+      <created>1470610165567</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1470610165567</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -566,7 +573,8 @@
     <MESSAGE value="getting ready for flaw selection" />
     <MESSAGE value="evaluating new steps' effects based on consistency with open conditions and risk to undo open condition" />
     <MESSAGE value="Flawque" />
-    <option name="LAST_COMMIT_MESSAGE" value="Flawque" />
+    <MESSAGE value="  Flawque copmlete, insert Flaw into FlawLib complete" />
+    <option name="LAST_COMMIT_MESSAGE" value="  Flawque copmlete, insert Flaw into FlawLib complete" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -691,8 +699,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Flaws.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="515">
-          <caret line="199" column="33" selection-start-line="199" selection-start-column="33" selection-end-line="199" selection-end-column="33" />
+        <state relative-caret-position="120">
+          <caret line="239" column="54" selection-start-line="239" selection-start-column="54" selection-end-line="239" selection-end-column="54" />
           <folding>
             <element signature="e#28#46#0" expanded="true" />
           </folding>

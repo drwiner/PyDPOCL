@@ -11,6 +11,7 @@ class Flaw:
 		self.flaw = tuple
 		self.cndts = 0
 		self.risks = 0
+		self.criteria = self.cndts
 
 	def __hash__(self):
 		return hash(self.flaw)
@@ -20,7 +21,14 @@ class Flaw:
 
 	#For comparison via bisect
 	def __lt__(self, other):
-		return self.cndts < other.cndts
+		return self.criteria < other.criteria
+
+	#switch to risks for unsafe flaws
+	def switch(self):
+		if self.criteria == self.cndts:
+			self.criteria = self.risks
+		else:
+			self.criteria = self.cndts
 		
 	def __repr__(self):
 		return 'Flaw(name={},tuple={})'.format(self.name, self.flaw)
@@ -50,6 +58,9 @@ class Flawque:
 		return self._flaws.popleft()
 
 	def tail(self):
+		return self._flaws.pop()
+
+	def pop(self):
 		return self._flaws.pop()
 
 	def peek(self):
@@ -132,15 +143,15 @@ class FlawLib():
 	def next(self):
 		''' Returns flaw with highest priority, and removes'''
 		if len(self.statics) > 0:
-			return self.stats.pop()
+			return self.statics.pop()
 		if len(self.threats) > 0:
 			return self.threats.pop()
 		elif len(self.unsafe) > 0:
 			return self.unsafe.pop()
-		elif len(self.simple) > 0:
-			return self.simple.pop()
-		elif len(self.local) > 0:
-			return self.local.pop()
+		elif len(self.reusable) > 0:
+			return self.reusable.pop()
+		elif len(self.nonreusable) > 0:
+			return self.nonreusable.pop()
 		else:
 			return None
 
@@ -150,20 +161,7 @@ class FlawLib():
 			which.remove(flaw)
 		newList.add(flaw)
 
-	def insert(self, flaw, status):
-		''' determine which list to put flaw in '''
-		if status == 'static':
-			self.statics.add(flaw)
-		if status == 'threat':
-			self.threats.add(flaw)
-		if status == 'unsafe':
-			self.unsafe.append(flaw)
-		if status == 'reusable':
-			self.reusable.add(flaw)
-		else:
-			self.nonreusable.add(flaw)
-
-	def evalCndts(self, graph, action):
+	def addCndtsAndRisks(self, graph, action):
 		""" For each effect of Action, add to open-condition mapping if consistent"""
 
 		for eff in graph.getNeighborsByLabel(action, 'effect-of'):
@@ -226,7 +224,7 @@ class FlawLib():
 
 		#if has risks, then unsafe
 		if flaw.risks > 0:
-			self.unsafe.insert(flaw)
+			self.unsafe.insert(flaw.switch())
 			return
 
 		#if not static but has cndts, then reusable
@@ -260,56 +258,6 @@ def evalRisk(graph, eff, pre, ExistingGraph, operation):
 				operation.add(eff)
 		return True
 	return False
-
-#
-# class Flaw(collections.deque):
-# 	def __init__(self):
-# 		self._flaws = []
-#
-# 	def __getitem__(self, position):
-# 		return self._flaws[position]
-#
-# 	def __len__(self):
-# 		return len(self._flaws)
-#
-# 	def __setitem__(self, flaw, position):
-# 		self._flaws[position] = flaw
-
-# def openConditionHeuristic(graph, flaw):
-# 	''' q is open condition '''
-# 	s_need, q = flaw
-# 	init_state = {eff for eff in graph.getNeighborsByLabel(graph.initial_dummy_step, 'effect-of')}
-# 	Q = graph.getElementGraphFromElementID(q.ID, Condition)
-# 	#if q is false, then we fail if consistent with some Q
-# 	if not q.truth:
-# 		Q.root.truth = True
-# 		cndts = {state for state in init_state if state.isConsistent(Q.root)}
-# 		for cndt in cndts:
-# 			State = graph.getElementGraphFromElementID(cndt.ID, Condition)
-# 			if State.canAbsolve(Q):
-#
-# 	for state in init_state:
-# 		if state.isConsistent(Q.root):
-# 			State = graph.getElementGraphFromElementID(state.ID, Condition)
-# 		else:
-# 			continue
-# 		if State.canAbsolve(Q):
-# 			flaw.h = 0
-# 			flaw.effort = 1
-# 			return
-# 	if not q.truth:
-#
-#
-# 	#first, check existing actions
-# 	for step in graph.Steps:
-# 		for eff in graph.getNeighborsByLabel(step, 'effect-of'):
-# 			if eff.isConsistent(q):
-# 				Eff = graph.getElementGraphFromElementID(eff.ID, Condition)
-# 			else:
-# 				continue
-# 		if Eff.canAbsolve(Q):
-# 			flaw.h +=
-
 
 
 """
