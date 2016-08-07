@@ -71,9 +71,9 @@ class PlanSpacePlanner:
 		
 		#Add initial Open precondition flaws for dummy step
 		init_flaws = (Flaw((dummy_final, prec), 'opf') for prec in graph.getNeighborsByLabel(dummy_final, 'precond-of'))
+		#For each flaw, determine candidate effects and risks, then insert into flawlib by bin
 		for flaw in init_flaws:
-			#also inserts flaw
-			graph.flaws.evalFlaw(graph,flaw)
+			graph.flaws.insert(graph,flaw)
 		
 		
 	def newStep(self, graph, flaw):
@@ -157,8 +157,9 @@ class PlanSpacePlanner:
 		for eff in graph.flawLib[flaw]:
 			Effect = graph.getElementGraphFromElementID(eff.ID)
 			if Effect.canAbsolve(Precondition):
+				pass
 
-		#suggestions = graph.flawLib[flaw]
+
 		Precondition = graph.getElementGraphFromElementID(pre.ID)
 		for edge in graph.edges:
 			if edge.label != 'effect-of':
@@ -187,17 +188,17 @@ class PlanSpacePlanner:
 				eff_orbs[eff].update(orbs)
 				num_orbs[eff] += len(orbs)
 
-		return sorted(num_orbs.keys(), key=num_orbs.values())
+		return num_orbs
+		#return sorted(num_orbs.keys(), key=num_orbs.values())
 		
-	def reuse(self, graph, flaw, cndt, id_match_set, orb):
+	def reuse(self, graph, flaw, cndt, id_match_set):
 		"""
 			returns set of graphs which resolve flaw by reusing a step in the plan, if possible
 			iterates through existing steps, and effects of those steps, and asks if any can absolve the precondition of the flaw
 		"""
-		#absorb_set = set()
+
 		s_need, pre = flaw.flaw
 
-		#rank effects by "effort" of resolving action (Most-Work-First)
 		graph_copy = copy.deepcopy(graph)
 
 		# 2 Replace effect with eff_abs, which is unified with the precondition
@@ -213,6 +214,7 @@ class PlanSpacePlanner:
 
 		# adds causal link and ordering constraints
 		condition = graph_copy.getElementById(cndt.root.ID)
+		step = next(iter(graph.getParents(cndt)))
 		self.addStep(graph_copy, step, s_need, condition, new=False)
 
 		return (graph_copy, 'reuse')
@@ -303,6 +305,17 @@ class PlanSpacePlanner:
 			#print('solution selected')
 			return graph
 
+		flaw = graph.flaws.next()
+		s_need, pre = flaw.flaw
+
+		Precondition = graph.getElementGraphFromElementID(pre.ID)
+
+		# Get all refinements
+		cndts = self.getOrbs(graph, flaw, Precondition)
+
+		#for cndt in cndts:
+		#	reuse(
+
 		#(1) select Flaw
 		#(2) select plan
 
@@ -340,20 +353,6 @@ class PlanSpacePlanner:
 		if len(graph.flaws) == 0:
 			#print('solution selected')
 			return graph
-
-		tclfs = [flaw for flaw in graph.flaws if flaw.name == 'tclf']
-		opfs = [flaw for flaw in graph.flaws if flaw.name == 'opf']
-
-		'''
-		s_need, pre = flaw.flaw
-		Precondition = graph.getElementGraphFromElementID(pre.ID)
-
-		#Get all refinements
-		cndts = self.getOrbs(graph, flaw, Precondition)
-
-		for cndt in cndts:
-			reuse(
-		'''
 
 		#INDUCTION
 		for flaw in graph.flaws:
