@@ -30,6 +30,27 @@ import collections
 	(8) Recursive Invocation (but, log status of plan first)
 """
 
+class Frontier:
+	def __init__(self):
+		self._frontier = []
+
+	def __len__(self):
+		return len(self._frontier)
+
+	def pop(self):
+		return collections.heapq.heappop(self._frontier)
+
+	def insert(self, plan):
+		collections.heapq.heappush(self._frontier, plan)
+
+	def __getitem__(self, position):
+		return self._frontier[position]
+
+	def extend(self, itera):
+		for item in itera:
+			self.insert(item)
+
+
 
 class PlanSpacePlanner:
 
@@ -310,14 +331,16 @@ class PlanSpacePlanner:
 			new_flaws = result.detectThreatenedCausalLinks()
 			result.flaws.threats.update(new_flaws)
 
-		self._frontier.extend(results)
+		return results
 
-	def SPyPOCL(self, graph):
+	def SPyPOCL(self, Open):
+		Visited = []
+		while Open:
 
-		while open:
+			graph = Open.pop()
 
 			if not graph.isInternallyConsistent():
-				#print('branch terminated')
+				print('branch terminated')
 				return None
 
 			if len(graph.flaws) == 0:
@@ -326,10 +349,10 @@ class PlanSpacePlanner:
 
 			#flaw selection handled by flaw library
 			flaw = graph.flaws.next()
+			Visited.append((graph,flaw))
 
-			#generate children and add flaws
-			self.generateChildren(graph, flaw)
-
+			#generate children and add new flaws
+			Open.extend(self.generateChildren(graph, flaw))
 
 
 
@@ -397,7 +420,7 @@ class PlanSpacePlanner:
 		
 		print('branch terminated')
 		return None
-		
+
 
 import sys	
 if __name__ ==  '__main__':

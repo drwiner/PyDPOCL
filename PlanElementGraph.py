@@ -200,6 +200,14 @@ class PlanElementGraph(ElementGraph):
 
 	def __lt__(self, other):
 		return (self.cost + self.heurstic) < (other.cost + other.heuristic)
+
+	@property
+	def heuristic(self):
+		return len(self.flaws) + len(self.flaws.nonreusable)
+
+	@property
+	def cost(self):
+		return len(self.Steps)
 	
 	def updateIntentionFrameAttributes(self):
 		for element in self.elements:
