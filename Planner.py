@@ -1,6 +1,6 @@
 #from Flaws import *
 from pddlToGraphs import *
-
+import collections
 
 
 """
@@ -261,7 +261,7 @@ class PlanSpacePlanner:
 			#Remove equality precondition edges
 			graph.edges -= noncodesg
 
-			graph.flaws += (Flaw((s_add, prec.sink), 'opf') for prec in prc_edges if not prec in noncodesg)
+			graph.flaws.update(Flaw((s_add, prec.sink), 'opf') for prec in prc_edges if not prec in noncodesg)
 				
 		#Good time as ever to updatePlan
 		graph.updatePlan()
@@ -295,29 +295,42 @@ class PlanSpacePlanner:
 
 		return results
 
+	def generateChildren(self, graph, flaw):
+		if flaw.name == 'opf':
+			results = self.reuse(graph, flaw)
+			results.update(self.newStep(graph, flaw))
+			if len(results) == 0:
+				# print('could not resolve opf')
+				return None
 
-	def PyPOCL(self, graph):
-		if not graph.isInternallyConsistent():
-			#print('branch terminated')
-			return None
+		if flaw.name == 'tclf':
+			results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
 
-		if len(graph.flaws) == 0:
-			#print('solution selected')
-			return graph
+		for result, res in results:
+			new_flaws = result.detectThreatenedCausalLinks()
+			result.flaws.threats.update(new_flaws)
 
-		flaw = graph.flaws.next()
-		s_need, pre = flaw.flaw
+		self._frontier.extend(results)
 
-		Precondition = graph.getElementGraphFromElementID(pre.ID)
+	def SPyPOCL(self, graph):
 
-		# Get all refinements
-		cndts = self.getOrbs(graph, flaw, Precondition)
+		while open:
 
-		#for cndt in cndts:
-		#	reuse(
+			if not graph.isInternallyConsistent():
+				#print('branch terminated')
+				return None
 
-		#(1) select Flaw
-		#(2) select plan
+			if len(graph.flaws) == 0:
+				#print('solution selected')
+				return graph
+
+			#flaw selection handled by flaw library
+			flaw = graph.flaws.next()
+
+			#generate children and add flaws
+			self.generateChildren(graph, flaw)
+
+
 
 
 	def rPOCL(self, graph, seeBranches = None, fl = None):

@@ -177,6 +177,10 @@ class PlanElementGraph(ElementGraph):
 		self.OrderingGraph = OrderingGraph(ID = uuid.uuid1(5))
 		self.CausalLinkGraph = CausalLinkGraph(ID = uuid.uuid1(6))
 		self.updatePlan(Elements)
+
+		self.cost = 0
+		self.heuristic = 0
+
 		#self.flaws = deque() #sort by heuristic?
 		self.flaws = FlawLib()
 		self.initial_dummy_step = None
@@ -193,6 +197,9 @@ class PlanElementGraph(ElementGraph):
 		super(PlanElementGraph,self).__init__(ID,type_graph,name,Elements,planElement,Edges,Constraints)
 		
 		self.updateIntentionFrameAttributes()
+
+	def __lt__(self, other):
+		return (self.cost + self.heurstic) < (other.cost + other.heuristic)
 	
 	def updateIntentionFrameAttributes(self):
 		for element in self.elements:
