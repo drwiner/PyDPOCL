@@ -178,9 +178,6 @@ class PlanElementGraph(ElementGraph):
 		self.CausalLinkGraph = CausalLinkGraph(ID = uuid.uuid1(6))
 		self.updatePlan(Elements)
 
-		self.cost = 0
-		self.heuristic = 0
-
 		#self.flaws = deque() #sort by heuristic?
 		self.flaws = FlawLib()
 		self.initial_dummy_step = None
@@ -208,7 +205,16 @@ class PlanElementGraph(ElementGraph):
 	@property
 	def cost(self):
 		return len(self.Steps)
-	
+
+	def subgraph(self, element, Type = None):
+		if Type == None:
+			Type = eval(element.typ)
+		self.getElementGraphFromElement(element, Type)
+
+	def subgraphFromID(self, element_ID, Type = None):
+		return self.subgraph(self.getElementById(element_ID), Type)
+
+
 	def updateIntentionFrameAttributes(self):
 		for element in self.elements:
 			if type(element) == IntentionFrameElement:
@@ -231,7 +237,7 @@ class PlanElementGraph(ElementGraph):
 		"""
 		step = next(iter(subseteq))
 		print('step {} used for starting actors'.format(step.ID))
-		Step = self.getElementGraphFromElement(step,Action)
+		Step = self.subgraph(step,Action)
 		S = copy.deepcopy(subseteq)
 		S = S - {action for action in S if action.ID == step.ID}
 		return self.rPickActorFromSteps(remaining_steps = S, potential_actors = Step.consenting_actors)

@@ -1,7 +1,12 @@
 from pddl.parser import Parser
+#from Flaws import *
+
 from math import floor
 import collections
 from PlanElementGraph import *
+
+
+
 #from Flaws import *
 
 ARGLABELS = ['first-arg', 'sec-arg','third-arg', 'fourth-arg', 'fifth-arg']
@@ -171,7 +176,7 @@ def rPrintFormulaElements(formula):
 		
 """ Convert pddl file to set of operator graphs"""
 def domainToOperatorGraphs(domain):
-	start_id = floor(random.random()*100)
+	start_id = 15
 	opGraphs = set()
 	for action in domain.actions:
 		start_id += 1

@@ -1,6 +1,5 @@
 from Graph import *
 
-
 class ElementGraph(Graph):
 	"""An element graph is a graph with a root element"""
 
@@ -31,12 +30,12 @@ class ElementGraph(Graph):
 
 	def getElementGraphFromElement(self, element, Type=None):
 		if Type == None:
-			Type = element.typ
+			Type = eval(element.typ)
 		if self.root == element:
 			return self.copyGen()
 		return Type.makeElementGraph(self, element)
 
-	def getElementGraphFromElementID(self, element_ID, Type):
+	def getElementGraphFromElementID(self, element_ID, Type = None):
 		return self.getElementGraphFromElement(self.getElementById(element_ID), Type)
 
 	def addNonCodesignationConstraints(self, elm1, elm2):

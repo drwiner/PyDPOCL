@@ -1,7 +1,7 @@
 #from Flaws import *
 from pddlToGraphs import *
 import collections
-
+from heapq import heappush, heappop
 
 """
 	Algorithm for Plan-Graph-Space search of Story Plan
@@ -38,10 +38,10 @@ class Frontier:
 		return len(self._frontier)
 
 	def pop(self):
-		return collections.heapq.heappop(self._frontier)
+		return heappop(self._frontier)
 
 	def insert(self, plan):
-		collections.heapq.heappush(self._frontier, plan)
+		heappush(self._frontier, plan)
 
 	def __getitem__(self, position):
 		return self._frontier[position]
@@ -67,7 +67,7 @@ class PlanSpacePlanner:
 		
 		#create special dummy step for init_graph and add to graphs {}		
 		self.setup(init_graph, init_action, goal_action)
-		self.Open =  Frontier
+		self.Open =  Frontier()
 		self.Open.insert(init_graph)
 		
 	def __len__(self):
@@ -110,7 +110,7 @@ class PlanSpacePlanner:
 		"""
 		
 		s_need, precondition = flaw.flaw
-		Precondition = graph.getElementGraphFromElementID(precondition.ID, Condition)
+		Precondition = graph.subgraph(precondition)
 		results = set()
 
 		for op in self.op_graphs:
@@ -119,7 +119,7 @@ class PlanSpacePlanner:
 				if not eff.isConsistent(precondition):
 					continue
 
-				Effect = op.getElementGraphFromElementID(eff.ID, Condition)
+				Effect = op.getElementGraphFromElement(eff,Condition)
 				
 				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
 				if Effect.canAbsolve(Precondition):
@@ -128,7 +128,7 @@ class PlanSpacePlanner:
 					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.ID)
 					
 					#Condition graph of copied operator for Effect
-					Effect  = step_op.getElementGraphFromElementID(nei, Condition)
+					Effect  = step_op.subgraphFromID(nei, Condition)
 					
 					#could be more than one way to unify effect with precondition
 					#Effect_absorbtions' graphs' elements' replaced_ids assigned Precondition's ids
@@ -168,8 +168,11 @@ class PlanSpacePlanner:
 						condition = graph_copy.getElementById(Precondition.root.ID)
 						self.addStep(graph_copy, new_step_op.root, s_need, condition, new = True)
 
-						# add graph to children
-						results.add((graph_copy, 'newStep'))
+						#Now that step is in plan, determine for which open conditions the step is a cndt/risk
+						graph_copy.flaws.addCndtsAndRisks(graph_copy, new_step_op.root)
+
+						#results.add((graph_copy, 'newStep'))
+						results.add(graph_copy)
 
 		return results
 
@@ -191,13 +194,13 @@ class PlanSpacePlanner:
 	def reuse(self, graph, flaw):
 		results = set()
 		s_need, pre = flaw.flaw
-		Precondition = graph.getElementGraphFromElementID(pre.ID, Condition)
+		Precondition = graph.subgraph(pre)
 
 		#limit search significantly by only considering precompliled cndts
 		for eff in graph.flaws.cndts[flaw]:
 			if not eff.isConsistent(pre):
 				continue
-			Effect = graph.getElementGraphFromElementID(eff.ID, Condition)
+			Effect = graph.subgraph(eff)
 			if not Effect.canAbsolve(Precondition):
 				continue
 
@@ -292,18 +295,21 @@ class PlanSpacePlanner:
 		promotion = copy.deepcopy(graph)
 		promotion.OrderingGraph.addEdge(causal_link.sink, threat)
 		if promotion.OrderingGraph.isInternallyConsistent():
-			results.add((promotion, 'promotion'))
+			#results.add((promotion, 'promotion'))
+			result.add(promotion)
 			
 		#Demotion
 		demotion = copy.deepcopy(graph)
 		demotion.OrderingGraph.addEdge(threat, causal_link.source)
 		if demotion.OrderingGraph.isInternallyConsistent():
-			results.add((demotion, 'demotion'))
+			results.add(demotion)
+		#	results.add((demotion, 'demotion'))
 
 		#Restriction
 		restriction = copy.deepcopy(graph)
 		restriction.addNonCodesignationConstraints(effect, causal_link.label)
-		results.add((restriction, 'restriction'))
+		results.add(restriction)
+		#results.add((restriction, 'restriction'))
 
 		return results
 
@@ -318,17 +324,18 @@ class PlanSpacePlanner:
 		if flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
 
-		for result, res in results:
+		#for result, res in results:
+		for result in results:
 			new_flaws = result.detectThreatenedCausalLinks()
 			result.flaws.threats.update(new_flaws)
 
 		return results
 
-	def SPyPOCL(self, Open):
+	def SPyPOCL(self):
 		Visited = []
-		while Open:
+		while self.Open:
 
-			graph = Open.pop()
+			graph = self.Open.pop()
 
 			if not graph.isInternallyConsistent():
 				print('branch terminated')
@@ -343,7 +350,7 @@ class PlanSpacePlanner:
 			Visited.append((graph,flaw))
 
 			#generate children and add new flaws
-			Open.extend(self.generateChildren(graph, flaw))
+			self.Open.extend(self.generateChildren(graph, flaw))
 
 
 
@@ -427,8 +434,9 @@ if __name__ ==  '__main__':
 	f = open('workfile', 'w')
 	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
-	graph = planner[0]
-	result = planner.rPOCL(graph, seeBranches = None, fl = f)
+	result = planner.SPyPOCL()
+	#graph = planner[0]
+	#result = planner.rPOCL(graph, seeBranches = None, fl = f)
 	##print('\n\n\n')
 	print(result)
 	

@@ -1,6 +1,9 @@
 #from pddlToGraphs import *
 import collections
 import bisect
+
+#from PlanElementGraph import Condition
+#import PlanElementGraph
 """
 	Flaws for plan element graphs
 """
@@ -165,7 +168,7 @@ class FlawLib():
 		""" For each effect of Action, add to open-condition mapping if consistent"""
 
 		for eff in graph.getNeighborsByLabel(action, 'effect-of'):
-			Effect = graph.getElementGraphFromElementID(eff.ID)
+			Effect = graph.subgraph(eff)
 			for oc in self.OCs():
 				s_need, pre = oc.flaw
 
@@ -178,7 +181,7 @@ class FlawLib():
 					continue
 
 				# check if Effect can match edges with Precondition, check against restrictions
-				Precondition = graph.getElementGraphFromElementID(pre.ID)
+				Precondition = graph.subgraph(pre)
 				if Effect.canAbsolve(Precondition):
 					self.cndts[oc].add(eff)
 
@@ -191,7 +194,7 @@ class FlawLib():
 
 		#Determine existing Cdnts and Risks for this flaw
 		s_need, pre = flaw.flaw
-		Precondition = graph.getElementGraphFromElementID(pre.ID)
+		Precondition = graph.subgraph(pre)
 
 		for edge in graph.getEdgesByLabel('effect-of'):
 
@@ -206,7 +209,7 @@ class FlawLib():
 				continue
 
 			#check if Effect can match edges with Precondition, check against restrictions
-			Effect = graph.getElementGraphFromElementID(eff.ID)
+			Effect = graph.subgraph(eff)
 			if Effect.canAbsolve(Precondition):
 				self.cndts.add(eff)
 
@@ -246,9 +249,9 @@ def evalRisk(graph, eff, pre, ExistingGraph, operation):
 
 			#Leverages the fact that there is an Existing Graph, instead of rebuilding
 			if ExistingGraph.root == eff:
-				R = graph.getElementGraphFromElementID(pre.ID)
+				R = graph.subgraph(pre)
 			else:
-				R = graph.getElementGraphFromElementID(eff.ID)
+				R = graph.subgraph(eff)
 
 			#whichever it is, has to be opposite
 			R.root.truth = not eff.truth
