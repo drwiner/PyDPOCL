@@ -347,7 +347,7 @@ class PlanSpacePlanner:
 			#flaw selection handled by flaw library
 			flaw = graph.flaws.next()
 
-			print(flaw)
+			print('selected : {}\n'.format(flaw))
 
 			Visited.append((graph,flaw))
 
