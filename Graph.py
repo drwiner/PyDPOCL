@@ -143,7 +143,7 @@ class Graph(Element):
 	def getNeighbors(self, element):
 		return {edge.sink for edge in self.edges if edge.source.ID == element.ID}
 	def getParents(self, element):
-		return set(edge.source for edge in self.edges if edge.sink is element)
+		return set(edge.source for edge in self.edges if edge.sink == element)
 	def getNeighborsByLabel(self, element, label):
 		return {edge.sink for edge in self.edges if edge.source.ID == element.ID and edge.label == label}
 	def getIncidentEdgesByLabel(self, element, label):

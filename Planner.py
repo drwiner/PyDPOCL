@@ -120,7 +120,6 @@ class PlanSpacePlanner:
 					continue
 
 				Effect = op.getElementGraphFromElement(eff,Condition)
-				
 				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
 				if Effect.canAbsolve(Precondition):
 					
@@ -128,7 +127,7 @@ class PlanSpacePlanner:
 					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.ID)
 					
 					#Condition graph of copied operator for Effect
-					Effect  = step_op.subgraphFromID(nei, Condition)
+					Effect  = step_op.getElementGraphFromElementID(nei, Condition)
 					
 					#could be more than one way to unify effect with precondition
 					#Effect_absorbtions' graphs' elements' replaced_ids assigned Precondition's ids
@@ -204,7 +203,7 @@ class PlanSpacePlanner:
 			if not Effect.canAbsolve(Precondition):
 				continue
 
-			step = graph.getParent(eff)
+			step = next(iter(graph.getParents(eff)))
 
 			Effect_absorbtions = Effect.getInstantiations(Precondition)
 
@@ -276,7 +275,7 @@ class PlanSpacePlanner:
 			graph.edges -= noncodesg
 			new_flaws = (Flaw((s_add, prec.sink), 'opf') for prec in prc_edges if not prec in noncodesg)
 			for flaw in new_flaws:
-				graph.flaws.insert(flaw)
+				graph.flaws.insert(graph,flaw)
 				
 		#Good time as ever to updatePlan
 		graph.updatePlan()
@@ -336,7 +335,7 @@ class PlanSpacePlanner:
 		while self.Open:
 
 			graph = self.Open.pop()
-
+			print(graph)
 			if not graph.isInternallyConsistent():
 				print('branch terminated')
 				return None
@@ -344,13 +343,19 @@ class PlanSpacePlanner:
 			if len(graph.flaws) == 0:
 				#print('solution selected')
 				return graph
-
+			print(graph.flaws)
 			#flaw selection handled by flaw library
 			flaw = graph.flaws.next()
+
+			print(flaw)
+
 			Visited.append((graph,flaw))
 
 			#generate children and add new flaws
-			self.Open.extend(self.generateChildren(graph, flaw))
+			children = self.generateChildren(graph, flaw)
+			if not children is None:
+				for child in children:
+					self.Open.insert(child)
 
 
 
@@ -437,6 +442,6 @@ if __name__ ==  '__main__':
 	result = planner.SPyPOCL()
 	#graph = planner[0]
 	#result = planner.rPOCL(graph, seeBranches = None, fl = f)
-	##print('\n\n\n')
+	print('\n\n\n')
 	print(result)
 	

@@ -209,7 +209,7 @@ class PlanElementGraph(ElementGraph):
 	def subgraph(self, element, Type = None):
 		if Type == None:
 			Type = eval(element.typ)
-		self.getElementGraphFromElement(element, Type)
+		return self.getElementGraphFromElement(element, Type)
 
 	def subgraphFromID(self, element_ID, Type = None):
 		return self.subgraph(self.getElementById(element_ID), Type)

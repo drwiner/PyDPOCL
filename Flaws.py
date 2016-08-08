@@ -177,7 +177,7 @@ class FlawLib():
 					continue
 
 				# if not eff.isConsistent(pre), eval if not-eff is consistent with pre.
-				if evalRisk(graph, eff, pre, Effect, self.risks.add):
+				if evalRisk(graph, eff, pre, Effect, self.risks[oc].add):
 					continue
 
 				# check if Effect can match edges with Precondition, check against restrictions
@@ -205,13 +205,13 @@ class FlawLib():
 			eff = edge.sink
 
 			#if not eff.isConsistent(pre), eval if not-eff is consistent with pre.
-			if evalRisk(graph, eff, pre, Precondition, self.risks.add):
+			if evalRisk(graph, eff, pre, Precondition, self.risks[flaw].add):
 				continue
 
 			#check if Effect can match edges with Precondition, check against restrictions
 			Effect = graph.subgraph(eff)
 			if Effect.canAbsolve(Precondition):
-				self.cndts.add(eff)
+				self.cndts[flaw].add(eff)
 
 		#Bin flaw into right list
 		flaw.cndts = len(self.cndts[flaw])
@@ -220,7 +220,11 @@ class FlawLib():
 		# for any cndt, if establishing step is initial, then flaw is static {t}
 		if flaw.cndts > 0:
 			for eff in self.cndts[flaw]:
-				parent = graph.getParentsByLabel(eff, 'effect-of')
+				#elm = graph.getElementById(eff.ID)
+				parent = next(iter(graph.getParents(eff)))
+				#print(len(parents))
+				#parent = parents.pop()
+				#parent = next(iter(graph.getParentsByLabel(elm, 'effect-of')))
 				if parent.name == 'initial_dummy_step':
 					self.statics.add(flaw)
 					return
@@ -237,6 +241,15 @@ class FlawLib():
 
 		#last, must be nonreusable
 		self.nonreusable.add(flaw)
+
+	def __repr__(self):
+		statics = str([flaw for flaw in self.statics])
+		threats = str([flaw for flaw in self.threats])
+		unsafe = str([flaw for flaw in self.unsafe])
+		reusable = str([flaw for flaw in self.reusable])
+		nonreusable = str([flaw for flaw in self.nonreusable])
+		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\nthreats: \n' + threats + '\nunsafe: \n' + unsafe + \
+			   '\nreusable: \n' + reusable + '\nnonreusable: \n' + nonreusable + '\n'
 
 
 def evalRisk(graph, eff, pre, ExistingGraph, operation):
@@ -258,7 +271,7 @@ def evalRisk(graph, eff, pre, ExistingGraph, operation):
 
 			#match edges if consistent, check against restrictions
 			if R.canAbsolve(ExistingGraph):
-				operation.add(eff)
+				operation(eff)
 		return True
 	return False
 
