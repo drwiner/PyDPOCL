@@ -225,7 +225,7 @@ class FlawLib():
 				#print(len(parents))
 				#parent = parents.pop()
 				#parent = next(iter(graph.getParentsByLabel(elm, 'effect-of')))
-				if parent.name == 'initial_dummy_step':
+				if parent.name == 'dummy_init':
 					self.statics.add(flaw)
 					return
 
