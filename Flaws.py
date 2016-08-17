@@ -32,6 +32,8 @@ class Flaw:
 			self.criteria = self.risks
 		else:
 			self.criteria = self.cndts
+
+		return self
 		
 	def __repr__(self):
 		return 'Flaw(name={},tuple={})'.format(self.name, self.flaw)
@@ -173,7 +175,7 @@ class FlawLib():
 				s_need, pre = oc.flaw
 
 				# fogetaboutit if effect cannot be established before s_need
-				if graph.OrderingGraph.isPath(action, s_need):
+				if graph.OrderingGraph.isPath(s_need, action):
 					continue
 
 				# if not eff.isConsistent(pre), eval if not-eff is consistent with pre.
