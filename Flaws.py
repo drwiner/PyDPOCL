@@ -198,8 +198,11 @@ class FlawLib():
 
 		for edge in graph.getEdgesByLabel('effect-of'):
 
+			if s_need == edge.source:
+				continue
+
 			#fogetaboutit if effect cannot be established before s_need
-			if graph.OrderingGraph.isPath(edge.source, s_need):
+			if graph.OrderingGraph.isPath(s_need, edge.source):
 				continue
 
 			eff = edge.sink

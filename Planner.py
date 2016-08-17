@@ -317,7 +317,7 @@ class PlanSpacePlanner:
 			results = self.reuse(graph, flaw)
 			results.update(self.newStep(graph, flaw))
 			if len(results) == 0:
-				# print('could not resolve opf')
+				print('could not resolve opf')
 				return None
 
 		if flaw.name == 'tclf':
@@ -332,9 +332,11 @@ class PlanSpacePlanner:
 
 	def SPyPOCL(self):
 		Visited = []
-		while self.Open:
+		while len(self.Open) > 0:
 
+			#Select child
 			graph = self.Open.pop()
+			#graph.updatePlan()
 			print(graph)
 			if not graph.isInternallyConsistent():
 				print('branch terminated')
@@ -344,18 +346,25 @@ class PlanSpacePlanner:
 				#print('solution selected')
 				return graph
 			print(graph.flaws)
-			#flaw selection handled by flaw library
+
+			#Select Flaw
 			flaw = graph.flaws.next()
 
 			print('selected : {}\n'.format(flaw))
 
+			#Add to Visited list, indicating that we've generated all its children
 			Visited.append((graph,flaw))
 
-			#generate children and add new flaws
+			#Add children to Open List
 			children = self.generateChildren(graph, flaw)
+
 			if not children is None:
+				print('generated children: {}'.format(len(children)))
 				for child in children:
 					self.Open.insert(child)
+			else:
+				print('generated children: 0')
+			print('open list number: {}'.format(len(self.Open)))
 
 
 
