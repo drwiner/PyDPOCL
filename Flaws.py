@@ -197,8 +197,8 @@ class FlawLib():
 		#Determine existing Cdnts and Risks for this flaw
 		s_need, pre = flaw.flaw
 		Precondition = graph.subgraph(pre)
-
-		for edge in graph.getEdgesByLabel('effect-of'):
+		Cndts = graph.getEdgesByLabel('effect-of')
+		for edge in Cndts:
 
 			if s_need == edge.source:
 				continue
@@ -248,7 +248,7 @@ class FlawLib():
 		self.nonreusable.add(flaw)
 
 	def __repr__(self):
-		statics = str([flaw for flaw in self.statics])
+		statics = str([(flaw, self.cndts[flaw]) for flaw in self.statics])
 		threats = str([flaw for flaw in self.threats])
 		unsafe = str([flaw for flaw in self.unsafe])
 		reusable = str([flaw for flaw in self.reusable])

@@ -1,5 +1,5 @@
 from Graph import *
-
+import uuid
 class ElementGraph(Graph):
 	"""An element graph is a graph with a root element"""
 
@@ -15,7 +15,9 @@ class ElementGraph(Graph):
 		self.root = root_element
 
 	def copyGen(self):
-		return copy.deepcopy(self)
+		new_self = copy.deepcopy(self)
+		new_self.ID = uuid.uuid1(21)
+		return new_self
 
 	def copyWithNewIDs(self, from_this_num):
 		new_self = self.copyGen()
@@ -26,7 +28,11 @@ class ElementGraph(Graph):
 
 	@classmethod
 	def makeElementGraph(cls, elementGraph, element):
-		return cls(element.ID, element.typ, name=None,Elements =elementGraph.rGetDescendants(element),  root_element =element,   Edges =elementGraph.rGetDescendantEdges(element),Constraints=elementGraph.rGetDescendantConstraints(element))
+		edges = copy.deepcopy(elementGraph.rGetDescendantEdges(element))
+		elms = {edge.source for edge in edges}|{edge.sink for edge in edges}
+		element_copy = next(iter(elm for elm in elms if elm.ID == element.ID))
+		return cls(element.ID, element.typ, name=None, root_element=element_copy,Elements= elms, Edges = edges,
+				   Constraints=elementGraph.rGetDescendantConstraints(element))
 
 	def getElementGraphFromElement(self, element, Type=None):
 		if Type == None:

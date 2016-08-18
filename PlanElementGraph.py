@@ -159,10 +159,10 @@ class PlanElementGraph(ElementGraph):
 		has-a constraint graph which encodes inequality constraints
 		has-a dummy init and dummy goal step
 	"""
-	def __init__(self,ID,type_graph =None,name=None, \
-				Elements = None, \
-				planElement = None, \
-				Edges = None, \
+	def __init__(self,ID,type_graph =None,name=None,
+				Elements = None,
+				planElement = None,
+				Edges = None,
 				Constraints = None):
 				
 		if type_graph == None:
@@ -196,7 +196,13 @@ class PlanElementGraph(ElementGraph):
 		self.updateIntentionFrameAttributes()
 
 	def __lt__(self, other):
-		return (self.cost + self.heurstic) < (other.cost + other.heuristic)
+		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+
+	def deepcopy(self):
+		new_self = copy.deepcopy(self)
+		new_self.ID = uuid.uuid1(21)
+		return new_self
+
 
 	@property
 	def heuristic(self):
@@ -213,6 +219,9 @@ class PlanElementGraph(ElementGraph):
 
 	def subgraphFromID(self, element_ID, Type = None):
 		return self.subgraph(self.getElementById(element_ID), Type)
+
+	def isInternallyConsistent(self):
+		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent()
 
 
 	def updateIntentionFrameAttributes(self):

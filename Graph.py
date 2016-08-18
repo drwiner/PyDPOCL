@@ -142,6 +142,8 @@ class Graph(Element):
 		return {edge for edge in self.edges if edge.source == element}
 	def getNeighbors(self, element):
 		return {edge.sink for edge in self.edges if edge.source.ID == element.ID}
+	def getEstablishingParent(self, element):
+		return next(iter(edge.source for edge in self.edges if edge.sink == element and edge.label == 'effect-of'))
 	def getParents(self, element):
 		return set(edge.source for edge in self.edges if edge.sink == element)
 	def getNeighborsByLabel(self, element, label):

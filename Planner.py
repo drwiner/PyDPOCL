@@ -56,48 +56,48 @@ class PlanSpacePlanner:
 
 	def __init__(self, op_graphs, objects, init_action, goal_action):
 		#Assumes these parameters are already read from file
-		
+
 		self.op_graphs = op_graphs
 		self.objects = objects
-		
-		
+
+
 		init_graph = PlanElementGraph(uuid.uuid1(0), Elements = objects | init_action.elements | goal_action.elements, Edges = init_action.edges | goal_action.edges)
 		init_graph.initial_dummy_step = init_action.root
 		init_graph.final_dummy_step = goal_action.root
-		
-		#create special dummy step for init_graph and add to graphs {}		
+
+		#create special dummy step for init_graph and add to graphs {}
 		self.setup(init_graph, init_action, goal_action)
 		self.Open =  Frontier()
 		self.Open.insert(init_graph)
-		
+
 	def __len__(self):
 		return len(self._frontier)
-	
+
 	def __getitem__(self, position):
 		return self._frontier[position]
-		
+
 	def __setitem__(self, graph, position):
 		self._frontier[position] = graph
-	
+
 	def setup(self, graph, start_action, end_action):
 		"""
 			Create step typed element DI, with effect edges to each condition of start_set
 			Create step typed element DG, with precondition edges to each condition of end_set
 			Add ordering from DI to DG
 		"""
-		
+
 		dummy_start = start_action.root
 		dummy_final = end_action.root
-			
+
 		graph.OrderingGraph.addOrdering(dummy_start, dummy_final)
-		
+
 		#Add initial Open precondition flaws for dummy step
 		init_flaws = (Flaw((dummy_final, prec), 'opf') for prec in graph.getNeighborsByLabel(dummy_final, 'precond-of'))
 		#For each flaw, determine candidate effects and risks, then insert into flawlib by bin
 		for flaw in init_flaws:
 			graph.flaws.insert(graph,flaw)
-		
-		
+
+
 	def newStep(self, graph, flaw):
 		"""
 			iterates through all operators, instantiating a step with effect that can absolve precondition of step in flaw
@@ -108,7 +108,7 @@ class PlanSpacePlanner:
 				"mergeGraph": 	given two graphs where the second had replaced some of the elements of the first,
 								the first graph merges the second one back in, tracking the elements it replaced
 		"""
-		
+
 		s_need, precondition = flaw.flaw
 		Precondition = graph.subgraph(precondition)
 		results = set()
@@ -122,19 +122,19 @@ class PlanSpacePlanner:
 				Effect = op.getElementGraphFromElement(eff,Condition)
 				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
 				if Effect.canAbsolve(Precondition):
-					
+
 					#nei : new element id, to easily access element from graph
 					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.ID)
-					
+
 					#Condition graph of copied operator for Effect
 					Effect  = step_op.getElementGraphFromElementID(nei, Condition)
-					
+
 					#could be more than one way to unify effect with precondition
 					#Effect_absorbtions' graphs' elements' replaced_ids assigned Precondition's ids
 					Effect_absorbtions = Effect.getInstantiations(Precondition)
-			
+
 					for eff_abs in Effect_absorbtions:
-						graph_copy = copy.deepcopy(graph)
+						graph_copy = graph.deepcopy()
 						new_step_op = copy.deepcopy(step_op)
 
 						#For each element 'e_a' in eff_abs which replaced an element 'e_p' in Precondition,
@@ -169,7 +169,9 @@ class PlanSpacePlanner:
 
 						#Now that step is in plan, determine for which open conditions the step is a cndt/risk
 						graph_copy.flaws.addCndtsAndRisks(graph_copy, new_step_op.root)
-
+						print('\ncreated child (newStep):\n')
+						print(graph_copy)
+						print('\n')
 						#results.add((graph_copy, 'newStep'))
 						results.add(graph_copy)
 
@@ -189,7 +191,7 @@ class PlanSpacePlanner:
 	#
 	# 	return num_orbs
 	# 	#return sorted(num_orbs.keys(), key=num_orbs.values())
-		
+
 	def reuse(self, graph, flaw):
 		results = set()
 		s_need, pre = flaw.flaw
@@ -203,13 +205,14 @@ class PlanSpacePlanner:
 			if not Effect.canAbsolve(Precondition):
 				continue
 
-			step = next(iter(graph.getParents(eff)))
+			#step = next(iter(graph.getParents(eff)))
+			step = graph.getEstablishingParent(eff)
 
 			Effect_absorbtions = Effect.getInstantiations(Precondition)
 
 			for eff_abs in Effect_absorbtions:
 				# 1 Create new child graph
-				graph_copy = copy.deepcopy(graph)
+				graph_copy = graph.deepcopy()
 
 				# 2 Replace effect with eff_abs, which is unified with the precondition
 				graph_copy.mergeGraph(eff_abs, no_add=True)
@@ -227,12 +230,14 @@ class PlanSpacePlanner:
 				# adds causal link and ordering constraints
 				condition = graph_copy.getElementById(eff_abs.root.ID)
 				self.addStep(graph_copy, step, s_need, condition, new=False)
-
+				print('\ncreated child (reuse):\n')
+				print(graph_copy)
+				print('\n')
 				# add graph to children
 				results.add(graph_copy)
 
 		return results
-		
+
 	def addStep(self, graph, s_add, s_need, condition, new=None):
 		"""
 			when a step is added/reused, 
@@ -241,15 +246,15 @@ class PlanSpacePlanner:
 		"""
 		if new == None:
 			new = False
-			
+
 		if not s_add == graph.initial_dummy_step:
 			graph.OrderingGraph.addEdge(graph.initial_dummy_step, s_add)
 			graph.OrderingGraph.addEdge(graph.initial_dummy_step, s_need)
-			
+
 		if not s_need == graph.final_dummy_step:
 			graph.OrderingGraph.addEdge(s_add, graph.final_dummy_step)
 			graph.OrderingGraph.addEdge(s_need, graph.final_dummy_step)
-			
+
 		#Always add this ordering
 		graph.OrderingGraph.addEdge(s_add,s_need)
 		graph.CausalLinkGraph.addEdge(s_add, s_need, condition)
@@ -265,22 +270,22 @@ class PlanSpacePlanner:
 
 				#This constraint/restriction prevents item1Edge.sink and item2Edge.sink from becoming a legal merge
 				graph.constraints.add(Edge(item1Edge.source, item2Edge.sink, item1Edge.label))
-				
+
 				#Remove outgoing edges and '=' Literal element
 				graph.edges.remove(item1Edge)
 				graph.edges.remove(item2Edge)
 				graph.elements.remove(prec.sink)
-				
+
 			#Remove equality precondition edges
 			graph.edges -= noncodesg
 			new_flaws = (Flaw((s_add, prec.sink), 'opf') for prec in prc_edges if not prec in noncodesg)
 			for flaw in new_flaws:
 				graph.flaws.insert(graph,flaw)
-				
+
 		#Good time as ever to updatePlan
 		graph.updatePlan()
 		return graph
-		
+
 	def resolveThreatenedCausalLinkFlaw(self, graph, flaw):
 		"""
 			Promotion: Add ordering from sink to threat, and check if cycle
@@ -289,23 +294,23 @@ class PlanSpacePlanner:
 		"""
 		results = set()
 		threat, effect, causal_link = flaw.flaw
-		
+
 		#Promotion
-		promotion = copy.deepcopy(graph)
+		promotion = graph.deepcopy()
 		promotion.OrderingGraph.addEdge(causal_link.sink, threat)
 		if promotion.OrderingGraph.isInternallyConsistent():
 			#results.add((promotion, 'promotion'))
 			result.add(promotion)
-			
+
 		#Demotion
-		demotion = copy.deepcopy(graph)
+		demotion = graph.deepcopy()
 		demotion.OrderingGraph.addEdge(threat, causal_link.source)
 		if demotion.OrderingGraph.isInternallyConsistent():
 			results.add(demotion)
 		#	results.add((demotion, 'demotion'))
 
 		#Restriction
-		restriction = copy.deepcopy(graph)
+		restriction = graph.deepcopy()
 		restriction.addNonCodesignationConstraints(effect, causal_link.label)
 		results.add(restriction)
 		#results.add((restriction, 'restriction'))
@@ -313,12 +318,13 @@ class PlanSpacePlanner:
 		return results
 
 	def generateChildren(self, graph, flaw):
+		results = set()
 		if flaw.name == 'opf':
 			results = self.reuse(graph, flaw)
 			results.update(self.newStep(graph, flaw))
 			if len(results) == 0:
 				print('could not resolve opf')
-				return None
+				return results
 
 		if flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
@@ -358,12 +364,10 @@ class PlanSpacePlanner:
 			#Add children to Open List
 			children = self.generateChildren(graph, flaw)
 
-			if not children is None:
-				print('generated children: {}'.format(len(children)))
-				for child in children:
-					self.Open.insert(child)
-			else:
-				print('generated children: 0')
+			print('generated children: {}'.format(len(children)))
+			for child in children:
+				self.Open.insert(child)
+
 			print('open list number: {}'.format(len(self.Open)))
 
 
@@ -405,17 +409,17 @@ class PlanSpacePlanner:
 		#INDUCTION
 		for flaw in graph.flaws:
 
-		
+
 			if flaw.name == 'opf':
 				results = self.reuse(graph, flaw)
 				results.update(self.newStep(graph, flaw))
 				if len(results) == 0:
 					#print('could not resolve opf')
 					return None
-				
+
 			if flaw.name == 'tclf':
 				results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
-				
+
 			for result, res in results:
 				new_flaws = result.detectThreatenedCausalLinks()
 				result.flaws += new_flaws
@@ -429,18 +433,18 @@ class PlanSpacePlanner:
 				result = self.rPOCL(g,seeBranches, fl)
 				if not result is None:
 					return result
-		
+
 		print('branch terminated')
 		return None
 
 
-import sys	
+import sys
 if __name__ ==  '__main__':
 	num_args = len(sys.argv)
 	if num_args >1:
 		domain_file = sys.argv[1]
 		if num_args > 2:
-			problem_file = sys.argv[2]		
+			problem_file = sys.argv[2]
 	else:
 		domain_file = 'domains/mini-indy-domain.pddl'
 		problem_file = 'domains/mini-indy-problem.pddl'
@@ -453,4 +457,3 @@ if __name__ ==  '__main__':
 	#result = planner.rPOCL(graph, seeBranches = None, fl = f)
 	print('\n\n\n')
 	print(result)
-	
