@@ -10,8 +10,8 @@
 
   (:axiom occupation
      :vars    (?location - location)
-     :context (and (exists (?c - character)
-                            (at ?c ?location)))
+     :context (exists (?c - character)
+                (at ?c ?location))
      :implies (occupied ?location))
 
   (:action move

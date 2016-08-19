@@ -99,6 +99,12 @@ class Predicate(Visitable):
 		self.name = name
 		self.parameters = parameters or []	# a list of Variables
 
+class Context(Visitable):
+	def __init__(self, exist_vars, formula):
+		self._visitorName = 'visit_context'
+		self.exist_vars = exist_vars
+		self.formula = formula
+
 
 class PredicateInstance(Visitable):
 	"""This class represents the AST node for a pddl predicate instance."""
@@ -228,18 +234,18 @@ class ActionStmt(Visitable):
 
 class AxiomStmt(Visitable):
 	"""This calss represents the AST node for a pddl axiom."""
-	def __init__(self, name, vars, context, implies):
+	def __init__(self, name, vars_, context, implies):
 		""" Construct a new Axiom.
 
 		Keyword arguments:
 		name -- the name of the axiom
-		vars -- a list of variables denoting the parameters
+		vars_ -- a list of variables denoting the parameters
 		context -- the state in which the axiom is applicable
 		implies -- the resulting state
 		"""
 		self._visitorName = 'visit_axiom_stmt'
 		self.name = name
-		self.vars = vars
+		self.vars_ = vars_
 		self.context = context #an exists statement
 		self.implies = implies
 
@@ -497,6 +503,22 @@ def parse_parameters(iter):
 	varList = parse_typed_var_list(next(iter))
 	return varList
 
+def parse_vars(iter):
+	if not iter.try_match(':vars'):
+		raise ValueError('Error keyword ":vars" required before '
+						 'var list!')
+	varList = parse_typed_var_list(next(iter))
+	return varList
+
+def parse_context(iter):
+	if not iter.try_match(':context'):
+		raise ValueError('Error keyword ":context" required before context list!')
+	if not next(iter).try_match('exists'):
+		raise ValueError('Error keyword "exists" required at beginning of axiom context')
+
+	exist_vars = parse_typed_var_list(next(iter))
+	context = parse_formula(next(iter))
+	return Context(exist_vars, context)
 
 def parse_requirements_stmt(iter):
 	""" Parse the pddl requirements definition.
@@ -636,10 +658,18 @@ def parse_agents_stmt(it):
 
 def parse_axiom_stmt(iter):
 	"""
-		Parse an axiom definition which consists of a name, vars, context, and implies stmts
+	Parse an axiom definition which consists of a name, vars, context, and implies stmts
 
-		Returns an AxiomStmt instance.
-		"""
+	Returns an AxiomStmt instance.
+	"""
+
+	if not iter.try_match(':axiom'):
+		raise ValueError('Error: Axiom must start with ":axiom" keyword!')
+	name = parse_name(iter, 'axiom')
+	params = parse_vars(iter)
+	context = parse_context(iter)
+	implies = parse_implies(iter)
+	return AxiomStmt(name, params, context, implies)
 
 def parse_action_stmt(iter):
 	"""
@@ -710,7 +740,6 @@ def parse_domain_def(iter):
 		elif key.name == 'constants':
 			const = parse_constants_stmt(next_iter)
 			domain.constants = const
-
 		elif key.name == 'axiom':
 			#TODO: parse these
 			axiom = parse_axiom_stmt(next_iter)
