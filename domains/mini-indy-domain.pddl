@@ -14,6 +14,7 @@
                 (at ?c ?location))
      :implies (occupied ?location))
 
+
   (:action move
     :parameters   (?character - character ?from - location ?to - location)
 	:precondition (and (not (equals ?from ?to))

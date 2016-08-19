@@ -105,6 +105,10 @@ class Context(Visitable):
 		self.exist_vars = exist_vars
 		self.formula = formula
 
+class Implies(Visitable):
+	def __init(self, formula):
+		self._visitorName = 'visit_implies'
+		self.formula = formula
 
 class PredicateInstance(Visitable):
 	"""This class represents the AST node for a pddl predicate instance."""
@@ -266,7 +270,7 @@ class PredicatesStmt(Visitable):
 class DomainDef(Visitable):
 	"""This class represents the AST node for a pddl domain."""
 
-	def __init__(self, name, requirements=None, types=None, predicates=None,
+	def __init__(self, name, requirements=None, types=None, predicates=None, axioms = None,
 				 actions=None, constants=None):
 		""" Construct a new Domain AST node.
 
@@ -282,10 +286,17 @@ class DomainDef(Visitable):
 		self.requirements = requirements  # a RequirementsStmt
 		self.types = types	# a list of Types
 		self.predicates = predicates  # a PredicatesStmt
+
+		if axioms == None:
+			self.axioms = []
+		else:
+			self.axioms = axioms
+
 		if actions == None:
 			self.actions = []
 		else:
 			self.actions = actions	# a list of ActionStmt
+
 		self.constants = constants
 
 
@@ -519,6 +530,10 @@ def parse_context(iter):
 	exist_vars = parse_typed_var_list(next(iter))
 	context = parse_formula(next(iter))
 	return Context(exist_vars, context)
+
+def parse_implies(iter):
+	formula = parse_formula(iter)
+	return Implies(formula)
 
 def parse_requirements_stmt(iter):
 	""" Parse the pddl requirements definition.
