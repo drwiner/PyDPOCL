@@ -37,8 +37,18 @@
       <file leaf-file-name="mini-indy-domain.pddl" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/domains/mini-indy-domain.pddl">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+            <state relative-caret-position="221">
+              <caret line="13" column="13" selection-start-line="13" selection-start-column="6" selection-end-line="13" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="lisp_iterators.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pddl/lisp_iterators.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="507">
+              <caret line="84" column="26" selection-start-line="84" selection-start-column="22" selection-end-line="84" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -93,7 +103,7 @@
       <file leaf-file-name="Planner.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Planner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="613">
+            <state relative-caret-position="562">
               <caret line="462" column="78" selection-start-line="462" selection-start-column="49" selection-end-line="462" selection-end-column="78" />
               <folding>
                 <element signature="e#21#47#0" expanded="true" />
@@ -105,8 +115,8 @@
       <file leaf-file-name="parser.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pddl/parser.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="639">
-              <caret line="290" column="28" selection-start-line="290" selection-start-column="28" selection-end-line="290" selection-end-column="28" />
+            <state relative-caret-position="378">
+              <caret line="107" column="25" selection-start-line="107" selection-start-column="25" selection-end-line="107" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -115,8 +125,8 @@
       <file leaf-file-name="pddlToGraphs.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="277" column="4" selection-start-line="277" selection-start-column="4" selection-end-line="277" selection-end-column="43" />
+            <state relative-caret-position="221">
+              <caret line="259" column="4" selection-start-line="259" selection-start-column="4" selection-end-line="259" selection-end-column="43" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
               </folding>
@@ -144,17 +154,17 @@
         <option value="$PROJECT_DIR$/Planner.py" />
         <option value="$PROJECT_DIR$/Flaws.py" />
         <option value="$PROJECT_DIR$/domains/mini-indy-problem.pddl" />
-        <option value="$PROJECT_DIR$/domains/mini-indy-domain.pddl" />
         <option value="$PROJECT_DIR$/pddlToGraphs.py" />
+        <option value="$PROJECT_DIR$/domains/mini-indy-domain.pddl" />
         <option value="$PROJECT_DIR$/pddl/parser.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="2576" />
-    <option name="height" value="1416" />
+    <option name="x" value="1" />
+    <option name="y" value="1" />
+    <option name="width" value="2558" />
+    <option name="height" value="1398" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -581,18 +591,25 @@
       <option name="project" value="LOCAL" />
       <updated>1471634899100</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="DomainDef to include axioms">
+      <created>1471637381328</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1471637381328</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
+    <frame x="1" y="1" width="2558" height="1398" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2760736" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30674848" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="-570" y="534" width="2560" height="400" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31104198" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="-570" y="534" width="2560" height="400" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32515338" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" x="2774" y="228" width="1505" height="1027" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -638,7 +655,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Detect Threatened Causal links compares Condition graphs rather than Literal elements, and memoizes safe (causal-link, step) and (causal-link, literal) pairs" />
     <MESSAGE value="cleanup and seeBranches option" />
     <MESSAGE value="small cleanup" />
     <MESSAGE value="cleanup new step in planner. easier to follow, less redundant work" />
@@ -663,7 +679,8 @@
     <MESSAGE value="nasty 'wrong-parent' mistake, relevant for evaluating cndt consistent effects for resolving flaws, bug busted" />
     <MESSAGE value="axiom stmt parsing, added new actions and axiom to domain." />
     <MESSAGE value="parsing axiom pieces" />
-    <option name="LAST_COMMIT_MESSAGE" value="parsing axiom pieces" />
+    <MESSAGE value="DomainDef to include axioms" />
+    <option name="LAST_COMMIT_MESSAGE" value="DomainDef to include axioms" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -672,13 +689,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/search/searchspace.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1088">
-          <caret line="64" column="0" selection-start-line="64" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/search/a_star.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
@@ -1053,17 +1063,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/domains/mini-indy-domain.pddl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Planner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="613">
+        <state relative-caret-position="562">
           <caret line="462" column="78" selection-start-line="462" selection-start-column="49" selection-end-line="462" selection-end-column="78" />
           <folding>
             <element signature="e#21#47#0" expanded="true" />
@@ -1073,18 +1075,34 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="277" column="4" selection-start-line="277" selection-start-column="4" selection-end-line="277" selection-end-column="43" />
+        <state relative-caret-position="221">
+          <caret line="259" column="4" selection-start-line="259" selection-start-column="4" selection-end-line="259" selection-end-column="43" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pddl/lisp_iterators.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="507">
+          <caret line="84" column="26" selection-start-line="84" selection-start-column="22" selection-end-line="84" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/mini-indy-domain.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="13" selection-start-line="13" selection-start-column="6" selection-end-line="13" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pddl/parser.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="639">
-          <caret line="290" column="28" selection-start-line="290" selection-start-column="28" selection-end-line="290" selection-end-column="28" />
+        <state relative-caret-position="378">
+          <caret line="107" column="25" selection-start-line="107" selection-start-column="25" selection-end-line="107" selection-end-column="25" />
           <folding />
         </state>
       </provider>

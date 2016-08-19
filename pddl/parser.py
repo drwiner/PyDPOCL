@@ -102,7 +102,7 @@ class Predicate(Visitable):
 class Context(Visitable):
 	def __init__(self, exist_vars, formula):
 		self._visitorName = 'visit_context'
-		self.exist_vars = exist_vars
+		#self.exist_vars = exist_vars
 		self.formula = formula
 
 class Implies(Visitable):
@@ -526,10 +526,14 @@ def parse_context(iter):
 		raise ValueError('Error keyword ":context" required before context list!')
 	if not next(iter).try_match('exists'):
 		raise ValueError('Error keyword "exists" required at beginning of axiom context')
-
-	exist_vars = parse_typed_var_list(next(iter))
+	#it = next(iter)
+	#while True:
+	#	print(next(iter))
+	#print(it)
+	#exist_vars = parse_typed_var_list(next(iter))
+	#exist_vars = []
 	context = parse_formula(next(iter))
-	return Context(exist_vars, context)
+	return Context(context)
 
 def parse_implies(iter):
 	formula = parse_formula(iter)
@@ -756,7 +760,6 @@ def parse_domain_def(iter):
 			const = parse_constants_stmt(next_iter)
 			domain.constants = const
 		elif key.name == 'axiom':
-			#TODO: parse these
 			axiom = parse_axiom_stmt(next_iter)
 			domain.axioms.append(axiom)
 		elif key.name == 'action':
