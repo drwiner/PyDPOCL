@@ -226,6 +226,23 @@ class ActionStmt(Visitable):
 		self.prereq = prereq
 		self.agents = agents
 
+class AxiomStmt(Visitable):
+	"""This calss represents the AST node for a pddl axiom."""
+	def __init__(self, name, vars, context, implies):
+		""" Construct a new Axiom.
+
+		Keyword arguments:
+		name -- the name of the axiom
+		vars -- a list of variables denoting the parameters
+		context -- the state in which the axiom is applicable
+		implies -- the resulting state
+		"""
+		self._visitorName = 'visit_axiom_stmt'
+		self.name = name
+		self.vars = vars
+		self.context = context #an exists statement
+		self.implies = implies
+
 
 class PredicatesStmt(Visitable):
 	"""Represents the AST node for a pddl domain predicates definition."""
@@ -617,6 +634,13 @@ def parse_prereq_stmt(it):
 def parse_agents_stmt(it):
 	return _parse_precondition_or_effect(it, ':agents', AgentsStmt)
 
+def parse_axiom_stmt(iter):
+	"""
+		Parse an axiom definition which consists of a name, vars, context, and implies stmts
+
+		Returns an AxiomStmt instance.
+		"""
+
 def parse_action_stmt(iter):
 	"""
 	Parse an action definition which consists of a name, parameters a
@@ -686,6 +710,11 @@ def parse_domain_def(iter):
 		elif key.name == 'constants':
 			const = parse_constants_stmt(next_iter)
 			domain.constants = const
+
+		elif key.name == 'axiom':
+			#TODO: parse these
+			axiom = parse_axiom_stmt(next_iter)
+			domain.axioms.append(axiom)
 		elif key.name == 'action':
 			action = parse_action_stmt(next_iter)
 			domain.actions.append(action)

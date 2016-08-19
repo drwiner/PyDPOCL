@@ -1,6 +1,7 @@
 #from pddlToGraphs import *
 import collections
 import bisect
+from Graph import rDetectConsistentEdgeGraph
 
 #from PlanElementGraph import Condition
 #import PlanElementGraph
@@ -226,13 +227,16 @@ class FlawLib():
 		if flaw.cndts > 0:
 			for eff in self.cndts[flaw]:
 				#elm = graph.getElementById(eff.ID)
-				parent = next(iter(graph.getParents(eff)))
+				parent = graph.getEstablishingParent(eff)
 				#print(len(parents))
 				#parent = parents.pop()
 				#parent = next(iter(graph.getParentsByLabel(elm, 'effect-of')))
 				if parent.name == 'dummy_init':
-					self.statics.add(flaw)
-					return
+					#remaining, available (remaining will pop
+					if rDetectConsistentEdgeGraph(Remaining = graph.subgraph(eff).edges, Available =
+					Precondition.edges):
+						self.statics.add(flaw)
+						return
 
 		#if has risks, then unsafe
 		if flaw.risks > 0:
@@ -248,7 +252,7 @@ class FlawLib():
 		self.nonreusable.add(flaw)
 
 	def __repr__(self):
-		statics = str([(flaw, self.cndts[flaw]) for flaw in self.statics])
+		statics = str([flaw for flaw in self.statics])
 		threats = str([flaw for flaw in self.threats])
 		unsafe = str([flaw for flaw in self.unsafe])
 		reusable = str([flaw for flaw in self.reusable])

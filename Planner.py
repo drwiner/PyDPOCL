@@ -300,19 +300,29 @@ class PlanSpacePlanner:
 		promotion.OrderingGraph.addEdge(causal_link.sink, threat)
 		if promotion.OrderingGraph.isInternallyConsistent():
 			#results.add((promotion, 'promotion'))
-			result.add(promotion)
+			results.add(promotion)
+			print('\ncreated child (promotion):\n')
+			print(promotion)
+			print('\n')
+
 
 		#Demotion
 		demotion = graph.deepcopy()
 		demotion.OrderingGraph.addEdge(threat, causal_link.source)
 		if demotion.OrderingGraph.isInternallyConsistent():
 			results.add(demotion)
+			print('\ncreated child (demotion):\n')
+			print(demotion)
+			print('\n')
 		#	results.add((demotion, 'demotion'))
 
 		#Restriction
 		restriction = graph.deepcopy()
 		restriction.addNonCodesignationConstraints(effect, causal_link.label)
 		results.add(restriction)
+		print('\ncreated child (restriction):\n')
+		print(restriction)
+		print('\n')
 		#results.add((restriction, 'restriction'))
 
 		return results
