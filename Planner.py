@@ -462,7 +462,7 @@ if __name__ ==  '__main__':
 
 	f = open('workfile', 'w')
 	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
-	print(str([initAction.getNeighborsByLabel(initAction.root, 'effect-of')]))
+	#print(str([initAction.getNeighborsByLabel(initAction.root, 'effect-of')]))
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 
 	result = planner.SPyPOCL()

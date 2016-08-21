@@ -265,14 +265,21 @@ def addNegativeInitStates(predicates, initAction, objects):
 
 		pred = Literal(ID=uuid.uuid1(2), typ='Condition', name=p.name, arg_name='init_effect', num_args=len(
 			p.parameters), truth=False)
+
 		for pt in param_tuples:
 			pc = copy.deepcopy(pred)
 			pc.ID = uuid.uuid1(3)
+
+			#TODO compare each effect Condition to every existing effect condition - if equivalent, then cannot add
+			# elements/edges to initAction. Better yet, create tuples for each existing effect condition and subtract
+			#  from param_tuples before getting here
+
+			for i, arg in enumerate(pt):
+				initAction.edges.add(Edge(pc, arg, ARGLABELS[i]))
+
 			if len(pt) > 0:
 				initAction.elements.add(pc)
 				initAction.edges.add(Edge(initAction.root, pc, 'effect-of'))
-			for i, arg in enumerate(pt):
-				initAction.edges.add(Edge(pc, arg, ARGLABELS[i]))
 	
 def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	""" Returns tuple 
