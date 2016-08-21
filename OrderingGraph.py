@@ -22,29 +22,22 @@ class OrderingGraph(Graph):
 	def addEdge(self, source, sink):
 		self.addOrdering(source, sink)
 		
-	def detectCycle(self, V = None):
-		if V == None:
-			V = set()	
-			
+	def detectCycle(self,):
+		''' Returns True if cycle, False otherwise
+			Strategy: for each element, find descendent elements. If a is descendant of b and b is descendant of a,
+			then there is a cycle'''
+
 		for element in self.elements:
-			if element in V:
-				continue
-				
-			visited = self.rDetectCycle(element)
-			
-			if visited == True:
-				return True
-			else:
-				V.update(visited)
-				
+			visited = self.rDetectCycle(element) - {element}
+			predecessors = self.getParents(element)
+			for elm in visited:
+				if elm in predecessors:
+					return True
 		return False
 
 			
 	######       rDetect       ####################
 	def rDetectCycle(self, element, visited = None):
-		""" Returns true if cycle detected. otherwise, returns visited elements
-
-		"""
 		if visited == None:
 			visited = set()
 			
@@ -109,11 +102,14 @@ class TestOrderingGraphMethods(unittest.TestCase):
 
 
 	def test_detect_cycle(self):
-		Elms = [Element(id=0), Element(id=1), Element(id=2), Element(id=3)]
+		Elms = [Element(ID=0, name = '0'), Element(ID=1, name='1'), Element(ID=2, name='2'), Element(ID=3, name='3')]
 		edges = {Edge(Elms[0], Elms[1], '<'), Edge(Elms[0], Elms[2], '<'), Edge(Elms[0], Elms[3], '<'),
 				 Edge(Elms[2], Elms[1], '<'), Edge(Elms[3], Elms[1], '<')}
-		G = Graph(id=10, typ='test', Elements=set(Elms), Edges=edges)
-		OG = OrderingGraph(G)
+		G = Graph(ID=10, typ='test', Elements=set(Elms), Edges=edges)
+		OG = OrderingGraph(ID = 5, Elements = G.elements, Edges = G.edges)
+		assert(not OG.detectCycle())
+		OG.edges.add(Edge(Elms[1], Elms[0], '<'))
+		assert (OG.detectCycle())
 		#Graph.get
 		#OG.isPath()
 
