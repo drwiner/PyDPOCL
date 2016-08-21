@@ -4,7 +4,7 @@
   (:predicates (alive ?character - character)
                (adj ?loc1 - location ?loc2 - location)
 			   (at ?character - character ?location - location)
-			   (equals ?anything1 ?anything2)
+			   (equals ?anything1 - object ?anything2 - object)
 			   (high-up ?location - location)
 			   (occupied ?location - location))
 

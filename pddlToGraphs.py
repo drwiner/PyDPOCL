@@ -248,6 +248,31 @@ def problemToGraphs(problem):
 	goal_graph.edges.update({Edge(goal_op, goal_lit, 'precond-of') for goal_lit in goal_elements})
 	
 	return (Args, init_graph, goal_graph)
+
+
+import itertools
+def addNegativeInitStates(predicates, initAction, objects):
+	objs_by_type_dict = defaultdict(set)
+	for obj in objects:
+		objs_by_type_dict[obj.typ].add(obj)
+
+	ARGLABELS = ['first-arg', 'sec-arg', 'third-arg']
+	for p in predicates:
+
+		param_object_pairs = [[obj for obj in objs_by_type_dict[param.types[0]]] for param in p.parameters if not
+		p.parameters[0].types is None]
+		param_tuples = {i for i in itertools.product(*param_object_pairs)}
+
+		pred = Literal(ID=uuid.uuid1(2), typ='Condition', name=p.name, arg_name='init_effect', num_args=len(
+			p.parameters), truth=False)
+		for pt in param_tuples:
+			pc = copy.deepcopy(pred)
+			pc.ID = uuid.uuid1(3)
+			if len(pt) > 0:
+				initAction.elements.add(pc)
+				initAction.edges.add(Edge(initAction.root, pc, 'effect-of'))
+			for i, arg in enumerate(pt):
+				initAction.edges.add(Edge(pc, arg, ARGLABELS[i]))
 	
 def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	""" Returns tuple 
@@ -262,7 +287,9 @@ def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	op_graphs = domainToOperatorGraphs(domain)
 	#axioms = domainAxiomsToGraphs(domain) #TODO: make this
 	args, init, goal = problemToGraphs(problem)
-	return (op_graphs, domain.predicates.predicates, set(args.values()), init, goal)
+	objects = set(args.values())
+	addNegativeInitStates(domain.predicates.predicates, init, objects)
+	return (op_graphs, objects, init, goal)
 	
 import sys	
 if __name__ ==  '__main__':
