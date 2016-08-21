@@ -252,11 +252,23 @@ def problemToGraphs(problem):
 
 import itertools
 def addNegativeInitStates(predicates, initAction, objects):
+	ARGLABELS = ['first-arg', 'sec-arg', 'third-arg']
+	init_tups = defaultdict(set)
+	effects = initAction.getNeighbors(initAction.root)
+	#[sorted([(edge.sink, ARGLABELS.index(edge.label)) for edge in initAction.getIncidentEdges(eff)],
+		 #  key=lambda x: x[1]) for eff in effects]
+	for eff in effects:
+		nontup = sorted([(edge.sink, ARGLABELS.index(edge.label)) for edge in initAction.getIncidentEdges(eff)],
+					key = lambda x: x[1])
+		init_tups[eff.name].add(tuple(nontup[i][0] for i in range(len(nontup))))
+	#init_tuples = [[arg for arg in initAction.getNeighbors(eff)) for eff in initAction.getNeighbors(
+		#initAction.root)))]
+
 	objs_by_type_dict = defaultdict(set)
 	for obj in objects:
 		objs_by_type_dict[obj.typ].add(obj)
 
-	ARGLABELS = ['first-arg', 'sec-arg', 'third-arg']
+
 	for p in predicates:
 
 		param_object_pairs = [[obj for obj in objs_by_type_dict[param.types[0]]] for param in p.parameters if not
@@ -267,6 +279,8 @@ def addNegativeInitStates(predicates, initAction, objects):
 			p.parameters), truth=False)
 
 		for pt in param_tuples:
+			if pt in init_tups[p.name]:
+				continue
 			pc = copy.deepcopy(pred)
 			pc.ID = uuid.uuid1(3)
 
