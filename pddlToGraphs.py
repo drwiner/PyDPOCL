@@ -260,6 +260,7 @@ def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	domain, dom = parser.parse_domain_drw()
 	problem, v = parser.parse_problem_drw(dom)
 	op_graphs = domainToOperatorGraphs(domain)
+	#axioms = domainAxiomsToGraphs(domain) #TODO: make this
 	args, init, goal = problemToGraphs(problem)
 	return (op_graphs, set(args.values()), init, goal)
 	

@@ -13,6 +13,13 @@
 		 (alive Indy)
 		 (alive Sapito)
 		 (high-up bridge)
+		; (not (high-up cliff1))
+		; (not (high-up cliff2))
+		; (occupied cliff1)
+		; (not (occupied bridge))
+	;	 (not (occupied cliff2))
+		; (not (occupied cave))
+		; (not (occupied away))
         )
   (:goal 	(and
                  (at Indy cliff2)
