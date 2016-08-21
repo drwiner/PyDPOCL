@@ -54,14 +54,15 @@ class Frontier:
 
 class PlanSpacePlanner:
 
-	def __init__(self, op_graphs, objects, init_action, goal_action):
+	def __init__(self, op_graphs, objects, init_action, goal_action, non_static):
 		#Assumes these parameters are already read from file
 
 		self.op_graphs = op_graphs
 		self.objects = objects
 
-
-		init_graph = PlanElementGraph(uuid.uuid1(0), Elements = objects | init_action.elements | goal_action.elements, Edges = init_action.edges | goal_action.edges)
+		init_graph = PlanElementGraph(uuid.uuid1(0), Elements = objects | init_action.elements |
+																goal_action.elements, Edges = init_action.edges |
+																							  goal_action.edges, non_static_preds = non_static)
 		init_graph.initial_dummy_step = init_action.root
 		init_graph.final_dummy_step = goal_action.root
 
@@ -327,6 +328,7 @@ class PlanSpacePlanner:
 
 		return results
 
+
 	def generateChildren(self, graph, flaw):
 		results = set()
 		if flaw.name == 'opf':
@@ -447,6 +449,12 @@ class PlanSpacePlanner:
 		print('branch terminated')
 		return None
 
+def preprocessDomain(operators):
+	#get all effect predicates
+	pred_set = set()
+	for op in operators:
+		pred_set.update({eff.name for eff in  op.getNeighborsByLabel(op.root, 'effect-of')})
+	return pred_set
 
 import sys
 
@@ -462,8 +470,8 @@ if __name__ ==  '__main__':
 
 	f = open('workfile', 'w')
 	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
-	#print(str([initAction.getNeighborsByLabel(initAction.root, 'effect-of')]))
-	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
+	non_static_preds = preprocessDomain(operators)
+	planner = PlanSpacePlanner(operators, objects, initAction, goalAction, non_static_preds)
 
 	result = planner.SPyPOCL()
 	#graph = planner[0]

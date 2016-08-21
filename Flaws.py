@@ -85,13 +85,17 @@ class Flawque:
 		return str(self._flaws)
 
 class FlawLib():
-	def __init__(self):
+	def __init__(self, non_static_preds):
 		"""TODO: need way to manage multiple sets which have preference ranking and different ordering criterion (
 		 LR/MW-first/LIFO)"""
-		self.typs = 'statics threats unsafe reusable nonreusable'.split()
 
-		#static = established by init
+		self.non_static_preds = non_static_preds
+
+		#static = unchangeable
 		self.statics = set()
+
+		#init = established by initial state
+		self.inits = set()
 
 		#threat = causal link dependency undone
 		self.threats = set()
@@ -108,6 +112,8 @@ class FlawLib():
 		#		sorted by number of cndts
 		self.nonreusable = Flawque()
 
+		self.typs = [self.statics, self.inits, self.threats, self.unsafe, self.reusable, self.nonreusable]
+
 		#cndts is a dictionary mapping open conditions to candidate action effects
 		self.cndts = collections.defaultdict(set)
 
@@ -116,56 +122,31 @@ class FlawLib():
 		self.risks = collections.defaultdict(set)
 
 	def __len__(self):
-		return len(self.threats) + len(self.unsafe) + len(self.statics) + len(self.reusable) + len(self.nonreusable)
+		return sum(len(flaw_set) for flaw_set in self.typs)
+	#	return len(self.threats) + len(self.unsafe) + len(self.statics) + len(self.reusable) + len(self.nonreusable)
 
 	def __contains__(self, flaw):
-		return flaw in self.threats or flaw in self.unsafe or flaw in self.nonreusable or flaw in self.reusable or \
-			   flaw in self.statics
-
-	def whichList(self, flaw):
-		if flaw in self.statics:
-			return self.statics
-		if flaw in self.threats:
-			return self.threats
-		if flaw in self.unsafe:
-			return self.unsafe
-		if flaw in self.reusable:
-			return self.reusable
-		if flaw in self.nonreusable:
-			return self.nonreusable
-		return None
+		for flaw_set in self.typs:
+			if flaw in flaw_set:
+				return True
+		return False
+	#	return flaw in self.threats or flaw in self.unsafe or flaw in self.nonreusable or flaw in self.reusable or \
+	#		   flaw in self.statics
 
 	def OCs(self):
 		''' Generator for open conditions'''
-		g = (flaw for flaw in self.statics)
-		yield next(g)
-		g = (flaw for flaw in self.unsafe)
-		yield next(g)
-		g = (flaw for flaw in self.reusable)
-		yield next(g)
-		g = (flaw for flaw in self.nonreusable)
-		yield next(g)
+		for flaw_set in self.typs:
+			if flaw_set == self.threats:
+				continue
+			g = (flaw for flaw in self.statics)
+			yield(next(g))
 
 	def next(self):
 		''' Returns flaw with highest priority, and removes'''
-		if len(self.statics) > 0:
-			return self.statics.pop()
-		if len(self.threats) > 0:
-			return self.threats.pop()
-		elif len(self.unsafe) > 0:
-			return self.unsafe.pop()
-		elif len(self.reusable) > 0:
-			return self.reusable.pop()
-		elif len(self.nonreusable) > 0:
-			return self.nonreusable.pop()
-		else:
-			return None
-
-	def upgrade(self, flaw, newList):
-		which = self.whichList(flaw)
-		if not which is None:
-			which.remove(flaw)
-		newList.add(flaw)
+		for flaw_set in self.typs:
+			if len(flaw_set) > 0:
+				return flaw_set.pop()
+		return None
 
 	def addCndtsAndRisks(self, graph, action):
 		""" For each effect of Action, add to open-condition mapping if consistent"""
@@ -195,8 +176,17 @@ class FlawLib():
 			self.threats.add(flaw)
 			return
 
-		#Determine existing Cdnts and Risks for this flaw
+		#First, determine if this flaw.flaw[1].name is in non_static_preds: if not, then let cndts be just those
+		# initial states with same predicate
 		s_need, pre = flaw.flaw
+
+		if not pre.name in self.non_static_preds:
+			self.cndts[flaw].update({g for g in graph.getNeighbors(graph.initial_dummy_step) if g.name == pre.name})
+			flaw.cndts = len(self.cndts[flaw])
+			self.statics.add(flaw)
+			return
+
+		#Determine existing Cdnts and Risks for this flaw
 		Precondition = graph.subgraph(pre)
 		Cndts = graph.getEdgesByLabel('effect-of')
 		for edge in Cndts:
@@ -226,16 +216,11 @@ class FlawLib():
 		# for any cndt, if establishing step is initial, then flaw is static {t}
 		if flaw.cndts > 0:
 			for eff in self.cndts[flaw]:
-				#elm = graph.getElementById(eff.ID)
 				parent = graph.getEstablishingParent(eff)
-				#print(len(parents))
-				#parent = parents.pop()
-				#parent = next(iter(graph.getParentsByLabel(elm, 'effect-of')))
 				if parent.name == 'dummy_init':
-					#remaining, available (remaining will pop
 					if rDetectConsistentEdgeGraph(Remaining = graph.subgraph(eff).edges, Available =
 					Precondition.edges):
-						self.statics.add(flaw)
+						self.inits.add(flaw)
 						return
 
 		#if has risks, then unsafe
@@ -252,13 +237,16 @@ class FlawLib():
 		self.nonreusable.add(flaw)
 
 	def __repr__(self):
+		#flaw_str_list = [str([flaw for flaw in flaw_set]) for flaw_set in self.typs]
+
 		statics = str([flaw for flaw in self.statics])
+		inits = str([flaw for flaw in self.inits])
 		threats = str([flaw for flaw in self.threats])
 		unsafe = str([flaw for flaw in self.unsafe])
 		reusable = str([flaw for flaw in self.reusable])
 		nonreusable = str([flaw for flaw in self.nonreusable])
-		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\nthreats: \n' + threats + '\nunsafe: \n' + unsafe + \
-			   '\nreusable: \n' + reusable + '\nnonreusable: \n' + nonreusable + '\n'
+	#	return '\nFLAW LIBRARY: \n' + [flaw_set for flaw_set in flaw_str_list] + '\n'
+		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\ninits: \n' + inits + '\nthreats: \n' + threats + '\nunsafe: \n' +  unsafe + '\nreusable: \n' + reusable + '\nnonreusable: \n' + nonreusable + '\n'
 
 
 def evalRisk(graph, eff, pre, ExistingGraph, operation):

@@ -163,7 +163,7 @@ class PlanElementGraph(ElementGraph):
 				Elements = None,
 				planElement = None,
 				Edges = None,
-				Constraints = None):
+				Constraints = None, non_static_preds = None):
 				
 		if type_graph == None:
 			type_graph = 'PlanElementGraph'
@@ -173,13 +173,15 @@ class PlanElementGraph(ElementGraph):
 			Edges=  set()
 		if Constraints == None:
 			Constraints = set()
+		if non_static_preds == None:
+			non_static_preds = set()
 		
 		self.OrderingGraph = OrderingGraph(ID = uuid.uuid1(5))
 		self.CausalLinkGraph = CausalLinkGraph(ID = uuid.uuid1(6))
 		self.updatePlan(Elements)
 
 		#self.flaws = deque() #sort by heuristic?
-		self.flaws = FlawLib()
+		self.flaws = FlawLib(non_static_preds)
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
 		
