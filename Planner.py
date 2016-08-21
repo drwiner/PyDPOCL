@@ -447,6 +447,12 @@ class PlanSpacePlanner:
 		print('branch terminated')
 		return None
 
+def multList(lis):
+	total = 1
+	for x in lis:
+		total*= x
+	return total
+
 
 import sys
 if __name__ ==  '__main__':
@@ -460,7 +466,56 @@ if __name__ ==  '__main__':
 		problem_file = 'domains/mini-indy-problem.pddl'
 
 	f = open('workfile', 'w')
-	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
+	operators, predicates, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
+
+	''' create negative initial state propositions '''
+	#obj_typs = {obj.typ for obj in objects}
+	#obj_freq_dict = defaultdict(int)
+	objs_by_type_dict = defaultdict(set)
+	for obj in objects:
+		#obj_freq_dict[obj.typ] += 1
+		objs_by_type_dict[obj.typ].add(obj)
+
+	neg_state = {}
+	for p in predicates:
+		#num_per_param = [len(objs_by_type_dict[param.types[0]]) for param in p.parameters]
+		#num_per_param =[obj_freq_dict[param.types[0]] for param in p.parameters]
+		#total_preds = multList(num_per_param)
+		pred = Literal(ID=uuid.uuid1(2), typ='Condition', name=p.name, arg_name='init_effect', num_args=len(
+			p.parameters), truth=False)
+		#new_preds = (copy.deepcopy(pred) for i in range(total_preds))
+
+		#make a copy of this for each new predicate with this name
+		param_object_pairs = [[obj for obj in objs_by_type_dict[param.types[0]]] for param in p.parameters]
+		#a = []
+		#[[obj for obj in param_object_pairs[k]] for k in range(len(p.parameters))]
+		[tuple(a for a in param_object_pairs[k]) for k in range(len(p.parameters))]
+			#new_edge.append(Edge(np, )
+		for i in len(p.parameters):
+		for a in param_object_pairs[i]
+		[tuple(a for a in param_object_pairs[k] for k in range(len(p.parameters)))]
+		obtd = copy.deepcopy(objs_by_type_dict)
+		carries = []
+
+			back_counter = len(objs_by_type_dict[param.types[0]])
+
+			for obj in objs_by_type_dict[param.types[0]]:
+				if back_counter == 0:
+					break
+				back_counter -= 1
+				carries.add()
+
+
+			carries.append(objs_by_type_dict[param.types[0]])
+			#Edge(pred, objs_by_type_dict[])
+			#make len(objs_by_type_dict[param.types[0]]) predicates for each param
+
+
+
+
+
+
+
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	result = planner.SPyPOCL()
 	#graph = planner[0]
