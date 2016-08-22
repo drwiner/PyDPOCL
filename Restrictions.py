@@ -13,6 +13,7 @@ element in 'E'.
 
 from Graph import *
 import collections
+from copy import deepcopy
 
 #class ElmContainer(set):
 def realHeadEdgeCompare(restriction_edge, existing_edge):
@@ -68,157 +69,12 @@ class Restriction(Graph):
 				unreals.add(edge)
 		return (realheads, realtails, reals_, unreals)
 
-	def detectIn(self, EG):
-		#EG - elementGraph
-		#Find a subset of edges in EG such that for each edge in self, there is some equivalent edge in EG and if
-		#For each edge, if edge.source in self.elements,
-		realheads, realtails, reals_, unreals  = self.realStats
-		#for unreal in unreals:
-
 	def convertToDict(self):
 		""" Converts Graph into adjacency dictionary"""
 		g = collections.defaultdict(set)
 		for edge in self.edges:
 			g[edge.source.ID].add(edge.sink.ID)
 		return g
-
-
-
-	def isIsomorphicSubgraph(self, EG_edges, consistent_graphs = None):
-		if consistent_graphs == None:
-			consistent_graphs = set()
-
-		if len(EG_edges) == 0:
-			return consistent_graphs
-
-		g = collections.defaultdict(set)
-		for edge in self.edges:
-			for other_edge in EG_edges:
-				if edge.isEquivalent(other_edge):
-					g_prime = copy.deepcopy(g)
-					g_prime[edge.source] = edge.sink
-					g_prime.add(self.isIsomorphicSubgraph(EG_edges - {other_edge}, consistent_graphs))
-
-	def rCompare(self, EG, r_elm, eg_elm):
-		''' Assuming r_elm and eg_elm are equivalent/identical:
-			Base case - no incident edges in r_elm.
-			1) get all incident edges of r_elm, and of eg_elm
-			2) find equivalent/identical matching edges for each r_elm_edges in eg_elm_edges (record them in dictionary)
-			3) If successful, then for each r_elm_edge_sink - eg_elm_edge.sink pair, rCompare
-		'''
-		#base case:
-		r_elm_edges = self.getIncidentEdges(r_elm)
-		if len(r_elm_edges) == 0:
-			return True
-
-		eg_elm_edges = EG.getincidentEdges(eg_elm)
-		potential_matches = {}
-
-		#graph container
-		new_graph = collections.defaultdict(set)
-		for re in r_elm_edges:
-			potential_matches = {new_graph}
-			for eg in eg_elm_edges:
-				if re.isEquivalent(eg):
-					if self.rCompare(EG, re.sink, eg.sink):
-
-						potential_matches.add(eg.sink)
-			#if len(potential_matches) == 0:
-			#THIS STRATEGY DOESN'T WORK BECAUSE: consider edges in self a --> b --> c, and a --> d --> c and edges a' --> b' --> r' and a'-->d' --> t' in EG where r' /= t'.
-			#instead, need to construct new graphs, where the graphs are valid just when they are isomorphic in edge
-					# relationships to R/self.
-	def rCompare(self, EG, r_elm, eg_elm, mapping = None):
-		"""GOAL: find all mappings of edges in self to edges in EG with as few as possible terminating branches
-				Strategy 1: top-down
-				Strategy 2: pick any edge and find consistent/equivalent other-edge
-		"""
-
-		#initially, mapping_dict[r_elm] : eg_elm
-
-		if mapping is None:
-			mapping = collections.defaultdict(int)
-
-		r_elm_edges = self.getIncidentEdges(r_elm)
-		if len(r_elm_edges) == 0:
-			return True
-
-		eg_elm_edges = EG.getincidentEdges(eg_elm)
-
-		#realheads, realtails, reals_, unreals = self.realStats
-		edge_mapping = collections.defaultdict(int)
-		edge_mappings
-		for re in r_elm_edges:
-			#limit search to just those
-			if not mapping[re.sink] == 0:
-				for eg in eg_elm_edges:
-					if re.isEquivalent(eg):
-						#mapping_copy = copy.deepcopy(mapping)
-						mapping[re.sink] = eg.sink
-			else:
-				cndts = {eg_edge for eg_edge in eg_elm_edges if eg_edge.sink == mapping[re.sink]}
-				for cndt in cndts:
-					if re.isEquivalent(cndt):
-						edge_mapping[re] = cndt
-
-			for eg in eg_elm_edges:
-			#	if re in unreals:
-					if re.isEquivalent(eg):
-						mapping_copy = copy.deepcopy(mapping)
-						mapping_copy[re.sink] = eg.sink
-						mappings.add(self.rCompare(EG, re.sink, eg.sink))
-
-		#then, for each potential edge
-		pass
-
-	def compare(self, EG, mapping_dicts = None):
-		if mapping_dicts == None:
-			mapping_dicts = set()
-
-		realheads, realtails, reals_, unreals = self.realStats
-
-		#Surface level copy is fine, just don't want to modify 'the set' EG.edges
-		Available = copy(EG.edges)
-		mapping_dict = {}
-		mapping_dicts.add(mapping_dict)
-		for edge in unreals:
-			for edge in Available:
-				if edge
-
-		def mapEdges(self, es1, es2):
-			mapping = {}
-			for edge in es1:
-				if self.exists(es1.source):
-					if self.exists(es1)
-		#initially, mapping_dict[r_elm] : eg_elm
-
-
-	def equivEdgesSameSink(self, EG, r_sink):
-		'''
-				r_edges = {edge for edge in self.edges if edge.sink == r_sink}
-				if len(r_edges) == 0:
-					return
-		'''
-
-		r_edges = self.getIncidentEdges(r_sink)
-
-		#Base Case 1: No outgoing edges, then find equivalent sink and return
-		if len(r_edges) == 0:
-			return {elm for elm in EG if elm.isEquivalent(r_sink)}
-			#return {(r_sink, cndt) for cndt in (elm for elm in EG if elm.isEquivalent(r_sink))}
-
-		for r_edge in r_edges:
-
-			#get all edges in EG which have sink compatible with r_sink
-			cndts = self.equivEdgesSameSink(EG, r_edge.source)
-			cndt_edges = {edge for edge in EG.edges if edge.sink in cndts}
-
-			#for each r_edge, match to an equivalent cndt EG edge
-
-			for cndt_edge in cndt_edges:
-				if r_edge.isEquivalent(cndt_edge):
-					self.equivEdgesSameSink(EG, r_edge.source)
-
-
 
 	def BreadthFirstIsIsomorphicSubgraphOf(self, EG, r = None, map_ = None):
 		""" Breadth-first search to determine if self is a subgraph of EG, with special identity requirements
@@ -232,14 +88,19 @@ class Restriction(Graph):
 			non_sinks = {edge.source for edge in self.edges if edge.source not in sinks}
 			for ns in non_sinks:
 				#ns has incident edges, so base case cannot be first return
-				if not self.BreadthFirstIsIsomorphicSubgraphOf(EG, ns, map_= {}) is None:
+				isomorphisms = self.BreadthFirstIsIsomorphicSubgraphOf(EG, ns, map_= {})
+
+				if len(isomorphisms) > 0:
 					return True
 			return False
 			#return {self.BreadthFirstIsIsomorphicSubgraphOf(EG, ns, openList = {}) for ns in non_sinks}
 
+		if map_ == None:
+			return {}
+
 		r_edges = self.getIncidentEdges(r)
 		if len(r_edges) == 0:
-			return {map_} #something
+			return frozenset(map_) #something
 
 		successful_maps = set()
 		for r_edge in r_edges:
@@ -251,27 +112,107 @@ class Restriction(Graph):
 
 			#Fail if there are no cndt edges
 			if len(cndt_edges) == 0:
-				return None
+				return set()
 
 			#construct new open list for each cndt
 			consistent_maps = set()
 			for cndt in cndt_edges:
-				Map_ = copy(map_)
+				Map_ = copy.deepcopy(map_)
 				if not cndt.source in map_:
 					Map_[cndt.source] = r_edge.source
 				if not cndt.sink in map_:
 					Map_[cndt.sink] = r_edge.sink
 				#OLs.add(OL)
-				OLs = self.BreadthFirstIsIsomorphicSubgraphOf(EG, r_edge.sink, Map_)
+				OLs = self.BreadthFirstIsIsomorphicSubgraphOf(EG, r_edge.sink, map_ = Map_)
 
 				#only add openList if consistent with some successful_ol
-				consistent_maps.update({ol for ol in OLs for sol in successful_maps if not ol is None and consistent_dicts(ol,sol)})
+				to_add = {ol for ol in OLs for sol in successful_maps if not ol is None and consistent_dicts(ol, sol)}
+				consistent_maps.update(to_add)
 
 			#if empty, then no ol collected was consistent with a successful_ol
 			if len(consistent_maps) == 0:
-				return None
+				return set()
 
 			successful_maps.update(consistent_maps)
 		#gauranteed to have successful_ol for each r_edge if
 
 		return successful_maps
+
+import unittest
+import uuid
+class TestOrderingGraphMethods(unittest.TestCase):
+	def test_isomorphic_subgraph(self):
+		"""
+				Restriction Graph:
+				1 --> 2 --> 3
+				1 --> 5 --> 3
+				4 --> 5 --> 6
+				4 		--> 3
+				7       --> 6
+
+				Element Graph:
+				[1]  --> [2]  --> [3a]
+				[4a] --> [2]  --> [3b]
+				[4b] --> [2]  --> [3a]
+				[4b] --> [5a] --> [3b]
+						 [5a] --> [6a]
+				[4b] --> [5b]
+				[4a] 		  --> [3a]
+				[4b] 		  --> [3b]
+				[7]  --> [5a]
+				[7]  --> [5b] --> ['n']
+				[7]  	      --> [6a]
+				[7]           --> [6b]
+				[7]  		  --> ['n']
+
+
+				1 = [1], [4a/4b] = 4, [3a if 4a else 3b if 4b] = 3, [7] = 7, [5b] = 5, [2] = 2, [6a] = 6
+			"""
+		R_elms = ['buffer']
+		R_elms += [Element(ID=uuid.uuid1(i), typ=str(i)) for i in range(1, 8)]
+		E_elms = ['buffer']
+		E_elms += [Element(ID=uuid.uuid1(91), typ=str(i)) for i in range(1, 8)]
+		E_elms += [Element(ID=8, typ='3'),
+				   Element(ID=9, typ='4'),
+				   Element(ID=10, typ='5'),
+				   Element(ID=11, typ='6'),
+				   Element(ID=12, typ='n')]
+		R_edges = {Edge(R_elms[1], R_elms[2], ' '),
+				   Edge(R_elms[1], R_elms[5], ' '),
+				   Edge(R_elms[4], R_elms[5], ' '),
+				   Edge(R_elms[4], R_elms[3], ' '),
+				   Edge(R_elms[7], R_elms[6], ' '),
+				   Edge(R_elms[2], R_elms[3], ' '),
+				   Edge(R_elms[5], R_elms[3], ' '),
+				   Edge(R_elms[5], R_elms[6], ' ')}
+		E_edges = {Edge(E_elms[1], E_elms[2], ' '),
+				   Edge(E_elms[1], E_elms[5], ' '),
+				   Edge(E_elms[4], E_elms[5], ' '),
+				   Edge(E_elms[4], E_elms[3], ' '),
+				   Edge(E_elms[7], E_elms[6], ' '),
+				   Edge(E_elms[2], E_elms[3], ' '),
+				   Edge(E_elms[5], E_elms[3], ' '),
+				   Edge(E_elms[5], E_elms[6], ' '),
+				   Edge(E_elms[2], E_elms[8], ' '),  # 8 = 3b, 9 = 4b, 10 = 5b, 11 = 6b, 12 = 'n'
+				   Edge(E_elms[9], E_elms[2], ' '),
+				   Edge(E_elms[9], E_elms[5], ' '),
+				   Edge(E_elms[5], E_elms[8], ' '),
+				   Edge(E_elms[9], E_elms[10], ' '),
+				   Edge(E_elms[9], E_elms[8], ' '),
+				   Edge(E_elms[7], E_elms[10], ' '),
+				   Edge(E_elms[10], E_elms[12], ' '),
+				   Edge(E_elms[7], E_elms[11], ' '),
+				   Edge(E_elms[7], E_elms[12], ' ')
+				   }
+		R = Restriction(ID=10, type_graph='R', Elements=set(R_elms), Edges=R_edges)
+		E = Graph(ID=11, typ='E', Elements=set(E_elms), Edges=E_edges)
+
+		k = R.BreadthFirstIsIsomorphicSubgraphOf(E)
+		assert(k)
+		print(R)
+
+
+if __name__ == '__main__':
+
+	#R.BreadthFirstIsIsomorphicSubgraphOf(E)
+	unittest.main()
