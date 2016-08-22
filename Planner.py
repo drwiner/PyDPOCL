@@ -340,6 +340,9 @@ class PlanSpacePlanner:
 
 		if flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
+			if len(results) == 0:
+				print('could not resolve tclf')
+				return results
 
 		#for result, res in results:
 		for result in results:

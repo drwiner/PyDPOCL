@@ -2,6 +2,7 @@ from Element import *
 import copy
 
 class Edge:
+	__slots__ = 'source', 'sink', 'label'
 	def __init__(self, source, sink, label):
 		self.source=  source
 		self.sink = sink
