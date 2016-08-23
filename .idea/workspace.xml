@@ -46,9 +46,11 @@
       <file leaf-file-name="Graph.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Graph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1736">
+            <state relative-caret-position="8806">
               <caret line="367" column="107" selection-start-line="367" selection-start-column="70" selection-end-line="367" selection-end-column="107" />
-              <folding />
+              <folding>
+                <element signature="e#0#21#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -78,11 +80,9 @@
       <file leaf-file-name="Restrictions.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Restrictions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="481">
-              <caret line="245" column="47" selection-start-line="245" selection-start-column="47" selection-end-line="245" selection-end-column="47" />
-              <folding>
-                <element signature="e#527#546#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="210">
+              <caret line="14" column="22" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -741,13 +741,17 @@
       <option name="project" value="LOCAL" />
       <updated>1471969746351</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="all tests passed, Restrictions">
+      <created>1471970873952</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1471970873952</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 22m 39s.xml">
-      <configuration name="Unittests in Restrictions" configurationId="tests" />
-    </history-entry>
     <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 22m 48s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
@@ -773,6 +777,9 @@
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
     <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 47m 44s.xml">
+      <configuration name="Unittests in Restrictions" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 48m 58s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
   </component>
@@ -830,7 +837,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="spypocl with astar" />
     <MESSAGE value="   reuse fixed to insert new flaws" />
     <MESSAGE value="subgraph" />
     <MESSAGE value="debugging, flaw library" />
@@ -855,7 +861,8 @@
     <MESSAGE value="debugging" />
     <MESSAGE value="passed Restrictions.py testcase" />
     <MESSAGE value="extra test conditions" />
-    <option name="LAST_COMMIT_MESSAGE" value="extra test conditions" />
+    <MESSAGE value="all tests passed, Restrictions" />
+    <option name="LAST_COMMIT_MESSAGE" value="all tests passed, Restrictions" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -888,7 +895,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2448">
           <caret line="145" column="69" selection-start-line="145" selection-start-column="69" selection-end-line="145" selection-end-column="69" />
-          <folding />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -978,7 +987,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2448">
           <caret line="145" column="69" selection-start-line="145" selection-start-column="69" selection-end-line="145" selection-end-column="69" />
-          <folding />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1068,7 +1079,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2448">
           <caret line="145" column="69" selection-start-line="145" selection-start-column="69" selection-end-line="145" selection-end-column="69" />
-          <folding />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1248,14 +1261,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Graph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1736">
-          <caret line="367" column="107" selection-start-line="367" selection-start-column="70" selection-end-line="367" selection-end-column="107" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="510">
@@ -1282,13 +1287,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Graph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="8806">
+          <caret line="367" column="107" selection-start-line="367" selection-start-column="70" selection-end-line="367" selection-end-column="107" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Restrictions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="481">
-          <caret line="245" column="47" selection-start-line="245" selection-start-column="47" selection-end-line="245" selection-end-column="47" />
-          <folding>
-            <element signature="e#527#546#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="210">
+          <caret line="14" column="22" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
+          <folding />
         </state>
       </provider>
     </entry>

@@ -12,8 +12,8 @@ element in 'E'.
 """
 
 from Graph import *
+#graph has import copy
 import collections
-from copy import deepcopy
 
 def consistent_dicts(dict1, dict2):
 	common_keys = set(dict1.keys()) & set(dict2.keys())
