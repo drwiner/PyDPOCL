@@ -15,23 +15,6 @@ from Graph import *
 import collections
 from copy import deepcopy
 
-#class ElmContainer(set):
-def realHeadEdgeCompare(restriction_edge, existing_edge):
-	if restriction_edge.source.ID == existing_edge.source.ID:
-		if restriction_edge.sink.isEquivalent(existing_edge.sink):
-			return True
-	return False
-def realTailEdgeCompare(restriction_edge, existing_edge):
-	if restriction_edge.sink.ID == existing_edge.sink.ID:
-		if restriction_edge.source.isEquivalent(existing_edge.source):
-			return True
-	return False
-def realEdgeCompare(restriction_edge, existing_edge):
-	if restriction_edge.source.ID == existing_edge.source.ID:
-		if restriction_edge.sink.ID == existing_edge.sink.ID:
-			return True
-	return False
-
 def consistent_dicts(dict1, dict2):
 	common_keys = set(dict1.keys()) & set(dict2.keys())
 	for ck in common_keys:
@@ -96,11 +79,11 @@ class Restriction(Graph):
 			#return {self.BreadthFirstIsIsomorphicSubgraphOf(EG, ns, openList = {}) for ns in non_sinks}
 
 		if map_ == None:
-			return {}
+			return []
 
 		r_edges = self.getIncidentEdges(r)
 		if len(r_edges) == 0:
-			return frozenset(map_) #something
+			return [map_] #something
 
 		successful_maps = set()
 		for r_edge in r_edges:
@@ -112,7 +95,7 @@ class Restriction(Graph):
 
 			#Fail if there are no cndt edges
 			if len(cndt_edges) == 0:
-				return set()
+				return []
 
 			#construct new open list for each cndt
 			consistent_maps = set()
@@ -123,15 +106,16 @@ class Restriction(Graph):
 				if not cndt.sink in map_:
 					Map_[cndt.sink] = r_edge.sink
 				#OLs.add(OL)
-				OLs = self.BreadthFirstIsIsomorphicSubgraphOf(EG, r_edge.sink, map_ = Map_)
+				Maps_ = self.BreadthFirstIsIsomorphicSubgraphOf(EG, r_edge.sink, map_ = Map_)
 
 				#only add openList if consistent with some successful_ol
-				to_add = {ol for ol in OLs for sol in successful_maps if not ol is None and consistent_dicts(ol, sol)}
+				to_add = {m for m in Maps_ for sm in successful_maps if len(successful_maps) > 0 and len(m)>0 and consistent_dicts(m,sm)}
+
 				consistent_maps.update(to_add)
 
 			#if empty, then no ol collected was consistent with a successful_ol
 			if len(consistent_maps) == 0:
-				return set()
+				return []
 
 			successful_maps.update(consistent_maps)
 		#gauranteed to have successful_ol for each r_edge if
@@ -208,7 +192,7 @@ class TestOrderingGraphMethods(unittest.TestCase):
 		E = Graph(ID=11, typ='E', Elements=set(E_elms), Edges=E_edges)
 
 		k = R.BreadthFirstIsIsomorphicSubgraphOf(E)
-		assert(k)
+		assert k is True
 		print(R)
 
 
