@@ -24,6 +24,25 @@ def consistent_dicts(dict1, dict2):
 	return True
 
 
+def consistentIsos(prior_isos, cndt_isos, new_isos = None):
+	if new_isos == None:
+		new_isos = []
+	if len(prior_isos) == 0:
+		new_isos.extend(cndt_isos)
+	else:
+		# for each dictionary 'm' in the list 'Maps_'
+		for m in cndt_isos:
+			if len(m) == 0:
+				continue
+			# for each dictionary 'sm' in the set 'successful_maps'
+			for sm in prior_isos:
+				if consistent_dicts(m, sm):
+					new_isos.append(m)
+					# this 'm' has been satisfied
+					break
+	return new_isos
+
+
 class Restriction(Graph):
 	def __init__(self, ID, name = None, type_graph = None, Elements = None, Edges = None):
 		if type_graph == None:
@@ -59,24 +78,30 @@ class Restriction(Graph):
 			g[edge.source.ID].add(edge.sink.ID)
 		return g
 
-	def BreadthFirstIsIsomorphicSubgraphOf(self, EG, r = None, map_ = None):
+	def firstIsIsomorphicSubgraphOf(self, EG, identities = None):
+		sinks = {edge.sink for edge in self.edges}
+		non_sinks = {edge.source for edge in self.edges if edge.source not in sinks}
+		isos = []
+		for ns in non_sinks:
+			# ns has incident edges, so base case cannot be first return
+			cndt_isomorphisms = self.isIsomorphicSubgraphOf(EG, ns, map_={})
+			if len(cndt_isomorphisms) == 0:
+				return False
+			new_isos = consistentIsos(isos, cndt_isomorphisms)
+			if len(new_isos) == 0:
+				return False
+			isos.extend(new_isos)
+		return True
+	def isIsomorphicSubgraphOf(self, EG, r = None, map_ = None):
 		""" Breadth-first search to determine if self is a subgraph of EG, with special identity requirements
 
 				Requirements: self must have at least one outgoing edge from 'r'
+				"map_" is of the form self.r_elm : EG.elm
 		"""
 
 		# if r == none, then find all elms which are souces but not sinks
 		if r == None:
-			sinks = {edge.sink for edge in self.edges}
-			non_sinks = {edge.source for edge in self.edges if edge.source not in sinks}
-			for ns in non_sinks:
-				#ns has incident edges, so base case cannot be first return
-				isomorphisms = self.BreadthFirstIsIsomorphicSubgraphOf(EG, ns, map_= {})
-
-				if len(isomorphisms) > 0:
-					return True
-			return False
-			#return {self.BreadthFirstIsIsomorphicSubgraphOf(EG, ns, openList = {}) for ns in non_sinks}
+			self.firstIsIsomorphicSubgraphOf(EG, map_)
 
 		if map_ == None:
 			return []
@@ -85,7 +110,7 @@ class Restriction(Graph):
 		if len(r_edges) == 0:
 			return [map_] #something
 
-		successful_maps = set()
+		successful_maps = []
 		for r_edge in r_edges:
 			cndt_edges = {eg_edge for eg_edge in EG.edges if r_edge.isEquivalent(eg_edge)}
 			if r_edge.source in map_:
@@ -98,27 +123,24 @@ class Restriction(Graph):
 				return []
 
 			#construct new open list for each cndt
-			consistent_maps = set()
+			consistent_maps = []
 			for cndt in cndt_edges:
 				Map_ = copy.deepcopy(map_)
 				if not cndt.source in map_:
-					Map_[cndt.source] = r_edge.source
+					Map_[r_edge.source] = cndt.source
 				if not cndt.sink in map_:
-					Map_[cndt.sink] = r_edge.sink
-				#OLs.add(OL)
-				Maps_ = self.BreadthFirstIsIsomorphicSubgraphOf(EG, r_edge.sink, map_ = Map_)
+					Map_[r_edge.sink] = cndt.sink
 
-				#only add openList if consistent with some successful_ol
-				to_add = {m for m in Maps_ for sm in successful_maps if len(successful_maps) > 0 and len(m)>0 and consistent_dicts(m,sm)}
+				Maps_ = self.isIsomorphicSubgraphOf(EG, r_edge.sink, map_ = Map_)
 
-				consistent_maps.update(to_add)
+				consistent_maps = consistentIsos(successful_maps, Maps_, consistent_maps)
 
 			#if empty, then no ol collected was consistent with a successful_ol
 			if len(consistent_maps) == 0:
 				return []
 
-			successful_maps.update(consistent_maps)
-		#gauranteed to have successful_ol for each r_edge if
+			successful_maps.extend(consistent_maps)
+		#gauranteed to have successful_map for each r_edge if
 
 		return successful_maps
 
@@ -136,6 +158,7 @@ class TestOrderingGraphMethods(unittest.TestCase):
 
 				Element Graph:
 				[1]  --> [2]  --> [3a]
+				[1]  --> [5a]
 				[4a] --> [2]  --> [3b]
 				[4b] --> [2]  --> [3a]
 				[4b] --> [5a] --> [3b]
@@ -197,6 +220,4 @@ class TestOrderingGraphMethods(unittest.TestCase):
 
 
 if __name__ == '__main__':
-
-	#R.BreadthFirstIsIsomorphicSubgraphOf(E)
 	unittest.main()
