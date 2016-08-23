@@ -78,8 +78,8 @@
       <file leaf-file-name="Restrictions.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Restrictions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="460">
-              <caret line="232" column="0" selection-start-line="232" selection-start-column="0" selection-end-line="232" selection-end-column="0" />
+            <state relative-caret-position="481">
+              <caret line="245" column="47" selection-start-line="245" selection-start-column="47" selection-end-line="245" selection-end-column="47" />
               <folding>
                 <element signature="e#527#546#0" expanded="true" />
               </folding>
@@ -734,19 +734,17 @@
       <option name="project" value="LOCAL" />
       <updated>1471967781416</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="extra test conditions">
+      <created>1471969746351</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1471969746351</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 18m 32s.xml">
-      <configuration name="Unittests in Restrictions" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 19m 00s.xml">
-      <configuration name="Unittests in Restrictions" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 21m 09s.xml">
-      <configuration name="Unittests in Restrictions" configurationId="tests" />
-    </history-entry>
     <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 22m 39s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
@@ -766,6 +764,15 @@
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
     <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 28m 57s.xml">
+      <configuration name="Unittests in Restrictions" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 45m 52s.xml">
+      <configuration name="Unittests in Restrictions" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 47m 36s.xml">
+      <configuration name="Unittests in Restrictions" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 47m 44s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
   </component>
@@ -823,7 +830,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="added __lt__ for plan-element-graphs (i.e., cost + heuristic), to enable open list comparison" />
     <MESSAGE value="spypocl with astar" />
     <MESSAGE value="   reuse fixed to insert new flaws" />
     <MESSAGE value="subgraph" />
@@ -848,7 +854,8 @@
     <MESSAGE value="   debugging Restrictions" />
     <MESSAGE value="debugging" />
     <MESSAGE value="passed Restrictions.py testcase" />
-    <option name="LAST_COMMIT_MESSAGE" value="passed Restrictions.py testcase" />
+    <MESSAGE value="extra test conditions" />
+    <option name="LAST_COMMIT_MESSAGE" value="extra test conditions" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1277,8 +1284,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Restrictions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="460">
-          <caret line="232" column="0" selection-start-line="232" selection-start-column="0" selection-end-line="232" selection-end-column="0" />
+        <state relative-caret-position="481">
+          <caret line="245" column="47" selection-start-line="245" selection-start-column="47" selection-end-line="245" selection-end-column="47" />
           <folding>
             <element signature="e#527#546#0" expanded="true" />
           </folding>

@@ -231,15 +231,25 @@ class TestOrderingGraphMethods(unittest.TestCase):
 		k = R_prime.isIsomorphicSubgraphOf(E)
 		assert k is True
 
-		R_prime_prime = Restriction(ID=10, type_graph='R', Elements=set(R_elms[1:2:1]), Edges=R_edges)
-		k = R_prime_prime.isIsomorphicSubgraphOf(E)
-		assert k is True
+
+		R_elms = ['buffer']
+		R_elms += [Element(ID=uuid.uuid1(i), typ=str(i)) for i in range(1, 8)]
+		R_edges = {Edge(R_elms[1], R_elms[2], ' '),
+				   Edge(R_elms[1], R_elms[5], ' '),
+				   Edge(R_elms[4], R_elms[5], ' '),
+				   Edge(R_elms[4], R_elms[3], ' '),
+				   Edge(R_elms[7], R_elms[6], ' '),
+				   Edge(R_elms[2], R_elms[3], ' '),
+				   Edge(R_elms[5], R_elms[3], ' '),
+				   Edge(R_elms[5], R_elms[6], ' ')}
+		R_new_IDS = Restriction(ID=10, type_graph='R', Elements=set(R_elms[1:]), Edges=R_edges)
+		k = R_new_IDS.isIsomorphicSubgraphOf(E)
+		assert k is False
 
 		R_edges.add(Edge(R_elms[7], R_elms[2], ' '))
 		R_prime_prime_prime = Restriction(ID=10, type_graph='R', Elements=set(R_elms[1:2:1]), Edges=R_edges)
 		k = R_prime_prime_prime.isIsomorphicSubgraphOf(E)
 		assert k is False
-
 
 
 if __name__ == '__main__':
