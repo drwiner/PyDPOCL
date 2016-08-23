@@ -50,34 +50,6 @@ class Restriction(Graph):
 
 		super(Restriction, self).__init__(ID = ID, name = name, typ = type_graph, Elements= Elements, Edges = Edges)
 
-	def exists(self, elm):
-		return elm in self.edges
-
-	@property
-	def realStats(self):
-		realheads = set()
-		realtails = set()
-		reals_ = set()
-		unreals = set()
-		for edge in self.edges:
-			if self.exists(edge.source):
-				if self.exists(edge.sink):
-					reals_.add(edge)
-				else:
-					realheads.add(edge)
-			elif self.exists(edge.sink):
-				realtails.add(edge)
-			else:
-				unreals.add(edge)
-		return (realheads, realtails, reals_, unreals)
-
-	def convertToDict(self):
-		""" Converts Graph into adjacency dictionary"""
-		g = collections.defaultdict(set)
-		for edge in self.edges:
-			g[edge.source.ID].add(edge.sink.ID)
-		return g
-
 	def firstIsIsomorphicSubgraphOf(self, EG, identities = None):
 		if identities == None:
 			identities = {elm:EG.getElementById(elm.ID) for elm in self.elements}

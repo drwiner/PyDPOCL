@@ -57,27 +57,25 @@ class Edge:
 		return 'Edge {} --{}--> {}'.format(self.source, self.label, self.sink)
 
 class Graph(Element):
-	"""A graph is an element with elements, edges, and constraints"""
-	def __init__(self, ID, typ, name = None, Elements = None, Edges = None, Constraints = None):
+	"""A graph is an element with elements, edges, and restrictions"""
+	def __init__(self, ID, typ, name = None, Elements = None, Edges = None, Restrictions = None):
 		if Elements == None:
 			Elements = set()
 		if Edges == None:
 			Edges = set()
-		if Constraints == None:
-			Constraints = set()
+		if Restrictions == None:
+			Restrictions = set()
 		
 		super(Graph,self).__init__(ID,typ,name)
 		self.elements = Elements
 		self.edges = Edges
-		self.constraints = Constraints
+		self.restrictions = Restrictions
 
 	
 	def hasEdgeIdentity(self, edge):
 		""" Returns set of edges s.t. (source.ID, label, sink.ID) in self.edges"""
 		return self.getEdgesByIdsAndLabel(edge.source.ID, edge.sink.ID, edge.label)
-		
-	def hasConstraintIdentity(self, edge):
-		return self.getConstraintsByIdsAndLabel(edge.source.ID, edge.sink.ID, edge.label)
+
 	
 	def addEdgeByIdentity(self, edge):
 		""" Assumes edge not in Graph
