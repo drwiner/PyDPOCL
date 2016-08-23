@@ -70,28 +70,6 @@ class Graph(Element):
 		self.elements = Elements
 		self.edges = Edges
 		self.restrictions = Restrictions
-
-	
-	def hasEdgeIdentity(self, edge):
-		""" Returns set of edges s.t. (source.ID, label, sink.ID) in self.edges"""
-		return self.getEdgesByIdsAndLabel(edge.source.ID, edge.sink.ID, edge.label)
-
-	
-	def addEdgeByIdentity(self, edge):
-		""" Assumes edge not in Graph
-			Finds elements with edge.source.ID and edge.sink.ID
-			Adds edge between them with edge.label
-		"""
-		source = self.getElementById(edge.source.ID)
-		sink = self.getElementById(edge.sink.ID)
-		label = edge.label
-		self.edges.add(Edge(source, sink, label))
-		
-	def addConstraintByIdentity(self, edge):
-		source = self.getElementById(edge.source.ID)
-		sink = self.getElementById(edge.sink.ID)
-		label = edge.label
-		self.constraints.add(Edge(source, sink, label))
 	
 	def getElementById(self, ID):
 		for element in self.elements:
@@ -105,10 +83,7 @@ class Graph(Element):
 				if element.replaced_ID == ID:
 					return element
 		return None
-	
-	def addConstraint(self, edge):
-		if edge not in self.constraints:
-			self.constraints.add(edge)
+
 			
 	def replaceWith(self, oldsnk, newsnk):
 		''' removes oldsnk from self.elements, replaces all edges with snk = oldsnk with newsnk'''
@@ -133,9 +108,6 @@ class Graph(Element):
 			
 	def getEdgesByIdsAndLabel(self, source_id, sink_id, label):
 		return {edge for edge in self.edges if edge.source.ID == source_id and edge.sink.ID == sink_id and edge.label == label}
-		
-	def getConstraintsByIdsAndLabel(self, source_id, sink_id, label):
-		return {edge for edge in self.constraints if edge.source.ID == source_id and edge.sink.ID == sink_id and edge.label == label}
 			
 	def getIncidentEdges(self, element):
 		return {edge for edge in self.edges if edge.source == element}
@@ -151,25 +123,6 @@ class Graph(Element):
 		return {edge for edge in self.edges if edge.source.ID == element.ID and edge.label == label}
 	def getParentsByLabel(self, element, label):
 		return set(edge.source for edge in self.edges if edge.sink is element and edge.label is label)
-	def getConstraints(self, element):
-		return {edge for edge in self.constraints if edge.source.ID == element.ID}
-	def getConstraintsByLabel(self, element, label):
-		return set(edge for edge in self.constraints if edge.source is element and edge.label is label)
-	def getConstraintsByParent(self, element):
-		return {edge.source for edge in self.constraints if edge.sink is element}
-		
-	def findConsistentElement(self, element):
-		return set(member for member in self.elements if member.isConsistent(element))
-		
-	#Given edge, find all other edges with same source
-	def findCoIncidentEdges(self, lonely_edge):
-		return set(edge for edge in self.edges if edge.source is lonely_edge.source and edge is not lonely_edge)
-		
-	def findConsistentEdge(self, edge):
-		return set(member for member in self.edges if member.isConsistent(edge))
-		
-	def findConsistentEdgeWithIgnoreList(self, edge, Ignore_List):
-		return set(member for member in self.edges if member not in Ignore_List and member.isConsistent(edge))
 		
 	######       rGet       ####################
 	def rGetDescendants(self, element, Descendants = None):
@@ -188,21 +141,7 @@ class Graph(Element):
 			#Descendants.add(edge.sink)
 			Descendants = self.rGetDescendants(edge.sink, Descendants)
 		return Descendants
-		
-	def rGetDescendantsGenerator(self, element, Descendants = None):
-		if Descendants == None:
-			Descendants = set()
-		""" TODO: test this generator"""
-		#Base Case
-		incidentEdges = self.getIncidentEdges(element)
-		if len(incidentEdges) == 0:
-			yield element
-			
-		#Induction
-		for edge in incidentEdges:
-			yield element
-			return self.rGetDescendants(edge.sink, Descendants)
-	
+
 	def rGetDescendantEdges(self, element, Descendant_Edges = None):
 		if Descendant_Edges == None:
 			Descendant_Edges = set()
@@ -217,51 +156,18 @@ class Graph(Element):
 			Descendant_Edges = self.rGetDescendantEdges(edge.sink, Descendant_Edges)
 			
 		return Descendant_Edges
-		
-	def rGetDescendantConstraints(self, constraint_source, Descendant_Constraints = None):
-		if Descendant_Constraints == None:
-			Descendant_Constraints = set()
-		#Base Case
-		incident_constraints = self.getConstraints(constraint_source)
-		if len(incident_constraints) == 0:
-			return Descendant_Constraints
-		
-		#Induction
-		Descendant_Constraints=Descendant_Constraints.union(incident_constraints)
-		for c in incident_constraints:
-			Descendant_Constraints = self.rGetDescendantConstraints(c.sink, \
-																	Descendant_Constraints\
-																	)
-			
-		return Descendant_Constraints
-	
 	
 	################  Consistency ###############################
 	def canAbsolve(self, other):
 		""" A graph absolves another iff for each other.edge, there is a consistent self.edge
 		"""
 		if rDetectConsistentEdgeGraph(Remaining = copy.deepcopy(other.edges), Available = copy.deepcopy(self.edges)):
-			#print('consistent without constraints')
-			if not self.equivalentWithConstraints(other):
-				#print('consistent with constraints')
+			if not self.equivalentWithRestrictions():
 				return True
 		return False
 		
 	def isInternallyConsistent(self):
-		constraint_sources = self.getConstraintSources()
-		for cs in constraint_sources:
-			suspects = {edge.source for edge in self.edges if edge.source.ID == cs.ID}
-			if len(suspects) == 0:
-				#print('no suspects for constraint source {}'.format(cs.ID))
-				continue
-			cg = self.rGetDescendantConstraints(cs)
-			for sp in suspects:
-				sg = self.rGetDescendantEdges(sp)
-				if rDetectEquivalentEdgeGraph(copy.deepcopy(cg),copy.deepcopy(sg)):
-					#print('suspect {} not consistent with constraints from source {}'.format(sp.ID,cs.ID))
-					return False
-
-		return True
+		return self.equivalentWithRestrictions()
 		
 	def coAbsolvant(self, other):
 		if self.isConsistent(other) and other.isConsistent(self):
@@ -281,44 +187,11 @@ class Graph(Element):
 			
 		return False
 		
-	def elementsAreEquivalent(self, other, self_element, other_element):
-		""" Elements in different graphs (self vs other) are equivalent 
-		if edge path from self_element has superset of edge path from other_element"""
-		if not self_element.isEquivalent(other_element):
-			return False
-		
-		descendant_edges = self.rGetDescendantEdges(self_element)
-		other_descendant_edges = other.rGetDescendantEdges(other_element)
-		return rDetectEquivalentEdgeGraph(other_descendant_edges, descendant_edges)
 
-	def getConstraintSources(self):
-		"""Constraints sources are constraint elements which are not sinks
-		"""
-		sinks = {constraint.sink for constraint in self.constraints}
-		return {constraint.source for constraint in self.constraints if constraint.source not in sinks}
-
-			
-		
-	######       Constraints       ####################
-	def equivalentWithConstraints(self, other):
-		"""
-			1) For each constraint source (propogate to source)
-			2) Find equivalent suspect (if none, move on)
-			3) Make constraint graph
-			4) Make operator subgraph from suspect
-			5) Determine if constraint equivalency via rDetectEquivalentEdges
-		"""
-		constraint_sources = other.getConstraintSources()
-		for cs in constraint_sources:
-			suspects = {edge.source for edge in self.edges if edge.source.isEquivalent(cs)}
-			if len(suspects) == 0:
-				continue
-			cg = other.rGetDescendantConstraints(cs)
-			for sp in suspects:
-				sg = self.rGetDescendantEdges(sp)
-				if rDetectEquivalentEdgeGraph(copy.deepcopy(cg),copy.deepcopy(sg)):
-					return True
-
+	def equivalentWithRestrictions(self):
+		for restriction in self.restrictions:
+			if restriction.isIsomorphicSubgraphOf(self):
+				return True
 		return False
 
 	def __repr__(self):
@@ -327,44 +200,26 @@ class Graph(Element):
 		return '\n' + edges + '\n\n_____\n\n ' + elms + '\n'
 		
 def rDetectConsistentEdgeGraph(Remaining = None, Available = None):
+	""" Returns True if all remaining edges can be assigned a consistent non-used edge in self
+		TODO: investigate if possible problem: two edges p1-->p2-->p3 are consistent with edges q1-->q2 q2'-->q3 just when q2 == q2'
+				this method will succeed, incorrectly, when q2 neq q2'
+			  -- This hasn't been a problem, because most edge labels have unique labels in a graph
+			  -- should create test conditions - in ElementGraph -- to test if "canAbsolve" always means that we will return something with "getInstantiations"
+	"""
 	if Remaining == None:
 		Remaining = set()
 	if Available == None:
 		Available = set()
 		
-	""" Returns True if all remaining edges can be assigned a consistent non-used edge in self """
+
 	if len(Remaining)  == 0:
 		return True
 
 	other_edge = Remaining.pop()
-	#print('remaining ', len(Remaining))
 
 	for prospect in Available:
 		if prospect.isConsistent(other_edge):
 			if rDetectConsistentEdgeGraph(	Remaining, {item for item in Available - {prospect}}):
 				return True
-	return False
-	
-def rDetectEquivalentEdgeGraph(Remaining = None, Available = None):
-	if Remaining == None:
-		Remaining = set()
-	if Available == None:
-		Available = set()
-	""" Returns True if all remaining edges can be assigned an equivalent non-used edge in self 
-	"""
-	if len(Remaining)  == 0:
-		return True
-		
-	#No solution if there are more edges remaining then there are available edges
-	if len(Remaining) > len(Available):
-		return False
-
-	other_edge = Remaining.pop()
-
-	for prospect in Available:
-		if prospect.isEquivalent(other_edge):
-			if rDetectEquivalentEdgeGraph(	Remaining, {item for item in Available 	if not item is prospect}):
-				return True
-
 	return False
 	
