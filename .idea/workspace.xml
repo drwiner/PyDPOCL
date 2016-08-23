@@ -46,8 +46,8 @@
       <file leaf-file-name="Graph.py" pinned="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Graph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="215">
-              <caret line="68" column="42" selection-start-line="68" selection-start-column="42" selection-end-line="68" selection-end-column="42" />
+            <state relative-caret-position="1008">
+              <caret line="42" column="19" selection-start-line="42" selection-start-column="19" selection-end-line="42" selection-end-column="19" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -421,13 +421,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00001" summary="&quot;testing&quot;">
-      <created>1470244131256</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1470244131256</updated>
-    </task>
     <task id="LOCAL-00002" summary="addGoals with negatives">
       <created>1470244347873</created>
       <option name="number" value="00002" />
@@ -764,7 +757,14 @@
       <option name="project" value="LOCAL" />
       <updated>1471971120614</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="cleanup isle Graph.py">
+      <created>1471971965439</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1471971965440</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -853,7 +853,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="subgraph" />
     <MESSAGE value="debugging, flaw library" />
     <MESSAGE value="rename init dummy" />
     <MESSAGE value="  troubleshooting flaw binning" />
@@ -878,7 +877,8 @@
     <MESSAGE value="extra test conditions" />
     <MESSAGE value="all tests passed, Restrictions" />
     <MESSAGE value="removed unneed methods" />
-    <option name="LAST_COMMIT_MESSAGE" value="removed unneed methods" />
+    <MESSAGE value="cleanup isle Graph.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="cleanup isle Graph.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1315,8 +1315,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Graph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="215">
-          <caret line="68" column="42" selection-start-line="68" selection-start-column="42" selection-end-line="68" selection-end-column="42" />
+        <state relative-caret-position="1008">
+          <caret line="42" column="19" selection-start-line="42" selection-start-column="19" selection-end-line="42" selection-end-column="19" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>

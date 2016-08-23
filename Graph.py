@@ -8,9 +8,6 @@ class Edge:
 		self.sink = sink
 		self.label = label
 		
-	def isProperty(self,other,property):
-		return self.property(other)
-		
 	def isConsistent(self, other):
 		if self.source.isConsistent(other.source) and self.sink.isConsistent(other.sink) and self.label == other.label:
 			return True
@@ -43,10 +40,6 @@ class Edge:
 		self.source.merge(other.source)
 		self.sink.merge(other.sink)
 		
-		return self
-	
-	def swapSource(self,source):
-		self.source= source
 		return self
 	
 	def swapSink(self,sink):
