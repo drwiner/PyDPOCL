@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment=" debugging">
+    <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Restrictions.py" afterPath="$PROJECT_DIR$/Restrictions.py" />
     </list>
@@ -78,8 +78,8 @@
       <file leaf-file-name="Restrictions.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Restrictions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-327">
-              <caret line="99" column="11" selection-start-line="99" selection-start-column="11" selection-end-line="99" selection-end-column="11" />
+            <state relative-caret-position="460">
+              <caret line="232" column="0" selection-start-line="232" selection-start-column="0" selection-end-line="232" selection-end-column="0" />
               <folding>
                 <element signature="e#527#546#0" expanded="true" />
               </folding>
@@ -727,38 +727,45 @@
       <option name="project" value="LOCAL" />
       <updated>1471913546855</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="passed Restrictions.py testcase">
+      <created>1471967781416</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1471967781416</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 11h 50m 23s.xml">
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 18m 32s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 11h 51m 00s.xml">
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 19m 00s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 11h 51m 15s.xml">
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 21m 09s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 11h 52m 01s.xml">
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 22m 39s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 11h 52m 06s.xml">
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 22m 48s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 11h 52m 13s.xml">
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 23m 40s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 11h 52m 36s.xml">
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 24m 20s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 11h 52m 58s.xml">
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 26m 36s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 11h 53m 03s.xml">
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 27m 19s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 11h 53m 11s.xml">
+    <history-entry file="Unittests_in_Restrictions - 2016.08.23 at 12h 28m 57s.xml">
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
   </component>
@@ -816,7 +823,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="organizing Planner" />
     <MESSAGE value="added __lt__ for plan-element-graphs (i.e., cost + heuristic), to enable open list comparison" />
     <MESSAGE value="spypocl with astar" />
     <MESSAGE value="   reuse fixed to insert new flaws" />
@@ -841,11 +847,12 @@
     <MESSAGE value="BreadthFirstIsIsomporhicSubgraphOf" />
     <MESSAGE value="   debugging Restrictions" />
     <MESSAGE value="debugging" />
-    <option name="LAST_COMMIT_MESSAGE" value="debugging" />
+    <MESSAGE value="passed Restrictions.py testcase" />
+    <option name="LAST_COMMIT_MESSAGE" value="passed Restrictions.py testcase" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="120" />
+      <option name="time" value="121" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1270,8 +1277,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Restrictions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-327">
-          <caret line="99" column="11" selection-start-line="99" selection-start-column="11" selection-end-line="99" selection-end-column="11" />
+        <state relative-caret-position="460">
+          <caret line="232" column="0" selection-start-line="232" selection-start-column="0" selection-end-line="232" selection-end-column="0" />
           <folding>
             <element signature="e#527#546#0" expanded="true" />
           </folding>

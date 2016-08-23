@@ -79,12 +79,18 @@ class Restriction(Graph):
 		return g
 
 	def firstIsIsomorphicSubgraphOf(self, EG, identities = None):
+		if identities == None:
+			identities = {elm:EG.getElementById(elm.ID) for elm in self.elements}
+
+		#identify graph sources for graph traversals
 		sinks = {edge.sink for edge in self.edges}
 		non_sinks = {edge.source for edge in self.edges if edge.source not in sinks}
+
+		#isomorphisms which are consistent across graph traversals
 		isos = []
 		for ns in non_sinks:
 			# ns has incident edges, so base case cannot be first return
-			cndt_isomorphisms = self.isIsomorphicSubgraphOf(EG, ns, map_={})
+			cndt_isomorphisms = self.isIsomorphicSubgraphOf(EG, ns, map_=identities)
 			if len(cndt_isomorphisms) == 0:
 				return False
 			new_isos = consistentIsos(isos, cndt_isomorphisms)
@@ -93,15 +99,12 @@ class Restriction(Graph):
 			isos.extend(new_isos)
 		return True
 	def isIsomorphicSubgraphOf(self, EG, r = None, map_ = None):
-		""" Breadth-first search to determine if self is a subgraph of EG, with special identity requirements
+		""" Graph traversals to determine if self is a subgraph of EG, with special identity requirements
 
-				Requirements: self must have at least one outgoing edge from 'r'
 				"map_" is of the form self.r_elm : EG.elm
 		"""
-
-		# if r == none, then find all elms which are souces but not sinks
 		if r == None:
-			self.firstIsIsomorphicSubgraphOf(EG, map_)
+			return self.firstIsIsomorphicSubgraphOf(EG, map_)
 
 		if map_ == None:
 			return []
@@ -175,15 +178,21 @@ class TestOrderingGraphMethods(unittest.TestCase):
 
 				1 = [1], [4a/4b] = 4, [3a if 4a else 3b if 4b] = 3, [7] = 7, [5b] = 5, [2] = 2, [6a] = 6
 			"""
-		R_elms = ['buffer']
-		R_elms += [Element(ID=uuid.uuid1(i), typ=str(i)) for i in range(1, 8)]
+
 		E_elms = ['buffer']
 		E_elms += [Element(ID=uuid.uuid1(91), typ=str(i)) for i in range(1, 8)]
+
+		R_elms = copy.deepcopy(E_elms)
+
 		E_elms += [Element(ID=8, typ='3'),
 				   Element(ID=9, typ='4'),
 				   Element(ID=10, typ='5'),
 				   Element(ID=11, typ='6'),
 				   Element(ID=12, typ='n')]
+
+
+		#R_elms += [Element(ID=uuid.uuid1(i), typ=str(i)) for i in range(1, 8)]
+
 		R_edges = {Edge(R_elms[1], R_elms[2], ' '),
 				   Edge(R_elms[1], R_elms[5], ' '),
 				   Edge(R_elms[4], R_elms[5], ' '),
@@ -211,12 +220,26 @@ class TestOrderingGraphMethods(unittest.TestCase):
 				   Edge(E_elms[7], E_elms[11], ' '),
 				   Edge(E_elms[7], E_elms[12], ' ')
 				   }
-		R = Restriction(ID=10, type_graph='R', Elements=set(R_elms), Edges=R_edges)
-		E = Graph(ID=11, typ='E', Elements=set(E_elms), Edges=E_edges)
 
-		k = R.BreadthFirstIsIsomorphicSubgraphOf(E)
+		R = Restriction(ID=10, type_graph='R',Elements = set(), Edges=R_edges)
+		E = Graph(ID=11, typ='E', Elements=set(E_elms[1:]), Edges=E_edges)
+
+		k = R.isIsomorphicSubgraphOf(E)
 		assert k is True
-		print(R)
+
+		R_prime = Restriction(ID=10, type_graph='R', Elements=set(R_elms[1:]), Edges=R_edges)
+		k = R_prime.isIsomorphicSubgraphOf(E)
+		assert k is True
+
+		R_prime_prime = Restriction(ID=10, type_graph='R', Elements=set(R_elms[1:2:1]), Edges=R_edges)
+		k = R_prime_prime.isIsomorphicSubgraphOf(E)
+		assert k is True
+
+		R_edges.add(Edge(R_elms[7], R_elms[2], ' '))
+		R_prime_prime_prime = Restriction(ID=10, type_graph='R', Elements=set(R_elms[1:2:1]), Edges=R_edges)
+		k = R_prime_prime_prime.isIsomorphicSubgraphOf(E)
+		assert k is False
+
 
 
 if __name__ == '__main__':
