@@ -45,15 +45,51 @@ class ElementGraph(Graph):
 	def getElementGraphFromElementID(self, element_ID, Type = None):
 		return self.getElementGraphFromElement(self.getElementById(element_ID), Type)
 
-	def addNonCodesignationConstraints(self, elm1, elm2):
-		''' Adds a constraint edge to prevent elm1 from being a legal merge with elm2
-			Strategy depends that two preconditions or two effects of the same step could not be non-codesignated
-			Also does not take into account future edges which are given the same edge-label
-			TODO: more robust anti-merge strategy
-		'''
-		# could pick more specific edge. some edges could be 'unique' in that no other outgoing/incoming edge label is same
-		prnt = next(iter(edge for edge in self.edges if edge.sink.ID == elm1.ID))
-		self.restrictions.add(Restriction(Elements = {prnt}, Edges = {Edge(prnt.source, elm2, prnt.label)}))
+	def preventThreatWithRestriction(self, threat, condition):
+		""" """
+		R = Restriction()
+		R.elements.add(threat)
+		for threat_edge in self.getIncidentEdges(threat):
+			if threat_edge.sink.name is None:
+				R.edges.add(Edge(condition, threat_edge.sink, threat_edge.label))
+				R.elements.add(threat_edge.sink)
+		if len(R.edges) == 0:
+			R.elements.add(condition)
+			for condition_edge in self.getIncidentEdges(condition):
+				if condition_edge.sink.name is None:
+					R.edges.add(Edge(threat, condition_edge.sink, condition_edge.label))
+					R.elements.add(condition_edge.sink)
+		if len(R.edges) == 0:
+			return None
+
+		self.restrictions.add(R)
+		return True
+
+	# def addNonCodesignationConstraints(self, elm1, elm2):
+	# 	''' Adds a constraint edge to prevent elm1 from being a legal merge with elm2
+	# 		Strategy depends that two preconditions or two effects of the same step could not be non-codesignated
+	# 		Also does not take into account future edges which are given the same edge-label
+	# 		TODO: more robust anti-merge strategy
+	# 	'''
+	# 	# could pick more specific edge. some edges could be 'unique' in that no other outgoing/incoming edge label is same
+	#
+	# 	#Revisited :
+	# 	cndts1 = {edge.sink for edge in self.getNeighbors(elm1) if edge.sink.name is None}
+	# 	cndts2 = {edge.sink for edge in self.getNeighbors(elm2) if edge.sink.name is None}
+	# 	if len(cndts1) + len(cndts2) == 0:
+	# 		return None
+	#
+	# 	elm2_edges = self.getIncidentEdges(elm2)
+	#
+	# 	#If any edge
+	# 	# for edge in self.getIncidentEdges(elm1):
+	# 	# 	if not edge.sink in self.getNeighborsByLabel(elm2, edge.label):
+	#
+	#
+	#
+	# 	prnt = next(iter(edge for edge in self.edges if edge.sink.ID == elm1.ID))
+	# 	self.restrictions.add(Restriction(Elements = {prnt.source, prnt.label, elm2}, Edges = {Edge(prnt.source, elm2,
+	# 																					prnt.label)}))
 
 	def mergeGraph(self, other, no_add=None):
 		"""

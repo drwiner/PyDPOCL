@@ -92,9 +92,9 @@ class Graph(Element):
 		for r in self.restrictions:
 			for r_edge in r.edges:
 				if r_edge.source == oldsnk:
-					r_edge.source = newsnk
+					r.replaceWith(r_edge.source, newsnk)
 				if r_edge.sink == oldsnk:
-					r_edge.sink = newsnk
+					r.replaceWith(r_edge.sink, newsnk)
 		return self
 
 	def getEdgesByLabel(self, label):
@@ -183,6 +183,9 @@ class Graph(Element):
 		
 
 	def equivalentWithRestrictions(self):
+		if len(self.restrictions) == 0:
+			return False
+
 		for restriction in self.restrictions:
 			if restriction.isIsomorphicSubgraphOf(self):
 				return True

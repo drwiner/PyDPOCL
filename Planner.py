@@ -262,20 +262,27 @@ class PlanSpacePlanner:
 
 		if new:
 			prc_edges = graph.getIncidentEdgesByLabel(s_add, 'precond-of')
+			#prcs = graph.getNeighborsByLabel(s_add, 'precond-of')
 			#preconditions = graph.getNeighborsByLabel(s_add, 'precond-of')
 			equalNames = {'equals', 'equal', '='}
-			noncodesg = {prec for prec in prc_edges if prec.sink.name in equalNames and not prec.sink.truth}
-			for prec in noncodesg:
-				# item1, item2 = tuple(graph.getNeighbors(prec.sink))
-				item1Edge, item2Edge = tuple(graph.getIncidentEdges(prec.sink))
+			noncodesg = {prc for prc in prc_edges if prc.sink.name in equalNames and not prc.sink.truth}
+			# for prec in noncodesg:
+			#
+			# 	arg1, arg2 = tuple(graph.getIncidentEdges(prec))
+			# 	#1) find some other parent of arg1 and arg2.
+			#
+			# 	#all precondition literals which are not '=/equals' which have arg1 as a child
+			# 	rlvnt = {prc for prc in prcs if arg1 in graph.getNeighbors(prc) and not prc in noncodesg}
+			#
+			#
+			# 	#This constraint/restriction prevents item1Edge.sink and item2Edge.sink from becoming a legal merge
+			# 	Restriction(Elements = {item1Edge.sink, item2Edge.sink,}, Edges = {})
+			# 	graph.addNonCodesignationConstraints(item1Edge.sink, item2Edge.sink)
 
-				#This constraint/restriction prevents item1Edge.sink and item2Edge.sink from becoming a legal merge
-				graph.addNonCodesignationConstraints(item1Edge.source, item2Edge.sink)
-
-				#Remove outgoing edges and '=' Literal element
-				graph.edges.remove(item1Edge)
-				graph.edges.remove(item2Edge)
-				graph.elements.remove(prec.sink)
+				# #Remove outgoing edges and '=' Literal element
+				# graph.edges.remove(item1Edge)
+				# graph.edges.remove(item2Edge)
+				# graph.elements.remove(prec.sink)
 
 			#Remove equality precondition edges
 			graph.edges -= noncodesg
@@ -319,8 +326,8 @@ class PlanSpacePlanner:
 
 		#Restriction
 		restriction = graph.deepcopy()
-		restriction.addNonCodesignationConstraints(effect, causal_link.label)
-		results.add(restriction)
+		if restriction.preventThreatWithRestriction(condition=causal_link.label, threat=effect):
+			results.add(restriction)
 		print('\ncreated child (restriction):\n')
 		print(restriction)
 		print('\n')
