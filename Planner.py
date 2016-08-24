@@ -178,20 +178,6 @@ class PlanSpacePlanner:
 
 		return results
 
-	# def getOrbs(self, graph, flaw, Precondition):
-	# 	eff_orbs = collections.defaultdict(set)
-	# 	num_orbs = collections.defaultdict(int)
-	#
-	# 	for eff in graph.flawLib[flaw]:
-	# 		Effect = graph.getElementGraphFromElementID(eff.ID)
-	# 		if Effect.canAbsolve(Precondition):
-	# 			# returns all possible ways to unify Effect with Precondition
-	# 			orbs = Effect.getInstantiations(Precondition)
-	# 			eff_orbs[eff].update(orbs)
-	# 			num_orbs[eff] += len(orbs)
-	#
-	# 	return num_orbs
-	# 	#return sorted(num_orbs.keys(), key=num_orbs.values())
 
 	def reuse(self, graph, flaw):
 		results = set()
@@ -266,23 +252,6 @@ class PlanSpacePlanner:
 			#preconditions = graph.getNeighborsByLabel(s_add, 'precond-of')
 			equalNames = {'equals', 'equal', '='}
 			noncodesg = {prc for prc in prc_edges if prc.sink.name in equalNames and not prc.sink.truth}
-			# for prec in noncodesg:
-			#
-			# 	arg1, arg2 = tuple(graph.getIncidentEdges(prec))
-			# 	#1) find some other parent of arg1 and arg2.
-			#
-			# 	#all precondition literals which are not '=/equals' which have arg1 as a child
-			# 	rlvnt = {prc for prc in prcs if arg1 in graph.getNeighbors(prc) and not prc in noncodesg}
-			#
-			#
-			# 	#This constraint/restriction prevents item1Edge.sink and item2Edge.sink from becoming a legal merge
-			# 	Restriction(Elements = {item1Edge.sink, item2Edge.sink,}, Edges = {})
-			# 	graph.addNonCodesignationConstraints(item1Edge.sink, item2Edge.sink)
-
-				# #Remove outgoing edges and '=' Literal element
-				# graph.edges.remove(item1Edge)
-				# graph.edges.remove(item2Edge)
-				# graph.elements.remove(prec.sink)
 
 			#Remove equality precondition edges
 			graph.edges -= noncodesg
@@ -364,7 +333,6 @@ class PlanSpacePlanner:
 
 			#Select child
 			graph = self.Open.pop()
-			#graph.updatePlan()
 			print(graph)
 			if not graph.isInternallyConsistent():
 				print('branch terminated')

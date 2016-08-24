@@ -371,10 +371,11 @@ class PlanElementGraph(ElementGraph):
 		return detectedThreatenedCausalLinks
 
 	def __repr__(self):
+		c = '\ncost {} + heuristic {}'.format(self.cost, self.heuristic)
 		steps =  str([self.getElementGraphFromElement(step,Action) for step in self.Steps])
 		orderings = self.OrderingGraph.__repr__()
 		links = self.CausalLinkGraph.__repr__()
-		return 'PLAN: ' + str(self.ID) + '\n*Steps: \n{' + steps + '}\n *Orderings:\n {' + orderings + '}\n ' \
+		return 'PLAN: ' + str(self.ID) + c + '\n*Steps: \n{' + steps + '}\n *Orderings:\n {' + orderings + '}\n ' \
 																								   '*CausalLinks:\n {' + links + '}'
 
 def operateIfConsistent(graph, flaw, operation):
