@@ -44,9 +44,11 @@ def consistentIsos(prior_isos, cndt_isos, new_isos = None):
 
 
 class Restriction(Graph):
-	def __init__(self, ID, name = None, type_graph = None, Elements = None, Edges = None):
+	def __init__(self, ID = None, name = None, type_graph = None, Elements = None, Edges = None):
 		if type_graph == None:
 			type_graph = 'Restriction'
+		if ID == None:
+			ID = uuid.uuid1(101)
 
 		super(Restriction, self).__init__(ID = ID, name = name, typ = type_graph, Elements= Elements, Edges = Edges)
 

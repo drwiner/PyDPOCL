@@ -89,11 +89,12 @@ class Graph(Element):
 		for incoming in (edge for edge in self.edges if edge.sink == oldsnk):
 			incoming.sink = newsnk
 		#update constraint edges which might reference specific elements being replaced
-		for edge in self.constraints:
-			if edge.source == oldsnk:
-				edge.source = newsnk
-			if edge.sink == oldsnk:
-				edge.sink = newsnk
+		for r in self.restrictions:
+			for r_edge in r.edges:
+				if r_edge.source == oldsnk:
+					r_edge.source = newsnk
+				if r_edge.sink == oldsnk:
+					r_edge.sink = newsnk
 		return self
 
 	def getEdgesByLabel(self, label):
@@ -160,7 +161,7 @@ class Graph(Element):
 		return False
 		
 	def isInternallyConsistent(self):
-		return self.equivalentWithRestrictions()
+		return not self.equivalentWithRestrictions()
 		
 	def coAbsolvant(self, other):
 		if self.isConsistent(other) and other.isConsistent(self):

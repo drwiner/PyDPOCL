@@ -270,7 +270,7 @@ class PlanSpacePlanner:
 				item1Edge, item2Edge = tuple(graph.getIncidentEdges(prec.sink))
 
 				#This constraint/restriction prevents item1Edge.sink and item2Edge.sink from becoming a legal merge
-				graph.constraints.add(Edge(item1Edge.source, item2Edge.sink, item1Edge.label))
+				graph.addNonCodesignationConstraints(item1Edge.source, item2Edge.sink)
 
 				#Remove outgoing edges and '=' Literal element
 				graph.edges.remove(item1Edge)

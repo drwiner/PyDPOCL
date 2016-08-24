@@ -1,17 +1,18 @@
-from Graph import *
+from Restrictions import *
 import uuid
+
 class ElementGraph(Graph):
 	"""An element graph is a graph with a root element"""
 
-	def __init__(self, ID, type_graph, name=None, Elements=None, root_element=None, Edges=None, Constraints=None):
+	def __init__(self, ID, type_graph, name=None, Elements=None, root_element=None, Edges=None, Restrictions=None):
 		if Elements == None:
 			Elements = set()
 		if Edges == None:
 			Edges = set()
-		if Constraints == None:
-			Constraints = set()
+		if Restrictions == None:
+			Restrictions = set()
 
-		super(ElementGraph, self).__init__(ID, type_graph, name, Elements, Edges, Constraints)
+		super(ElementGraph, self).__init__(ID, type_graph, name, Elements, Edges, Restrictions)
 		self.root = root_element
 
 	def copyGen(self):
@@ -32,7 +33,7 @@ class ElementGraph(Graph):
 		elms = {edge.source for edge in edges}|{edge.sink for edge in edges}
 		element_copy = next(iter(elm for elm in elms if elm.ID == element.ID))
 		return cls(element.ID, element.typ, name=None, root_element=element_copy,Elements= elms, Edges = edges,
-				   Constraints=elementGraph.rGetDescendantConstraints(element))
+				   Restrictions=elementGraph.restrictions)
 
 	def getElementGraphFromElement(self, element, Type=None):
 		if Type == None:
@@ -52,7 +53,7 @@ class ElementGraph(Graph):
 		'''
 		# could pick more specific edge. some edges could be 'unique' in that no other outgoing/incoming edge label is same
 		prnt = next(iter(edge for edge in self.edges if edge.sink.ID == elm1.ID))
-		self.constraints.add(Edge(prnt.source, elm2, prnt.label))
+		self.restrictions.add(Restriction(Elements = {prnt}, Edges = {Edge(prnt.source, elm2, prnt.label)}))
 
 	def mergeGraph(self, other, no_add=None):
 		"""
@@ -112,11 +113,11 @@ class ElementGraph(Graph):
 
 		completed = self.absolve(copy.deepcopy(other.edges), self.edges)
 		if len(completed) == 0:
-			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other.ID, self.ID))
+			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other, self))
 
 		for element_graph in completed:
 			# element_graph.updateActionParams() #only will work if this is action
-			element_graph.constraints = copy.deepcopy(other.constraints)
+			element_graph.restrictions = copy.deepcopy(other.restrictions)
 		return completed
 
 	def updateArgs(self):
@@ -182,17 +183,3 @@ class ElementGraph(Graph):
 		self_sink.replaced_ID = other_edge.sink.ID
 		self_sink.merge(other_edge.sink)  # sink merge
 		return new_self
-
-
-def extractElementsubGraphFromElement(G, element, Type):
-	Edges = G.rGetDescendantEdges(element, set())
-	Elements = G.rGetDescendants(element, set())
-	Constraints = G.rGetDescendantConstraints(element, set())
-	return Type(element.ID, \
-				type_graph=element.typ, \
-				name=element.name, \
-				Elements=Elements, \
-				root_element=element, \
-				Edges=Edges, \
-				Constraints=Constraints \
-				)

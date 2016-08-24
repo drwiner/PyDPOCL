@@ -390,7 +390,8 @@ class PlanElement(Element):
 		super(PlanElement,self).__init__(ID,typ,name, arg_name)
 		
 class IntentionFrameElement(Element):
-	def __init__(self, ID, typ_graph=None, name= None, arg_name = None, ms=None, motivation = None, intender = None, goal = None, sat = None, steps = None):
+	def __init__(self, ID, type_graph=None, name= None, arg_name = None, ms=None, motivation = None, intender = None,
+				 goal = None, sat = None, steps = None):
 		if steps == None:
 			steps = set()
 		if type_graph == None:

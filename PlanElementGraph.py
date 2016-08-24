@@ -4,30 +4,14 @@ from collections import deque
 import uuid
 import random
 
-class Belief(ElementGraph):
-	def __init__(self, ID, typ, name=None,Elements = None, root_element=None,Edges = None, Constraints = None):
-		if Elements == None:
-			Elements = set()
-		if Edges == None:
-			Edges = set()
-		if Constraints == None:
-			Constraints = set()
-		
-		super(Belief, self).__init__(ID,typ,name,Elements, root_element, Edges, Constraints)
-		
-	def __repr__(self):
-		self.updateArgs()
-		args = str([' {}-{} '.format(arg.name, arg.typ) for arg in self.Args])
-		return '{}-Bel-{}{}'.format(self.root.truth, self.root.name, self.typ) + args
-
 class Action(ElementGraph):
 	stepnumber = 2
-	def __init__(self,ID,type_graph,name=None,Elements = None, root_element = None, Edges = None,Constraints = None):
+	def __init__(self,ID,type_graph,name=None,Elements = None, root_element = None, Edges = None,Restrictions = None):
 		
 		if Edges == None:
 			Edges = set()
-		if Constraints == None:
-			Constraints = set()
+		if Restrictions == None:
+			Restrictions = set()
 
 		if root_element is None:
 			root_element = Operator(uuid.uuid1(200),typ='Action')
@@ -35,7 +19,7 @@ class Action(ElementGraph):
 		if Elements == None:
 			Elements = {root_element}
 			
-		super(Action,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Constraints)
+		super(Action,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Restrictions)
 		
 		""" Get consenting actors"""		
 		self.updateConsentingActors(scratch = True)
@@ -133,9 +117,9 @@ class Action(ElementGraph):
 		
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
-	def __init__(self,ID,type_graph,name=None,Elements=None, root_element = None, Edges = None, Constraints = None):
+	def __init__(self,ID,type_graph,name=None,Elements=None, root_element = None, Edges = None, Restrictions = None):
 		
-		super(Condition,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Constraints)
+		super(Condition,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Restrictions)
 		self.labels = ['first-arg','sec-arg','third-arg','fourth-arg']
 		
 	def getArgList(self):
@@ -163,7 +147,7 @@ class PlanElementGraph(ElementGraph):
 				Elements = None,
 				planElement = None,
 				Edges = None,
-				Constraints = None, non_static_preds = None):
+				 Restrictions = None, non_static_preds = None):
 				
 		if type_graph == None:
 			type_graph = 'PlanElementGraph'
@@ -171,8 +155,8 @@ class PlanElementGraph(ElementGraph):
 			Elements = set()
 		if Edges == None:
 			Edges=  set()
-		if Constraints == None:
-			Constraints = set()
+		if Restrictions == None:
+			Restrictions = set()
 		if non_static_preds == None:
 			non_static_preds = set()
 		
@@ -193,7 +177,7 @@ class PlanElementGraph(ElementGraph):
 		#Edges.update( {Edge(planElement,IF, 'frame-of') for IF in self.IntentionFrames})
 		#Edges.update( {Edge(planElement,step, 'step-of') for step in self.Steps})
 									
-		super(PlanElementGraph,self).__init__(ID,type_graph,name,Elements,planElement,Edges,Constraints)
+		super(PlanElementGraph,self).__init__(ID,type_graph,name,Elements,planElement,Edges,Restrictions)
 		
 		self.updateIntentionFrameAttributes()
 
@@ -233,7 +217,7 @@ class PlanElementGraph(ElementGraph):
 			#Keeps intention frame element attributes up to date
 			#Must be done after super instantation because needs edges
 	
-	def updatePlan(self, Elements = None,Constraints = None):
+	def updatePlan(self, Elements = None,Restrictions = None):
 		""" Updating plans to have accurate top-level Sets"""
 		if Elements is None:
 			Elements = self.elements
