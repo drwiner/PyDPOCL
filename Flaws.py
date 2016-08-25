@@ -35,6 +35,7 @@ class Flaw:
 			self.criteria = self.cndts
 
 		return self
+
 		
 	def __repr__(self):
 		return 'Flaw(name={},tuple={})'.format(self.name, self.flaw)
@@ -84,21 +85,31 @@ class Flawque:
 	def __repr__(self):
 		return str(self._flaws)
 
+class simpleQueueWrapper(collections.deque):
+	def add(self, item):
+		self.append(item)
+	def pop(self):
+		return self.popleft()
+	def update(self, iter):
+		for it in iter:
+			self.append(it)
+
 class FlawLib():
-	def __init__(self, non_static_preds):
+	non_static_preds = set()
+	def __init__(self):
 		"""TODO: need way to manage multiple sets which have preference ranking and different ordering criterion (
 		 LR/MW-first/LIFO)"""
 
-		self.non_static_preds = non_static_preds
+		#self.non_static_preds = non_static_preds
 
-		#static = unchangeable
-		self.statics = set()
+		#static = unchangeable (should do oldest first.)
+		self.statics = simpleQueueWrapper()
 
 		#init = established by initial state
-		self.inits = set()
+		self.inits = simpleQueueWrapper()
 
 		#threat = causal link dependency undone
-		self.threats = set()
+		self.threats = simpleQueueWrapper()
 
 		#unsafe = existing effect would undo
 		#		sorted by number of cndts
@@ -113,6 +124,7 @@ class FlawLib():
 		self.nonreusable = Flawque()
 
 		self.typs = [self.statics, self.inits, self.threats, self.unsafe, self.reusable, self.nonreusable]
+	#	self.typs = [self.sub_library, self.threats, self.unsafe, self.reusable, self.nonreusable]
 
 		#cndts is a dictionary mapping open conditions to candidate action effects
 		self.cndts = collections.defaultdict(set)
@@ -138,7 +150,7 @@ class FlawLib():
 		for flaw_set in self.typs:
 			if flaw_set == self.threats:
 				continue
-			g = (flaw for flaw in self.statics)
+			g = (flaw for flaw in flaw_set)
 			yield(next(g))
 
 	def next(self):
@@ -179,8 +191,7 @@ class FlawLib():
 		#First, determine if this flaw.flaw[1].name is in non_static_preds: if not, then let cndts be just those
 		# initial states with same predicate
 		s_need, pre = flaw.flaw
-
-		if not pre.name in self.non_static_preds:
+		if not pre.name in FlawLib.non_static_preds:
 			self.cndts[flaw].update({g for g in graph.getNeighbors(graph.initial_dummy_step) if g.name == pre.name})
 			flaw.cndts = len(self.cndts[flaw])
 			self.statics.add(flaw)
@@ -271,6 +282,46 @@ def evalRisk(graph, eff, pre, ExistingGraph, operation):
 				operation(eff)
 		return True
 	return False
+
+
+# class FlawLibQue(collections.deque):
+# 	""" A deque where each item is a flaw library"""
+# 	@property
+# 	def flaws(self):
+# 		return sum(len(flaws) for flaws in self)
+#
+# 	@property
+# 	def reusableFlaws(self):
+# 		return sum(len(flaws.reusable) for flaws in self)
+#
+# 	@property
+# 	def heuristic(self):
+# 		return self.flaws + self.reusableFlaws
+#
+# 	def addCndtsAndRisks(self, graph, action):
+# 		for flaws in self:
+# 			flaws.addCndtsAndRisks(graph, action)
+
+import unittest
+class TestOrderingGraphMethods(unittest.TestCase):
+
+	def test_flaw_counter(self):
+		A = Flaw(('a'), 'A')
+		A.cndts = 12
+		B = Flaw(('b'), 'B')
+		B.cndts = 11
+		print(Flaw.counter) #0
+		Flaw.counter+= 1
+		print(Flaw.counter) #1
+		print(B.counter) #0
+		B.cndts = Flaw.counter
+		B.cndts +=1
+		print(B.cndts) #2
+		print(Flaw.counter) #1
+
+
+if __name__ ==  '__main__':
+	unittest.main()
 
 
 """

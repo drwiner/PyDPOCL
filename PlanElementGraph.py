@@ -147,7 +147,8 @@ class PlanElementGraph(ElementGraph):
 				Elements = None,
 				planElement = None,
 				Edges = None,
-				 Restrictions = None, non_static_preds = None):
+				 Restrictions = None):
+				 #, non_static_preds = None):
 				
 		if type_graph == None:
 			type_graph = 'PlanElementGraph'
@@ -157,15 +158,15 @@ class PlanElementGraph(ElementGraph):
 			Edges=  set()
 		if Restrictions == None:
 			Restrictions = set()
-		if non_static_preds == None:
-			non_static_preds = set()
+		#if non_static_preds == None:
+		#	non_static_preds = set()
 		
 		self.OrderingGraph = OrderingGraph(ID = uuid.uuid1(5))
 		self.CausalLinkGraph = CausalLinkGraph(ID = uuid.uuid1(6))
 		self.updatePlan(Elements)
 
-		#self.flaws = deque() #sort by heuristic?
-		self.flaws = FlawLib(non_static_preds)
+
+		self.flaws = FlawLib()
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
 		
@@ -192,6 +193,7 @@ class PlanElementGraph(ElementGraph):
 
 	@property
 	def heuristic(self):
+		#return self.flaws.heuristic
 		return len(self.flaws) + len(self.flaws.nonreusable)
 
 	@property

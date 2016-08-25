@@ -54,7 +54,7 @@ class Frontier:
 
 class PlanSpacePlanner:
 
-	def __init__(self, op_graphs, objects, init_action, goal_action, non_static):
+	def __init__(self, op_graphs, objects, init_action, goal_action):
 		#Assumes these parameters are already read from file
 
 		self.op_graphs = op_graphs
@@ -62,7 +62,7 @@ class PlanSpacePlanner:
 
 		init_graph = PlanElementGraph(uuid.uuid1(0), Elements = objects | init_action.elements |
 																goal_action.elements, Edges = init_action.edges |
-																							  goal_action.edges, non_static_preds = non_static)
+																							  goal_action.edges)
 		init_graph.initial_dummy_step = init_action.root
 		init_graph.final_dummy_step = goal_action.root
 
@@ -94,9 +94,12 @@ class PlanSpacePlanner:
 
 		#Add initial Open precondition flaws for dummy step
 		init_flaws = (Flaw((dummy_final, prec), 'opf') for prec in graph.getNeighborsByLabel(dummy_final, 'precond-of'))
-		#For each flaw, determine candidate effects and risks, then insert into flawlib by bin
 		for flaw in init_flaws:
-			graph.flaws.insert(graph,flaw)
+			graph.flaws.insert(graph, flaw)
+
+		#For each flaw, determine candidate effects and risks, then insert into flawlib by bin
+		#for flaw in init_flaws:
+		#	graph.flaws.insert(graph,flaw)
 
 
 	def newStep(self, graph, flaw):
@@ -170,10 +173,10 @@ class PlanSpacePlanner:
 
 						#Now that step is in plan, determine for which open conditions the step is a cndt/risk
 						graph_copy.flaws.addCndtsAndRisks(graph_copy, new_step_op.root)
-						print('\ncreated child (newStep):\n')
-						print(graph_copy)
-						print('\n')
-						#results.add((graph_copy, 'newStep'))
+						#print('\ncreated child (newStep):\n')
+						#print(graph_copy)
+						#print('\n')
+
 						results.add(graph_copy)
 
 		return results
@@ -217,9 +220,9 @@ class PlanSpacePlanner:
 				# adds causal link and ordering constraints
 				condition = graph_copy.getElementById(eff_abs.root.ID)
 				self.addStep(graph_copy, step, s_need, condition, new=False)
-				print('\ncreated child (reuse):\n')
-				print(graph_copy)
-				print('\n')
+					#print('\ncreated child (reuse):\n')
+					#print(graph_copy)
+					#print('\n')
 				# add graph to children
 				results.add(graph_copy)
 
@@ -278,9 +281,9 @@ class PlanSpacePlanner:
 		if promotion.OrderingGraph.isInternallyConsistent():
 			#results.add((promotion, 'promotion'))
 			results.add(promotion)
-			print('\ncreated child (promotion):\n')
-			print(promotion)
-			print('\n')
+			#print('\ncreated child (promotion):\n')
+			#print(promotion)
+			#print('\n')
 
 
 		#Demotion
@@ -288,18 +291,17 @@ class PlanSpacePlanner:
 		demotion.OrderingGraph.addEdge(threat, causal_link.source)
 		if demotion.OrderingGraph.isInternallyConsistent():
 			results.add(demotion)
-			print('\ncreated child (demotion):\n')
-			print(demotion)
-			print('\n')
-		#	results.add((demotion, 'demotion'))
+			#print('\ncreated child (demotion):\n')
+			#print(demotion)
+			#print('\n')
 
 		#Restriction
 		restriction = graph.deepcopy()
 		if restriction.preventThreatWithRestriction(condition=causal_link.label, threat=effect):
 			results.add(restriction)
-		print('\ncreated child (restriction):\n')
-		print(restriction)
-		print('\n')
+		#print('\ncreated child (restriction):\n')
+		#print(restriction)
+		#print('\n')
 		#results.add((restriction, 'restriction'))
 
 		return results
@@ -327,7 +329,7 @@ class PlanSpacePlanner:
 
 		return results
 
-	def SPyPOCL(self):
+	def POCL(self):
 		Visited = []
 		while len(self.Open) > 0:
 
@@ -359,73 +361,8 @@ class PlanSpacePlanner:
 				self.Open.insert(child)
 
 			print('open list number: {}'.format(len(self.Open)))
+			print('\n')
 
-
-
-	def rPOCL(self, graph, seeBranches = None, fl = None):
-		"""
-			Recursively, given graph, 
-				for each flaw, 
-				for each way to resolve flaw, 
-				create new graphs and rPOCL on it
-		"""
-
-		if seeBranches == True:
-			print(graph)
-
-		if not fl is None:
-			fl.write('\n\n\n\n\n\n\n\n')
-			fl.write(str(graph))
-			numOPFs = len([1 for flaw in graph.flaws if flaw.name == 'opf'])
-			numTCLFs = len([1 for flaw in graph.flaws if flaw.name == 'tclf'])
-			fl.write('\nnum_flaws: {}'.format(len(graph.flaws)))
-			fl.write('\nnum_OPFs: {}'.format(numOPFs))
-			fl.write('\nnum_TCLFs: {}'.format(numTCLFs))
-			for i, flaw in enumerate(graph.flaws):
-				fl.write('\nflaw-{}: {}'.format(i, flaw))
-			fl.write('\ninternally consistent: {}'.format(graph.isInternallyConsistent()))
-
-		#print('num flaws: {} '.format(len(graph.flaws)))
-
-		#BASE CASES
-		if not graph.isInternallyConsistent():
-			#print('branch terminated')
-			return None
-
-		if len(graph.flaws) == 0:
-			#print('solution selected')
-			return graph
-
-		#INDUCTION
-		for flaw in graph.flaws:
-
-
-			if flaw.name == 'opf':
-				results = self.reuse(graph, flaw)
-				results.update(self.newStep(graph, flaw))
-				if len(results) == 0:
-					#print('could not resolve opf')
-					return None
-
-			if flaw.name == 'tclf':
-				results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
-
-			for result, res in results:
-				new_flaws = result.detectThreatenedCausalLinks()
-				result.flaws += new_flaws
-
-			if not fl is None:
-				fl.write('\n flaw: {}'.format(flaw))
-				for g, res in results:
-					fl.write('\n\n outcome via {}:\n {}'.format(res, g))
-			for g, _ in results:
-				g.flaws.remove(flaw)
-				result = self.rPOCL(g,seeBranches, fl)
-				if not result is None:
-					return result
-
-		print('branch terminated')
-		return None
 
 def preprocessDomain(operators):
 	#get all effect predicates
@@ -446,13 +383,13 @@ if __name__ ==  '__main__':
 		domain_file = 'domains/mini-indy-domain.pddl'
 		problem_file = 'domains/mini-indy-problem.pddl'
 
-	f = open('workfile', 'w')
+	#f = open('workfile', 'w')
 	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
-	non_static_preds = preprocessDomain(operators)
-	planner = PlanSpacePlanner(operators, objects, initAction, goalAction, non_static_preds)
+	#non_static_preds = preprocessDomain(operators)
+	FlawLib.non_static_preds = preprocessDomain(operators)
+	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 
-	result = planner.SPyPOCL()
-	#graph = planner[0]
-	#result = planner.rPOCL(graph, seeBranches = None, fl = f)
+	result = planner.POCL()
+
 	print('\n\n\n')
 	print(result)
