@@ -371,6 +371,22 @@ def preprocessDomain(operators):
 		pred_set.update({eff.name for eff in  op.getNeighborsByLabel(op.root, 'effect-of')})
 	return pred_set
 
+def topoSort(graph):
+	OG  = copy.deepcopy(graph.OrderingGraph)
+	L =[]
+	S = {graph.initial_dummy_step}
+	while len(S) > 0:
+		n = S.pop()
+		L.append(n)
+		for m_edge in OG.getIncidentEdges(n):
+			OG.edges.remove(m_edge)
+			if len({edge for edge in OG.getParents(m_edge.sink)}) == 0:
+				S.add(m_edge.sink)
+	if len(OG.edges) > 0:
+		print('error')
+		return
+	return L
+
 import sys
 
 if __name__ ==  '__main__':
@@ -391,5 +407,11 @@ if __name__ ==  '__main__':
 
 	result = planner.POCL()
 
+	totOrdering = topoSort(result)
 	print('\n\n\n')
-	print(result)
+	for step in totOrdering:
+		#Step = result.subgraph(step, Action)
+		print(result.subgraph(step, Action))
+
+	#print('\n\n\n')
+	#print(result)

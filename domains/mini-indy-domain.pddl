@@ -8,12 +8,6 @@
 			   (high-up ?location - location)
 			   (occupied ?location - location))
 
-  ;(:axiom occupation
-  ;   :vars    (?location - location)
-  ;   :exists  (?c - character)
-  ;   :context (at ?c ?location)
-  ;   :implies (occupied ?location))
-
 
   (:action move
     :parameters   (?character - character ?from - location ?to - location)
