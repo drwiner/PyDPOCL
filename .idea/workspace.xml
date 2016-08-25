@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/setup.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/search/__init__.py" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Planner.py" afterPath="$PROJECT_DIR$/Planner.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/domains/mini-indy-domain.pddl" afterPath="$PROJECT_DIR$/domains/mini-indy-domain.pddl" />
     </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -455,13 +451,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00007" summary="cleanup new step in planner. easier to follow, less redundant work">
-      <created>1470342267109</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1470342267109</updated>
-    </task>
     <task id="LOCAL-00008" summary="Cleanup">
       <created>1470343817091</created>
       <option name="number" value="00008" />
@@ -798,7 +787,14 @@
       <option name="project" value="LOCAL" />
       <updated>1472140639636</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="added setup">
+      <created>1472144758269</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1472144758269</updated>
+    </task>
+    <option name="localTasksCounter" value="57" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -887,7 +883,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="axiom stmt parsing, added new actions and axiom to domain." />
     <MESSAGE value="parsing axiom pieces" />
     <MESSAGE value="DomainDef to include axioms" />
     <MESSAGE value="change axiom to include separate existential variables" />
@@ -912,7 +907,8 @@
     <MESSAGE value="Changed noncodesignation constraint method, removed noneq restriction" />
     <MESSAGE value="working POCL planner" />
     <MESSAGE value="Found error in flaw management at &quot;OCs&quot; -- addCndts and Risks now accurate... thanks Obama" />
-    <option name="LAST_COMMIT_MESSAGE" value="Found error in flaw management at &quot;OCs&quot; -- addCndts and Risks now accurate... thanks Obama" />
+    <MESSAGE value="added setup" />
+    <option name="LAST_COMMIT_MESSAGE" value="added setup" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
