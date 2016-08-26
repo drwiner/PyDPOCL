@@ -9,6 +9,11 @@
 			   (occupied ?location - location))
 
 
+   (:action vacant-axiom
+    :parameters (?character - character ?location - location)
+    :precondition (forall ?character (not (at ?character ?location)))
+    :effect (not (occupied ?location)))
+
   (:action move
     :parameters   (?character - character ?from - location ?to - location)
 	:precondition (and (not (equals ?from ?to))

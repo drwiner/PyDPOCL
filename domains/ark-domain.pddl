@@ -64,7 +64,7 @@
     :parameters   (?taker - character ?item - item ?victim - character ?place - place)
 	:precondition (and 
                        (alive ?taker)
-					   (not (equa ?taker ?victim))
+					   (not (equals ?taker ?victim))
                        (at ?taker ?place)
                        (armed ?taker)
                        (not (armed ?victim))

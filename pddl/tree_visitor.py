@@ -313,6 +313,8 @@ class TraversePDDLDomain(PDDLVisitor):
 		"""Visits a PDDL action statement."""
 		signature = list()
 		# Visit all parameters and create signature.
+		#if node.key in {'forall', 'exists', 'equals'}:
+		#	pass
 		for v in node.parameters:
 			v.accept(self)
 			signatureTuple = self.get_in(v)
@@ -340,6 +342,11 @@ class TraversePDDLDomain(PDDLVisitor):
 		#############################################################
 		nextPredicate = None
 		isNegative = False
+		forall = False
+		if c.key in {'forall', 'for-all'}:
+			forall = True
+			scoped_var = c.children[0]
+			c = c.children[1]
 		if c.key == 'not':
 			# This is a negative effect, only one child allowed.
 			if len(c.children) != 1:
@@ -352,7 +359,7 @@ class TraversePDDLDomain(PDDLVisitor):
 		
 		if not nextPredicate.key in self._predicates:
 			raise SemanticError('Error: unknown predicate %s used in precondition '
-								'of action' % nextPredicate.key)
+									'of action' % nextPredicate.key)
 		
 		if nextPredicate == None:
 			raise SemanticError('Error: NoneType predicate used in precondition of '
@@ -381,10 +388,17 @@ class TraversePDDLDomain(PDDLVisitor):
 		for v in nextPredicate.children:
 			if isinstance(v.key, Variable):
 				signature.append((v.key.name, predDef.signature[count][1]))
+
 			else:
 				signature.append((v.key, predDef.signature[count][1]))
 			count += 1
-		
+
+		if forall:
+			for name, sig in signature:
+				if name == scoped_var.key.name:
+					scoped_var = (name, sig)
+					break
+
 		#Apply to all arguments.
 		# for v in c.children:
 			# if isinstance(v.key, Variable):
@@ -395,6 +409,12 @@ class TraversePDDLDomain(PDDLVisitor):
 
 		# Add predicate to precondition list.
 		#precond.append(pddl.Predicate(nextPredicate.key, signature))
+		if forall:
+			#pred = pddl.Predicate(nextPredicate.key, signature)
+			p =  pddl.Predicate(nextPredicate.key, signature)
+			q = pddl.Quantifier('forall', scoped_var, p)
+			precond.addlist.add(q)
+			return
 		if isNegative:
 			precond.dellist.add(pddl.Predicate(nextPredicate.key, signature))
 		else:
@@ -404,15 +424,22 @@ class TraversePDDLDomain(PDDLVisitor):
 		""" Visits a PDDL precond statement."""
 		precond = pddl.Effect()
 		formula = node.formula
-		
+
+		if formula.key in {'forall', 'for-all'}:
+			pass
+
 		# For now we only allow 'and' in the effect.
 		if formula.key == 'and':
 			for c in formula.children:
 				# Call helper.
+				if c.key in {'equals', 'equal', '='}:
+					continue
 				self.add_precond(precond, c)
 		else:
 			# Call helper.
-			self.add_precond(precond, formula)
+			#if formula.key in {'forall', 'for-all', 'exists', 'equals', '=', 'equal'}:
+			if not formula.key in {'equals', 'equal', '='}:
+				self.add_precond(precond, formula)
 		# Store precondition in node.
 		self.set_in(node, precond)
 

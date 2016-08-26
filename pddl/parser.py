@@ -124,6 +124,12 @@ class PredicateInstance(Visitable):
 		self.name = name
 		self.parameters = parameters  # a list of object names
 
+class QuantifierInstance(Visitable):
+	def __init__(self, name, parameters=[], predicates=[]):
+		self._visitorName = 'visite_quantifier_instance'
+		self.name = name
+		self.parameters = parameters
+		self.predicates = predicates
 
 class RequirementsStmt(Visitable):
 	"""This class represents the AST node for a pddl requirements statement."""
@@ -212,8 +218,6 @@ class Formula(Visitable):
 		self.children = children or []	# a list of Formulas
 		self.type = type  # a Type
 
-
-
 class ActionStmt(Visitable):
 	"""This class represents the AST node for a pddl action."""
 
@@ -238,7 +242,7 @@ class ActionStmt(Visitable):
 
 class AxiomStmt(Visitable):
 	"""This calss represents the AST node for a pddl axiom."""
-	def __init__(self, name, vars_, exist_vars, context, implies):
+	def __init__(self, name, vars_, context, implies):
 		""" Construct a new Axiom.
 
 		Keyword arguments:
@@ -250,8 +254,7 @@ class AxiomStmt(Visitable):
 		self._visitorName = 'visit_axiom_stmt'
 		self.name = name
 		self.vars_ = vars_
-		self.exist_vars = exist_vars
-		self.context = context #an exists statement
+		self.context = context
 		self.implies = implies
 
 
@@ -525,14 +528,6 @@ def parse_vars(iter):
 def parse_context(iter):
 	if not iter.try_match(':context'):
 		raise ValueError('Error keyword ":context" required before context list!')
-	#if not next(iter).try_match('exists'):
-	#	raise ValueError('Error keyword "exists" required at beginning of axiom context')
-	#it = next(iter)
-	#while True:
-	#	print(next(iter))
-	#print(it)
-	#exist_vars = parse_typed_var_list(next(iter))
-	#exist_vars = []
 	context = parse_formula(next(iter))
 	return Context(context)
 
@@ -694,10 +689,10 @@ def parse_axiom_stmt(iter):
 		raise ValueError('Error: Axiom must start with ":axiom" keyword!')
 	name = parse_name(iter, 'axiom')
 	params = parse_vars(iter)
-	exists  = parse_exist_vars(iter)
+	#exists  = parse_exist_vars(iter)
 	context = parse_context(iter)
 	implies = parse_implies(iter)
-	return AxiomStmt(name, params, exists, context, implies)
+	return AxiomStmt(name, params, context, implies)
 
 def parse_action_stmt(iter):
 	"""

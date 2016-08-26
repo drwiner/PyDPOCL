@@ -60,6 +60,15 @@ def makeLit(formula, current_id, parent, relationship, elements, edges, bit = No
 	edges.add(Edge(parent,lit,relationship))
 	return lit, formula
 
+def forallFormula(formula, parent, relationship, elements, edges):
+	'''
+		(forall ?c (not (at ?c ?l)))
+		first find out what ?c is . then get all args and create precondition for each
+	'''
+	global args
+	formula
+
+
 def getSubFormulaGraph(formula, current_id = None, parent = None, relationship = None, elements = None, edges = None):
 	if elements ==None:
 		elements = set()
@@ -75,6 +84,10 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 			lit, formula = makeLit(formula, current_id, parent, relationship, elements, edges, False)
 	elif formula.key == 'intends':
 		lit, formula = makeMotive(formula, current_id, parent, relationship, elements, edges, True)
+	elif formula.key == 'for-all' or formula.key == 'forall':
+		formula = next(iter(formula.children))
+		forallFormula(formula, parent, relationship, elements, edges)
+
 	elif formula.type >0:
 		pass
 	else:
@@ -294,6 +307,13 @@ def addNegativeInitStates(predicates, initAction, objects):
 			if len(pt) > 0:
 				initAction.elements.add(pc)
 				initAction.edges.add(Edge(initAction.root, pc, 'effect-of'))
+
+def domainAxiomsToGraphs(domain):
+	if len(domain.axioms) > 0:
+		from pddlToGraphs import ActionStmt
+	for ax in domain.axioms:
+		domain.actions.append(ActionStmt(name = ax.name, parameters = ax.vars_, precond = ax.context,
+										 effect = ax.implies))
 	
 def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	""" Returns tuple 
@@ -305,11 +325,16 @@ def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	parser = Parser(domain_file, problem_file)
 	domain, dom = parser.parse_domain_drw()
 	problem, v = parser.parse_problem_drw(dom)
-	op_graphs = domainToOperatorGraphs(domain)
-	#axioms = domainAxiomsToGraphs(domain) #TODO: make this
+	global args
 	args, init, goal = problemToGraphs(problem)
 	objects = set(args.values())
 	addNegativeInitStates(domain.predicates.predicates, init, objects)
+
+	#parse Domain after parsing problem - so that for-all/exists statements can create edges for each legal typed object
+	# treats axioms as actions, TODO: consider if this affects heuristics drastically enough to change.
+	domainAxiomsToGraphs(domain)
+	op_graphs = domainToOperatorGraphs(domain)
+
 	return (op_graphs, objects, init, goal)
 	
 import sys	
@@ -358,19 +383,19 @@ if __name__ ==  '__main__':
 
 
 
-		
+
 #parser = Parser(domain_file, problem_file)
 #domain = parser.parse_domain()
 #problem = parser.parse_problem(domain)
 
 
-		
+
 #opGraphs = domainToOperatorGraphs(domain_file)
 #print(len(opGraphs))
 #for opgraph in opGraphs:
 #	opgraph.print_graph_names()
 #	print('\n')
-	
+
 #domain_file = '
 #problem_file = 'domains/mini-indy-problem.pddl'
 #problem = parse(domain_file, problem_file)

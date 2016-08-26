@@ -52,6 +52,21 @@ class Predicate:
     def __str__(self):
         return self.name + str(self.signature)
 
+class Quantifier:
+    def __init__(self, name, signature, predicates):
+        """
+        name: The name of the predicate.
+        signature: A list of tuples (name, [types]) to represent a list of
+                   parameters and their type(s) which are in the scope.
+        predicate: A list of predicates
+        """
+        self.name = name #exists | forall
+        self.signature = signature
+        self.predicates = predicates
+    def __repr__(self):
+        return self.name + str(self.signature) + str(self.predicates)
+    def __str__(self):
+        return self.name + str(self.signature) + str(self.predicates)
 
 # Formula is unused right now!
 #class Formula:
