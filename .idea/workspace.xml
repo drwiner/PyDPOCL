@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="added setup">
+    <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/domains/ark-domain.pddl" afterPath="$PROJECT_DIR$/domains/ark-domain.pddl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/domains/mini-indy-domain.pddl" afterPath="$PROJECT_DIR$/domains/mini-indy-domain.pddl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/domains/mini-indy-problem.pddl" afterPath="$PROJECT_DIR$/domains/mini-indy-problem.pddl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pddl/parser.py" afterPath="$PROJECT_DIR$/pddl/parser.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pddl/pddl.py" afterPath="$PROJECT_DIR$/pddl/pddl.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pddl/tree_visitor.py" afterPath="$PROJECT_DIR$/pddl/tree_visitor.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pddlToGraphs.py" afterPath="$PROJECT_DIR$/pddlToGraphs.py" />
     </list>
     <ignored path="story-elements.iws" />
@@ -105,11 +99,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Planner.py" pinned="true" current-in-tab="true">
+      <file leaf-file-name="Planner.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Planner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="410" column="19" selection-start-line="410" selection-start-column="19" selection-end-line="410" selection-end-column="19" />
+            <state relative-caret-position="126">
+              <caret line="395" column="24" selection-start-line="395" selection-start-column="24" selection-end-line="395" selection-end-column="24" />
               <folding>
                 <element signature="e#21#47#0" expanded="true" />
               </folding>
@@ -137,11 +131,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pddlToGraphs.py" pinned="true" current-in-tab="false">
+      <file leaf-file-name="pddlToGraphs.py" pinned="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="185">
-              <caret line="68" column="0" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+            <state relative-caret-position="398">
+              <caret line="91" column="29" selection-start-line="91" selection-start-column="29" selection-end-line="91" selection-end-column="29" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
               </folding>
@@ -178,11 +172,11 @@
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/domains/mini-indy-problem.pddl" />
         <option value="$PROJECT_DIR$/domains/ark-domain.pddl" />
-        <option value="$PROJECT_DIR$/pddlToGraphs.py" />
         <option value="$PROJECT_DIR$/pddl/parser.py" />
         <option value="$PROJECT_DIR$/domains/mini-indy-domain.pddl" />
         <option value="$PROJECT_DIR$/pddl/pddl.py" />
         <option value="$PROJECT_DIR$/pddl/tree_visitor.py" />
+        <option value="$PROJECT_DIR$/pddlToGraphs.py" />
       </list>
     </option>
   </component>
@@ -513,20 +507,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00008" summary="Cleanup">
-      <created>1470343817091</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1470343817091</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Cleanup">
-      <created>1470347759544</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1470347759544</updated>
-    </task>
     <task id="LOCAL-00010" summary="testing with edit to problem">
       <created>1470367380463</created>
       <option name="number" value="00010" />
@@ -856,7 +836,21 @@
       <option name="project" value="LOCAL" />
       <updated>1472144758269</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="forall quantifiers">
+      <created>1472180964333</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1472180964334</updated>
+    </task>
+    <task id="LOCAL-00058" summary="forall quantifier parsing">
+      <created>1472198131544</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1472198131544</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -945,8 +939,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="parsing axiom pieces" />
-    <MESSAGE value="DomainDef to include axioms" />
     <MESSAGE value="change axiom to include separate existential variables" />
     <MESSAGE value="axiom no error, now need to return list of axioms and figure out when to decide on applicability (e.g., whenever a new action is added)" />
     <MESSAGE value="debug domain new operators missing '?'" />
@@ -970,16 +962,13 @@
     <MESSAGE value="working POCL planner" />
     <MESSAGE value="Found error in flaw management at &quot;OCs&quot; -- addCndts and Risks now accurate... thanks Obama" />
     <MESSAGE value="added setup" />
-    <option name="LAST_COMMIT_MESSAGE" value="added setup" />
+    <MESSAGE value="forall quantifiers" />
+    <MESSAGE value="forall quantifier parsing" />
+    <option name="LAST_COMMIT_MESSAGE" value="forall quantifier parsing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/pddlToGraphs.py</url>
-          <line>68</line>
-          <option name="timeStamp" value="148" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Planner.py</url>
           <line>404</line>
@@ -1346,22 +1335,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
+    <entry file="file://$PROJECT_DIR$/Planner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
-          <caret line="68" column="0" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+        <state relative-caret-position="126">
+          <caret line="395" column="24" selection-start-line="395" selection-start-column="24" selection-end-line="395" selection-end-column="24" />
           <folding>
-            <element signature="e#0#30#0" expanded="true" />
+            <element signature="e#21#47#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Planner.py">
+    <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="410" column="19" selection-start-line="410" selection-start-column="19" selection-end-line="410" selection-end-column="19" />
+        <state relative-caret-position="398">
+          <caret line="91" column="29" selection-start-line="91" selection-start-column="29" selection-end-line="91" selection-end-column="29" />
           <folding>
-            <element signature="e#21#47#0" expanded="true" />
+            <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>

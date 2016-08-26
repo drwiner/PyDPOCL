@@ -91,6 +91,7 @@ def forallFormula(formula, parent, relationship, elements, edges):
 		L.ID = uuid.uuid1(26)
 		edges.add(L, arg, '')
 		for i, child in enumerate(formula.children):
+			pass
 	formula
 
 
