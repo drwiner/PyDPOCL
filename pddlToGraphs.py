@@ -51,6 +51,8 @@ def makeMotive(formula, current_id, parent, relationship, elements, edges, bit =
 	return lit, formula
 	
 def makeLit(formula, current_id, parent, relationship, elements, edges, bit = None):
+	if current_id == None:
+		current_id == uuid.uuid1(7)
 	if bit == None:
 		bit=  True
 	num_children = len(formula.children)
@@ -66,6 +68,29 @@ def forallFormula(formula, parent, relationship, elements, edges):
 		first find out what ?c is . then get all args and create precondition for each
 	'''
 	global args
+	scoped_var = formula.children[0]
+	typ = next(iter(elm.typ for elm in elements if elm.arg_name == scoped_var[0].key.name))
+
+	#scoped_args = objects from planning problem which share a typ with scoped_var
+	scoped_args = {(arg,i) for arg, i in enumerate(args) if arg.typ ==typ}
+	lit = formula.children[1]
+
+	negative = False
+	num_args = 0
+	if lit.key == 'not':
+		Lit, form = makeLit(next(iter(formula.children)),parent = parent,relationship= relationship,
+							elements =elements,edges = edges,bit= False)
+	else:
+		Lit, form = makeLit(formula,parent = parent,relationship= relationship, elements =elements,edges = edges,
+							bit= True)
+
+	other_vars = [elm for elm in elements if elm.typ != typ]
+	#create new Literal and add edge to each scoped arg, and then also the arg which isn't scoped
+	for arg in scoped_args:
+		L = copy.deepcopy(Lit)
+		L.ID = uuid.uuid1(26)
+		edges.add(L, arg, '')
+		for i, child in enumerate(formula.children):
 	formula
 
 
@@ -85,7 +110,7 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 	elif formula.key == 'intends':
 		lit, formula = makeMotive(formula, current_id, parent, relationship, elements, edges, True)
 	elif formula.key == 'for-all' or formula.key == 'forall':
-		formula = next(iter(formula.children))
+		#formula = next(iter(formula.children))
 		forallFormula(formula, parent, relationship, elements, edges)
 
 	elif formula.type >0:
@@ -101,7 +126,9 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 		
 		if relationship == 'actor-of':
 			edges.add(Edge(parent, arg, 'actor-of'))
+
 		elif lit.name == '=' or lit.name == 'equals' or lit.name == 'equal':
+			# TODO: test if ever receiving 'equals'
 			edges.add(Edge(lit, arg, 'arg-of'))
 		else:
 			edges.add(Edge(lit, arg, ARGLABELS[i]))
@@ -208,10 +235,10 @@ def domainToOperatorGraphs(domain):
 		'''First, create elements for all action parameters (variables)'''
 		for i, parameter in enumerate(action.parameters):
 			#parameters are list
-			if 'character' in parameter.types:
+			if 'character' in parameter.types or 'actor' in parameter.types:
 				op_graph.elements.add(Actor(ID = uuid.uuid1(start_id), typ = 'character', arg_name = parameter.name))#, #arg_pos_dict={op_id : i}))
-			elif 'actor' in parameter.types:
-				op_graph.elements.add(Actor(ID = uuid.uuid1(start_id), typ = 'actor', arg_name = parameter.name))#, arg_pos_dict={op_id : i}))
+			# elif 'actor' in parameter.types:
+			# 	op_graph.elements.add(Actor(ID = uuid.uuid1(start_id), typ = 'actor', arg_name = parameter.name))#, arg_pos_dict={op_id : i}))
 			else:
 				arg_type = next(iter(parameter.types))
 				op_graph.elements.add(Argument(ID = uuid.uuid1(start_id), 	typ=arg_type, arg_name=parameter.name))#, arg_pos_dict=	{op_id :  i}))
