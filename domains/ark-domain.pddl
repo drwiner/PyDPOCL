@@ -9,15 +9,13 @@
                (burried ?item - item ?place - place)
                (knows-location ?character - character ?item - item ?place - place)
                (at ?character - character ?place - place)
-               (has ?character - character ?item - item)
-			   (equa ?object1 - object ?object2 - object))
+               (has ?character - character ?item - item))
 
 
   (:action travel
     :parameters   (?character - character ?from - place ?to - place)
 	:precondition (and 
                        (alive ?character)
-					   (not (equa ?from ?to))
                        (at ?character ?from))
 	:effect       (and (not (at ?character ?from))
                        (at ?character ?to))
@@ -39,7 +37,6 @@
     :parameters   (?giver - character ?item - item ?receiver - character ?place - place)
 	:precondition (and 
                        (alive ?giver)
-					   (not (equa ?giver ?receiver))
                        (at ?giver ?place)
                        (has ?giver ?item)
                        (alive ?receiver)
@@ -64,7 +61,6 @@
     :parameters   (?taker - character ?item - item ?victim - character ?place - place)
 	:precondition (and 
                        (alive ?taker)
-					   (not (equals ?taker ?victim))
                        (at ?taker ?place)
                        (armed ?taker)
                        (not (armed ?victim))
@@ -80,7 +76,6 @@
 	:precondition (and 
                        (alive ?taker)
                        (at ?taker ?place)
-					   (not (equa ?taker ?victim))
                        (not (alive ?victim))
                        (at ?victim ?place)
                        (has ?victim ?item))
@@ -102,5 +97,17 @@
 	:parameters (?ark - ark)
 	:precondition (open ?ark)
 	:effect       (not (open ?ark)))
+
+
+     ;; When a character has a weapon, they are armed.
+   (:action armed-axiom
+     :parameters    (?character - character ?w - weapon)
+     :precondition (has ?character ?w)
+     :effect (armed ?character))
+
+    (:action unarmed-axiom
+     :parameters    (?character - character ?w - weapon)
+     :precondition (not (has ?character ?w))
+     :effect (not (armed ?character)))
 
 )

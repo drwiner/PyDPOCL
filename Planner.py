@@ -117,8 +117,6 @@ class PlanSpacePlanner:
 		Precondition = graph.subgraph(precondition)
 
 		results = set()
-		if precondition.name == 'occupied':
-			pass
 
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
@@ -403,6 +401,24 @@ def topoSort(graph):
 		return
 	return L
 
+def obTypesDict(object_types):
+	obtypes = defaultdict(set)
+	for t in object_types:
+		obtypes[t.name].add(t.parent)
+		accumulated = set()
+		rFollowHierarchy(object_types, t.parent, accumulated)
+		obtypes[t.name].update(accumulated)
+	return obtypes
+
+
+def rFollowHierarchy(object_types, child_name, accumulated = set()):
+	for ob in object_types:
+		if not ob.name in accumulated:
+			if ob.name == child_name:
+				accumulated.add(ob.parent)
+				rFollowHierarchy(object_types, ob.parent, accumulated)
+
+
 import sys
 
 if __name__ ==  '__main__':
@@ -412,15 +428,19 @@ if __name__ ==  '__main__':
 		if num_args > 2:
 			problem_file = sys.argv[2]
 	else:
-		domain_file = 'domains/mini-indy-domain.pddl'
-		problem_file = 'domains/mini-indy-problem.pddl'
+		#domain_file = 'domains/mini-indy-domain.pddl'
+		#problem_file = 'domains/mini-indy-problem.pddl'
+		domain_file = 'domains/ark-domain.pddl'
+		problem_file = 'domains/ark-problem.pddl'
 
 	#f = open('workfile', 'w')
-	operators, objects, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
+	operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
 	#non_static_preds = preprocessDomain(operators)
 	FlawLib.non_static_preds = preprocessDomain(operators)
-	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
+	obtypes = obTypesDict(object_types)
 
+	Element.object_types = obtypes
+	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	result = planner.POCL()
 
 	totOrdering = topoSort(result)

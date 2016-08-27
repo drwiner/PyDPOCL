@@ -15,6 +15,7 @@
 import copy
 
 class Element:
+	object_types = None
 	"""Element is a token or label"""
 	def __init__(self, ID, typ = None, name = None, arg_name = None):
 		self.ID = ID
@@ -26,7 +27,8 @@ class Element:
 	def isConsistent(self, other):
 		""" Returns True if self and other have same name or unassigned"""
 		if not self.typ is None and not other.typ is None:
-			if self.typ != other.typ:
+			if self.typ != other.typ or self.typ in self.object_types[other.typ] or other.typ in self.object_types[
+				self.typ]:
 				return False
 		if not self.name is None and not other.name is None:
 			if self.name != other.name:
@@ -79,21 +81,12 @@ class Element:
 			return self
 		if self.typ is None and not other.typ is None:
 			self.typ = other.typ
+		#if other.typ is lower in the hierarchy than self.typ
+		if self.typ in self.object_types[other.typ]:
+			self.typ = other.typ
 		if self.name is None and not other.name is None:
 			self.name = other.name
 		return self
-		
-	def combine(self, other):
-		if not self.isConsistent(other):
-			return None
-		if self.isEquivalent(other):
-			return self
-		if other.merge(self) is None:
-			return None
-		if self.merge(other) is None:
-			return None
-		return self
-
 		
 	def __repr__(self):
 		id = str(self.ID)[19:23]

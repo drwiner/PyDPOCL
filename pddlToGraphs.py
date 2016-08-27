@@ -368,7 +368,7 @@ def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	domainAxiomsToGraphs(domain)
 	op_graphs = domainToOperatorGraphs(domain)
 
-	return (op_graphs, objects, init, goal)
+	return (op_graphs, objects, domain.types, init, goal)
 	
 import sys	
 if __name__ ==  '__main__':
