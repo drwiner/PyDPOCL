@@ -115,7 +115,10 @@ class PlanSpacePlanner:
 
 		s_need, precondition = flaw.flaw
 		Precondition = graph.subgraph(precondition)
+
 		results = set()
+		if precondition.name == 'occupied':
+			pass
 
 		for op in self.op_graphs:
 			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
@@ -157,15 +160,29 @@ class PlanSpacePlanner:
 							if elm in untouched_step_elms:
 								graph_copy.elements.add(elm)
 
+
+						#for edge in new_step_op.edges:
+						#	if edge.source in untouched_step_elms:
+						#		graph_copy.elements.add(elm)
+						#	if edge.sink in untouched_step_elms:
+						#		graph_copy.elements.add(elm)
+
 						# For each edge 'e1 --label--> e2 in new_step_op such that e1 not in eff_abs,
 							# if exists some e_p s.t. e_p.merge(sink), replace edge sink
 							# graph_copy.add(edge)
 						for edge in new_step_op.edges:
 							if edge.source in untouched_step_elms:
+								#untouched_step_elms
 								if not edge.sink in untouched_step_elms:
 									e_abs = eff_abs.getElementById(edge.sink.ID)
-									edge.sink = graph_copy.getElementById(e_abs.replaced_ID)
+									if e_abs is None:
+										pass
+									edge.sink = graph_copy.getElementById(e_abs.replaced_ID)#place here
+									#untouched_step_elms.add(edge.sink)
 								graph_copy.edges.add(edge)
+								#to prevent same edge from being selected in this iteration of for-loop
+
+
 
 						# adds causal link and ordering constraints
 						condition = graph_copy.getElementById(Precondition.root.ID)
@@ -178,7 +195,6 @@ class PlanSpacePlanner:
 						#print('\n')
 
 						results.add(graph_copy)
-
 		return results
 
 

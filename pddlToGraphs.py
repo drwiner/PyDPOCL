@@ -50,16 +50,18 @@ def makeMotive(formula, current_id, parent, relationship, elements, edges, bit =
 	current_id+=1
 	return lit, formula
 	
-def makeLit(formula, current_id, parent, relationship, elements, edges, bit = None):
-	if current_id == None:
-		current_id == uuid.uuid1(7)
+def makeLit(formula, current_id, parent, relationship, elements, edges, bit = None, noAdd = None):
+
 	if bit == None:
 		bit=  True
+	if noAdd == None:
+		noAdd = False
 	num_children = len(formula.children)
 	lit = Literal(ID = uuid.uuid1(current_id), typ = 'Condition',  name = formula.key, num_args = num_children, truth = bit)
-	current_id += 1
-	elements.add(lit)
-	edges.add(Edge(parent,lit,relationship))
+	#current_id += 1
+	if not noAdd:
+		elements.add(lit)
+		edges.add(Edge(parent,lit,relationship))
 	return lit, formula
 
 def forallFormula(formula, parent, relationship, elements, edges):
@@ -68,32 +70,35 @@ def forallFormula(formula, parent, relationship, elements, edges):
 		first find out what ?c is . then get all args and create precondition for each
 	'''
 	global args
+	arg_elements = {v for v in args.values()}
 	scoped_var = formula.children[0]
-	typ = next(iter(elm.typ for elm in elements if elm.arg_name == scoped_var[0].key.name))
+	typ = next(iter(elm.typ for elm in elements if elm.arg_name == scoped_var.key.name))
 
 	#scoped_args = objects from planning problem which share a typ with scoped_var
-	scoped_args = {(arg,i) for arg, i in enumerate(args) if arg.typ ==typ}
+	scoped_args = {arg for arg in arg_elements if arg.typ ==typ}
 	lit = formula.children[1]
 
 	negative = False
 	num_args = 0
 	if lit.key == 'not':
-		Lit, form = makeLit(next(iter(formula.children)),parent = parent,relationship= relationship,
-							elements =elements,edges = edges,bit= False)
+		Lit, formula = makeLit(next(iter(lit.children)),7,parent = parent,relationship= relationship,
+							elements =elements,edges = edges,bit= False, noAdd = True)
 	else:
-		Lit, form = makeLit(formula,parent = parent,relationship= relationship, elements =elements,edges = edges,
-							bit= True)
+		Lit, formula = makeLit(lit,7,parent = parent,relationship= relationship, elements =elements,edges = edges,
+							bit= True, noAdd = True)
 
-	other_vars = [elm for elm in elements if elm.typ != typ]
-	#create new Literal and add edge to each scoped arg, and then also the arg which isn't scoped
 	for arg in scoped_args:
 		L = copy.deepcopy(Lit)
 		L.ID = uuid.uuid1(26)
-		edges.add(L, arg, '')
+		elements.add(L)
+		edges.add(Edge(parent, L, relationship))
 		for i, child in enumerate(formula.children):
-			pass
-	formula
-
+			if child.key.name == scoped_var.key.name:
+				elements.add(arg)
+				edges.add(Edge(L, arg, ARGLABELS[i]))  # figure out which arg
+			else:
+				non_scoped = next(element for element in elements if child.key.name == element.arg_name)
+				edges.add(Edge(L,non_scoped,ARGLABELS[i]))
 
 def getSubFormulaGraph(formula, current_id = None, parent = None, relationship = None, elements = None, edges = None):
 	if elements ==None:
@@ -113,7 +118,7 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 	elif formula.key == 'for-all' or formula.key == 'forall':
 		#formula = next(iter(formula.children))
 		forallFormula(formula, parent, relationship, elements, edges)
-
+		return elements, edges
 	elif formula.type >0:
 		pass
 	else:

@@ -347,6 +347,7 @@ class TraversePDDLDomain(PDDLVisitor):
 			forall = True
 			scoped_var = c.children[0]
 			c = c.children[1]
+
 		if c.key == 'not':
 			# This is a negative effect, only one child allowed.
 			if len(c.children) != 1:
@@ -356,6 +357,10 @@ class TraversePDDLDomain(PDDLVisitor):
 			isNegative = True
 		else:
 			nextPredicate = c
+
+		if nextPredicate.key in {'equals', '=', 'equal'}:
+			#nonequals by default
+			return
 		
 		if not nextPredicate.key in self._predicates:
 			raise SemanticError('Error: unknown predicate %s used in precondition '
