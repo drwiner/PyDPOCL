@@ -313,9 +313,9 @@ class PlanSpacePlanner:
 		restriction = graph.deepcopy()
 		if restriction.preventThreatWithRestriction(condition=causal_link.label, threat=effect):
 			results.add(restriction)
-		#print('\ncreated child (restriction):\n')
-		#print(restriction)
-		#print('\n')
+			print('\ncreated child (restriction):\n')
+			print(restriction)
+			print('\n')
 		#results.add((restriction, 'restriction'))
 
 		return results
@@ -352,7 +352,8 @@ class PlanSpacePlanner:
 			print(graph)
 			if not graph.isInternallyConsistent():
 				print('branch terminated')
-				return None
+				continue
+				#return None
 
 			if len(graph.flaws) == 0:
 				#print('solution selected')

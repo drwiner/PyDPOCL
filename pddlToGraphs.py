@@ -298,7 +298,6 @@ def problemToGraphs(problem):
 
 import itertools
 def addNegativeInitStates(predicates, initAction, objects):
-	ARGLABELS = ['first-arg', 'sec-arg', 'third-arg']
 	init_tups = defaultdict(set)
 	effects = initAction.getNeighbors(initAction.root)
 	#[sorted([(edge.sink, ARGLABELS.index(edge.label)) for edge in initAction.getIncidentEdges(eff)],
