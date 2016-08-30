@@ -3,11 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Element.py" afterPath="$PROJECT_DIR$/Element.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ElementGraph.py" afterPath="$PROJECT_DIR$/ElementGraph.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Graph.py" afterPath="$PROJECT_DIR$/Graph.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlanElementGraph.py" afterPath="$PROJECT_DIR$/PlanElementGraph.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Planner.py" afterPath="$PROJECT_DIR$/Planner.py" />
     </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -545,13 +540,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00014" summary="getting ready for flaw selection">
-      <created>1470555400975</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1470555400975</updated>
-    </task>
     <task id="LOCAL-00015" summary="evaluating new steps' effects based on consistency with open conditions and risk to undo open condition">
       <created>1470586228807</created>
       <option name="number" value="00015" />
@@ -888,7 +876,14 @@
       <option name="project" value="LOCAL" />
       <updated>1472402784935</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="fixed the tanis problem">
+      <created>1472519343716</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1472519343717</updated>
+    </task>
+    <option name="localTasksCounter" value="64" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -977,7 +972,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="in progress negative initial dummy step effects" />
     <MESSAGE value="negative init effects - but forgot to subtract if positive is also effect of init" />
     <MESSAGE value="added TODO for paramTuples in addNegativeInitStateEffects" />
     <MESSAGE value="completed negative effects attempt" />
@@ -1002,7 +996,8 @@
     <MESSAGE value="forall and equality" />
     <MESSAGE value="object_types - element merges" />
     <MESSAGE value="not enough arg labels&#10;" />
-    <option name="LAST_COMMIT_MESSAGE" value="not enough arg labels&#10;" />
+    <MESSAGE value="fixed the tanis problem" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed the tanis problem" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
