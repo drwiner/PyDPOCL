@@ -9,6 +9,7 @@
                (burried ?item - item ?place - place)
                (knows-location ?character - character ?item - item ?place - place)
                (at ?character - character ?place - place)
+               (= ?obj - object ?obj2 - object)
                (has ?character - character ?item - item))
 
 
@@ -35,7 +36,8 @@
 
   (:action give
     :parameters   (?giver - character ?item - item ?receiver - character ?place - place)
-	:precondition (and 
+	:precondition (and
+	                   (not (= ?giver ?receiver))
                        (alive ?giver)
                        (at ?giver ?place)
                        (has ?giver ?item)
@@ -48,7 +50,9 @@
 
   (:action kill
     :parameters   (?killer - character ?weapon - weapon ?victim - character ?place - place)
-    :precondition (and (alive ?killer)
+    :precondition (and
+                       (not (= ?killer ?victim))
+                       (alive ?killer)
                        (at ?killer ?place)
                        (has ?killer ?weapon)
                        (alive ?victim)

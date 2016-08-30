@@ -229,8 +229,6 @@ class PlanSpacePlanner:
 				snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID): eff_abs.getElementById(elm.ID)
 								 for elm in new_snk_cddts}
 				for old, new in snk_swap_dict.items():
-					if new.name is None and not old.name is None:
-						pass
 					graph_copy.replaceWith(old, new)
 
 				# adds causal link and ordering constraints
@@ -270,10 +268,15 @@ class PlanSpacePlanner:
 			#prcs = graph.getNeighborsByLabel(s_add, 'precond-of')
 			#preconditions = graph.getNeighborsByLabel(s_add, 'precond-of')
 			equalNames = {'equals', 'equal', '='}
+
+			#just edges of label 'precond'
 			noncodesg = {prc for prc in prc_edges if prc.sink.name in equalNames and not prc.sink.truth}
 
-			#Remove equality precondition edges
-			graph.edges -= noncodesg
+			if len(noncodesg) > 0:
+				graph.edges -= noncodesg
+				if not graph.addNonEqualityRestrictions({nonco.sink for nonco in noncodesg}):
+					print('problem with adding nonequality restrictions')
+
 			new_flaws = (Flaw((s_add, prec.sink), 'opf') for prec in prc_edges if not prec in noncodesg)
 			for flaw in new_flaws:
 				graph.flaws.insert(graph,flaw)
@@ -315,7 +318,7 @@ class PlanSpacePlanner:
 		restriction = graph.deepcopy()
 		if restriction.preventThreatWithRestriction(condition=causal_link.label, threat=effect):
 			results.add(restriction)
-			print('\ncreated child (restriction):\n')
+			#print('\ncreated child (restriction):\n')
 
 		#	print(restriction)
 		#	print('\n')
@@ -330,13 +333,13 @@ class PlanSpacePlanner:
 			results = self.reuse(graph, flaw)
 			results.update(self.newStep(graph, flaw))
 			if len(results) == 0:
-				print('could not resolve opf')
+				#print('could not resolve opf')
 				return results
 
 		if flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
 			if len(results) == 0:
-				print('could not resolve tclf')
+				#print('could not resolve tclf')
 				return results
 
 		#for result, res in results:
@@ -344,25 +347,18 @@ class PlanSpacePlanner:
 			new_flaws = result.detectThreatenedCausalLinks()
 			result.flaws.threats.update(new_flaws)
 
-		for result in results:
-			init_action = result.subgraph(result.initial_dummy_step, Action)
-			init_action.updateArgs()
-			for arg in init_action.Args:
-				if arg.name is None:
-					pass
 		return results
 
 	def POCL(self):
 		Visited = []
 		while len(self.Open) > 0:
-
 			#Select child
 			graph = self.Open.pop()
 			print(graph)
 			if not graph.isInternallyConsistent():
 				print('branch terminated')
 				continue
-				#return None
+
 
 			if len(graph.flaws) == 0:
 				#print('solution selected')

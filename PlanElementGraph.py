@@ -209,7 +209,8 @@ class PlanElementGraph(ElementGraph):
 		return self.subgraph(self.getElementById(element_ID), Type)
 
 	def isInternallyConsistent(self):
-		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent()
+		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent() and \
+			   super(PlanElementGraph, self).isInternallyConsistent()
 
 
 	def updateIntentionFrameAttributes(self):

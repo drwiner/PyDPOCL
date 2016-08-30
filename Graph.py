@@ -94,8 +94,12 @@ class Graph(Element):
 		for r in self.restrictions:
 			for r_edge in r.edges:
 				if r_edge.source == oldsnk:
+					if r_edge.source in r.elements:
+						r.elements.add(newsnk)
 					r.replaceWith(r_edge.source, newsnk)
 				if r_edge.sink == oldsnk:
+					if r_edge.sink in r.elements:
+						r.elements.add(newsnk)
 					r.replaceWith(r_edge.sink, newsnk)
 		return self
 
@@ -104,7 +108,8 @@ class Graph(Element):
 			
 	def getEdgesByIdsAndLabel(self, source_id, sink_id, label):
 		return {edge for edge in self.edges if edge.source.ID == source_id and edge.sink.ID == sink_id and edge.label == label}
-			
+
+
 	def getIncidentEdges(self, element):
 		return {edge for edge in self.edges if edge.source == element}
 	def getNeighbors(self, element):
@@ -119,6 +124,10 @@ class Graph(Element):
 		return {edge for edge in self.edges if edge.source.ID == element.ID and edge.label == label}
 	def getParentsByLabel(self, element, label):
 		return set(edge.source for edge in self.edges if edge.sink is element and edge.label is label)
+	def getIncomingEdges(self, element):
+		return {edge for edge in self.edges if edge.sink == element}
+	def getIncomingEdgesByType(self, element, typ):
+		return {edge for edge in self.edges if edge.sink  == element and edge.source.typ == typ}
 		
 	######       rGet       ####################
 	def rGetDescendants(self, element, Descendants = None):

@@ -45,13 +45,54 @@ class ElementGraph(Graph):
 	def getElementGraphFromElementID(self, element_ID, Type = None):
 		return self.getElementGraphFromElement(self.getElementById(element_ID), Type)
 
+	def addRealRestriction(self, source, sink, label):
+		R = Restriction()
+		R.elements.add(source)
+		R.elements.add(sink)
+		R.edges.add(Edge(source,sink, label))
+		self.restrictions.add(R)
+
+	def addNonEqualityRestrictions(self, iter):
+		""" @param iter : set of False-Equals Lits"""
+		for nonequal in iter:
+			IE = self.getIncidentEdges(nonequal)
+			arg1, arg2 = (edge.sink for edge in IE)
+			self.edges -= IE
+			self.elements -= {nonequal}
+			if not self.preventEqualityWithRestriction(arg1, arg2):
+				return False
+		return True
+
+	def preventEqualityWithRestriction(self, arg1, arg2):
+		#Just need one parent of type Condition
+
+		arg_1_edge = next(iter(self.getIncomingEdgesByType(arg1, 'Condition')))
+		if arg_1_edge is None:
+			arg_2_edge = next(iter(self.getIncomingEdgesByType(arg2, 'Condition')))
+			if arg_2_edge is None:
+				#TODO: consider cases when argument passed to this method would be orphans without Condition parents
+				return False
+			self.addRealRestriction(arg_2_edge.source, arg1, arg_2_edge.label)
+			return True
+
+		self.addRealRestriction(arg_1_edge.source, arg2, arg_1_edge.label)
+		return True
+
+
+
 	def preventThreatWithRestriction(self, threat, condition):
 		"""
 		"""
 		R = Restriction()
-		edge_pairs = {(e1, e2) for e1 in self.getIncidentEdges(threat) for e2 in self.getIncidentEdges(condition)
+		T = self.getIncidentEdges(threat)
+		C = self.getIncidentEdges(condition)
+		edge_pairs = {(e1, e2) for e1 in T for e2 in C
 						if e1.label == e2.label and e1.sink != e2.sink}
 		if len(edge_pairs) == 0:
+			if len(T) == 0 and len(C) == 0:
+				#TODO: consider cases when a Condition wouldn't have children even if hollow containers with no minds
+				#  of their own
+				return False
 			return False
 
 		t_edge, c_edge = next(iter(edge_pairs))
@@ -60,54 +101,6 @@ class ElementGraph(Graph):
 		R.edges.add(Edge(c_edge.source, t_edge.sink, t_edge.label))
 		self.restrictions.add(R)
 		return True
-		# for ce in condition_edges:
-		# 	for te in threat_edges:
-		# 		if ce.label != te.label and ce.sink != te.sink:
-		# 			R.elements.add(threat)
-		# 			R.elements.add(ce.sink)
-		# 			R.edges.add(Edge(te.source, ce.sink, ce.label))
-		# 			return
-
-		# R.elements.add(threat)
-		# for threat_edge in self.getIncidentEdges(threat):
-		# 	if threat_edge.sink.name is None:
-		# 		R.edges.add(Edge(condition, threat_edge.sink, threat_edge.label))
-		# 		R.elements.add(threat_edge.sink)
-		# if len(R.edges) == 0:
-		# 	R.elements.add(condition)
-		# 	for condition_edge in self.getIncidentEdges(condition):
-		# 		if condition_edge.sink.name is None:
-		# 			R.edges.add(Edge(threat, condition_edge.sink, condition_edge.label))
-		# 			R.elements.add(condition_edge.sink)
-		# if len(R.edges) == 0:
-		# 	return None
-
-
-	# def addNonCodesignationConstraints(self, elm1, elm2):
-	# 	''' Adds a constraint edge to prevent elm1 from being a legal merge with elm2
-	# 		Strategy depends that two preconditions or two effects of the same step could not be non-codesignated
-	# 		Also does not take into account future edges which are given the same edge-label
-	# 		TODO: more robust anti-merge strategy
-	# 	'''
-	# 	# could pick more specific edge. some edges could be 'unique' in that no other outgoing/incoming edge label is same
-	#
-	# 	#Revisited :
-	# 	cndts1 = {edge.sink for edge in self.getNeighbors(elm1) if edge.sink.name is None}
-	# 	cndts2 = {edge.sink for edge in self.getNeighbors(elm2) if edge.sink.name is None}
-	# 	if len(cndts1) + len(cndts2) == 0:
-	# 		return None
-	#
-	# 	elm2_edges = self.getIncidentEdges(elm2)
-	#
-	# 	#If any edge
-	# 	# for edge in self.getIncidentEdges(elm1):
-	# 	# 	if not edge.sink in self.getNeighborsByLabel(elm2, edge.label):
-	#
-	#
-	#
-	# 	prnt = next(iter(edge for edge in self.edges if edge.sink.ID == elm1.ID))
-	# 	self.restrictions.add(Restriction(Elements = {prnt.source, prnt.label, elm2}, Edges = {Edge(prnt.source, elm2,
-	# 																					prnt.label)}))
 
 	def mergeGraph(self, other, no_add=None):
 		"""
@@ -169,9 +162,6 @@ class ElementGraph(Graph):
 		if len(completed) == 0:
 			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other, self))
 
-		for element_graph in completed:
-			# element_graph.updateActionParams() #only will work if this is action
-			element_graph.restrictions = copy.deepcopy(other.restrictions)
 		return completed
 
 	def updateArgs(self):

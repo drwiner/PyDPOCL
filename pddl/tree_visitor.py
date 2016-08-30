@@ -313,8 +313,7 @@ class TraversePDDLDomain(PDDLVisitor):
 		"""Visits a PDDL action statement."""
 		signature = list()
 		# Visit all parameters and create signature.
-		#if node.key in {'forall', 'exists', 'equals'}:
-		#	pass
+
 		for v in node.parameters:
 			v.accept(self)
 			signatureTuple = self.get_in(v)
@@ -358,10 +357,7 @@ class TraversePDDLDomain(PDDLVisitor):
 		else:
 			nextPredicate = c
 
-		if nextPredicate.key in {'equals', '=', 'equal'}:
-			#nonequals by default
-			return
-		
+
 		if not nextPredicate.key in self._predicates:
 			raise SemanticError('Error: unknown predicate %s used in precondition '
 									'of action' % nextPredicate.key)
