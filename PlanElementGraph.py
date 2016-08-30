@@ -28,6 +28,7 @@ class Action(ElementGraph):
 		
 		""" Determine if Action is an orphan"""
 		#self.isOrphan()
+
 						
 	def updateConsentingActors(self,scratch = None):
 		if scratch == None:
@@ -108,7 +109,7 @@ class Action(ElementGraph):
 		
 	def __repr__(self):
 		self.updateArgs()
-		args = str(list(self.Args))
+		args = str(self.Args)
 		exe = self.root.executed
 		if exe == None:
 			exe = 'ex'

@@ -165,11 +165,17 @@ class ElementGraph(Graph):
 		return completed
 
 	def updateArgs(self):
-		argTyps = {Argument, Actor}
-		self.Args = set()
-		for element in self.rGetDescendants(self.root):
-			if type(element) in argTyps:
-				self.Args.add(element)
+		arglabels = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
+		#argTyps = {Argument, Actor}
+		self.Args = []
+		for label in arglabels:
+			try:
+				self.Args.append(next(iter(self.getNeighborsByLabel(self.root, label))))
+			except:
+				return
+		#for element in self.rGetDescendants(self.root):
+			#if type(element) in argTyps:
+			#	self.Args.add(element)
 
 	def absolve(self, Remaining=None, Available=None, Collected=None):
 		""" Every edge from other must be consistent with some edge in self.

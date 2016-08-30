@@ -242,12 +242,16 @@ def domainToOperatorGraphs(domain):
 		for i, parameter in enumerate(action.parameters):
 			#parameters are list
 			if 'character' in parameter.types or 'actor' in parameter.types:
-				op_graph.elements.add(Actor(ID = uuid.uuid1(start_id), typ = 'character', arg_name = parameter.name))#, #arg_pos_dict={op_id : i}))
+				arg = Actor(ID=uuid.uuid1(start_id), typ='character', arg_name=parameter.name)
+				op_graph.elements.add(arg)#, #arg_pos_dict={op_id : i}))
+
 			# elif 'actor' in parameter.types:
 			# 	op_graph.elements.add(Actor(ID = uuid.uuid1(start_id), typ = 'actor', arg_name = parameter.name))#, arg_pos_dict={op_id : i}))
 			else:
 				arg_type = next(iter(parameter.types))
-				op_graph.elements.add(Argument(ID = uuid.uuid1(start_id), 	typ=arg_type, arg_name=parameter.name))#, arg_pos_dict=	{op_id :  i}))
+				arg = Argument(ID = uuid.uuid1(start_id), 	typ=arg_type, arg_name=parameter.name)
+				op_graph.elements.add(arg)#, arg_pos_dict=	{op_id :  i}))
+			op_graph.edges.add(Edge(op_graph.root, arg, ARGLABELS[i]))
 			start_id += 1
 		
 		getFormulaGraph(action.precond.formula, start_id, parent = op, relationship = 'precond-of',elements= op_graph.elements, edges=op_graph.edges)
