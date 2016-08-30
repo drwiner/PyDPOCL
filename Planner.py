@@ -226,9 +226,11 @@ class PlanSpacePlanner:
 				# Get elm for elms which were in eff_abs but not in precondition (were replaced)
 				precondition_IDs = {element.ID for element in Precondition.elements}
 				new_snk_cddts = {elm for elm in eff_abs.elements if not elm.ID in precondition_IDs}
-				snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID): graph_copy.getElementById(elm.ID)
+				snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID): eff_abs.getElementById(elm.ID)
 								 for elm in new_snk_cddts}
 				for old, new in snk_swap_dict.items():
+					if new.name is None and not old.name is None:
+						pass
 					graph_copy.replaceWith(old, new)
 
 				# adds causal link and ordering constraints
@@ -314,8 +316,9 @@ class PlanSpacePlanner:
 		if restriction.preventThreatWithRestriction(condition=causal_link.label, threat=effect):
 			results.add(restriction)
 			print('\ncreated child (restriction):\n')
-			print(restriction)
-			print('\n')
+
+		#	print(restriction)
+		#	print('\n')
 		#results.add((restriction, 'restriction'))
 
 		return results
@@ -341,6 +344,12 @@ class PlanSpacePlanner:
 			new_flaws = result.detectThreatenedCausalLinks()
 			result.flaws.threats.update(new_flaws)
 
+		for result in results:
+			init_action = result.subgraph(result.initial_dummy_step, Action)
+			init_action.updateArgs()
+			for arg in init_action.Args:
+				if arg.name is None:
+					pass
 		return results
 
 	def POCL(self):
@@ -440,7 +449,7 @@ if __name__ ==  '__main__':
 	FlawLib.non_static_preds = preprocessDomain(operators)
 	obtypes = obTypesDict(object_types)
 
-	Element.object_types = obtypes
+	Argument.object_types = obtypes
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	result = planner.POCL()
 

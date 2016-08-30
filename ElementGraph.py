@@ -46,24 +46,42 @@ class ElementGraph(Graph):
 		return self.getElementGraphFromElement(self.getElementById(element_ID), Type)
 
 	def preventThreatWithRestriction(self, threat, condition):
-		""" """
+		"""
+		"""
 		R = Restriction()
-		R.elements.add(threat)
-		for threat_edge in self.getIncidentEdges(threat):
-			if threat_edge.sink.name is None:
-				R.edges.add(Edge(condition, threat_edge.sink, threat_edge.label))
-				R.elements.add(threat_edge.sink)
-		if len(R.edges) == 0:
-			R.elements.add(condition)
-			for condition_edge in self.getIncidentEdges(condition):
-				if condition_edge.sink.name is None:
-					R.edges.add(Edge(threat, condition_edge.sink, condition_edge.label))
-					R.elements.add(condition_edge.sink)
-		if len(R.edges) == 0:
-			return None
+		edge_pairs = {(e1, e2) for e1 in self.getIncidentEdges(threat) for e2 in self.getIncidentEdges(condition)
+						if e1.label == e2.label and e1.sink != e2.sink}
+		if len(edge_pairs) == 0:
+			return False
 
+		t_edge, c_edge = next(iter(edge_pairs))
+		R.elements.add(c_edge.source)
+		R.elements.add(t_edge.sink)
+		R.edges.add(Edge(c_edge.source, t_edge.sink, t_edge.label))
 		self.restrictions.add(R)
 		return True
+		# for ce in condition_edges:
+		# 	for te in threat_edges:
+		# 		if ce.label != te.label and ce.sink != te.sink:
+		# 			R.elements.add(threat)
+		# 			R.elements.add(ce.sink)
+		# 			R.edges.add(Edge(te.source, ce.sink, ce.label))
+		# 			return
+
+		# R.elements.add(threat)
+		# for threat_edge in self.getIncidentEdges(threat):
+		# 	if threat_edge.sink.name is None:
+		# 		R.edges.add(Edge(condition, threat_edge.sink, threat_edge.label))
+		# 		R.elements.add(threat_edge.sink)
+		# if len(R.edges) == 0:
+		# 	R.elements.add(condition)
+		# 	for condition_edge in self.getIncidentEdges(condition):
+		# 		if condition_edge.sink.name is None:
+		# 			R.edges.add(Edge(threat, condition_edge.sink, condition_edge.label))
+		# 			R.elements.add(condition_edge.sink)
+		# if len(R.edges) == 0:
+		# 	return None
+
 
 	# def addNonCodesignationConstraints(self, elm1, elm2):
 	# 	''' Adds a constraint edge to prevent elm1 from being a legal merge with elm2

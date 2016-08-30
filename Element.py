@@ -15,7 +15,7 @@
 import copy
 
 class Element:
-	object_types = None
+
 	"""Element is a token or label"""
 	def __init__(self, ID, typ = None, name = None, arg_name = None):
 		self.ID = ID
@@ -27,8 +27,7 @@ class Element:
 	def isConsistent(self, other):
 		""" Returns True if self and other have same name or unassigned"""
 		if not self.typ is None and not other.typ is None:
-			if self.typ != other.typ or self.typ in self.object_types[other.typ] or other.typ in self.object_types[
-				self.typ]:
+			if self.typ != other.typ:
 				return False
 		if not self.name is None and not other.name is None:
 			if self.name != other.name:
@@ -80,9 +79,6 @@ class Element:
 		if self.isEquivalent(other):
 			return self
 		if self.typ is None and not other.typ is None:
-			self.typ = other.typ
-		#if other.typ is lower in the hierarchy than self.typ
-		if self.typ in self.object_types[other.typ]:
 			self.typ = other.typ
 		if self.name is None and not other.name is None:
 			self.name = other.name
@@ -308,7 +304,7 @@ class Literal(InternalElement):
 		
 		
 class Argument(Element):
-
+	object_types = None
 	def __init__(self, ID, typ, name= None, arg_name = None):
 		super(Argument,self).__init__(ID,typ,name, arg_name)		
 	
@@ -318,7 +314,8 @@ class Argument(Element):
 			
 		"""
 		if not super(Argument,self).isEquivalent(other):
-			return False
+			if not self.typ in self.object_types[other.typ] and not other.typ in self.object_types[self.typ]:
+				return False
 		
 		if not self.name is None:
 			if other.name != self.name:
@@ -327,6 +324,19 @@ class Argument(Element):
 			if not other.name is None:
 				return False		
 		return True
+
+	def isConsistent(self, other):
+		if not super(Argument, self).isConsistent(other):
+			if not self.typ in self.object_types[other.typ] and not other.typ in self.object_types[self.typ]:
+				return False
+		return True
+
+	def merge(self, other):
+		if super(Argument, self).merge(other) is None:
+			return None
+		if self.typ in self.object_types[other.typ]:
+			self.typ = other.typ
+		return self
 		
 	def __repr__(self):
 		id = str(self.ID)[19:23]

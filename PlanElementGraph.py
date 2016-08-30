@@ -359,14 +359,16 @@ class PlanElementGraph(ElementGraph):
 						if cond_graph.canAbsolve(reverse_dependency):
 							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
 							count+=1
-						else:
-							nonThreats[causal_link].add(eff)
+						#else:
+						#always add that it's not a threat anymore, because we don't want to reconsider the same tclf
+						#nonThreats[causal_link].add(eff)
 					elif num_edges >= len(cond_graph.edges):
 						if reverse_dependency.canAbsolve(cond_graph):
 							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
 							count+=1
-						else:
-							nonThreats[causal_link].add(eff)
+						#else:
+						#	nonThreats[causal_link].add(eff)
+					nonThreats[causal_link].add(eff)
 				if count == 0:
 					nonThreats[causal_link].add(step)
 

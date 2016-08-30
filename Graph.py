@@ -80,6 +80,8 @@ class Graph(Element):
 			
 	def replaceWith(self, oldsnk, newsnk):
 		''' removes oldsnk from self.elements, replaces all edges with snk = oldsnk with newsnk'''
+
+
 		if oldsnk == newsnk:
 			return
 		if self.getElementById(newsnk.ID) is None:
