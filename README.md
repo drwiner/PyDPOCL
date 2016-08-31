@@ -28,6 +28,8 @@ TODO: intention frames (open motivation flaws, unsatisfied intention frame flaws
 
 TODO: actions with duration
 
+TODO: speed-up
+
 
 
 --David Winer drwiner@cs.utah.edu
