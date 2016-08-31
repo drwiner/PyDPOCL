@@ -12,3 +12,5 @@ this graph representation is to enable an outside program to make very minute/at
 to a plan with a common language of abstraction.
 
 python Planner.py 'domain.pddl' 'problem.pddl'
+
+tested in python 3.3 and 3.5
