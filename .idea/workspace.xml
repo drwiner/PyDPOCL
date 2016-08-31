@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -540,13 +539,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00018" summary="augmenting flawques and flaw comparators for unsafe">
-      <created>1470612544678</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1470612544678</updated>
-    </task>
     <task id="LOCAL-00019" summary="organizing Planner">
       <created>1470613403315</created>
       <option name="number" value="00019" />
@@ -883,7 +875,14 @@
       <option name="project" value="LOCAL" />
       <updated>1472666380939</updated>
     </task>
-    <option name="localTasksCounter" value="67" />
+    <task id="LOCAL-00067" summary="  added to readme">
+      <created>1472666408591</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1472666408591</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -972,7 +971,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="completed negative effects attempt" />
     <MESSAGE value="negative effects successful planner run, after preprocess static flaws from domain, send them to flawLib" />
     <MESSAGE value="fixed detectCycle ordering Graphs" />
     <MESSAGE value="rCompare" />
@@ -997,7 +995,8 @@
     <MESSAGE value="fixed the tanis problem" />
     <MESSAGE value="working planner" />
     <MESSAGE value="added to readme" />
-    <option name="LAST_COMMIT_MESSAGE" value="added to readme" />
+    <MESSAGE value="  added to readme" />
+    <option name="LAST_COMMIT_MESSAGE" value="  added to readme" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
