@@ -14,12 +14,18 @@ detect patterns that extend across multiple literals and steps, and to make atom
 
 python Planner.py 'domain.pddl' 'problem.pddl'
 
-Example: python Planner.py domains/ark-domain.pddl domains/ark-problem.pddl > console.txt
+Examples:
+
+python Planner.py domains/ark-domain.pddl domains/ark-problem.pddl > console.txt
+
+python Planner.py domains/mini-indy-domain.pddl domains/mini-indy-problem.pddl
 
 tested in python 3.3 and 3.5
 
-TODO: intention frames
+TODO: intention frames (open motivation flaws, unsatisfied intention frame flaws, orphan flaws, execution marking)
+
 TODO: actions with duration
-TODO:
+
+
 
 --David Winer drwiner@cs.utah.edu
