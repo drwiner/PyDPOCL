@@ -1,6 +1,6 @@
 # story-elements
 
-This is a partial-order causal-link planner (POCL), adopting planning as plan refinement, where each child node in the
+This is a partial-order causal-link (POCL) planner, adopting planning as plan refinement, where each child node in the
 search is a refinement to a flaw in the parent-node. Iteratively selects plan at frontier of search, selects a flaw,
 refines flaws, identifies new flaws, and repeats.
 
@@ -10,3 +10,5 @@ whose root represents the predicate name and truth-status of the literal, and th
 atoms/constants, and each edge from the parent to the child is labeled with the argument position. The benefit of
 this graph representation is to enable an outside program to make very minute/atomic changes/additions/restrictions
 to a plan with a common language of abstraction.
+
+python Planner.py 'domain.pddl' 'problem.pddl'
