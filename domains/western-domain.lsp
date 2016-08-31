@@ -1,36 +1,46 @@
 (define (domain western-duel)
   (:requirements)
   (:types character place item - object
-          gun horse lasso door bottle cig - item
+          gun horse lasso door bottle cig tnt - item
 		  )
-  (:predicates (aimed-at ?g1 - gun ?target - object)
+  (:predicates 	   
+			   (has ?c - character ?it - item)
+			   (at ?object - object ?place - place)
+			   (has ?character - character ?item - item)
+			   (= ?obj - object ?obj2 - object)
+			   
+			   ;guns
+			   (armed ?character - character)
+			   (deholstered ?g1 - gun)
 			   (cocked ?g1 - gun)
 			   (raised ?g1 - gun)
-			   (has ?c - character ?it - item)
-			   (deholstered ?g1 - gun)
 			   (loaded ?g1 - gun)
-			   (hands-busy ?c - character)
-			   (tied-up ?c - character)
-			   (stare-at ?c1 - character ?ob - object)
-			   (sitting ?c1 - character)
-			   (hit-by-bullet ?ob - object)
-			   (on-horse ?c1 - character ?h1 - horse)
-			   (cowering ?c1 - character)
-               (alive ?character - character)
-               (armed ?character - character)
-			   (angered ?character - character)
-			   (sees ?c1 - character ?it - item)
-			   (open ?door - door)
-               (at ?object - object ?place - place)
-               (knows-location ?character - character ?obj - object ?place - place)
-               (= ?obj - object ?obj2 - object)
-               (has ?character - character ?item - item)
-			   (smoking ?c - character ?cig - cig)
+			   (aimed-at ?g1 - gun ?target - object)
 			   (marksman ?c - character)
+			   (hit-by-bullet ?ob - object)
+			   
+			   ;hands
+			   (ready-to-grab ?c - character ?g - gun)
+			   (hands-busy ?c - character)
+			   
+			   ;cognitive
+			   (stare-at ?c1 - character ?ob - object)
+			   (sees ?c1 - character ?it - item)
+               
+			   ;char states
+			   (alive ?character - character)
+			   (sitting ?c1 - character)
+			   (tied-up ?c - character)
+			   (smoking ?c - character ?cig - cig)
 			   (cowboy ?c - character)
 			   (angry ?c - character)
 			   (scared ?c - character)
 			   (drunk ?c - character)
+			   (cowering ?c1 - character)
+			   
+			   ;item specific
+			   (open ?door - door)
+			   (on-horse ?c1 - character ?h1 - horse)
 			   )
 
 
@@ -71,15 +81,21 @@
   (:action raise-gun
     :parameters   (?shooter - character ?gun - gun)
 	:precondition (and (alive ?shooter)
-                       (at ?shooter ?place)
                        (has ?shooter ?gun)
-					   
-					   (cocked ?gun)
-					   (loaded ?gun)
-					   (sees ?shooter ?target)
+					   (deholstered ?gun)
                        )
-	:effect       (and (
-                       (hit-by-bullet ?target))
+	:effect       (and (not (deholstered ?gun))
+					(raised ?gun))
+    :agents       (?shooter))
+	
+  (:action cock-gun
+    :parameters   (?shooter - character ?gun - gun)
+	:precondition (and (alive ?shooter)
+                       (has ?shooter ?gun)
+					   (deholstered ?gun)
+                       )
+	:effect       (and (not (deholstered ?gun))
+					(raised ?gun))
     :agents       (?shooter))
 
 
