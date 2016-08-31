@@ -13,4 +13,6 @@ to a plan with a common language of abstraction.
 
 python Planner.py 'domain.pddl' 'problem.pddl'
 
+Example: python Planner.py domains/ark-domain.pddl domains/ark-problem.pddl > console.txt
+
 tested in python 3.3 and 3.5
