@@ -16,3 +16,5 @@ python Planner.py 'domain.pddl' 'problem.pddl'
 Example: python Planner.py domains/ark-domain.pddl domains/ark-problem.pddl > console.txt
 
 tested in python 3.3 and 3.5
+
+--David Winer drwiner@cs.utah.edu
