@@ -72,6 +72,7 @@ class Restriction(Graph):
 				return False
 			isos.extend(new_isos)
 		return True
+
 	def isIsomorphicSubgraphOf(self, EG, r = None, map_ = None):
 		""" Graph traversals to determine if self is a subgraph of EG, with special identity requirements
 
@@ -120,6 +121,7 @@ class Restriction(Graph):
 		#gauranteed to have successful_map for each r_edge if
 
 		return successful_maps
+
 
 import unittest
 import uuid

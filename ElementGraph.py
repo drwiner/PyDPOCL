@@ -46,6 +46,8 @@ class ElementGraph(Graph):
 		return self.getElementGraphFromElement(self.getElementById(element_ID), Type)
 
 	def addRealRestriction(self, source, sink, label):
+		""" It's 'real' because the source and sink must be ID-identical in a graph for the Restriction to be
+		considered an isomorphic subgraph"""
 		R = Restriction()
 		R.elements.add(source)
 		R.elements.add(sink)
