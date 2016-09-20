@@ -235,3 +235,12 @@ class ElementGraph(Graph):
 		self_sink.replaced_ID = other_edge.sink.ID
 		self_sink.merge(other_edge.sink)  # sink merge
 		return new_self
+
+
+import unittest
+class TestInstantiations(unittest.TestCase):
+	def test_method(self):
+		pass
+
+if __name__ ==  '__main__':
+	unittest.main()
