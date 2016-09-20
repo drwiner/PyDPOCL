@@ -294,6 +294,18 @@ def isConsistentEdgeSet(Rem = None, Avail = None, map_ = None):
 			return True
 	return False
 
+def Unify(_Map = None, R = None, A = None):
+	if _Map ==None:
+		_Map = {} 	;#_Map is a 1:1 mapping (r : a) for r in "R" for a in "A" s.t. every edge in "R" has one partner in "A"
+	if R == None:
+		R = []		;#"R" is the set of edges all of whose edges must be accounted for
+	if A == None:
+		A = []		;#"A" is the set of edges which account for edges in "R".
+
+					#@param _Map is a mapping (r : a) for r in R for a in A
+					#@param R is the
+
+
 
 import unittest
 
