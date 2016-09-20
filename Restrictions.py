@@ -75,7 +75,7 @@ class Restriction(Graph):
 
 	def isIsomorphicSubgraphOf(self, EG, r = None, map_ = None):
 		""" Graph traversals to determine if self is a subgraph of EG, with special identity requirements
-
+				r is root
 				"map_" is of the form self.r_elm : EG.elm
 		"""
 		if r == None:

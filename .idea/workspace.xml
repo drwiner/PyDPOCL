@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ElementGraph.py" afterPath="$PROJECT_DIR$/ElementGraph.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Restrictions.py" afterPath="$PROJECT_DIR$/Restrictions.py" />
     </list>
     <ignored path="story-elements.iws" />
@@ -39,8 +38,8 @@
       <file leaf-file-name="Restrictions.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Restrictions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="118">
-              <caret line="77" column="25" selection-start-line="77" selection-start-column="25" selection-end-line="77" selection-end-column="25" />
+            <state relative-caret-position="322">
+              <caret line="89" column="0" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -544,13 +543,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00032" summary="axiom no error, now need to return list of axioms and figure out when to decide on applicability (e.g., whenever a new action is added)">
-      <created>1471647256472</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1471647256472</updated>
-    </task>
     <task id="LOCAL-00033" summary="debug domain new operators missing '?'">
       <created>1471741331517</created>
       <option name="number" value="00033" />
@@ -887,7 +879,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474378616499</updated>
     </task>
-    <option name="localTasksCounter" value="81" />
+    <task id="LOCAL-00081" summary="CreatePossibleWorlds method for merging graphs">
+      <created>1474379144795</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1474379144795</updated>
+    </task>
+    <option name="localTasksCounter" value="82" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -979,7 +978,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="passed Restrictions.py testcase" />
     <MESSAGE value="extra test conditions" />
     <MESSAGE value="all tests passed, Restrictions" />
     <MESSAGE value="removed unneed methods" />
@@ -1004,7 +1002,8 @@
     <MESSAGE value="        absolve small change to return condition" />
     <MESSAGE value="Clauses for considering all possible merges of one graph with another." />
     <MESSAGE value="Quick note on edge labels" />
-    <option name="LAST_COMMIT_MESSAGE" value="Quick note on edge labels" />
+    <MESSAGE value="CreatePossibleWorlds method for merging graphs" />
+    <option name="LAST_COMMIT_MESSAGE" value="CreatePossibleWorlds method for merging graphs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1321,8 +1320,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Restrictions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="118">
-          <caret line="77" column="25" selection-start-line="77" selection-start-column="25" selection-end-line="77" selection-end-column="25" />
+        <state relative-caret-position="322">
+          <caret line="89" column="0" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
           <folding />
         </state>
       </provider>
