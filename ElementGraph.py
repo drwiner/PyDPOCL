@@ -236,6 +236,22 @@ class ElementGraph(Graph):
 				2) (p1,p2), (pi,pj)			   "possibel exclusion"
 				3) (p1==pi, p2), (p1==pi, pj)  "potential adjacencies"
 				4) (p1, p2==pj), (pi, p2==pj)  "potential adjacencies"
+
+		New Strategy as of 5 seconds ago:
+			If G is self and G' is another graph,
+				1) For each root r' in G', create an r'-induced subgraph R' from G'. {R'1, ..., R'n)
+				2) For each R', find r consistent with r' and make r-induced subgraph R from G
+					If R is "consistent" with R' -- but, what if R and R' share nothing but r==r'?
+						RULE: you cannot merge requirement graphs with partial steps because it's not clear who
+						has what. If we took all possible ways to aggregate two partial steps with nothing in
+						common, then we would have explosion of possible steps. Any partial step which is part of a
+						frame must first become instantiated by an operator before it can be used to satisfy a requirement-step.
+
+						But, what about frames? A frame is consistent with another frame - requires a definition such that
+							F1 is consistent with F2 just when for each special labeled edge in F1, if F2 has that
+							label, then that edge must be consistent. For each pair of steps which must be
+							consistent, if those steps are both partial steps, then this is fine since if they have
+							goal literals or consenting agents, these would need to be consistent already.
 		"""
 
 		if Remaining == None:
@@ -245,16 +261,26 @@ class ElementGraph(Graph):
 		if Collected == None:
 			Collected = set()
 
+		#Base Case: All edges have been accounted for.
 		if len(Remaining) == 0:
 			Collected.add(self)
 			return Collected
 
+		#Induction: pop edge to account for.
 		other_edge = Remaining.pop()
 		num_collected_before = len(Collected)
 
+		#For each prospect, create 4 possible worlds, and be sure to keep list of shared endpoints.
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
+				#World 1 --> assimilate
 				new_self = self.assimilate(prospect, other_edge)
+				#World 2 --> keep separate. (do nothing, letting mergeGraph put in a good word)
+				#World 3--> assimilateSource
+				new_self_source = self.assimilateSource(prospect, other_edge)
+				#world 4 --> assimilateSink
+				new_self_sink = self.assimilateSink(prospect, other_edge)
+
 				# if new_self.isInternallyConsistent():
 				Collected.update(new_self.absolve({copy.deepcopy(rem) for rem in Remaining}, Available, Collected))
 
@@ -280,6 +306,19 @@ class ElementGraph(Graph):
 		self_sink.merge(other_edge.sink)  # sink merge
 		return new_self
 
+	def assimilateSource(self, old_edge, other_edge):
+		new_self = self.copyGen()
+		self_source = new_self.getElementById(old_edge.source.ID)
+		self_source.merge(other_edge.source)
+		self_source.replaced_ID = other_edge.source.ID
+		return new_self
+
+	def assimilateSink(self, old_edge, other_edge):
+		new_self = self.copyGen()
+		self_sink = new_self.getElementById(old_edge.sink.ID)  # sink from new_self
+		self_sink.replaced_ID = other_edge.sink.ID
+		self_sink.merge(other_edge.sink)  # sink merge
+		return new_self
 
 import unittest
 class TestInstantiations(unittest.TestCase):

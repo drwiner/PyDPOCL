@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Restrictions.py" afterPath="$PROJECT_DIR$/Restrictions.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ElementGraph.py" afterPath="$PROJECT_DIR$/ElementGraph.py" />
     </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,21 +35,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Restrictions.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Restrictions.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Restrictions.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="322">
-              <caret line="89" column="0" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
+              <caret line="92" column="36" selection-start-line="92" selection-start-column="36" selection-end-line="92" selection-end-column="36" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ElementGraph.py" pinned="true" current-in-tab="false">
+      <file leaf-file-name="ElementGraph.py" pinned="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ElementGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="511">
-              <caret line="238" column="11" selection-start-line="238" selection-start-column="11" selection-end-line="238" selection-end-column="11" />
+            <state relative-caret-position="596">
+              <caret line="253" column="106" selection-start-line="253" selection-start-column="106" selection-end-line="253" selection-end-column="106" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
               </folding>
@@ -104,8 +104,8 @@
       <file leaf-file-name="Planner.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Planner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="343">
-              <caret line="429" column="0" selection-start-line="429" selection-start-column="0" selection-end-line="429" selection-end-column="27" />
+            <state relative-caret-position="355">
+              <caret line="221" column="37" selection-start-line="221" selection-start-column="27" selection-end-line="221" selection-end-column="37" />
               <folding>
                 <element signature="e#21#47#0" expanded="true" />
               </folding>
@@ -172,8 +172,8 @@
         <option value="$PROJECT_DIR$/PlanElementGraph.py" />
         <option value="$PROJECT_DIR$/nlk.py" />
         <option value="$PROJECT_DIR$/Graph.py" />
-        <option value="$PROJECT_DIR$/ElementGraph.py" />
         <option value="$PROJECT_DIR$/Restrictions.py" />
+        <option value="$PROJECT_DIR$/ElementGraph.py" />
       </list>
     </option>
   </component>
@@ -543,13 +543,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00033" summary="debug domain new operators missing '?'">
-      <created>1471741331517</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1471741331517</updated>
-    </task>
     <task id="LOCAL-00034" summary="in progress negative initial dummy step effects">
       <created>1471753906153</created>
       <option name="number" value="00034" />
@@ -886,7 +879,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474379144795</updated>
     </task>
-    <option name="localTasksCounter" value="82" />
+    <task id="LOCAL-00082" summary="labeled r as root in isIsomorphic subgraph">
+      <created>1474379170734</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1474379170734</updated>
+    </task>
+    <option name="localTasksCounter" value="83" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -978,7 +978,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="extra test conditions" />
     <MESSAGE value="all tests passed, Restrictions" />
     <MESSAGE value="removed unneed methods" />
     <MESSAGE value="cleanup isle Graph.py" />
@@ -1003,7 +1002,8 @@
     <MESSAGE value="Clauses for considering all possible merges of one graph with another." />
     <MESSAGE value="Quick note on edge labels" />
     <MESSAGE value="CreatePossibleWorlds method for merging graphs" />
-    <option name="LAST_COMMIT_MESSAGE" value="CreatePossibleWorlds method for merging graphs" />
+    <MESSAGE value="labeled r as root in isIsomorphic subgraph" />
+    <option name="LAST_COMMIT_MESSAGE" value="labeled r as root in isIsomorphic subgraph" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1280,16 +1280,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Planner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="343">
-          <caret line="429" column="0" selection-start-line="429" selection-start-column="0" selection-end-line="429" selection-end-column="27" />
-          <folding>
-            <element signature="e#21#47#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="411">
@@ -1308,21 +1298,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ElementGraph.py">
+    <entry file="file://$PROJECT_DIR$/Restrictions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="511">
-          <caret line="238" column="11" selection-start-line="238" selection-start-column="11" selection-end-line="238" selection-end-column="11" />
+        <state relative-caret-position="322">
+          <caret line="92" column="36" selection-start-line="92" selection-start-column="36" selection-end-line="92" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Planner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="355">
+          <caret line="221" column="37" selection-start-line="221" selection-start-column="27" selection-end-line="221" selection-end-column="37" />
           <folding>
-            <element signature="e#0#26#0" expanded="true" />
+            <element signature="e#21#47#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Restrictions.py">
+    <entry file="file://$PROJECT_DIR$/ElementGraph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="89" column="0" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="596">
+          <caret line="253" column="106" selection-start-line="253" selection-start-column="106" selection-end-line="253" selection-end-column="106" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
