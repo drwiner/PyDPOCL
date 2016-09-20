@@ -208,13 +208,10 @@ class ElementGraph(Graph):
 		for prospect in Available:
 			if other_edge.isConsistent(prospect):
 				new_self = self.assimilate(prospect, other_edge)
-				if new_self.isInternallyConsistent():
-					Collected.update(new_self.absolve({copy.deepcopy(rem) for rem in Remaining}, Available, Collected))
+				#if new_self.isInternallyConsistent():
+				Collected.update(new_self.absolve({copy.deepcopy(rem) for rem in Remaining}, Available, Collected))
 
-		if len(Collected) == 0:
-			return set()
-
-		if len(Collected) > num_collected_before:
+		if len(Collected) > num_collected_before and len(Collected) > 0:
 			return Collected
 		else:
 			return set()
@@ -240,7 +237,18 @@ class ElementGraph(Graph):
 import unittest
 class TestInstantiations(unittest.TestCase):
 	def test_method(self):
-		pass
+		""" Test Idea:
+				Create three conditions between pairs of two graphs
+				1) G1 is a subset of G2
+				2) G1 has a subset which equals a subset of G2, but G1 is not a subset of G2
+				3) G1 has
+
+		"""
+		Elms = [Element(ID=0, name='0'), Element(ID=1, name='1'), Element(ID=2, name='2'), Element(ID=3, name='3')]
+		edges = {Edge(Elms[0], Elms[1], 'k1'), Edge(Elms[0], Elms[2], 'k2'), Edge(Elms[0], Elms[3], 'k3'),
+				 Edge(Elms[2], Elms[1], 'j'), Edge(Elms[3], Elms[1], 'j')}
+		G = Graph(ID=10, typ='test', Elements=set(Elms), Edges=edges)
+
 
 if __name__ ==  '__main__':
 	unittest.main()
