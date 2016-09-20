@@ -216,6 +216,47 @@ class ElementGraph(Graph):
 
 		return set()
 
+	def createMerges(self, Remaining=None, Available=None, Collected=None):
+		""" Every edge from other must be consistent with some edge in self.
+			"Shared-endpoint clause"
+				AND, for any two edges (e1, e2) sharing an endpoint p, if (d1, d2) are two edges consistent with (e1,
+				e2), then (d1,d2) share an endpoint p' consistent with p.
+			"Possible-exclusion clause"
+				AND, for each edge of the form p1 --k--> p2, if there is a consistent edge in self pi --k-->pj,
+				then there are (at least) 2 possible worlds: 1 where (pi,pj) merges with (p1,p2), and another world
+				where (pi,pj) are distinct from (p1,p2).
+			"Potential-adjacencies clause"
+				AND, for each edge of the form p1 --k--> p2, if there is a consistent edge in self pi --k-->pj,
+				then there are 3 additional possible worlds, 1 where pi==p1 (s.t. all edges of the form (p0,
+				p1) are now (p0,p1==pi), another where pj == p2, BUT THERE IS NO THIRD WORLD where pi==p1 and pj==p2
+				because then it would be the same edge with label k. Labels are always function-free and grounded.
+		"""
+
+		if Remaining == None:
+			Remaining = set()
+		if Available == None:
+			Available = set()
+		if Collected == None:
+			Collected = set()
+
+		if len(Remaining) == 0:
+			Collected.add(self)
+			return Collected
+
+		other_edge = Remaining.pop()
+		num_collected_before = len(Collected)
+
+		for prospect in Available:
+			if other_edge.isConsistent(prospect):
+				new_self = self.assimilate(prospect, other_edge)
+				# if new_self.isInternallyConsistent():
+				Collected.update(new_self.absolve({copy.deepcopy(rem) for rem in Remaining}, Available, Collected))
+
+		if len(Collected) > num_collected_before and len(Collected) > 0:
+			return Collected
+
+		return set()
+
 	def assimilate(self, old_edge, other_edge):
 		"""	ProvIDed with old_edge consistent with other_edge
 			Merges source and sinks
