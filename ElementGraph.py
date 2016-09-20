@@ -213,8 +213,8 @@ class ElementGraph(Graph):
 
 		if len(Collected) > num_collected_before and len(Collected) > 0:
 			return Collected
-		else:
-			return set()
+
+		return set()
 
 	def assimilate(self, old_edge, other_edge):
 		"""	ProvIDed with old_edge consistent with other_edge
