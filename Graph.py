@@ -2,6 +2,7 @@ from Element import *
 import copy
 
 class Edge:
+	""" Edge labels are assumed to be function-free and ground, and there can be no edge otherwise"""
 	__slots__ = 'source', 'sink', 'label'
 	def __init__(self, source, sink, label):
 		self.source=  source
