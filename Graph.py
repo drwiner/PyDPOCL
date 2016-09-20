@@ -242,23 +242,23 @@ def consistent_dicts(dict1, dict2):
 	return True
 
 
-def consistentIsos(prior_isos, cndt_isos, new_isos = None):
-	if new_isos == None:
-		new_isos = []
-	if len(prior_isos) == 0:
-		new_isos.extend(cndt_isos)
+def consistentMaps(prior_maps, cndt_maps, Mbins = None):
+	if Mbins == None:
+		Mbins = []
+	if len(prior_maps) == 0:
+		Mbins.extend(cndt_maps)
 	else:
 		# for each dictionary 'm' in the list 'Maps_'
-		for m in cndt_isos:
+		for m in cndt_maps:
 			if len(m) == 0:
 				continue
 			# for each dictionary 'sm' in the set 'successful_maps'
-			for sm in prior_isos:
-				if consistent_dicts(m, sm):
-					new_isos.append(m)
+			for pm in prior_maps:
+				if consistent_dicts(m, pm):
+					Mbins.append(m)
 					# this 'm' has been satisfied
 					break
-	return new_isos
+	return Mbins
 
 def isConsistentEdgeSet(Rem = None, Avail = None, map_ = None):
 	if Rem == None:
@@ -294,17 +294,54 @@ def isConsistentEdgeSet(Rem = None, Avail = None, map_ = None):
 			return True
 	return False
 
+
 def Unify(_Map = None, R = None, A = None):
+	"""
+
+	@param _Map: dictonary
+	@param R: edges to account for
+	@param A: edges which account as
+	@return: dictionary _Map
+	"""
+
 	if _Map ==None:
 		_Map = {} 	;#_Map is a 1:1 mapping (r : a) for r in "R" for a in "A" s.t. every edge in "R" has one partner in "A"
+					#Mapping is a dictionary.
 	if R == None:
 		R = []		;#"R" is the set of edges all of whose edges must be accounted for
 	if A == None:
 		A = []		;#"A" is the set of edges which account for edges in "R".
 
-					#@param _Map is a mapping (r : a) for r in R for a in A
-					#@param R is the
+	if len(R) == 0:
+		return _Map
 
+	rem = R.pop()
+	cndts = {edge for edge in A if edge.isConsistent(rem)}
+
+	if rem.source in _Map:
+		cndts -= {edge for edge in cndts if not edge.source == _Map[rem.source]}
+	if rem.sink in _Map:
+		cndts -= {edge for edge in cndts if not edge.sink == _Map[rem.sink]}
+
+	if len(cndts) == 0:
+		return []
+
+	Mbins = []
+	for cndt in cndts:
+		Map_ = copy.deepcopy(_Map)
+		if not cndt.source in _Map:
+			Map_[rem.source] = cndt.source
+		if not cndt.sink in _Map:
+			Map_[rem.sink] = cndt.sink
+
+		#if this 'cndt' was to account for 'rem', recursively solve for rest of R and append all possible worlds in []
+		M_ = isConsistentEdgeSet(Map_ = _Map, R = copy.deepcopy(R), A = A-{cndt})
+		Mbins = consistentMaps(prior_maps=Map_,cndt_maps = M_, Mbins = Mbins)
+
+	if len(Mbins) == 0:
+		return []
+
+	return _Map.extend(Mbins)
 
 
 import unittest

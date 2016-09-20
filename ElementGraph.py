@@ -335,6 +335,9 @@ class TestInstantiations(unittest.TestCase):
 				 Edge(Elms[2], Elms[1], 'j'), Edge(Elms[3], Elms[1], 'j')}
 		G = Graph(ID=10, typ='test', Elements=set(Elms), Edges=edges)
 
+		""" Instead of "create possible worlds method, instead we just need to select some consistent mapping. But,
+		we don't need to do this for operator effects to absolve preconditions because roots are always lits and args
+		are always temporal and therefore uniquely labeled."""
 
 if __name__ ==  '__main__':
 	unittest.main()
