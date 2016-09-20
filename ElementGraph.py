@@ -216,7 +216,7 @@ class ElementGraph(Graph):
 
 		return set()
 
-	def createMerges(self, Remaining=None, Available=None, Collected=None):
+	def createPossibleWorlds(self, Remaining=None, Available=None, Collected=None):
 		""" Every edge from other must be consistent with some edge in self.
 			"Shared-endpoint clause"
 				AND, for any two edges (e1, e2) sharing an endpoint p, if (d1, d2) are two edges consistent with (e1,
@@ -230,6 +230,12 @@ class ElementGraph(Graph):
 				then there are 3 additional possible worlds, 1 where pi==p1 (s.t. all edges of the form (p0,
 				p1) are now (p0,p1==pi), another where pj == p2, BUT THERE IS NO THIRD WORLD where pi==p1 and pj==p2
 				because then it would be the same edge with label k. Labels are always function-free and grounded.
+
+			In total, for every edge (p1,p2) consistent with edge in self (pi,pj), there are 4 possible worlds
+				1) (p1==pi,p2==pj)			   "regular merge"
+				2) (p1,p2), (pi,pj)			   "possibel exclusion"
+				3) (p1==pi, p2), (p1==pi, pj)  "potential adjacencies"
+				4) (p1, p2==pj), (pi, p2==pj)  "potential adjacencies"
 		"""
 
 		if Remaining == None:

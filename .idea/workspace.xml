@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Graph.py" afterPath="$PROJECT_DIR$/Graph.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ElementGraph.py" afterPath="$PROJECT_DIR$/ElementGraph.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Restrictions.py" afterPath="$PROJECT_DIR$/Restrictions.py" />
     </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,21 +36,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Restrictions.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Restrictions.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Restrictions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1393">
-              <caret line="119" column="44" selection-start-line="119" selection-start-column="44" selection-end-line="119" selection-end-column="44" />
+            <state relative-caret-position="118">
+              <caret line="77" column="25" selection-start-line="77" selection-start-column="25" selection-end-line="77" selection-end-column="25" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ElementGraph.py" pinned="true" current-in-tab="true">
+      <file leaf-file-name="ElementGraph.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ElementGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="290">
-              <caret line="231" column="114" selection-start-line="231" selection-start-column="114" selection-end-line="231" selection-end-column="114" />
+            <state relative-caret-position="511">
+              <caret line="238" column="11" selection-start-line="238" selection-start-column="11" selection-end-line="238" selection-end-column="11" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
               </folding>
@@ -170,10 +171,10 @@
         <option value="$PROJECT_DIR$/pddlToGraphs.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/PlanElementGraph.py" />
-        <option value="$PROJECT_DIR$/Restrictions.py" />
         <option value="$PROJECT_DIR$/nlk.py" />
-        <option value="$PROJECT_DIR$/ElementGraph.py" />
         <option value="$PROJECT_DIR$/Graph.py" />
+        <option value="$PROJECT_DIR$/ElementGraph.py" />
+        <option value="$PROJECT_DIR$/Restrictions.py" />
       </list>
     </option>
   </component>
@@ -543,13 +544,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00031" summary="change axiom to include separate existential variables">
-      <created>1471645833043</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1471645833043</updated>
-    </task>
     <task id="LOCAL-00032" summary="axiom no error, now need to return list of axioms and figure out when to decide on applicability (e.g., whenever a new action is added)">
       <created>1471647256472</created>
       <option name="number" value="00032" />
@@ -886,7 +880,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474378552090</updated>
     </task>
-    <option name="localTasksCounter" value="80" />
+    <task id="LOCAL-00080" summary="Quick note on edge labels">
+      <created>1474378616499</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1474378616499</updated>
+    </task>
+    <option name="localTasksCounter" value="81" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -978,7 +979,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="debugging" />
     <MESSAGE value="passed Restrictions.py testcase" />
     <MESSAGE value="extra test conditions" />
     <MESSAGE value="all tests passed, Restrictions" />
@@ -1003,7 +1003,8 @@
     <MESSAGE value="absolve small change to return condition" />
     <MESSAGE value="        absolve small change to return condition" />
     <MESSAGE value="Clauses for considering all possible merges of one graph with another." />
-    <option name="LAST_COMMIT_MESSAGE" value="Clauses for considering all possible merges of one graph with another." />
+    <MESSAGE value="Quick note on edge labels" />
+    <option name="LAST_COMMIT_MESSAGE" value="Quick note on edge labels" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1298,14 +1299,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Restrictions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1393">
-          <caret line="119" column="44" selection-start-line="119" selection-start-column="44" selection-end-line="119" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Graph.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
@@ -1318,11 +1311,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ElementGraph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
-          <caret line="231" column="114" selection-start-line="231" selection-start-column="114" selection-end-line="231" selection-end-column="114" />
+        <state relative-caret-position="511">
+          <caret line="238" column="11" selection-start-line="238" selection-start-column="11" selection-end-line="238" selection-end-column="11" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Restrictions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="118">
+          <caret line="77" column="25" selection-start-line="77" selection-start-column="25" selection-end-line="77" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>
