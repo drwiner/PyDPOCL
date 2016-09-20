@@ -231,4 +231,123 @@ def rDetectConsistentEdgeGraph(Remaining = None, Available = None):
 			if rDetectConsistentEdgeGraph(	Remaining, {item for item in Available - {prospect}}):
 				return True
 	return False
-	
+
+
+def consistent_dicts(dict1, dict2):
+	common_keys = set(dict1.keys()) & set(dict2.keys())
+	for ck in common_keys:
+		if not dict1[ck] == dict2[ck]:
+			return False
+
+	return True
+
+
+def consistentIsos(prior_isos, cndt_isos, new_isos = None):
+	if new_isos == None:
+		new_isos = []
+	if len(prior_isos) == 0:
+		new_isos.extend(cndt_isos)
+	else:
+		# for each dictionary 'm' in the list 'Maps_'
+		for m in cndt_isos:
+			if len(m) == 0:
+				continue
+			# for each dictionary 'sm' in the set 'successful_maps'
+			for sm in prior_isos:
+				if consistent_dicts(m, sm):
+					new_isos.append(m)
+					# this 'm' has been satisfied
+					break
+	return new_isos
+
+def isConsistentEdgeSet(Rem = None, Avail = None, map_ = None):
+	if Rem == None:
+		Rem = set()
+	if Avail == None:
+		Avail = set()
+	if map_ == None:
+		map_ = {}
+
+	#Base Case - all Remaining edges
+	if len(Rem) == 0:
+		return True
+
+	edge_match = Rem.pop()
+
+	cndt_edges = {edge for edge in Avail if edge.isConsistent(edge_match)}
+
+	if edge_match.source in map_:
+		cndt_edges -= {edge for edge in cndt_edges if not edge.source == map_[edge_match.source]}
+	if edge_match.sink in map_:
+		cndt_edges -= {edge for edge in cndt_edges if not edge.sink == map_[edge_match.sink]}
+
+	if len(cndt_edges) == 0:
+		return False
+
+	for cndt in cndt_edges:
+		Map_ = copy.deepcopy(map_)
+		if not cndt.source in map_:
+			Map_[edge_match.source] = cndt.source
+		if not cndt.sink in map_:
+			Map_[edge_match.sink] = cndt.sink
+		if isConsistentEdgeSet(copy.deepcopy(Rem), Avail-{cndt}, Map_):
+			return True
+	return False
+
+
+import unittest
+
+class TestGraph(unittest.TestCase):
+	def test_consistent_edge_set(self):
+		"""
+				Full Graph
+				1 --> 2 --> 3 --> 5
+					  2 --> 4 --> 5
+
+				Requirements
+				[2]  --> [3]
+				[2]  --> [4]
+
+
+			"""
+		G = 	  ['buffer',
+				   Element(ID=1,name=1, typ='1'),
+				   Element(ID=2,name=2, typ='2'),
+				   Element(ID=3,name=3, typ='3'),
+				   Element(ID=4,name=4, typ='4'),
+				   Element(ID=5,name=5, typ='5')]
+		O =		  [Element(ID=20, typ='2'),
+				   Element(ID=30, typ='3'),
+				   Element(ID=40, typ='4')]
+
+		Avail = {Edge(G[1],G[2],'a'),
+			   Edge(G[2],G[3], 'b'),
+			   Edge(G[2],G[4], 'c'),
+			   Edge(G[3],G[5], 'd'),
+			   Edge(G[4],G[5], 'e')}
+		Rem = {
+				Edge(O[0],O[1], 'b'),
+				Edge(O[0],O[2], 'c')}
+
+
+		isit = isConsistentEdgeSet(Rem, Avail)
+		assert(isit)
+		assert(not isConsistentEdgeSet(Avail, Rem))
+		print(isit)
+
+		#With LARGER example to look through
+		G = ['buffer']
+		G+= [Element(ID=i, name=i, typ=str(i)) for i in range(1,900)]
+		Avail = {Edge(G[i],G[i+1],'m') for i in range(1,700)}
+		Avail.update({Edge(G[1],G[2],'a'),
+			   Edge(G[2],G[3], 'b'),
+			   Edge(G[2],G[4], 'c'),
+			   Edge(G[3],G[5], 'd'),
+			   Edge(G[4],G[5], 'e')})
+
+		isit = isConsistentEdgeSet(Rem, Avail)
+		assert (isit)
+		print(isit)
+
+if __name__ ==  '__main__':
+	unittest.main()
