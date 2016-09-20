@@ -105,7 +105,10 @@ class Action(ElementGraph):
 		# print('Effects:\n')
 		# for eff in effs:
 			# eff.sink
-		
+
+	def isConsistent(self, other):
+		""" an action is consistent just when one can absolve the other"""
+		return self.canAbsolve(other)
 		
 	def __repr__(self):
 		self.updateArgs()
@@ -125,6 +128,9 @@ class Condition(ElementGraph):
 		
 	def getArgList(self):
 		return [self.getNeighborsByLabel(self.root, self.labels[i]) for i in range(self.root.num_args)]
+
+	def isConsistent(self, other):
+		return self.canAbsolve(other)
 			
 	def __repr__(self):
 		self.updateArgs()
