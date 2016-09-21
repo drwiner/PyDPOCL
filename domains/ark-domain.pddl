@@ -15,7 +15,8 @@
 
   (:action travel
     :parameters   (?character - character ?from - place ?to - place)
-	:precondition (and 
+	:precondition (and
+	                   (not (= ?from ?to))
                        (alive ?character)
                        (at ?character ?from))
 	:effect       (and (not (at ?character ?from))
