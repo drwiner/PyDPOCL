@@ -23,6 +23,7 @@ class Element:
 		#Optional:
 		self.name = name
 		self.arg_name = arg_name
+		self.replaced_ID = -1
 		
 	def isConsistent(self, other):
 		""" Returns True if self and other have same name or unassigned"""

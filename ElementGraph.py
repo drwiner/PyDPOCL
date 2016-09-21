@@ -104,41 +104,27 @@ class ElementGraph(Graph):
 		self.restrictions.add(R)
 		return True
 
-	def mergeGraph(self, other, no_add=None):
+	def mergeGraph(self, effabs, no_add=None):
 		"""
-			For each element in other to include in self, if its a replacer, merge it into self
-					A relacer element 'replacer' is one such that replacer.replaced_ID == some element ID in self
-			Otherwise, add that element to self
-			For each edge in other to include in self, if its in self do nothing, otherwise add it
-		
-			Plan.mergeGraph(instance), where instance is "other". 
-					Other is a graph where some elements in the graph are "replacing" elements in self
-					
-			Precondition.mergeGraph(Effect) where the Effect is a Condition which has instantiated a precondition of S_{need}
-					Effect has some elements (arguments) which replaced elements in the operator clone
-					This method will merge the originals in the operator giving them the extra properties in the replacees of Effect
-					
-			Graph.mergeGraph(new_operator) where new_operator has replaced some elements in graph.
-					Then, if its a new element, add it. If its a replacer, merge it. 
-					For each edge in new_operator, if 
-					
+			@param effabs -  an effect of a step unified with precondition of existing step
+			@param no_add - if step whose effects include effabs is new, then toggle no_add to add new elms from effabs
+			@return self with effabs replacing its former precondition literal
 		"""
-		for element in other.elements:
-			if not hasattr(element, 'replaced_ID'):
-				element.replaced_ID = -1
+		for element in effabs.elements:
 
+			#if effabs element replaced a precondition during unification
+			# (NOTE: replaced_IDs switched to -1 before unify)
 			if element.replaced_ID != -1:
 				existing_element = self.getElementById(element.replaced_ID)
 				existing_element.merge(element)
-				existing_element.replaced_ID = element.ID
+				#existing_element.replaced_ID = element.ID #CHECK: is this needed?
 			else:
 				element.replaced_ID = element.ID
 				if no_add is None:
 					self.elements.add(element)
-					element.replaced_ID = element.ID
 
 		if no_add is None:
-			for edge in other.edges:
+			for edge in effabs.edges:
 				source = self.getElementById(edge.source.replaced_ID)
 				sink = self.getElementById(edge.sink.replaced_ID)
 				existing_edges = {E for E in self.edges if
@@ -181,7 +167,7 @@ class ElementGraph(Graph):
 			#	self.Args.add(element)
 
 
-def assimilate(EG, old_edge, other_edge):
+def assimilate(EG, ee, pe):
 	"""	ProvIDed with old_edge consistent with other_edge
 		Merges source and sinks
 		Uses = {'new-step', 'effect'}
@@ -190,12 +176,12 @@ def assimilate(EG, old_edge, other_edge):
 	"""
 
 	new_self = EG.copyGen()
-	self_source = new_self.getElementById(old_edge.source.ID)  # source from new_self
-	self_source.merge(other_edge.source)  # source merge
-	self_source.replaced_ID = other_edge.source.ID
-	self_sink = new_self.getElementById(old_edge.sink.ID)  # sink from new_self
-	self_sink.replaced_ID = other_edge.sink.ID
-	self_sink.merge(other_edge.sink)  # sink merge
+	self_source = new_self.getElementById(ee.source.ID)  # source from new_self
+	self_source.merge(pe.source)  # source merge
+	self_source.replaced_ID = pe.source.ID
+	self_sink = new_self.getElementById(ee.sink.ID)  # sink from new_self
+	self_sink.replaced_ID = pe.sink.ID
+	self_sink.merge(pe.sink)  # sink merge
 	return new_self
 
 def UnifyLiterals(effect, prec, C = None):
