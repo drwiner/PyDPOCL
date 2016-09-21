@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CompileReq.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CompileReq.py" afterPath="$PROJECT_DIR$/CompileReq.py" />
     </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -130,8 +130,8 @@
       <file leaf-file-name="CompileReq.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CompileReq.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="19" column="82" selection-start-line="19" selection-start-column="82" selection-end-line="19" selection-end-column="82" />
+            <state relative-caret-position="408">
+              <caret line="29" column="26" selection-start-line="29" selection-start-column="26" selection-end-line="29" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -546,13 +546,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00042" summary="BreadthFirstIsIsomporhicSubgraphOf">
-      <created>1471890417133</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1471890417133</updated>
-    </task>
     <task id="LOCAL-00043" summary="   debugging Restrictions">
       <created>1471907904739</created>
       <option name="number" value="00043" />
@@ -889,7 +882,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474473902027</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <task id="LOCAL-00091" summary="notes on compiling requirements">
+      <created>1474477750366</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1474477750366</updated>
+    </task>
+    <option name="localTasksCounter" value="92" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -981,7 +981,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="forall quantifiers" />
     <MESSAGE value="forall quantifier parsing" />
     <MESSAGE value="forall and equality" />
     <MESSAGE value="object_types - element merges" />
@@ -1006,7 +1005,8 @@
     <MESSAGE value="refactoring consistent subgraph and unifications" />
     <MESSAGE value="mods to mergeGraph" />
     <MESSAGE value="mergeUnifiedEffect method and usage" />
-    <option name="LAST_COMMIT_MESSAGE" value="mergeUnifiedEffect method and usage" />
+    <MESSAGE value="notes on compiling requirements" />
+    <option name="LAST_COMMIT_MESSAGE" value="notes on compiling requirements" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1345,8 +1345,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CompileReq.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="19" column="82" selection-start-line="19" selection-start-column="82" selection-end-line="19" selection-end-column="82" />
+        <state relative-caret-position="408">
+          <caret line="29" column="26" selection-start-line="29" selection-start-column="26" selection-end-line="29" selection-end-column="26" />
           <folding />
         </state>
       </provider>

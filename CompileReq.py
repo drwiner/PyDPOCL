@@ -18,6 +18,12 @@
 				{s: t} --> t.unifyWith(s) just when s is a consistent subgraph of t
 				Returns a set of steps T = {t'_1,...,t'_n} such that s is an isomorphic subgraph of t
 				For each step s, {s:t'_1,...,s:t'_n, s:domain_action_1,...,s:domain_action_m}
+			ORDERINGS and LINKS: are edges between steps, and problems are detected just when there is a cycle in an
+									ordering graph. when there is a causal link, consider first cases when that
+									condition is specified:
+										if the condition is specified in the link, then there are edges:
+											s --eff--> e, t --pre--> e.
+										if the conditino is unspecified, then the condition e is a hollow container
 			Frames:
 				{f : i} --> i.unifyWith(f) just when f is consistent with i
 					f is consistent with i just when:
@@ -30,10 +36,13 @@
 								then t must be consistent subgraph of s
 							check if antecedents of s are consistent with antecedents of t
 						rCheckSubplan(s, t):
-							t_antes = {(t'.condition, t') for t' in i.subplan.links if t'.isAntecedent(t).
+							t_antes = {(t'.condition, t') for t' in i.subplan.links if t'.isAntecedent(t)}.
+							s_antes = {(s'.condition, s') for s' in f.subplan.links if s'.isAntecedent(s)}
 							for (e, t') in t_antes:
-								s_antes = {s' for s' in f.subplan.links if s'.isAntecedent(s)}
-
+								S = {(e',s') for s_ante in s_antes if e'.isConsistent(e)}
+								if len(S) == 0
+									continue (because, there's no required step consistency)
+								if t'.isConsistentSubgraph(s_ante
 
 
 
