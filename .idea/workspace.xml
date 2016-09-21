@@ -130,8 +130,8 @@
       <file leaf-file-name="CompileReq.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CompileReq.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="29" column="26" selection-start-line="29" selection-start-column="26" selection-end-line="29" selection-end-column="26" />
+            <state relative-caret-position="1242">
+              <caret line="67" column="32" selection-start-line="67" selection-start-column="32" selection-end-line="67" selection-end-column="32" />
               <folding />
             </state>
           </provider>
@@ -546,13 +546,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00043" summary="   debugging Restrictions">
-      <created>1471907904739</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1471907904739</updated>
-    </task>
     <task id="LOCAL-00044" summary="debugging">
       <created>1471913546855</created>
       <option name="number" value="00044" />
@@ -889,7 +882,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474477750366</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="notes on compiling requirements">
+      <created>1474480401140</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1474480401140</updated>
+    </task>
+    <option name="localTasksCounter" value="93" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1345,8 +1345,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CompileReq.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="29" column="26" selection-start-line="29" selection-start-column="26" selection-end-line="29" selection-end-column="26" />
+        <state relative-caret-position="1242">
+          <caret line="67" column="32" selection-start-line="67" selection-start-column="32" selection-end-line="67" selection-end-column="32" />
           <folding />
         </state>
       </provider>
