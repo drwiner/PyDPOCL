@@ -68,10 +68,10 @@ class Restriction(Graph):
 
 		super(Restriction, self).__init__(ID = ID, name = name, typ = type_graph, Elements= Elements, Edges = Edges)
 
-	def firstIsIsomorphicSubgraphOf(self, EG, identities = None, toggle = None):
-		if toggle == None:
-			toggle = False
-		if toggle == True and identities == None:
+	def firstIsIsomorphicSubgraphOf(self, EG, identities = None, consistency = None):
+		if consistency == None:
+			consistency = False
+		if consistency == True and identities == None:
 			identities = {elm: EG.getElementById(elm.ID) for elm in self.elements
 							  if not EG.getElementById(elm.ID) == None}
 		if identities == None:
@@ -85,7 +85,7 @@ class Restriction(Graph):
 		isos = []
 		for ns in non_sinks:
 			# ns has incident edges, so base case cannot be first return
-			cndt_isomorphisms = self.isIsomorphicSubgraphOf(EG, ns, map_=identities, toggle=toggle)
+			cndt_isomorphisms = self.isIsomorphicSubgraphOf(EG, ns, map_=identities, consistency=consistency)
 			if len(cndt_isomorphisms) == 0:
 				return False
 			new_isos = consistentIsos(isos, cndt_isomorphisms)
@@ -94,15 +94,15 @@ class Restriction(Graph):
 			isos.extend(new_isos)
 		return True
 
-	def isIsomorphicSubgraphOf(self, EG, r = None, map_ = None, toggle = None):
+	def isIsomorphicSubgraphOf(self, EG, r = None, map_ = None, consistency = None):
 		""" Graph traversals to determine if self is a subgraph of EG, with special identity requirements
 				r is root
 				"map_" is of the form self.r_elm : EG.elm
 		"""
-		if toggle == None:
-			toggle= False
+		if consistency == None:
+			consistency= False
 		if r == None:
-			return self.firstIsIsomorphicSubgraphOf(EG, map_, toggle=toggle)
+			return self.firstIsIsomorphicSubgraphOf(EG, map_, consistency=consistency)
 
 		if map_ == None:
 			return []
@@ -113,7 +113,7 @@ class Restriction(Graph):
 
 		successful_maps = []
 		for r_edge in r_edges:
-			if not toggle:
+			if not consistency:
 				cndt_edges = {eg_edge for eg_edge in EG.edges if r_edge.isEquivalent(eg_edge)}
 			else:
 				cndt_edges = {eg_edge for eg_edge in EG.edges if r_edge.isConsistent(eg_edge)}
@@ -135,7 +135,7 @@ class Restriction(Graph):
 				if not cndt.sink in map_:
 					Map_[r_edge.sink] = cndt.sink
 
-				Maps_ = self.isIsomorphicSubgraphOf(EG, r_edge.sink, map_ = Map_, toggle=toggle)
+				Maps_ = self.isIsomorphicSubgraphOf(EG, r_edge.sink, map_ = Map_, consistency=consistency)
 
 				consistent_maps = consistentIsos(successful_maps, Maps_, consistent_maps)
 
@@ -287,7 +287,7 @@ class TestOrderingGraphMethods(unittest.TestCase):
 		Req = Restriction(ID=10, type_graph='R', Elements = set(O), Edges = Rem)
 		Plan = Graph(ID=11, typ='E', Elements=set(G[1:]), Edges = Avail)
 
-		isit = Req.isIsomorphicSubgraphOf(Plan,toggle=True)
+		isit = Req.isIsomorphicSubgraphOf(Plan, consistency=True)
 		assert isit is True
 
 if __name__ == '__main__':

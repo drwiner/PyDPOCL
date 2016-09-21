@@ -49,6 +49,33 @@
 								if t'.isConsistentSubgraph(s_ante
 
 
+For now, don't worry about intention frames, but here are somenotes that may or may not offer insight
+	Let I = {i1,...,in} be the set of frames in Req.
+	Let F be the set of frames in P.
+	Create a dictionary IMap = {i1 : fi,...,fj,
+								,...,
+								im : fu,..,fv}
+			where for each (i_j, f_j) pair, i_j is consistent with f_j
+
+	NOTE: for each step "t" in a frame "i" in Req, let t.TMap = "s" be a step such that {t : s} is in TMap.
+	Two frames i, f are consistent just when:
+		actors are consistent, goals are consistent,
+		fi.ms is either equal to or a consistent subgraph of a step "s" in fj.ms.TMap
+			Construct intention frame
+		if fi.ms is equal to or a consistent subgraph of with fj.ms.TMap
+
+	For each frame 'i_j' of the form <a, g, ms, sat, Sf> in Req, remove f_j where i_j : f_j for any of the following issues:
+		if t_i in T is f.ms, then remove s_i where t_i : s_i if s_i cannot include intends(a, g) as one of its effects
+		if t_i in T is f.sat, then remove s_i where t_i : s_i if s_i cannot include g as one of its effects or cannot
+		have the consent of 'a'
+		if t_i in T is f.insubplan, then remove s_i if s_i cannot have the consent of 'a'
+
+	For each partially specified frame 'i' of the form <a, g, ms, sat, Sf> in Req:
+
+
+"""
+
+"""
 
 Let T = {t1,...,tn} be the set of steps in Req.
 Let S be set of steps in P.
@@ -63,28 +90,36 @@ For each ordering of the form ti < tj in Req, remove s_i, s_j where t_i : s_i an
 is an ordering path from s_j to s_i in P.
 For each link of the form ti --e--> tj in Req, remove s_i, s_j where t_i : s_i and t_j : s_j if s_i is not a valid
 antecedent for s_j.
-
-Let I = {i1,...,in} be the set of frames in Req.
-Let F be the set of frames in P.
-Create a dictionary IMap = {i1 : fi,...,fj,
-							,...,
-							im : fu,..,fv}
-		where for each (i_j, f_j) pair, i_j is consistent with f_j
-
-NOTE: for each step "t" in a frame "i" in Req, let t.TMap = "s" be a step such that {t : s} is in TMap.
-Two frames i, f are consistent just when:
-	actors are consistent, goals are consistent,
-	fi.ms is either equal to or a consistent subgraph of a step "s" in fj.ms.TMap
-		Construct intention frame
-	if fi.ms is equal to or a consistent subgraph of with fj.ms.TMap
-
-For each frame 'i_j' of the form <a, g, ms, sat, Sf> in Req, remove f_j where i_j : f_j for any of the following issues:
-	if t_i in T is f.ms, then remove s_i where t_i : s_i if s_i cannot include intends(a, g) as one of its effects
-	if t_i in T is f.sat, then remove s_i where t_i : s_i if s_i cannot include g as one of its effects or cannot
-	have the consent of 'a'
-	if t_i in T is f.insubplan, then remove s_i if s_i cannot have the consent of 'a'
-
-For each partially specified frame 'i' of the form <a, g, ms, sat, Sf> in Req:
-
-
 """
+
+#from Restrictions import Restriction
+#self is Planner
+def assignReqs(self, Plan, ReqSteps, ReqLinks, ReqOrderings):
+	S = Plan.Steps
+	D = self.op_graphs
+	TMap = {t : {s for s in S if t.isIsomorphicSubgraphOf(s, consistency=True)}
+			for t in ReqSteps}
+	DMap = {t : {d for d in D if t.isIsomorphicSubgraphOf(d, consistency=True)}
+			for t in ReqSteps}
+
+	for (ti,tj) in ReqOrderings:
+		removable = {(si,sj) for si in TMap[ti] for sj in TMap[tj] if Plan.OrderingGraph.isPath(sj,si)}
+		for (si,sj) in removable:
+			TMap[ti] -= si
+			TMap[tj] -= sj
+
+	TMap.update(DMap)
+	for (ti,tj,te) in ReqLinks:
+		removable = {(si,sj) for si in TMap[ti] for sj in TMap[tj] if Plan.OrderingGraph.isPath(sj,si)}
+		for (si,sj) in removable:
+			TMap[ti] -= si
+			TMap[tj] -= sj
+
+		removable = {(si,sj) for si in TMap[ti] for sj in TMap[tj] if not si.isConsistentAntecedentFor(sj,effect =te)}
+		for (si,sj) in removable:
+			TMap[ti] -= si
+			TMap[tj] -= sj
+
+	return TMap
+
+

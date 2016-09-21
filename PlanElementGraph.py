@@ -77,18 +77,22 @@ class Action(ElementGraph):
 		return new_self, nei
 							
 
-	def isConsistentAntecedentFor(self, action):
+	def isConsistentAntecedentFor(self, consequent, effect = None):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
-		effects = 	{edge.sink for edge in self.edges if edge.label == 'effect-of'}
+		if effect == None:
+			effects = {edge.sink for edge in self.edges if edge.label == 'effect-of'}
+		else:
+			effects = {effect}
 				
 		if len(effects) == 0:
 			return False
 			
-		preconditions = {edge.sink for edge in self.edges if edge.label == 'precond-of'}
+		preconditions = {edge.sink for edge in consequent.edges if edge.label == 'precond-of'}
 		if len(preconditions) == 0:
 			return False
-			
-		prospects = {(eff,pre) for eff in effects for pre in preconditions if eff.isConsistent(pre)}
+
+		prospects = {(eff,pre) for eff in effects for pre in preconditions if self.subgraph(eff).isConsistent(
+			consequent.subgraph(pre))}
 					
 		if len(prospects)  == 0:
 			return False
