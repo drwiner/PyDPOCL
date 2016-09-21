@@ -1,7 +1,7 @@
 #from pddlToGraphs import *
 import collections
 import bisect
-from Graph import rDetectConsistentEdgeGraph
+from Graph import isConsistentEdgeSet
 
 #from PlanElementGraph import Condition
 #import PlanElementGraph
@@ -178,7 +178,7 @@ class FlawLib():
 
 				# check if Effect can match edges with Precondition, check against restrictions
 				Precondition = graph.subgraph(pre)
-				if Effect.canAbsolve(Precondition):
+				if Effect.isConsistentSubgraph(Precondition):
 					self.cndts[oc].add(eff)
 
 	def insert(self, graph, flaw):
@@ -217,7 +217,7 @@ class FlawLib():
 
 			#check if Effect can match edges with Precondition, check against restrictions
 			Effect = graph.subgraph(eff)
-			if Effect.canAbsolve(Precondition):
+			if Effect.isConsistentSubgraph(Precondition):
 				self.cndts[flaw].add(eff)
 
 		#Bin flaw into right list
@@ -229,8 +229,7 @@ class FlawLib():
 			for eff in self.cndts[flaw]:
 				parent = graph.getEstablishingParent(eff)
 				if parent.name == 'dummy_init':
-					if rDetectConsistentEdgeGraph(Remaining = graph.subgraph(eff).edges, Available =
-					Precondition.edges):
+					if isConsistentEdgeSet(Rem = graph.subgraph(eff).edges, Avail = Precondition.edges):
 						self.inits.add(flaw)
 						return
 
@@ -278,7 +277,7 @@ def evalRisk(graph, eff, pre, ExistingGraph, operation):
 			R.root.truth = not eff.truth
 
 			#match edges if consistent, check against restrictions
-			if R.canAbsolve(ExistingGraph):
+			if R.isConsistentSubgraph(ExistingGraph):
 				operation(eff)
 		return True
 	return False

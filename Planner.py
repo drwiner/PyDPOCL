@@ -126,7 +126,7 @@ class PlanSpacePlanner:
 
 				Effect = op.getElementGraphFromElement(eff,Condition)
 				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
-				if Effect.canAbsolve(Precondition):
+				if Effect.isConsistentSubgraph(Precondition):
 
 					#nei : new element id, to easily access element from graph
 					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.ID)
@@ -136,7 +136,7 @@ class PlanSpacePlanner:
 
 					#could be more than one way to unify effect with precondition
 					#Effect_absorbtions' graphs' elements' replaced_ids assigned Precondition's ids
-					Effect_absorbtions = Effect.getInstantiations(Precondition)
+					Effect_absorbtions = Effect.UnifyWith(Precondition)
 
 					for eff_abs in Effect_absorbtions:
 						graph_copy = graph.deepcopy()
@@ -206,13 +206,13 @@ class PlanSpacePlanner:
 			if not eff.isConsistent(pre):
 				continue
 			Effect = graph.subgraph(eff)
-			if not Effect.canAbsolve(Precondition):
+			if not Effect.isConsistentSubgraph(Precondition):
 				continue
 
 			#step = next(iter(graph.getParents(eff)))
 			step = graph.getEstablishingParent(eff)
 
-			Effect_absorbtions = Effect.getInstantiations(Precondition)
+			Effect_absorbtions = Effect.UnifyWith(Precondition)
 
 			for eff_abs in Effect_absorbtions:
 				# 1 Create new child graph

@@ -162,37 +162,20 @@ class Graph(Element):
 			Descendant_Edges = self.rGetDescendantEdges(edge.sink, Descendant_Edges)
 			
 		return Descendant_Edges
-	
-	################  Consistency ###############################
-	def canAbsolve(self, other):
-		""" A graph absolves another iff for each other.edge, there is a consistent self.edge
+
+	def isConsistentSubgraph(self, other):
 		"""
-		if rDetectConsistentEdgeGraph(Remaining = copy.deepcopy(other.edges), Available = copy.deepcopy(self.edges)):
-			if not self.equivalentWithRestrictions():
-				return True
+		@param other: a graph which may be a consistent subgraph of self
+		@return: if for each other.edge, there is a consistent self.edge, following the shared-endpoints rule of edge sets
+		"""
+		if isConsistentEdgeSet(Rem = copy.deepcopy(other.edges), Avail = copy.deepcopy(self.edges)):
+			#if not self.equivalentWithRestrictions():
+			return True
 		return False
 		
 	def isInternallyConsistent(self):
 		return not self.equivalentWithRestrictions()
-		
-	def coAbsolvant(self, other):
-		if self.isConsistent(other) and other.isConsistent(self):
-			return True
-		return False
-		
-	###############################################################
-		
-	def elementsAreConsistent(self, other, self_element, other_element):
-		if not self_element.isConsistent(other_element):
-			return False
-			
-		descendant_edges = self.rGetDescendantEdges(self_element)
-		other_descendant_edges = other.rGetDescendantEdges(other_element)
-		if rDetectConsistentEdgeGraph(other_descendant_edges,descendant_edges):
-			return True
-			
-		return False
-		
+
 
 	def equivalentWithRestrictions(self):
 		if len(self.restrictions) == 0:
@@ -207,58 +190,11 @@ class Graph(Element):
 		edges = str([edge for edge in self.edges])
 		elms = str([elm for elm in self.elements])
 		return '\n' + edges + '\n\n_____\n\n ' + elms + '\n'
-		
-def rDetectConsistentEdgeGraph(Remaining = None, Available = None):
-	""" Returns True if all remaining edges can be assigned a consistent non-used edge in self
-		TODO: investigate if possible problem: two edges p1-->p2-->p3 are consistent with edges q1-->q2 q2'-->q3 just when q2 == q2'
-				this method will succeed, incorrectly, when q2 neq q2'
-			  -- This hasn't been a problem, because most edge labels have unique labels in a graph
-			  -- should create test conditions - in ElementGraph -- to test if "canAbsolve" always means that we will return something with "getInstantiations"
-	"""
-	if Remaining == None:
-		Remaining = set()
-	if Available == None:
-		Available = set()
-		
-
-	if len(Remaining)  == 0:
-		return True
-
-	other_edge = Remaining.pop()
-
-	for prospect in Available:
-		if prospect.isConsistent(other_edge):
-			if rDetectConsistentEdgeGraph(	Remaining, {item for item in Available - {prospect}}):
-				return True
-	return False
 
 
-def consistent_dicts(dict1, dict2):
-	common_keys = set(dict1.keys()) & set(dict2.keys())
-	for ck in common_keys:
-		if not dict1[ck] == dict2[ck]:
-			return False
-
-	return True
-
-
-def consistentMaps(prior_maps, cndt_maps, Mbins = None):
-	if Mbins == None:
-		Mbins = []
-	if len(prior_maps) == 0:
-		Mbins.extend(cndt_maps)
-	else:
-		# for each dictionary 'm' in the list 'Maps_'
-		for m in cndt_maps:
-			if len(m) == 0:
-				continue
-			# for each dictionary 'sm' in the set 'successful_maps'
-			for pm in prior_maps:
-				if consistent_dicts(m, pm):
-					Mbins.append(m)
-					# this 'm' has been satisfied
-					break
-	return Mbins
+################################################################
+# consistent edge sets following shared endpoints clause    ####
+################################################################
 
 def isConsistentEdgeSet(Rem = None, Avail = None, map_ = None):
 	if Rem == None:
@@ -294,54 +230,54 @@ def isConsistentEdgeSet(Rem = None, Avail = None, map_ = None):
 			return True
 	return False
 
-
-def Unify(_Map = None, R = None, A = None):
-	"""
-
-	@param _Map: dictonary
-	@param R: edges to account for
-	@param A: edges which account as
-	@return: dictionary _Map
-	"""
-
-	if _Map ==None:
-		_Map = {} 	;#_Map is a 1:1 mapping (r : a) for r in "R" for a in "A" s.t. every edge in "R" has one partner in "A"
-					#Mapping is a dictionary.
-	if R == None:
-		R = []		;#"R" is the set of edges all of whose edges must be accounted for
-	if A == None:
-		A = []		;#"A" is the set of edges which account for edges in "R".
-
-	if len(R) == 0:
-		return _Map
-
-	rem = R.pop()
-	cndts = {edge for edge in A if edge.isConsistent(rem)}
-
-	if rem.source in _Map:
-		cndts -= {edge for edge in cndts if not edge.source == _Map[rem.source]}
-	if rem.sink in _Map:
-		cndts -= {edge for edge in cndts if not edge.sink == _Map[rem.sink]}
-
-	if len(cndts) == 0:
-		return []
-
-	Mbins = []
-	for cndt in cndts:
-		Map_ = copy.deepcopy(_Map)
-		if not cndt.source in _Map:
-			Map_[rem.source] = cndt.source
-		if not cndt.sink in _Map:
-			Map_[rem.sink] = cndt.sink
-
-		#if this 'cndt' was to account for 'rem', recursively solve for rest of R and append all possible worlds in []
-		M_ = isConsistentEdgeSet(Map_ = _Map, R = copy.deepcopy(R), A = A-{cndt})
-		Mbins = consistentMaps(prior_maps=Map_,cndt_maps = M_, Mbins = Mbins)
-
-	if len(Mbins) == 0:
-		return []
-
-	return _Map.extend(Mbins)
+#A method - unify - which given two graphs, will merge. currently performed by mergeGraph
+# def Unify(_Map = None, R = None, A = None):
+# 	"""
+#
+# 	@param _Map: dictonary
+# 	@param R: edges to account for
+# 	@param A: edges which account as
+# 	@return: dictionary _Map
+# 	"""
+#
+# 	if _Map ==None:
+# 		_Map = {} 	;#_Map is a 1:1 mapping (r : a) for r in "R" for a in "A" s.t. every edge in "R" has one partner in "A"
+# 					#Mapping is a dictionary.
+# 	if R == None:
+# 		R = []		;#"R" is the set of edges all of whose edges must be accounted for
+# 	if A == None:
+# 		A = []		;#"A" is the set of edges which account for edges in "R".
+#
+# 	if len(R) == 0:
+# 		return _Map
+#
+# 	rem = R.pop()
+# 	cndts = {edge for edge in A if edge.isConsistent(rem)}
+#
+# 	if rem.source in _Map:
+# 		cndts -= {edge for edge in cndts if not edge.source == _Map[rem.source]}
+# 	if rem.sink in _Map:
+# 		cndts -= {edge for edge in cndts if not edge.sink == _Map[rem.sink]}
+#
+# 	if len(cndts) == 0:
+# 		return []
+#
+# 	Mbins = []
+# 	for cndt in cndts:
+# 		Map_ = copy.deepcopy(_Map)
+# 		if not cndt.source in _Map:
+# 			Map_[rem.source] = cndt.source
+# 		if not cndt.sink in _Map:
+# 			Map_[rem.sink] = cndt.sink
+#
+# 		#if this 'cndt' was to account for 'rem', recursively solve for rest of R and append all possible worlds in []
+# 		M_ = isConsistentEdgeSet(Map_ = _Map, R = copy.deepcopy(R), A = A-{cndt})
+# 		Mbins = consistentMaps(prior_maps=Map_,cndt_maps = M_, Mbins = Mbins)
+#
+# 	if len(Mbins) == 0:
+# 		return []
+#
+# 	return _Map.extend(Mbins)
 
 
 import unittest

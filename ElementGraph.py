@@ -148,7 +148,7 @@ class ElementGraph(Graph):
 
 		return self
 
-	def getInstantiations(self, other):
+	def UnifyWith(self, other):
 		""" self is operator, other is partial step 'Action'
 			self is effect, other is precondition of existing step
 			Returns all possible ways to unify self and other, 
@@ -160,7 +160,8 @@ class ElementGraph(Graph):
 		for elm in other.elements:
 			elm.replaced_ID = -1
 
-		completed = self.absolve(copy.deepcopy(other.edges), self.edges)
+		completed = UnifyLiterals(self, other)
+		#completed = self.absolve(copy.deepcopy(other.edges), self.edges)
 		if len(completed) == 0:
 			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other, self))
 
@@ -179,146 +180,98 @@ class ElementGraph(Graph):
 			#if type(element) in argTyps:
 			#	self.Args.add(element)
 
-	def absolve(self, Remaining=None, Available=None, Collected=None):
-		""" Every edge from other must be consistent with some edge in self.
-			An edge from self cannot account for more than one edge from other.
-				
-				Remaining: edges left to account for in other
-				Available: edges in 'first' self, which cannot account for more than one edge
-				
-				USAGE: Excavate_Graph.absolves(partial_step, partial_step.edges, self.edges, Collected)
-				
-				Returns: Set of copies of Operator which absolve the step (i.e. merge)
-		"""
 
-		if Remaining == None:
-			Remaining = set()
-		if Available == None:
-			Available = set()
-		if Collected == None:
-			Collected = set()
+def assimilate(EG, old_edge, other_edge):
+	"""	ProvIDed with old_edge consistent with other_edge
+		Merges source and sinks
+		Uses = {'new-step', 'effect'}
+		"new-step" Self is operator, old_edge is operator edge, other is partial step
+		"effect": self is plan-graph, old edge is effect edge, other is eff_abs
+	"""
 
-		if len(Remaining) == 0:
-			Collected.add(self)
-			return Collected
+	new_self = EG.copyGen()
+	self_source = new_self.getElementById(old_edge.source.ID)  # source from new_self
+	self_source.merge(other_edge.source)  # source merge
+	self_source.replaced_ID = other_edge.source.ID
+	self_sink = new_self.getElementById(old_edge.sink.ID)  # sink from new_self
+	self_sink.replaced_ID = other_edge.sink.ID
+	self_sink.merge(other_edge.sink)  # sink merge
+	return new_self
 
-		other_edge = Remaining.pop()
-		num_collected_before = len(Collected)
+def UnifyLiterals(effect, prec, C = None):
+	"""
+		@param effect is an element graph, root element is literal
+		@param prec is an element graph, root element is literal consistent with effect.root
+		@param C is collected unifications in set
+		@return set of literals corresponding to potential effect-prec unifications
 
-		for prospect in Available:
-			if other_edge.isConsistent(prospect):
-				new_self = self.assimilate(prospect, other_edge)
-				#if new_self.isInternallyConsistent():
-				Collected.update(new_self.absolve({copy.deepcopy(rem) for rem in Remaining}, Available, Collected))
+		Unifying literals, unlike other elements, can be done just by finding consistent edges, since it is assumed
+		that each edge label is unique per literal.
 
-		if len(Collected) > num_collected_before and len(Collected) > 0:
-			return Collected
+		It is assumed that prec is a subgraph of effect, except with argument bindings.
+	"""
 
-		return set()
+	# collected unifications
+	if C == None:
+		C = set()
 
-	def createPossibleWorlds(self, Remaining=None, Available=None, Collected=None):
-		""" Every edge from other must be consistent with some edge in self.
-			"Shared-endpoint clause"
-				AND, for any two edges (e1, e2) sharing an endpoint p, if (d1, d2) are two edges consistent with (e1,
-				e2), then (d1,d2) share an endpoint p' consistent with p.
-			"Possible-exclusion clause"
-				AND, for each edge of the form p1 --k--> p2, if there is a consistent edge in self pi --k-->pj,
-				then there are (at least) 2 possible worlds: 1 where (pi,pj) merges with (p1,p2), and another world
-				where (pi,pj) are distinct from (p1,p2).
-			"Potential-adjacencies clause"
-				AND, for each edge of the form p1 --k--> p2, if there is a consistent edge in self pi --k-->pj,
-				then there are 3 additional possible worlds, 1 where pi==p1 (s.t. all edges of the form (p0,
-				p1) are now (p0,p1==pi), another where pj == p2, BUT THERE IS NO THIRD WORLD where pi==p1 and pj==p2
-				because then it would be the same edge with label k. Labels are always function-free and grounded.
+	#BASE CASE:
+	if len(prec.edges) == 0:
+		C.add(effect)
+		return C
 
-			In total, for every edge (p1,p2) consistent with edge in self (pi,pj), there are 4 possible worlds
-				1) (p1==pi,p2==pj)			   "regular merge"
-				2) (p1,p2), (pi,pj)			   "possibel exclusion"
-				3) (p1==pi, p2), (p1==pi, pj)  "potential adjacencies"
-				4) (p1, p2==pj), (pi, p2==pj)  "potential adjacencies"
+	P = copy.deepcopy(prec)
 
-		New Strategy as of 5 seconds ago:
-			If G is self and G' is another graph,
-				1) For each root r' in G', create an r'-induced subgraph R' from G'. {R'1, ..., R'n)
-				2) For each R', find r consistent with r' and make r-induced subgraph R from G
-					If R is "consistent" with R' -- but, what if R and R' share nothing but r==r'?
-						RULE: you cannot merge requirement graphs with partial steps because it's not clear who
-						has what. If we took all possible ways to aggregate two partial steps with nothing in
-						common, then we would have explosion of possible steps. Any partial step which is part of a
-						frame must first become instantiated by an operator before it can be used to satisfy a requirement-step.
+	#until we can account for all precondition edges
+	pe = P.edges.pop()
+	b4 = len(C)
+	for ee in effect.edges:
+		if pe.isConsistent(ee):
+			merged_graph = assimilate(effect, ee, pe)
+			C.update(UnifyLiterals(merged_graph, P, C))
+	if len(C) > b4 and len(C) > 0:
+		return C
+	return set()
 
-						But, what about frames? A frame is consistent with another frame - requires a definition such that
-							F1 is consistent with F2 just when for each special labeled edge in F1, if F2 has that
-							label, then that edge must be consistent. For each pair of steps which must be
-							consistent, if those steps are both partial steps, then this is fine since if they have
-							goal literals or consenting agents, these would need to be consistent already.
-		"""
 
-		if Remaining == None:
-			Remaining = set()
-		if Available == None:
-			Available = set()
-		if Collected == None:
-			Collected = set()
+def createPossibleWorlds(self, Remaining=None, Available=None, Collected=None):
+	""" Every edge from other must be consistent with some edge in self.
+		"Shared-endpoint clause"
+			AND, for any two edges (e1, e2) sharing an endpoint p, if (d1, d2) are two edges consistent with (e1,
+			e2), then (d1,d2) share an endpoint p' consistent with p.
+		"Possible-exclusion clause"
+			AND, for each edge of the form p1 --k--> p2, if there is a consistent edge in self pi --k-->pj,
+			then there are (at least) 2 possible worlds: 1 where (pi,pj) merges with (p1,p2), and another world
+			where (pi,pj) are distinct from (p1,p2).
+		"Potential-adjacencies clause"
+			AND, for each edge of the form p1 --k--> p2, if there is a consistent edge in self pi --k-->pj,
+			then there are 3 additional possible worlds, 1 where pi==p1 (s.t. all edges of the form (p0,
+			p1) are now (p0,p1==pi), another where pj == p2, BUT THERE IS NO THIRD WORLD where pi==p1 and pj==p2
+			because then it would be the same edge with label k. Labels are always function-free and grounded.
 
-		#Base Case: All edges have been accounted for.
-		if len(Remaining) == 0:
-			Collected.add(self)
-			return Collected
+		In total, for every edge (p1,p2) consistent with edge in self (pi,pj), there are 4 possible worlds
+			1) (p1==pi,p2==pj)			   "regular merge"
+			2) (p1,p2), (pi,pj)			   "possibel exclusion"
+			3) (p1==pi, p2), (p1==pi, pj)  "potential adjacencies"
+			4) (p1, p2==pj), (pi, p2==pj)  "potential adjacencies"
 
-		#Induction: pop edge to account for.
-		other_edge = Remaining.pop()
-		num_collected_before = len(Collected)
+	New Strategy as of 5 seconds ago:
+		If G is self and G' is another graph,
+			1) For each root r' in G', create an r'-induced subgraph R' from G'. {R'1, ..., R'n)
+			2) For each R', find r consistent with r' and make r-induced subgraph R from G
+				If R is "consistent" with R' -- but, what if R and R' share nothing but r==r'?
+					RULE: you cannot merge requirement graphs with partial steps because it's not clear who
+					has what. If we took all possible ways to aggregate two partial steps with nothing in
+					common, then we would have explosion of possible steps. Any partial step which is part of a
+					frame must first become instantiated by an operator before it can be used to satisfy a requirement-step.
 
-		#For each prospect, create 4 possible worlds, and be sure to keep list of shared endpoints.
-		for prospect in Available:
-			if other_edge.isConsistent(prospect):
-				#World 1 --> assimilate
-				new_self = self.assimilate(prospect, other_edge)
-				#World 2 --> keep separate. (do nothing, letting mergeGraph put in a good word)
-				#World 3--> assimilateSource
-				new_self_source = self.assimilateSource(prospect, other_edge)
-				#world 4 --> assimilateSink
-				new_self_sink = self.assimilateSink(prospect, other_edge)
-
-				# if new_self.isInternallyConsistent():
-				Collected.update(new_self.absolve({copy.deepcopy(rem) for rem in Remaining}, Available, Collected))
-
-		if len(Collected) > num_collected_before and len(Collected) > 0:
-			return Collected
-
-		return set()
-
-	def assimilate(self, old_edge, other_edge):
-		"""	ProvIDed with old_edge consistent with other_edge
-			Merges source and sinks
-			Uses = {'new-step', 'effect'}
-			"new-step" Self is operator, old_edge is operator edge, other is partial step
-			"effect": self is plan-graph, old edge is effect edge, other is eff_abs 
-		"""
-
-		new_self = self.copyGen()
-		self_source = new_self.getElementById(old_edge.source.ID)  # source from new_self
-		self_source.merge(other_edge.source)  # source merge
-		self_source.replaced_ID = other_edge.source.ID
-		self_sink = new_self.getElementById(old_edge.sink.ID)  # sink from new_self
-		self_sink.replaced_ID = other_edge.sink.ID
-		self_sink.merge(other_edge.sink)  # sink merge
-		return new_self
-
-	def assimilateSource(self, old_edge, other_edge):
-		new_self = self.copyGen()
-		self_source = new_self.getElementById(old_edge.source.ID)
-		self_source.merge(other_edge.source)
-		self_source.replaced_ID = other_edge.source.ID
-		return new_self
-
-	def assimilateSink(self, old_edge, other_edge):
-		new_self = self.copyGen()
-		self_sink = new_self.getElementById(old_edge.sink.ID)  # sink from new_self
-		self_sink.replaced_ID = other_edge.sink.ID
-		self_sink.merge(other_edge.sink)  # sink merge
-		return new_self
+					But, what about frames? A frame is consistent with another frame - requires a definition such that
+						F1 is consistent with F2 just when for each special labeled edge in F1, if F2 has that
+						label, then that edge must be consistent. For each pair of steps which must be
+						consistent, if those steps are both partial steps, then this is fine since if they have
+						goal literals or consenting agents, these would need to be consistent already.
+	"""
+	pass
 
 import unittest
 class TestInstantiations(unittest.TestCase):

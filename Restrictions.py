@@ -41,7 +41,23 @@ def consistentIsos(prior_isos, cndt_isos, new_isos = None):
 					# this 'm' has been satisfied
 					break
 	return new_isos
-
+def consistentMaps(prior_maps, cndt_maps, Mbins = None):
+	if Mbins == None:
+		Mbins = []
+	if len(prior_maps) == 0:
+		Mbins.extend(cndt_maps)
+	else:
+		# for each dictionary 'm' in the list 'Maps_'
+		for m in cndt_maps:
+			if len(m) == 0:
+				continue
+			# for each dictionary 'sm' in the set 'successful_maps'
+			for pm in prior_maps:
+				if consistent_dicts(m, pm):
+					Mbins.append(m)
+					# this 'm' has been satisfied
+					break
+	return Mbins
 
 class Restriction(Graph):
 	def __init__(self, ID = None, name = None, type_graph = None, Elements = None, Edges = None):
@@ -52,7 +68,12 @@ class Restriction(Graph):
 
 		super(Restriction, self).__init__(ID = ID, name = name, typ = type_graph, Elements= Elements, Edges = Edges)
 
-	def firstIsIsomorphicSubgraphOf(self, EG, identities = None):
+	def firstIsIsomorphicSubgraphOf(self, EG, identities = None, toggle = None):
+		if toggle == None:
+			toggle = False
+		if toggle == True and identities == None:
+			identities = {elm: EG.getElementById(elm.ID) for elm in self.elements
+							  if not EG.getElementById(elm.ID) == None}
 		if identities == None:
 			identities = {elm:EG.getElementById(elm.ID) for elm in self.elements}
 
@@ -64,7 +85,7 @@ class Restriction(Graph):
 		isos = []
 		for ns in non_sinks:
 			# ns has incident edges, so base case cannot be first return
-			cndt_isomorphisms = self.isIsomorphicSubgraphOf(EG, ns, map_=identities)
+			cndt_isomorphisms = self.isIsomorphicSubgraphOf(EG, ns, map_=identities, toggle=toggle)
 			if len(cndt_isomorphisms) == 0:
 				return False
 			new_isos = consistentIsos(isos, cndt_isomorphisms)
@@ -73,13 +94,15 @@ class Restriction(Graph):
 			isos.extend(new_isos)
 		return True
 
-	def isIsomorphicSubgraphOf(self, EG, r = None, map_ = None):
+	def isIsomorphicSubgraphOf(self, EG, r = None, map_ = None, toggle = None):
 		""" Graph traversals to determine if self is a subgraph of EG, with special identity requirements
 				r is root
 				"map_" is of the form self.r_elm : EG.elm
 		"""
+		if toggle == None:
+			toggle= False
 		if r == None:
-			return self.firstIsIsomorphicSubgraphOf(EG, map_)
+			return self.firstIsIsomorphicSubgraphOf(EG, map_, toggle=toggle)
 
 		if map_ == None:
 			return []
@@ -90,7 +113,10 @@ class Restriction(Graph):
 
 		successful_maps = []
 		for r_edge in r_edges:
-			cndt_edges = {eg_edge for eg_edge in EG.edges if r_edge.isEquivalent(eg_edge)}
+			if not toggle:
+				cndt_edges = {eg_edge for eg_edge in EG.edges if r_edge.isEquivalent(eg_edge)}
+			else:
+				cndt_edges = {eg_edge for eg_edge in EG.edges if r_edge.isConsistent(eg_edge)}
 			if r_edge.source in map_:
 				cndt_edges -= {edge for edge in cndt_edges if not edge.source == map_[r_edge.source]}
 			if r_edge.sink in map_:
@@ -109,7 +135,7 @@ class Restriction(Graph):
 				if not cndt.sink in map_:
 					Map_[r_edge.sink] = cndt.sink
 
-				Maps_ = self.isIsomorphicSubgraphOf(EG, r_edge.sink, map_ = Map_)
+				Maps_ = self.isIsomorphicSubgraphOf(EG, r_edge.sink, map_ = Map_, toggle=toggle)
 
 				consistent_maps = consistentIsos(successful_maps, Maps_, consistent_maps)
 
@@ -227,6 +253,42 @@ class TestOrderingGraphMethods(unittest.TestCase):
 		k = R_prime_prime_prime.isIsomorphicSubgraphOf(E)
 		assert k is False
 
+	def test_consistent_Graph(self):
+		"""
+				Full Graph
+				1 --> 2 --> 3 --> 5
+					  2 --> 4 --> 5
+
+				Requirements
+				[2]  --> [3]
+				[2]  --> [4]
+
+
+			"""
+		G = 	  ['buffer',
+				   Element(ID=1,name=1, typ='1'),
+				   Element(ID=2,name=2, typ='2'),
+				   Element(ID=3,name=3, typ='3'),
+				   Element(ID=4,name=4, typ='4'),
+				   Element(ID=5,name=5, typ='5')]
+		O =		  [Element(ID=20, typ='2'),
+				   Element(ID=30, typ='3'),
+				   Element(ID=40, typ='4')]
+
+		Avail = {Edge(G[1],G[2],'a'),
+			   Edge(G[2],G[3], 'b'),
+			   Edge(G[2],G[4], 'c'),
+			   Edge(G[3],G[5], 'd'),
+			   Edge(G[4],G[5], 'e')}
+		Rem = {
+				Edge(O[0],O[1], 'b'),
+				Edge(O[0],O[2], 'c')}
+
+		Req = Restriction(ID=10, type_graph='R', Elements = set(O), Edges = Rem)
+		Plan = Graph(ID=11, typ='E', Elements=set(G[1:]), Edges = Avail)
+
+		isit = Req.isIsomorphicSubgraphOf(Plan,toggle=True)
+		assert isit is True
 
 if __name__ == '__main__':
 	unittest.main()

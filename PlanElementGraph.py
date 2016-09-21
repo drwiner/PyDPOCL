@@ -108,7 +108,7 @@ class Action(ElementGraph):
 
 	def isConsistent(self, other):
 		""" an action is consistent just when one can absolve the other"""
-		return self.canAbsolve(other)
+		return self.isConsistentSubgraph(other)
 		
 	def __repr__(self):
 		self.updateArgs()
@@ -130,7 +130,7 @@ class Condition(ElementGraph):
 		return [self.getNeighborsByLabel(self.root, self.labels[i]) for i in range(self.root.num_args)]
 
 	def isConsistent(self, other):
-		return self.canAbsolve(other)
+		return self.isConsistentSubgraph(other)
 			
 	def __repr__(self):
 		self.updateArgs()
@@ -312,7 +312,7 @@ class PlanElementGraph(ElementGraph):
 		operatorClones = {op.makeCopyFromID(rnd) for op in operator_choices}
 		for op in operatorClones:
 			#nStep = Step.copyGen()
-			complete_steps.update(op.getInstantiations(Step))
+			complete_steps.update(op.UnifyWith(Step))
 		return complete_steps
 		
 	'''for debugging'''
@@ -364,14 +364,14 @@ class PlanElementGraph(ElementGraph):
 						continue
 					cond_graph = self.getElementGraphFromElement(eff, Condition)
 					if len(cond_graph.edges) > num_edges:
-						if cond_graph.canAbsolve(reverse_dependency):
+						if cond_graph.isConsistentSubgraph(reverse_dependency):
 							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
 							count+=1
 						#else:
 						#always add that it's not a threat anymore, because we don't want to reconsider the same tclf
 						#nonThreats[causal_link].add(eff)
 					elif num_edges >= len(cond_graph.edges):
-						if reverse_dependency.canAbsolve(cond_graph):
+						if reverse_dependency.isConsistentSubgraph(cond_graph):
 							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
 							count+=1
 						#else:
