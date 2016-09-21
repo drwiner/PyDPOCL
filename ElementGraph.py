@@ -104,35 +104,48 @@ class ElementGraph(Graph):
 		self.restrictions.add(R)
 		return True
 
-	def mergeGraph(self, effabs, no_add=None):
-		"""
-			@param effabs -  an effect of a step unified with precondition of existing step
-			@param no_add - if step whose effects include effabs is new, then toggle no_add to add new elms from effabs
-			@return self with effabs replacing its former precondition literal
-		"""
+	def mergeUnifiedEffect(self, effabs):
 		for element in effabs.elements:
-
-			#if effabs element replaced a precondition during unification
-			# (NOTE: replaced_IDs switched to -1 before unify)
 			if element.replaced_ID != -1:
 				existing_element = self.getElementById(element.replaced_ID)
 				existing_element.merge(element)
-				#existing_element.replaced_ID = element.ID #CHECK: is this needed?
 			else:
 				element.replaced_ID = element.ID
-				if no_add is None:
-					self.elements.add(element)
-
-		if no_add is None:
-			for edge in effabs.edges:
-				source = self.getElementById(edge.source.replaced_ID)
-				sink = self.getElementById(edge.sink.replaced_ID)
-				existing_edges = {E for E in self.edges if
-								  E.source == source and E.sink == sink and E.label == edge.label}
-				if len(existing_edges) == 0:
-					self.edges.add(Edge(source, sink, edge.label))
-
 		return self
+
+	#This method has been replaced by the method above
+	# def mergeGraph(self, effabs, no_add=None):
+	# 	"""
+	# 		@param effabs -  an effect of a step unified with precondition of existing step
+	# 		@param no_add - if step whose effects include effabs is new, then toggle no_add to add new elms from effabs
+	# 		@return self with effabs replacing its former precondition literal
+	# 	"""
+	# 	for element in effabs.elements:
+	#
+	# 		#if effabs element replaced a precondition during unification
+	# 		# (NOTE: replaced_IDs switched to -1 before unify)
+	# 		if element.replaced_ID != -1:
+	# 			existing_element = self.getElementById(element.replaced_ID)
+	# 			existing_element.merge(element)
+	# 			#existing_element.replaced_ID = element.ID #CHECK: is this needed?
+	# 		else:
+	# 			element.replaced_ID = element.ID
+	# 			#if no_add is None:
+	# 				#self.elements.add(element)
+	#
+	# 	# if no_add is None:
+	# 	# 	#Create edges for each edge in effabs where the elms
+	# 	# 	for edge in effabs.edges:
+	# 	# 		source = self.getElementById(edge.source.replaced_ID)
+	# 	# 		sink = self.getElementById(edge.sink.replaced_ID)
+	# 	# 		existing_edges = {E for E in self.edges if
+	# 	# 						  E.source == source and E.sink == sink and E.label == edge.label}
+	# 	# 		if len(existing_edges) == 0:
+	# 	# 			self.edges.add(Edge(source, sink, edge.label))
+	# 	# 			print('a;sldkfjal;sdkfja\nsl;dkfjas\n;ldkfjas;ldf\njkas;ldfkj;asldk\nfja;sldfjkas;ldfkjas;\nldfkjas'
+	# 	# 				  ';dlfkjasdl;fkj')
+	#
+	# 	return self
 
 	def UnifyWith(self, other):
 		""" self is operator, other is partial step 'Action'

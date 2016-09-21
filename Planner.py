@@ -142,13 +142,8 @@ class PlanSpacePlanner:
 						graph_copy = graph.deepcopy()
 						new_step_op = copy.deepcopy(step_op)
 
-						#For each element 'e_a' in eff_abs which replaced an element 'e_p' in Precondition,
-							# e_p.merge(e_a)
-						#For each element 'e_a' introduced by eff_abs,
-							# graph_copy.add(e_a)
-						#For each edge (a --label --> b) in eff_abs, if not edge (p --label--> d) in Precondition
-							# such that a.replaced_ID = p.ID and b.replaced_ID = d.ID, then graph_copy.add(edge)
-						graph_copy.mergeGraph(eff_abs)
+						#graph_copy.mergeGraph(eff_abs)
+						graph_copy.mergeUnifiedEffect(eff_abs)
 
 						#For each elm 'e_s' in new_step_op not in eff_abs,
 							# graph_copy.add(e_s)
@@ -157,13 +152,6 @@ class PlanSpacePlanner:
 						for elm in new_step_op.elements:
 							if elm in untouched_step_elms:
 								graph_copy.elements.add(elm)
-
-
-						#for edge in new_step_op.edges:
-						#	if edge.source in untouched_step_elms:
-						#		graph_copy.elements.add(elm)
-						#	if edge.sink in untouched_step_elms:
-						#		graph_copy.elements.add(elm)
 
 						# For each edge 'e1 --label--> e2 in new_step_op such that e1 not in eff_abs,
 							# if exists some e_p s.t. e_p.merge(sink), replace edge sink
@@ -179,8 +167,6 @@ class PlanSpacePlanner:
 									#untouched_step_elms.add(edge.sink)
 								graph_copy.edges.add(edge)
 								#to prevent same edge from being selected in this iteration of for-loop
-
-
 
 						# adds causal link and ordering constraints
 						condition = graph_copy.getElementById(Precondition.root.ID)
@@ -219,7 +205,8 @@ class PlanSpacePlanner:
 				graph_copy = graph.deepcopy()
 
 				# 2 Replace effect with eff_abs, which is unified with the precondition
-				graph_copy.mergeGraph(eff_abs, no_add=True)
+				#graph_copy.mergeGraph(eff_abs, no_add=True)
+				graph_copy.mergeUnifiedEffect(eff_abs)
 
 				# 3) "Redirect Task""
 
