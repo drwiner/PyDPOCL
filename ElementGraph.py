@@ -188,12 +188,24 @@ class ElementGraph(Graph):
 			#if type(element) in argTyps:
 			#	self.Args.add(element)
 
+	def getArgLabel(self, arg):
+		incoming = {edge for edge in self.edges if edge.source == self.root and edge.sink == arg}
+		for edge in incoming:
+			if edge.label in self.arglabels:
+				return self.arglabels.index(edge.label)
+
+	def getArgLabels(self, arg_tuple):
+		return tuple(self.getArgLabel(arg) for arg in arg_tuple)
+
 	def replaceArg(self, original, replacer):
+
 		self.elements.add(replacer)
 		incoming = {edge for edge in self.edges if edge.sink == original}
 		for edge in incoming:
 			edge.sink = replacer
-		self.elements.remove(original)
+		#print('Ok')
+		#removable = self.getElementById(original.ID)
+		#self.elements.remove(removable)
 
 	def replaceArgs(self, arg_tuple):
 		"""
@@ -207,6 +219,28 @@ class ElementGraph(Graph):
 		for i, arg in enumerate(arg_tuple):
 			original = self.getSingleArgByLabel(self.arglabels[i])
 			self.replaceArg(original, arg)
+		self.updateArgs()
+
+	def replaceArgsFromLabels(self, arg_list, label_tuple):
+		self.updateArgs()
+		if not len(self.Args) >= label_tuple[-1]:
+			raise ValueError('cannot replace Args, label_tuple references nonexistent arg in %s' % self.name)
+
+		for i,index in enumerate(label_tuple):
+			label = self.arglabels[index]
+			original = self.getSingleArgByLabel(label)
+			self.replaceArg(original, arg_list[i])
+		self.updateArgs()
+
+	def swap(self, internal_old, internal_new):
+		for edge in (e for e in self.edges if e.sink == internal_old):
+			edge.sink = internal_new
+		for edge in (e for e in self.edges if e.source == internal_old):
+			edge.source = internal_new
+
+	def replaceStepArgsInGraph(self, old_args, new_args):
+		pass
+
 
 def assimilate(EG, ee, pe):
 	"""	ProvIDed with old_edge consistent with other_edge
@@ -224,6 +258,7 @@ def assimilate(EG, ee, pe):
 	self_sink.replaced_ID = pe.sink.ID
 	self_sink.merge(pe.sink)  # sink merge
 	return new_self
+
 
 def UnifyLiterals(effect, prec, C = None):
 	"""

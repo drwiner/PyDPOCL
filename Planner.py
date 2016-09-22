@@ -116,7 +116,7 @@ class PlanSpacePlanner:
 
 		s_need, precondition = flaw.flaw
 		Precondition = graph.subgraph(precondition)
-
+		Precondition.updateArgs()
 		results = set()
 
 		for op in self.op_graphs:
@@ -126,60 +126,85 @@ class PlanSpacePlanner:
 					continue
 
 				Effect = op.getElementGraphFromElement(eff,Condition)
+
 				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
-				if Effect.isConsistentSubgraph(Precondition):
+				if not Effect.isConsistentSubgraph(Precondition):
+					continue
 
-					#nei : new element id, to easily access element from graph
-					step_op, nei = op.instantiateOperator(old_element_id=eff.ID)
+				graph_copy = graph.deepcopy()
+				#nei : new element id, to easily access element from graph
+				step_op, nei = op.instantiateOperator(old_element_id=eff.ID)
 
-					#Condition graph of copied operator for Effect
-					Effect  = step_op.getElementGraphFromElementID(nei, Condition)
+				## Bookkeeping for replacing effect of step_op with precondition
+				effect_token = step_op.getElementById(nei)
+				Effect = step_op.subgraph(effect_token, Condition)
+				Effect.updateArgs()
+				arg_labels = step_op.getArgLabels(tuple(Effect.Args))
+				new_edges = {edge for edge in step_op.edges if edge.sink != effect_token and edge.source !=
+							 effect_token}
+				step_op.edges = new_edges
+				new_elms = {elm for elm in step_op.elements if elm != effect_token}
+				step_op.elements = new_elms
+				step_op.replaceArgsFromLabels(Precondition.Args, arg_labels)
+				condition = graph_copy.getElementById(Precondition.root.ID)
+				step_op.edges.add(Edge(step_op.root, condition, 'effect-of'))
+				####
 
-					#could be more than one way to unify effect with precondition
-					#Effect_absorbtions' graphs' elements' replaced_ids assigned Precondition's ids
-					Effect_absorbtions = Effect.UnifyWith(Precondition)
+				graph_copy.edges.update(step_op.edges)
+				graph_copy.elements.update(step_op.elements)
 
-					for eff_abs in Effect_absorbtions:
-						graph_copy = graph.deepcopy()
-						new_step_op = copy.deepcopy(step_op)
+				self.addStep(graph_copy, step_op.root, s_need, condition, new=True)
+				graph_copy.flaws.addCndtsAndRisks(graph_copy, step_op.root)
+				# print('\ncreated child (newStep):\n')
+				# print(graph_copy)
+				# print('\n')
+				results.add(graph_copy)
 
-						#graph_copy.mergeGraph(eff_abs)
-						graph_copy.mergeUnifiedEffect(eff_abs)
-
-						#For each elm 'e_s' in new_step_op not in eff_abs,
-							# graph_copy.add(e_s)
-						untouched_step_elms = {elm for elm in new_step_op.elements if not elm.ID in {e.ID for e in
-																						 eff_abs.elements}}
-						for elm in new_step_op.elements:
-							if elm in untouched_step_elms:
-								graph_copy.elements.add(elm)
-
-						# For each edge 'e1 --label--> e2 in new_step_op such that e1 not in eff_abs,
-							# if exists some e_p s.t. e_p.merge(sink), replace edge sink
-							# graph_copy.add(edge)
-						for edge in new_step_op.edges:
-							if edge.source in untouched_step_elms:
-								#untouched_step_elms
-								if not edge.sink in untouched_step_elms:
-									e_abs = eff_abs.getElementById(edge.sink.ID)
-									if e_abs is None:
-										pass
-									edge.sink = graph_copy.getElementById(e_abs.replaced_ID)#place here
-									#untouched_step_elms.add(edge.sink)
-								graph_copy.edges.add(edge)
-								#to prevent same edge from being selected in this iteration of for-loop
-
-						# adds causal link and ordering constraints
-						condition = graph_copy.getElementById(Precondition.root.ID)
-						self.addStep(graph_copy, new_step_op.root, s_need, condition, new = True)
-
-						#Now that step is in plan, determine for which open conditions the step is a cndt/risk
-						graph_copy.flaws.addCndtsAndRisks(graph_copy, new_step_op.root)
-						#print('\ncreated child (newStep):\n')
-						#print(graph_copy)
-						#print('\n')
-
-						results.add(graph_copy)
+				# #could be more than one way to unify effect with precondition
+				# #Effect_absorbtions' graphs' elements' replaced_ids assigned Precondition's ids
+				# Effect_absorbtions = Effect.UnifyWith(Precondition)
+				#
+				# for eff_abs in Effect_absorbtions:
+				# 	graph_copy = graph.deepcopy()
+				# 	new_step_op = copy.deepcopy(step_op)
+				#
+				# 	#graph_copy.mergeGraph(eff_abs)
+				# 	graph_copy.mergeUnifiedEffect(eff_abs)
+				#
+				# 	#For each elm 'e_s' in new_step_op not in eff_abs,
+				# 		# graph_copy.add(e_s)
+				# 	untouched_step_elms = {elm for elm in new_step_op.elements if not elm.ID in {e.ID for e in
+				# 																	 eff_abs.elements}}
+				# 	for elm in new_step_op.elements:
+				# 		if elm in untouched_step_elms:
+				# 			graph_copy.elements.add(elm)
+				#
+				# 	# For each edge 'e1 --label--> e2 in new_step_op such that e1 not in eff_abs,
+				# 		# if exists some e_p s.t. e_p.merge(sink), replace edge sink
+				# 		# graph_copy.add(edge)
+				# 	for edge in new_step_op.edges:
+				# 		if edge.source in untouched_step_elms:
+				# 			#untouched_step_elms
+				# 			if not edge.sink in untouched_step_elms:
+				# 				e_abs = eff_abs.getElementById(edge.sink.ID)
+				# 				if e_abs is None:
+				# 					pass
+				# 				edge.sink = graph_copy.getElementById(e_abs.replaced_ID)#place here
+				# 				#untouched_step_elms.add(edge.sink)
+				# 			graph_copy.edges.add(edge)
+				# 			#to prevent same edge from being selected in this iteration of for-loop
+				#
+				# 	# adds causal link and ordering constraints
+				# 	condition = graph_copy.getElementById(Precondition.root.ID)
+				# 	self.addStep(graph_copy, new_step_op.root, s_need, condition, new = True)
+				#
+				# 	#Now that step is in plan, determine for which open conditions the step is a cndt/risk
+				# 	graph_copy.flaws.addCndtsAndRisks(graph_copy, new_step_op.root)
+				# 	#print('\ncreated child (newStep):\n')
+				# 	#print(graph_copy)
+				# 	#print('\n')
+				#
+				# 	results.add(graph_copy)
 		return results
 
 
@@ -187,46 +212,73 @@ class PlanSpacePlanner:
 		results = set()
 		s_need, pre = flaw.flaw
 		Precondition = graph.subgraph(pre)
-
+		Precondition.updateArgs()
 		#limit search significantly by only considering precompliled cndts
 		for eff in graph.flaws.cndts[flaw]:
+			eff = graph.getElementById(eff.ID)
 			if not eff.isConsistent(pre):
 				continue
+
 			Effect = graph.subgraph(eff)
 			if not Effect.isConsistentSubgraph(Precondition):
 				continue
 
+			Effect.updateArgs()
 			#step = next(iter(graph.getParents(eff)))
 			step = graph.getEstablishingParent(eff)
 
-			Effect_absorbtions = Effect.UnifyWith(Precondition)
 
-			for eff_abs in Effect_absorbtions:
-				# 1 Create new child graph
-				graph_copy = graph.deepcopy()
+			## Bookkeeping for replacing effect of step_op with precondition
+			graph_copy = graph.deepcopy()
+			removable = {edge for edge in graph_copy.edges if edge.sink == eff or edge.source == eff}
+			graph_copy.edges -= removable
+			graph_copy.elements -= {eff}
 
-				# 2 Replace effect with eff_abs, which is unified with the precondition
-				#graph_copy.mergeGraph(eff_abs, no_add=True)
-				graph_copy.mergeUnifiedEffect(eff_abs)
 
-				# 3) "Redirect Task""
 
-				# Get elm for elms which were in eff_abs but not in precondition (were replaced)
-				precondition_IDs = {element.ID for element in Precondition.elements}
-				new_snk_cddts = {elm for elm in eff_abs.elements if not elm.ID in precondition_IDs}
-				snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID): eff_abs.getElementById(elm.ID)
-								 for elm in new_snk_cddts}
-				for old, new in snk_swap_dict.items():
-					graph_copy.replaceWith(old, new)
+			arg_labels = step.getArgLabels(tuple(Effect.Args))
+			step.replaceArgsFromLabels(Precondition.Args, arg_labels)
+			condition = graph_copy.getElementById(Precondition.root.ID)
+			graph_copy.edges.add(Edge(step.root, condition, 'effect-of'))
+			graph_copy.edges.update(step.edges)
+			self.addStep(graph_copy, step, s_need, condition, new=False)
+			results.add(graph_copy)
 
-				# adds causal link and ordering constraints
-				condition = graph_copy.getElementById(eff_abs.root.ID)
-				self.addStep(graph_copy, step, s_need, condition, new=False)
-					#print('\ncreated child (reuse):\n')
-					#print(graph_copy)
-					#print('\n')
-				# add graph to children
-				results.add(graph_copy)
+			####
+
+
+			# Effect_absorbtions = Effect.UnifyWith(Precondition)
+			#
+			# for eff_abs in Effect_absorbtions:
+			# 	# 1 Create new child graph
+			# 	graph_copy = copy.deepcopy(graph)
+			# 	#.deepcopy()
+			#
+			# 	# 2 Replace effect with eff_abs, which is unified with the precondition
+			# 	#graph_copy.mergeGraph(eff_abs, no_add=True)
+			# 	graph_copy.mergeUnifiedEffect(eff_abs)
+			#
+			# 	# 3) "Redirect Task""
+			#
+			# 	# Get elm for elms which were in eff_abs but not in precondition (were replaced)
+			# 	precondition_IDs = {element.ID for element in Precondition.elements}
+			# 	new_snk_cddts = {elm for elm in eff_abs.elements if not elm.ID in precondition_IDs}
+			# 	snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID): eff_abs.getElementById(elm.ID)
+			# 					 for elm in new_snk_cddts}
+			# 	for old, new in snk_swap_dict.items():
+			# 		try:
+			# 			graph_copy.replaceWith(old, new)
+			# 		except:
+			# 			print('whatsup')
+			#
+			# 	# adds causal link and ordering constraints
+			# 	condition = graph_copy.getElementById(eff_abs.root.ID)
+			# 	self.addStep(graph_copy, step, s_need, condition, new=False)
+			# 		#print('\ncreated child (reuse):\n')
+			# 		#print(graph_copy)
+			# 		#print('\n')
+			# 	# add graph to children
+			# 	results.add(graph_copy)
 
 		return results
 
@@ -450,9 +502,9 @@ if __name__ ==  '__main__':
 
 	###
 	#Task: create list of fully ground steps given domain actions (operators), and arguments (objects)
-	gsteps = groundStepList(operators, objects)
-	for g in gsteps:
-		print(g)
+	#gsteps = groundStepList(operators, objects)
+	#for g in gsteps:
+#		print(g)
 	#
 	###
 	result = planner.POCL()

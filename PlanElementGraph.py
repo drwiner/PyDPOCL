@@ -29,6 +29,13 @@ class Action(ElementGraph):
 		""" Determine if Action is an orphan"""
 		#self.isOrphan()
 
+	def subgraph(self, element, Type = None):
+		if Type == None:
+			Type = eval(element.typ)
+		return self.getElementGraphFromElement(element, Type)
+
+	def subgraphFromID(self, element_ID, Type = None):
+		return self.subgraph(self.getElementById(element_ID), Type)
 						
 	def updateConsentingActors(self,scratch = None):
 		if scratch == None:
@@ -51,28 +58,27 @@ class Action(ElementGraph):
 			Makes copy of step-induced subgraph and changes ids
 		"""
 		new_self = self.copyGen()
-		new_self.ID = 12
-		nei = -1
-		
-		
+		new_self.ID = Action.stepnumber
+
 		#While changing IDs, look for the element which used to have old_element.id and let 'nei' = new element id
 		if not old_element_id is None:
-			ole = {element for element in new_self.elements if element.ID == old_element_id}
-			if not ole:
-				print('could not find old element id {} in old Action {}'.format(old_element_id, self.ID))
-			else:
-				old_element = ole.pop()
-		
+			old_element = new_self.getElementById(old_element_id)
+			if not old_element:
+				raise ValueError('could not find old element id {} in old Action {}'.format(old_element_id, self.ID))
+
+		#Replace all element IDs
 		for element in new_self.elements:
 			element.ID = uuid.uuid1(new_self.ID)
-			
+
 		new_self.root.arg_name = Action.stepnumber
 		Action.stepnumber+=1
-		
+
+		#But we save
 		if not old_element_id is None:
 			nei = old_element.ID
+			return new_self, nei
 
-		return new_self, nei
+		return new_self
 							
 
 	def isConsistentAntecedentFor(self, consequent, effect = None):
