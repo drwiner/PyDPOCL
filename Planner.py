@@ -2,6 +2,7 @@
 from pddlToGraphs import *
 import collections
 from heapq import heappush, heappop
+import itertools
 
 """
 	Algorithm for Plan-Graph-Space search of Story Plan
@@ -129,7 +130,7 @@ class PlanSpacePlanner:
 				if Effect.isConsistentSubgraph(Precondition):
 
 					#nei : new element id, to easily access element from graph
-					step_op, nei = op.makeCopyFromID(start_from = 1,old_element_id = eff.ID)
+					step_op, nei = op.instantiateOperator(old_element_id=eff.ID)
 
 					#Condition graph of copied operator for Effect
 					Effect  = step_op.getElementGraphFromElementID(nei, Condition)
@@ -411,6 +412,18 @@ def rFollowHierarchy(object_types, child_name, accumulated = set()):
 				accumulated.add(ob.parent)
 				rFollowHierarchy(object_types, ob.parent, accumulated)
 
+def groundStepList(operators, objects):
+	gsteps = []
+	for op in operators:
+		op.updateArgs()
+		cndts = [[obj for obj in objects if arg.typ == obj.typ or arg.typ in obtypes[obj.typ]] for arg in op.Args]
+		tuples = itertools.product(*cndts)
+		for t in tuples:
+			gstep = copy.deepcopy(op)
+			gstep.replaceArgs(t)
+			gsteps.append(gstep)
+	return gsteps
+
 
 import sys
 
@@ -434,6 +447,14 @@ if __name__ ==  '__main__':
 
 	Argument.object_types = obtypes
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
+
+	###
+	#Task: create list of fully ground steps given domain actions (operators), and arguments (objects)
+	gsteps = groundStepList(operators, objects)
+	for g in gsteps:
+		print(g)
+	#
+	###
 	result = planner.POCL()
 
 	totOrdering = topoSort(result)

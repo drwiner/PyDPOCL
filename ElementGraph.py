@@ -3,6 +3,7 @@ import uuid
 
 class ElementGraph(Graph):
 	"""An element graph is a graph with a root element"""
+	arglabels = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
 
 	def __init__(self, ID, type_graph, name=None, Elements=None, root_element=None, Edges=None, Restrictions=None):
 		if Elements == None:
@@ -166,19 +167,46 @@ class ElementGraph(Graph):
 
 		return completed
 
+	def getSingleArgByLabel(self, label):
+		for edge in self.edges:
+			if edge.source == self.root:
+				if edge.label == label:
+					return edge.sink
+		return None
+
 	def updateArgs(self):
-		arglabels = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
+		#arglabels = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
 		#argTyps = {Argument, Actor}
 		self.Args = []
-		for label in arglabels:
-			try:
-				self.Args.append(next(iter(self.getNeighborsByLabel(self.root, label))))
-			except:
-				return
+		for label in self.arglabels:
+			arg = self.getSingleArgByLabel(label)
+			if arg is None:
+				break
+			else:
+				self.Args.append(arg)
 		#for element in self.rGetDescendants(self.root):
 			#if type(element) in argTyps:
 			#	self.Args.add(element)
 
+	def replaceArg(self, original, replacer):
+		self.elements.add(replacer)
+		incoming = {edge for edge in self.edges if edge.sink == original}
+		for edge in incoming:
+			edge.sink = replacer
+		self.elements.remove(original)
+
+	def replaceArgs(self, arg_tuple):
+		"""
+		A method to replace all args, as ordered by their args in self.Args, by the args in tuple
+		@param arg_tuple: a tuple of args ordered by their replacement of args in self
+		@return: none
+		"""
+		if not len(arg_tuple) == len(self.Args):
+			raise ValueError('cannot replace Args, arg_tuple too long/short for %s' % self.name)
+
+		for i, arg in enumerate(arg_tuple):
+			original = self.getSingleArgByLabel(self.arglabels[i])
+			self.replaceArg(original, arg)
 
 def assimilate(EG, ee, pe):
 	"""	ProvIDed with old_edge consistent with other_edge

@@ -46,14 +46,12 @@ class Action(ElementGraph):
 				# self.is_orphan = True
 				
 	
-	def makeCopyFromID(self, start_from, old_element_id = None):
+	def instantiateOperator(self, old_element_id=None):
 		"""
 			Makes copy of step-induced subgraph and changes ids
-			Non-equality constraints wiped
 		"""
 		new_self = self.copyGen()
-		old_id = self.ID
-		new_self.ID = start_from
+		new_self.ID = 12
 		nei = -1
 		
 		
@@ -66,7 +64,7 @@ class Action(ElementGraph):
 				old_element = ole.pop()
 		
 		for element in new_self.elements:
-			element.ID = uuid.uuid1(start_from)
+			element.ID = uuid.uuid1(new_self.ID)
 			
 		new_self.root.arg_name = Action.stepnumber
 		Action.stepnumber+=1
@@ -113,6 +111,7 @@ class Action(ElementGraph):
 	def isConsistent(self, other):
 		""" an action is consistent just when one can absolve the other"""
 		return self.isConsistentSubgraph(other)
+
 		
 	def __repr__(self):
 		self.updateArgs()
@@ -313,7 +312,7 @@ class PlanElementGraph(ElementGraph):
 			
 		rnd =floor(random.random()*100)
 		Step = new_self.getElementGraphFromElementID(partial.ID, Action)
-		operatorClones = {op.makeCopyFromID(rnd) for op in operator_choices}
+		operatorClones = {op.instantiateOperator() for op in operator_choices}
 		for op in operatorClones:
 			#nStep = Step.copyGen()
 			complete_steps.update(op.UnifyWith(Step))
