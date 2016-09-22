@@ -216,32 +216,47 @@ class PlanSpacePlanner:
 		#limit search significantly by only considering precompliled cndts
 		for eff in graph.flaws.cndts[flaw]:
 			eff = graph.getElementById(eff.ID)
-			if not eff.isConsistent(pre):
-				continue
+			try:
+				if not eff.isConsistent(pre):
+					continue
+			except:
+				print('ok')
 
-			Effect = graph.subgraph(eff)
+			try:
+				Effect = graph.subgraph(eff)
+			except:
+				print('ok')
 			if not Effect.isConsistentSubgraph(Precondition):
 				continue
 
-			Effect.updateArgs()
-			#step = next(iter(graph.getParents(eff)))
-			step = graph.getEstablishingParent(eff)
-
-
-			## Bookkeeping for replacing effect of step_op with precondition
 			graph_copy = graph.deepcopy()
-			removable = {edge for edge in graph_copy.edges if edge.sink == eff or edge.source == eff}
-			graph_copy.edges -= removable
+			eff = graph_copy.getElementById(eff.ID)
+			Effect = graph_copy.subgraph(eff)
+			Effect.updateArgs()
+
+			#all edges to eff and from eff should be eliminated, including eff itself
+			eff = graph_copy.getElementById(eff.ID)
+			try:
+				establishing_step = graph_copy.getEstablishingParent(eff)
+			except:
+				print('ok')
+			graph_copy.edges -= {edge for edge in graph_copy.edges if edge.source == eff or edge.sink == eff}
 			graph_copy.elements -= {eff}
 
+			precondition_token = graph_copy.getElementById(pre.ID)
+			#s_need_token = graph_copy.getElementById(s_need)
+			graph_copy.edges.add(Edge(s_need, precondition_token, 'precond-of'))
+			precondition_token.ID = eff.ID
 
+			#all edges in graph_copy that went to the precondition arg, now go to the effect arg
+			arg_match = zip(Effect.Args, Precondition.Args)
+			for edge in graph_copy.edges:
+				if edge.sink in Precondition.Args:
+					for (e,p) in arg_match:
+						if edge.sink == p:
+							edge.sink = e
 
-			arg_labels = step.getArgLabels(tuple(Effect.Args))
-			step.replaceArgsFromLabels(Precondition.Args, arg_labels)
-			condition = graph_copy.getElementById(Precondition.root.ID)
-			graph_copy.edges.add(Edge(step.root, condition, 'effect-of'))
-			graph_copy.edges.update(step.edges)
-			self.addStep(graph_copy, step, s_need, condition, new=False)
+			self.addStep(graph_copy, establishing_step, s_need, precondition_token, new=False)
 			results.add(graph_copy)
 
 			####
