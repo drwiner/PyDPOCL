@@ -2,7 +2,8 @@
 import collections
 import bisect
 from Graph import isConsistentEdgeSet
-
+import itertools
+from clockdeco import clock
 #from PlanElementGraph import Condition
 #import PlanElementGraph
 """
@@ -182,6 +183,7 @@ class FlawLib():
 				if Effect.isConsistentSubgraph(Precondition):
 					self.cndts[oc].add(eff)
 
+	@clock
 	def insert(self, graph, flaw):
 		''' for each effect of an existing step, check and update mapping to consistent effects'''
 

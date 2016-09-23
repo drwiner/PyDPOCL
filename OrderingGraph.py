@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from ElementGraph import *
 
+
 class OrderingGraph(Graph):
 	
 	def __init__(self, ID, typ = None, name = None, Elements = None, Edges = None, Constraints= None):
@@ -21,7 +22,7 @@ class OrderingGraph(Graph):
 		
 	def addEdge(self, source, sink):
 		self.addOrdering(source, sink)
-		
+
 	def detectCycle(self,):
 		''' Returns True if cycle, False otherwise
 			Strategy: for each element, find descendent elements. If a is descendant of b and b is descendant of a,

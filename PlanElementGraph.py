@@ -55,8 +55,7 @@ class Action(ElementGraph):
 				# self.is_orphan = True
 			# elif actor.orphan_dict[self.root.id] == True:
 				# self.is_orphan = True
-				
-	@clock
+
 	def instantiateOperator(self, old_element_id=None):
 		"""
 			Makes copy of step-induced subgraph and changes ids
@@ -83,7 +82,7 @@ class Action(ElementGraph):
 			return new_self, nei
 
 		return new_self
-							
+
 
 	def isConsistentAntecedentFor(self, consequent, effect = None):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
@@ -212,7 +211,6 @@ class PlanElementGraph(ElementGraph):
 	def __lt__(self, other):
 		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
 
-	@clock
 	def deepcopy(self):
 		new_self = copy.deepcopy(self)
 		new_self.ID = uuid.uuid1(21)
@@ -228,7 +226,6 @@ class PlanElementGraph(ElementGraph):
 	def cost(self):
 		return len(self.Steps)
 
-	@clock
 	def subgraph(self, element, Type = None):
 		if Type == None:
 			Type = eval(element.typ)

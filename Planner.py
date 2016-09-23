@@ -241,7 +241,7 @@ class PlanSpacePlanner:
 		graph.updatePlan()
 		return graph
 
-
+	@clock
 	def resolveThreatenedCausalLinkFlaw(self, graph, flaw):
 		"""
 			Promotion: Add ordering from sink to threat, and check if cycle
@@ -254,9 +254,9 @@ class PlanSpacePlanner:
 		#Promotion
 		promotion = graph.deepcopy()
 		promotion.OrderingGraph.addEdge(causal_link.sink, threat)
-		if promotion.OrderingGraph.isInternallyConsistent():
+		#if promotion.OrderingGraph.isInternallyConsistent():
 			#results.add((promotion, 'promotion'))
-			results.add(promotion)
+		results.add(promotion)
 			#print('\ncreated child (promotion):\n')
 			#print(promotion)
 			#print('\n')
@@ -265,8 +265,8 @@ class PlanSpacePlanner:
 		#Demotion
 		demotion = graph.deepcopy()
 		demotion.OrderingGraph.addEdge(threat, causal_link.source)
-		if demotion.OrderingGraph.isInternallyConsistent():
-			results.add(demotion)
+		#if demotion.OrderingGraph.isInternallyConsistent():
+		results.add(demotion)
 			#print('\ncreated child (demotion):\n')
 			#print(demotion)
 			#print('\n')
