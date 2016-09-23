@@ -164,10 +164,8 @@ class FlawLib():
 		""" For each effect of Action, add to open-condition mapping if consistent"""
 
 		for eff in graph.getNeighborsByLabel(action, 'effect-of'):
-			try:
-				Effect = graph.subgraph(eff)
-			except:
-				print('ok')
+
+			Effect = graph.subgraph(eff)
 			for oc in self.OCs():
 				s_need, pre = oc.flaw
 

@@ -150,24 +150,24 @@ class ElementGraph(Graph):
 	#
 	# 	return self
 
-	def UnifyWith(self, other):
-		""" self is operator, other is partial step 'Action'
-			self is effect, other is precondition of existing step
-			Returns all possible ways to unify self and other, 
-				may result in changes to self
-		"""
-
-		for element in self.elements:
-			element.replaced_ID = -1
-		for elm in other.elements:
-			elm.replaced_ID = -1
-
-		completed = UnifyLiterals(self, other)
-		#completed = self.absolve(copy.deepcopy(other.edges), self.edges)
-		if len(completed) == 0:
-			print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other, self))
-
-		return completed
+	# def UnifyWith(self, other):
+	# 	""" self is operator, other is partial step 'Action'
+	# 		self is effect, other is precondition of existing step
+	# 		Returns all possible ways to unify self and other,
+	# 			may result in changes to self
+	# 	"""
+	#
+	# 	for element in self.elements:
+	# 		element.replaced_ID = -1
+	# 	for elm in other.elements:
+	# 		elm.replaced_ID = -1
+	#
+	# 	completed = UnifyLiterals(self, other)
+	# 	#completed = self.absolve(copy.deepcopy(other.edges), self.edges)
+	# 	if len(completed) == 0:
+	# 		print('\n\nno completed instantiations of {} with operator {}\n\n'.format(other, self))
+	#
+	# 	return completed
 
 	def getSingleArgByLabel(self, label):
 		for edge in self.edges:

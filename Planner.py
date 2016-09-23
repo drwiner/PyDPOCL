@@ -3,6 +3,7 @@ from pddlToGraphs import *
 import collections
 from heapq import heappush, heappop
 import itertools
+from clockdeco import clock
 
 """
 	Algorithm for Plan-Graph-Space search of Story Plan
@@ -102,7 +103,7 @@ class PlanSpacePlanner:
 		#for flaw in init_flaws:
 		#	graph.flaws.insert(graph,flaw)
 
-
+	@clock
 	def newStep(self, graph, flaw):
 		"""
 			iterates through all operators, instantiating a step with effect that can absolve precondition of step in flaw
@@ -132,12 +133,12 @@ class PlanSpacePlanner:
 					continue
 
 				graph_copy = graph.deepcopy()
-				condition = graph_copy.getElementById(Precondition.root.ID)
+
+				#precondition = precondition
+				#condition = graph_copy.getElementById(Precondition.root.ID)
 
 				#nei : new element id, to easily access element from graph
 				step_op, nei = op.instantiateOperator(old_element_id=eff.ID)
-
-
 				effect_token = step_op.getElementById(nei)
 				Effect = step_op.subgraph(effect_token, Condition)
 
@@ -151,65 +152,20 @@ class PlanSpacePlanner:
 				###
 
 
-				step_op.edges.add(Edge(step_op.root, condition, 'effect-of'))
+				step_op.edges.add(Edge(step_op.root, precondition, 'effect-of'))
 				graph_copy.edges.update(step_op.edges)
 				graph_copy.elements.update(step_op.elements)
 
-				self.addStep(graph_copy, step_op.root, s_need, condition, new=True)
+				self.addStep(graph_copy, step_op.root, s_need, precondition, new=True)
 				graph_copy.flaws.addCndtsAndRisks(graph_copy, step_op.root)
 				# print('\ncreated child (newStep):\n')
 				# print(graph_copy)
 				# print('\n')
 				results.add(graph_copy)
 
-				# #could be more than one way to unify effect with precondition
-				# #Effect_absorbtions' graphs' elements' replaced_ids assigned Precondition's ids
-				# Effect_absorbtions = Effect.UnifyWith(Precondition)
-				#
-				# for eff_abs in Effect_absorbtions:
-				# 	graph_copy = graph.deepcopy()
-				# 	new_step_op = copy.deepcopy(step_op)
-				#
-				# 	#graph_copy.mergeGraph(eff_abs)
-				# 	graph_copy.mergeUnifiedEffect(eff_abs)
-				#
-				# 	#For each elm 'e_s' in new_step_op not in eff_abs,
-				# 		# graph_copy.add(e_s)
-				# 	untouched_step_elms = {elm for elm in new_step_op.elements if not elm.ID in {e.ID for e in
-				# 																	 eff_abs.elements}}
-				# 	for elm in new_step_op.elements:
-				# 		if elm in untouched_step_elms:
-				# 			graph_copy.elements.add(elm)
-				#
-				# 	# For each edge 'e1 --label--> e2 in new_step_op such that e1 not in eff_abs,
-				# 		# if exists some e_p s.t. e_p.merge(sink), replace edge sink
-				# 		# graph_copy.add(edge)
-				# 	for edge in new_step_op.edges:
-				# 		if edge.source in untouched_step_elms:
-				# 			#untouched_step_elms
-				# 			if not edge.sink in untouched_step_elms:
-				# 				e_abs = eff_abs.getElementById(edge.sink.ID)
-				# 				if e_abs is None:
-				# 					pass
-				# 				edge.sink = graph_copy.getElementById(e_abs.replaced_ID)#place here
-				# 				#untouched_step_elms.add(edge.sink)
-				# 			graph_copy.edges.add(edge)
-				# 			#to prevent same edge from being selected in this iteration of for-loop
-				#
-				# 	# adds causal link and ordering constraints
-				# 	condition = graph_copy.getElementById(Precondition.root.ID)
-				# 	self.addStep(graph_copy, new_step_op.root, s_need, condition, new = True)
-				#
-				# 	#Now that step is in plan, determine for which open conditions the step is a cndt/risk
-				# 	graph_copy.flaws.addCndtsAndRisks(graph_copy, new_step_op.root)
-				# 	#print('\ncreated child (newStep):\n')
-				# 	#print(graph_copy)
-				# 	#print('\n')
-				#
-				# 	results.add(graph_copy)
 		return results
 
-
+	@clock
 	def reuse(self, graph, flaw):
 		results = set()
 		s_need, pre = flaw.flaw
@@ -225,55 +181,20 @@ class PlanSpacePlanner:
 				continue
 
 			graph_copy = graph.deepcopy()
-			eff_token = graph_copy.getElementById(eff.ID)
-			pre_token = graph_copy.getElementById(pre.ID)
-			arg_mapping = graph_copy.createArgMapping(eff_token, pre_token)
-			removable = {edge for edge in graph_copy.edges if edge.sink == pre_token and edge.label == 'precond-of'}
+			#eff_token = graph_copy.getElementById(eff.ID)
+			#pre_token = graph_copy.getElementById(pre.ID)
+
+			arg_mapping = graph_copy.createArgMapping(eff, pre)
+			removable = {edge for edge in graph_copy.edges if edge.sink == pre or edge.source == pre}
 			graph_copy.edges -= removable
-			removable = {edge for edge in graph_copy.edges if edge.source == pre_token}
-			graph_copy.edges -= removable
-			graph_copy.edges.add(Edge(s_need, eff_token, 'precond-of'))
-			graph_copy.elements -= {pre_token}
+			graph_copy.edges.add(Edge(s_need, eff, 'precond-of'))
+			graph_copy.elements -= {pre}
 			graph_copy.Unify(arg_mapping)
-			establishing_step = graph_copy.getEstablishingParent(eff_token)
+			establishing_step = graph_copy.getEstablishingParent(eff)
 
 
-			self.addStep(graph_copy, establishing_step, s_need, eff_token, new=False)
+			self.addStep(graph_copy, establishing_step, s_need, eff, new=False)
 			results.add(graph_copy)
-
-			####
-
-
-			# Effect_absorbtions = Effect.UnifyWith(Precondition)
-			#
-			# for eff_abs in Effect_absorbtions:
-			# 	# 1 Create new child graph
-			# 	graph_copy = copy.deepcopy(graph)
-			# 	#.deepcopy()
-			#
-			# 	# 2 Replace effect with eff_abs, which is unified with the precondition
-			# 	#graph_copy.mergeGraph(eff_abs, no_add=True)
-			# 	graph_copy.mergeUnifiedEffect(eff_abs)
-			#
-			# 	# 3) "Redirect Task""
-			#
-			# 	# Get elm for elms which were in eff_abs but not in precondition (were replaced)
-			# precondition_IDs = {element.ID for element in Precondition.elements}
-			# new_snk_cddts = {elm for elm in UnifiedEffect.elements if not elm.ID in precondition_IDs}
-			# snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID): UnifiedEffect.getElementById(elm.ID)
-			# 				 for elm in new_snk_cddts}
-			# for old, new in snk_swap_dict.items():
-			# 	graph_copy.replaceWith(old, new)
-
-			#
-			# 	# adds causal link and ordering constraints
-			# 	condition = graph_copy.getElementById(eff_abs.root.ID)
-			# 	self.addStep(graph_copy, step, s_need, condition, new=False)
-			# 		#print('\ncreated child (reuse):\n')
-			# 		#print(graph_copy)
-			# 		#print('\n')
-			# 	# add graph to children
-			# 	results.add(graph_copy)
 
 		return results
 
@@ -319,6 +240,7 @@ class PlanSpacePlanner:
 		#Good time as ever to updatePlan
 		graph.updatePlan()
 		return graph
+
 
 	def resolveThreatenedCausalLinkFlaw(self, graph, flaw):
 		"""
@@ -384,12 +306,13 @@ class PlanSpacePlanner:
 
 		return results
 
+	@clock
 	def POCL(self):
 		Visited = []
 		while len(self.Open) > 0:
 			#Select child
 			graph = self.Open.pop()
-			print(graph)
+			#print(graph)
 			if not graph.isInternallyConsistent():
 				print('branch terminated')
 				continue
@@ -398,7 +321,7 @@ class PlanSpacePlanner:
 			if len(graph.flaws) == 0:
 				#print('solution selected')
 				return graph
-			print(graph.flaws)
+			#print(graph.flaws)
 
 			#Select Flaw
 			flaw = graph.flaws.next()
@@ -473,6 +396,7 @@ def groundStepList(operators, objects):
 
 
 import sys
+
 
 if __name__ ==  '__main__':
 	num_args = len(sys.argv)

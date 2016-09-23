@@ -3,6 +3,8 @@ from Flaws import *
 from collections import deque
 import uuid
 import random
+import itertools
+from clockdeco import clock
 
 class Action(ElementGraph):
 	stepnumber = 2
@@ -54,7 +56,7 @@ class Action(ElementGraph):
 			# elif actor.orphan_dict[self.root.id] == True:
 				# self.is_orphan = True
 				
-	
+	@clock
 	def instantiateOperator(self, old_element_id=None):
 		"""
 			Makes copy of step-induced subgraph and changes ids
@@ -210,6 +212,7 @@ class PlanElementGraph(ElementGraph):
 	def __lt__(self, other):
 		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
 
+	@clock
 	def deepcopy(self):
 		new_self = copy.deepcopy(self)
 		new_self.ID = uuid.uuid1(21)
@@ -225,10 +228,12 @@ class PlanElementGraph(ElementGraph):
 	def cost(self):
 		return len(self.Steps)
 
+	@clock
 	def subgraph(self, element, Type = None):
 		if Type == None:
 			Type = eval(element.typ)
 		return self.getElementGraphFromElement(element, Type)
+
 
 	def subgraphFromID(self, element_ID, Type = None):
 		return self.subgraph(self.getElementById(element_ID), Type)
@@ -337,6 +342,7 @@ class PlanElementGraph(ElementGraph):
 	def getActions(self):
 		return list(self.getElementGraphFromElement(step,Action) for step in self.Steps)
 
+	@clock
 	def detectThreatenedCausalLinks(self):
 		"""
 		A threatened causal link flaw is a tuple <causal link edge, threatening step element>
@@ -350,7 +356,7 @@ class PlanElementGraph(ElementGraph):
 		detectedThreatenedCausalLinks = set()
 		for causal_link in self.CausalLinkGraph.edges:
 			nonThreats = self.CausalLinkGraph.nonThreats
-			dependency = self.getElementGraphFromElement(causal_link.label,Condition)
+			dependency = self.subgraph(causal_link.label,Condition)
 			reverse_dependency = copy.deepcopy(dependency)
 			# Reverse the truth status of the dependency
 			if reverse_dependency.root.truth == True:
@@ -380,7 +386,7 @@ class PlanElementGraph(ElementGraph):
 				for eff in effects:
 					if eff in nonThreats[causal_link]:
 						continue
-					cond_graph = self.getElementGraphFromElement(eff, Condition)
+					cond_graph = self.subgraph(eff, Condition)
 					if len(cond_graph.edges) > num_edges:
 						if cond_graph.isConsistentSubgraph(reverse_dependency):
 							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))

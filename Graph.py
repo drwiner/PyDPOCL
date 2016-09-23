@@ -178,7 +178,6 @@ class Graph(Element):
 	def isInternallyConsistent(self):
 		return not self.equivalentWithRestrictions()
 
-
 	def equivalentWithRestrictions(self):
 		if len(self.restrictions) == 0:
 			return False
