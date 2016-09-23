@@ -31,6 +31,23 @@ class Action(ElementGraph):
 		""" Determine if Action is an orphan"""
 		#self.isOrphan()
 
+	def RemoveSubgraph(self, elm):
+		link = None
+		to_remove = set()
+		for edge in self.edges:
+			if edge.source == elm:
+				to_remove.add(edge)
+			if link is None:
+				if edge.sink == elm:
+					edge.sink = None
+					link = edge
+		self.elements -= {elm}
+		self.edges -= to_remove
+		return link
+
+	def getPreconditionsOrEffects(self, label):
+		return {edge.sink for edge in self.edges if edge.label == label}
+
 	def subgraph(self, element, Type = None):
 		if Type == None:
 			Type = eval(element.typ)
@@ -42,6 +59,7 @@ class Action(ElementGraph):
 		return self.subgraph(self.getElementById(element_ID), Type)
 						
 	def updateConsentingActors(self,scratch = None):
+		pass
 		if scratch == None:
 			scratch = False
 		if scratch:
@@ -83,6 +101,17 @@ class Action(ElementGraph):
 
 		return new_self
 
+	def replaceInternals(self):
+		new_self = self.copyGen()
+		new_self.ID = Action.stepnumber
+		new_self.root.arg_name = Action.stepnumber
+		Action.stepnumber += 1
+
+		for elm in new_self.elements:
+			if not isinstance(elm, Argument):
+				elm.ID = uuid.uuid1(new_self.ID)
+
+		return new_self
 
 	def isConsistentAntecedentFor(self, consequent, effect = None):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""
