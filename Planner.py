@@ -191,10 +191,10 @@ class PlanSpacePlanner:
 			graph_copy = graph.deepcopy()
 			eff_token = graph_copy.getElementById(eff.ID)
 			sneed = graph_copy.getElementById(s_need.ID)
-			eff_token.merge(pre)
 			pre_token = graph_copy.getElementById(pre.ID)
+			eff_token.merge(pre_token)
 
-			arg_mapping = graph_copy.createArgMapping(eff, pre_token)
+			arg_mapping = graph_copy.createArgMapping(eff_token, pre_token)
 
 			graph_copy.edges -= {edge for edge in graph_copy.edges if edge.sink == pre or edge.source == pre}
 			graph_copy.elements -= {pre_token}

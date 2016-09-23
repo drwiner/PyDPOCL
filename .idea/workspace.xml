@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/story-elements.iml" afterPath="$PROJECT_DIR$/.idea/story-elements.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ElementGraph.py" afterPath="$PROJECT_DIR$/ElementGraph.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Flaws.py" afterPath="$PROJECT_DIR$/Flaws.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Graph.py" afterPath="$PROJECT_DIR$/Graph.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlanElementGraph.py" afterPath="$PROJECT_DIR$/PlanElementGraph.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Planner.py" afterPath="$PROJECT_DIR$/Planner.py" />
     </list>
     <ignored path="story-elements.iws" />
@@ -76,8 +70,8 @@
       <file leaf-file-name="PlanElementGraph.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="236" column="0" selection-start-line="236" selection-start-column="0" selection-end-line="236" selection-end-column="0" />
+            <state relative-caret-position="748">
+              <caret line="405" column="30" selection-start-line="405" selection-start-column="30" selection-end-line="405" selection-end-column="30" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -107,11 +101,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OrderingGraph.py" pinned="true" current-in-tab="false">
+      <file leaf-file-name="OrderingGraph.py" pinned="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="100" column="0" selection-start-line="100" selection-start-column="0" selection-end-line="114" selection-end-column="20" />
+            <state relative-caret-position="646">
+              <caret line="97" column="23" selection-start-line="97" selection-start-column="23" selection-end-line="97" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -129,11 +123,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Planner.py" pinned="true" current-in-tab="true">
+      <file leaf-file-name="Planner.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Planner.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="530">
-              <caret line="198" column="109" selection-start-line="198" selection-start-column="109" selection-end-line="198" selection-end-column="109" />
+              <caret line="156" column="91" selection-start-line="156" selection-start-column="91" selection-end-line="156" selection-end-column="91" />
               <folding>
                 <element signature="e#21#47#0" expanded="true" />
               </folding>
@@ -176,12 +170,12 @@
         <option value="$PROJECT_DIR$/CompileReq.py" />
         <option value="$PROJECT_DIR$/clockdeco.py" />
         <option value="$PROJECT_DIR$/Restrictions.py" />
-        <option value="$PROJECT_DIR$/OrderingGraph.py" />
         <option value="$PROJECT_DIR$/Graph.py" />
         <option value="$PROJECT_DIR$/PlanElementGraph.py" />
         <option value="$PROJECT_DIR$/Flaws.py" />
         <option value="$PROJECT_DIR$/ElementGraph.py" />
         <option value="$PROJECT_DIR$/Planner.py" />
+        <option value="$PROJECT_DIR$/OrderingGraph.py" />
       </list>
     </option>
   </component>
@@ -556,13 +550,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00050" summary="cleanup isle Graph.py">
-      <created>1471971965439</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1471971965440</updated>
-    </task>
     <task id="LOCAL-00051" summary="cleanup isle Graph.py">
       <created>1471972005735</created>
       <option name="number" value="00051" />
@@ -899,7 +886,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474645498498</updated>
     </task>
-    <option name="localTasksCounter" value="99" />
+    <task id="LOCAL-00099" summary="bug fixed for new step/reuse">
+      <created>1474653946605</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1474653946605</updated>
+    </task>
+    <option name="localTasksCounter" value="100" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -991,7 +985,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="fixed the tanis problem" />
     <MESSAGE value="working planner" />
     <MESSAGE value="  added to readme" />
     <MESSAGE value="added to readme" />
@@ -1016,7 +1009,8 @@
     <MESSAGE value="gsteps" />
     <MESSAGE value="debugged - newstep and reuse step are once again operational" />
     <MESSAGE value="clocking speed" />
-    <option name="LAST_COMMIT_MESSAGE" value="clocking speed" />
+    <MESSAGE value="bug fixed for new step/reuse" />
+    <option name="LAST_COMMIT_MESSAGE" value="bug fixed for new step/reuse" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1208,16 +1202,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="136" column="50" selection-start-line="136" selection-start-column="44" selection-end-line="136" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Restrictions.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="663">
@@ -1249,14 +1233,6 @@
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="100" column="0" selection-start-line="100" selection-start-column="0" selection-end-line="114" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1296,16 +1272,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="236" column="0" selection-start-line="236" selection-start-column="0" selection-end-line="236" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ElementGraph.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1279">
@@ -1314,13 +1280,41 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="284">
+          <caret line="136" column="50" selection-start-line="136" selection-start-column="44" selection-end-line="136" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Planner.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="530">
-          <caret line="198" column="109" selection-start-line="198" selection-start-column="109" selection-end-line="198" selection-end-column="109" />
+          <caret line="156" column="91" selection-start-line="156" selection-start-column="91" selection-end-line="156" selection-end-column="91" />
           <folding>
             <element signature="e#21#47#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="748">
+          <caret line="405" column="30" selection-start-line="405" selection-start-column="30" selection-end-line="405" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="646">
+          <caret line="97" column="23" selection-start-line="97" selection-start-column="23" selection-end-line="97" selection-end-column="23" />
+          <folding />
         </state>
       </provider>
     </entry>
