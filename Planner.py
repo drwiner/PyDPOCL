@@ -140,6 +140,12 @@ class PlanSpacePlanner:
 				#nei : new element id, to easily access element from graph
 				step_op, nei = op.instantiateOperator(old_element_id=eff.ID)
 				effect_token = step_op.getElementById(nei)
+				sneed = graph_copy.getElementById(s_need.ID)
+				pre_token = graph_copy.getElementById(precondition.ID)
+				pre_token.merge(effect_token)
+				arg_mapping = graph_copy.createArgMappingWithOther(pre_token, step_op, effect_token)
+
+				#precondition.merge(effect_token)
 				Effect = step_op.subgraph(effect_token, Condition)
 
 				## Bookkeeping for replacing effect of step_op with precondition
@@ -148,15 +154,17 @@ class PlanSpacePlanner:
 							 effect_token}
 				step_op.elements = {elm for elm in step_op.elements if elm != effect_token}
 				step_op.updateArgs()
-				step_op.replaceArgsFromLabels(Precondition.Args, arg_labels)
+				step_op.replaceArgsFromLabels(copy.deepcopy(Precondition.Args), arg_labels)
 				###
 
 
-				step_op.edges.add(Edge(step_op.root, precondition, 'effect-of'))
+				step_op.edges.add(Edge(step_op.root, pre_token, 'effect-of'))
 				graph_copy.edges.update(step_op.edges)
 				graph_copy.elements.update(step_op.elements)
 
-				self.addStep(graph_copy, step_op.root, s_need, precondition, new=True)
+				graph_copy.Unify(arg_mapping)
+
+				self.addStep(graph_copy, step_op.root, sneed, pre_token, new=True)
 				graph_copy.flaws.addCndtsAndRisks(graph_copy, step_op.root)
 				# print('\ncreated child (newStep):\n')
 				# print(graph_copy)
@@ -172,7 +180,7 @@ class PlanSpacePlanner:
 		Precondition = graph.subgraph(pre)
 		#limit search significantly by only considering precompliled cndts
 		for eff in graph.flaws.cndts[flaw]:
-
+			eff = graph.getElementById(eff.ID)
 			if not eff.isConsistent(pre):
 				continue
 
@@ -181,19 +189,19 @@ class PlanSpacePlanner:
 				continue
 
 			graph_copy = graph.deepcopy()
-			#eff_token = graph_copy.getElementById(eff.ID)
-			#pre_token = graph_copy.getElementById(pre.ID)
+			eff_token = graph_copy.getElementById(eff.ID)
+			sneed = graph_copy.getElementById(s_need.ID)
+			eff_token.merge(pre)
+			pre_token = graph_copy.getElementById(pre.ID)
 
-			arg_mapping = graph_copy.createArgMapping(eff, pre)
-			removable = {edge for edge in graph_copy.edges if edge.sink == pre or edge.source == pre}
-			graph_copy.edges -= removable
-			graph_copy.edges.add(Edge(s_need, eff, 'precond-of'))
-			graph_copy.elements -= {pre}
+			arg_mapping = graph_copy.createArgMapping(eff, pre_token)
+
+			graph_copy.edges -= {edge for edge in graph_copy.edges if edge.sink == pre or edge.source == pre}
+			graph_copy.elements -= {pre_token}
+			graph_copy.edges.add(Edge(sneed, eff_token, 'precond-of'))
 			graph_copy.Unify(arg_mapping)
-			establishing_step = graph_copy.getEstablishingParent(eff)
 
-
-			self.addStep(graph_copy, establishing_step, s_need, eff, new=False)
+			self.addStep(graph_copy, graph_copy.getEstablishingParent(eff), sneed, eff_token, new=False)
 			results.add(graph_copy)
 
 		return results
@@ -289,15 +297,9 @@ class PlanSpacePlanner:
 		if flaw.name == 'opf':
 			results = self.reuse(graph, flaw)
 			results.update(self.newStep(graph, flaw))
-			if len(results) == 0:
-				#print('could not resolve opf')
-				return results
 
 		if flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
-			if len(results) == 0:
-				#print('could not resolve tclf')
-				return results
 
 		#for result, res in results:
 		for result in results:
@@ -308,6 +310,7 @@ class PlanSpacePlanner:
 
 	@clock
 	def POCL(self):
+		Completed = []
 		Visited = []
 		while len(self.Open) > 0:
 			#Select child
@@ -320,7 +323,11 @@ class PlanSpacePlanner:
 
 			if len(graph.flaws) == 0:
 				#print('solution selected')
-				return graph
+				Completed.append(graph)
+				if len(Completed) == 10:
+					return Completed
+				continue
+				#return graph
 			#print(graph.flaws)
 
 			#Select Flaw
@@ -340,6 +347,36 @@ class PlanSpacePlanner:
 
 			print('open list number: {}'.format(len(self.Open)))
 			print('\n')
+
+	@clock
+	def integrateRequirements(self, Plan, ReqSteps, ReqLinks, ReqOrderings):
+		S = Plan.Steps
+		D = self.op_graphs
+		TMap = {t: {s for s in S if t.isIsomorphicSubgraphOf(s, consistency=True)}
+				for t in ReqSteps}
+		DMap = {t: {d for d in D if t.isIsomorphicSubgraphOf(d, consistency=True)}
+				for t in ReqSteps}
+
+		for (ti, tj) in ReqOrderings:
+			removable = {(si, sj) for si in TMap[ti] for sj in TMap[tj] if Plan.OrderingGraph.isPath(sj, si)}
+			for (si, sj) in removable:
+				TMap[ti] -= si
+				TMap[tj] -= sj
+
+		TMap.update(DMap)
+		for (ti, tj, te) in ReqLinks:
+			removable = {(si, sj) for si in TMap[ti] for sj in TMap[tj] if Plan.OrderingGraph.isPath(sj, si)}
+			for (si, sj) in removable:
+				TMap[ti] -= si
+				TMap[tj] -= sj
+
+			removable = {(si, sj) for si in TMap[ti] for sj in TMap[tj] if
+						 not si.isConsistentAntecedentFor(sj, effect=te)}
+			for (si, sj) in removable:
+				TMap[ti] -= si
+				TMap[tj] -= sj
+
+		return TMap
 
 
 def preprocessDomain(operators):
@@ -397,6 +434,11 @@ def groundStepList(operators, objects):
 
 import sys
 
+# import unittest
+# class TestRequirements(unittest.TestCase):
+# 	def testIntegrateRequirements(self):
+
+
 
 if __name__ ==  '__main__':
 	num_args = len(sys.argv)
@@ -426,13 +468,17 @@ if __name__ ==  '__main__':
 #		print(g)
 	#
 	###
-	result = planner.POCL()
+	#result = planner.POCL()
+	results = planner.POCL()
+	#result = results[0]
 
-	totOrdering = topoSort(result)
-	print('\n\n\n')
-	for step in totOrdering:
-		#Step = result.subgraph(step, Action)
-		print(result.subgraph(step, Action))
+	for result in results:
+		totOrdering = topoSort(result)
+		print('\n\n\n')
+		for step in totOrdering:
+			#Step = result.subgraph(step, Action)
+			print(result.subgraph(step, Action))
+		print(result)
 
 	#print('\n\n\n')
 	#print(result)

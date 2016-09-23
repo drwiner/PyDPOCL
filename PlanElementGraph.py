@@ -144,6 +144,11 @@ class Condition(ElementGraph):
 	def isConsistent(self, other):
 		return self.isConsistentSubgraph(other)
 
+	def numArgs(self):
+		if not hasattr(self, 'Args'):
+			self.updateArgs()
+		return len({arg for arg in self.Args if not arg.name is None})
+
 	def subgraph(self, element, Type = None):
 		if Type == None:
 			Type = eval(element.typ)

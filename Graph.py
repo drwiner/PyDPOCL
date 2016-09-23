@@ -1,6 +1,6 @@
 from Element import *
 import copy
-
+from clockdeco import clock
 class Edge:
 	""" Edge labels are assumed to be function-free and ground, and there can be no edge otherwise"""
 	__slots__ = 'source', 'sink', 'label'

@@ -74,6 +74,7 @@ class Flawque:
 	def peek(self):
 		return self._flaws[-1]
 
+
 	def insert(self, flaw):
 		index = bisect.bisect_left(self._flaws, flaw)
 		self._flaws.rotate(-index)
@@ -183,7 +184,7 @@ class FlawLib():
 				if Effect.isConsistentSubgraph(Precondition):
 					self.cndts[oc].add(eff)
 
-	@clock
+
 	def insert(self, graph, flaw):
 		''' for each effect of an existing step, check and update mapping to consistent effects'''
 
@@ -203,6 +204,7 @@ class FlawLib():
 		#Determine existing Cdnts and Risks for this flaw
 		Precondition = graph.subgraph(pre)
 		Cndts = graph.getEdgesByLabel('effect-of')
+		int_experiment = 0
 		for edge in Cndts:
 
 			if s_need == edge.source:
@@ -222,9 +224,12 @@ class FlawLib():
 			Effect = graph.subgraph(eff)
 			if Effect.isConsistentSubgraph(Precondition):
 				self.cndts[flaw].add(eff)
+				if eff.num_args != Effect.numArgs():
+					int_experiment += 1
+
 
 		#Bin flaw into right list
-		flaw.cndts = len(self.cndts[flaw])
+		flaw.cndts = len(self.cndts[flaw]) - int_experiment
 		flaw.risks = len(self.risks[flaw])
 
 		# for any cndt, if establishing step is initial, then flaw is static {t}

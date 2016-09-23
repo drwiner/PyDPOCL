@@ -269,6 +269,13 @@ class ElementGraph(Graph):
 		ConditionB.updateArgs()
 		return zip(ConditionA.Args,ConditionB.Args)
 
+	def createArgMappingWithOther(self, litTokenA, other, litTokenB):
+		ConditionA = self.subgraph(litTokenA)
+		ConditionA.updateArgs()
+		ConditionB = other.subgraph(litTokenB)
+		ConditionB.updateArgs()
+		return zip(ConditionA.Args, ConditionB.Args)
+
 def assimilate(EG, ee, pe):
 	"""	ProvIDed with old_edge consistent with other_edge
 		Merges source and sinks
