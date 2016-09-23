@@ -69,12 +69,14 @@ class ElementGraph(Graph):
 	def preventEqualityWithRestriction(self, arg1, arg2):
 		#Just need one parent of type Condition
 
-		arg_1_edge = next(iter(self.getIncomingEdgesByType(arg1, 'Condition')))
-		if arg_1_edge is None:
-			arg_2_edge = next(iter(self.getIncomingEdgesByType(arg2, 'Condition')))
-			if arg_2_edge is None:
-				#TODO: consider cases when argument passed to this method would be orphans without Condition parents
-				return False
+		try:
+			arg_1_edge = next(iter(self.getIncomingEdgesByType(arg1, 'Action')))
+		except:
+			try:
+				arg_2_edge = next(iter(self.getIncomingEdgesByType(arg2, 'Action')))
+			except:
+				raise ValueError('these args have no action parents {} {} '.format(arg1, arg2))
+
 			self.addRealRestriction(arg_2_edge.source, arg1, arg_2_edge.label)
 			return True
 
@@ -222,7 +224,7 @@ class ElementGraph(Graph):
 		self.updateArgs()
 
 	def replaceArgsFromLabels(self, arg_list, label_tuple):
-		self.updateArgs()
+		#self.updateArgs()
 		if not len(self.Args) >= label_tuple[-1]:
 			raise ValueError('cannot replace Args, label_tuple references nonexistent arg in %s' % self.name)
 
@@ -233,14 +235,39 @@ class ElementGraph(Graph):
 		self.updateArgs()
 
 	def swap(self, internal_old, internal_new):
-		for edge in (e for e in self.edges if e.sink == internal_old):
-			edge.sink = internal_new
-		for edge in (e for e in self.edges if e.source == internal_old):
-			edge.source = internal_new
+		for edge in self.edges:
+			if edge.sink == internal_old:
+				edge.sink = internal_new
+			if edge.source == internal_old:
+				edge.source = internal_new
 
 	def replaceStepArgsInGraph(self, old_args, new_args):
 		pass
 
+
+	def Unify(self, mapping_tuples):
+		"""
+
+		@param mapping_tuples: [0] receives merge from [1]. All edges in self to [1] go to [0]
+		@return: nothing
+		"""
+		if mapping_tuples == None:
+			raise ValueError('must provide mapping tuples {(a b),(x,y), etc} for unify in elementgraph')
+
+		for (receiver, old_element) in mapping_tuples:
+			if not old_element in self.elements:
+				raise ValueError('old element {} in mapping_tuple in Unify was not found elements...'.format(old_element.ID))
+			if not receiver in self.elements:
+				raise ValueError('receiver element {} in mapping_tuple in Unify was not found in elements...'.format(receiver.ID))
+			receiver.merge(old_element)
+			self.replaceWith(old_element, receiver)
+
+	def createArgMapping(self, litTokenA, litTokenB):
+		ConditionA = self.subgraph(litTokenA)
+		ConditionA.updateArgs()
+		ConditionB = self.subgraph(litTokenB)
+		ConditionB.updateArgs()
+		return zip(ConditionA.Args,ConditionB.Args)
 
 def assimilate(EG, ee, pe):
 	"""	ProvIDed with old_edge consistent with other_edge
@@ -260,40 +287,40 @@ def assimilate(EG, ee, pe):
 	return new_self
 
 
-def UnifyLiterals(effect, prec, C = None):
-	"""
-		@param effect is an element graph, root element is literal
-		@param prec is an element graph, root element is literal consistent with effect.root
-		@param C is collected unifications in set
-		@return set of literals corresponding to potential effect-prec unifications
-
-		Unifying literals, unlike other elements, can be done just by finding consistent edges, since it is assumed
-		that each edge label is unique per literal.
-
-		It is assumed that prec is a subgraph of effect, except with argument bindings.
-	"""
-
-	# collected unifications
-	if C == None:
-		C = set()
-
-	#BASE CASE:
-	if len(prec.edges) == 0:
-		C.add(effect)
-		return C
-
-	P = copy.deepcopy(prec)
-
-	#until we can account for all precondition edges
-	pe = P.edges.pop()
-	b4 = len(C)
-	for ee in effect.edges:
-		if pe.isConsistent(ee):
-			merged_graph = assimilate(effect, ee, pe)
-			C.update(UnifyLiterals(merged_graph, P, C))
-	if len(C) > b4 and len(C) > 0:
-		return C
-	return set()
+# def UnifyLiterals(effect, prec, C = None):
+# 	"""
+# 		@param effect is an element graph, root element is literal
+# 		@param prec is an element graph, root element is literal consistent with effect.root
+# 		@param C is collected unifications in set
+# 		@return set of literals corresponding to potential effect-prec unifications
+#
+# 		Unifying literals, unlike other elements, can be done just by finding consistent edges, since it is assumed
+# 		that each edge label is unique per literal.
+#
+# 		It is assumed that prec is a subgraph of effect, except with argument bindings.
+# 	"""
+#
+# 	# collected unifications
+# 	if C == None:
+# 		C = set()
+#
+# 	#BASE CASE:
+# 	if len(prec.edges) == 0:
+# 		C.add(effect)
+# 		return C
+#
+# 	P = copy.deepcopy(prec)
+#
+# 	#until we can account for all precondition edges
+# 	pe = P.edges.pop()
+# 	b4 = len(C)
+# 	for ee in effect.edges:
+# 		if pe.isConsistent(ee):
+# 			merged_graph = assimilate(effect, ee, pe)
+# 			C.update(UnifyLiterals(merged_graph, P, C))
+# 	if len(C) > b4 and len(C) > 0:
+# 		return C
+# 	return set()
 
 
 def createPossibleWorlds(self, Remaining=None, Available=None, Collected=None):

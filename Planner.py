@@ -115,7 +115,7 @@ class PlanSpacePlanner:
 		"""
 
 		s_need, precondition = flaw.flaw
-		Precondition = graph.subgraph(precondition)
+		Precondition = graph.subgraph(precondition, Condition)
 		Precondition.updateArgs()
 		results = set()
 
@@ -125,31 +125,33 @@ class PlanSpacePlanner:
 				if not eff.isConsistent(precondition):
 					continue
 
-				Effect = op.getElementGraphFromElement(eff,Condition)
+				Effect = op.subgraph(eff, Condition)
 
 				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
 				if not Effect.isConsistentSubgraph(Precondition):
 					continue
 
 				graph_copy = graph.deepcopy()
+				condition = graph_copy.getElementById(Precondition.root.ID)
+
 				#nei : new element id, to easily access element from graph
 				step_op, nei = op.instantiateOperator(old_element_id=eff.ID)
 
-				## Bookkeeping for replacing effect of step_op with precondition
+
 				effect_token = step_op.getElementById(nei)
 				Effect = step_op.subgraph(effect_token, Condition)
-				Effect.updateArgs()
-				arg_labels = step_op.getArgLabels(tuple(Effect.Args))
-				new_edges = {edge for edge in step_op.edges if edge.sink != effect_token and edge.source !=
-							 effect_token}
-				step_op.edges = new_edges
-				new_elms = {elm for elm in step_op.elements if elm != effect_token}
-				step_op.elements = new_elms
-				step_op.replaceArgsFromLabels(Precondition.Args, arg_labels)
-				condition = graph_copy.getElementById(Precondition.root.ID)
-				step_op.edges.add(Edge(step_op.root, condition, 'effect-of'))
-				####
 
+				## Bookkeeping for replacing effect of step_op with precondition
+				arg_labels = step_op.getArgLabels(tuple(Effect.Args))
+				step_op.edges = {edge for edge in step_op.edges if edge.sink != effect_token and edge.source !=
+							 effect_token}
+				step_op.elements = {elm for elm in step_op.elements if elm != effect_token}
+				step_op.updateArgs()
+				step_op.replaceArgsFromLabels(Precondition.Args, arg_labels)
+				###
+
+
+				step_op.edges.add(Edge(step_op.root, condition, 'effect-of'))
 				graph_copy.edges.update(step_op.edges)
 				graph_copy.elements.update(step_op.elements)
 
@@ -212,51 +214,31 @@ class PlanSpacePlanner:
 		results = set()
 		s_need, pre = flaw.flaw
 		Precondition = graph.subgraph(pre)
-		Precondition.updateArgs()
 		#limit search significantly by only considering precompliled cndts
 		for eff in graph.flaws.cndts[flaw]:
-			eff = graph.getElementById(eff.ID)
-			try:
-				if not eff.isConsistent(pre):
-					continue
-			except:
-				print('ok')
 
-			try:
-				Effect = graph.subgraph(eff)
-			except:
-				print('ok')
+			if not eff.isConsistent(pre):
+				continue
+
+			Effect = graph.subgraph(eff)
 			if not Effect.isConsistentSubgraph(Precondition):
 				continue
 
 			graph_copy = graph.deepcopy()
-			eff = graph_copy.getElementById(eff.ID)
-			Effect = graph_copy.subgraph(eff)
-			Effect.updateArgs()
+			eff_token = graph_copy.getElementById(eff.ID)
+			pre_token = graph_copy.getElementById(pre.ID)
+			arg_mapping = graph_copy.createArgMapping(eff_token, pre_token)
+			removable = {edge for edge in graph_copy.edges if edge.sink == pre_token and edge.label == 'precond-of'}
+			graph_copy.edges -= removable
+			removable = {edge for edge in graph_copy.edges if edge.source == pre_token}
+			graph_copy.edges -= removable
+			graph_copy.edges.add(Edge(s_need, eff_token, 'precond-of'))
+			graph_copy.elements -= {pre_token}
+			graph_copy.Unify(arg_mapping)
+			establishing_step = graph_copy.getEstablishingParent(eff_token)
 
-			#all edges to eff and from eff should be eliminated, including eff itself
-			eff = graph_copy.getElementById(eff.ID)
-			try:
-				establishing_step = graph_copy.getEstablishingParent(eff)
-			except:
-				print('ok')
-			graph_copy.edges -= {edge for edge in graph_copy.edges if edge.source == eff or edge.sink == eff}
-			graph_copy.elements -= {eff}
 
-			precondition_token = graph_copy.getElementById(pre.ID)
-			#s_need_token = graph_copy.getElementById(s_need)
-			graph_copy.edges.add(Edge(s_need, precondition_token, 'precond-of'))
-			precondition_token.ID = eff.ID
-
-			#all edges in graph_copy that went to the precondition arg, now go to the effect arg
-			arg_match = zip(Effect.Args, Precondition.Args)
-			for edge in graph_copy.edges:
-				if edge.sink in Precondition.Args:
-					for (e,p) in arg_match:
-						if edge.sink == p:
-							edge.sink = e
-
-			self.addStep(graph_copy, establishing_step, s_need, precondition_token, new=False)
+			self.addStep(graph_copy, establishing_step, s_need, eff_token, new=False)
 			results.add(graph_copy)
 
 			####
@@ -276,15 +258,13 @@ class PlanSpacePlanner:
 			# 	# 3) "Redirect Task""
 			#
 			# 	# Get elm for elms which were in eff_abs but not in precondition (were replaced)
-			# 	precondition_IDs = {element.ID for element in Precondition.elements}
-			# 	new_snk_cddts = {elm for elm in eff_abs.elements if not elm.ID in precondition_IDs}
-			# 	snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID): eff_abs.getElementById(elm.ID)
-			# 					 for elm in new_snk_cddts}
-			# 	for old, new in snk_swap_dict.items():
-			# 		try:
-			# 			graph_copy.replaceWith(old, new)
-			# 		except:
-			# 			print('whatsup')
+			# precondition_IDs = {element.ID for element in Precondition.elements}
+			# new_snk_cddts = {elm for elm in UnifiedEffect.elements if not elm.ID in precondition_IDs}
+			# snk_swap_dict = {graph_copy.getElementById(elm.replaced_ID): UnifiedEffect.getElementById(elm.ID)
+			# 				 for elm in new_snk_cddts}
+			# for old, new in snk_swap_dict.items():
+			# 	graph_copy.replaceWith(old, new)
+
 			#
 			# 	# adds causal link and ordering constraints
 			# 	condition = graph_copy.getElementById(eff_abs.root.ID)

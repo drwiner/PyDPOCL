@@ -32,7 +32,9 @@ class Action(ElementGraph):
 	def subgraph(self, element, Type = None):
 		if Type == None:
 			Type = eval(element.typ)
-		return self.getElementGraphFromElement(element, Type)
+		new_self = self.getElementGraphFromElement(element, Type)
+		new_self.updateArgs()
+		return new_self
 
 	def subgraphFromID(self, element_ID, Type = None):
 		return self.subgraph(self.getElementById(element_ID), Type)
@@ -140,6 +142,13 @@ class Condition(ElementGraph):
 
 	def isConsistent(self, other):
 		return self.isConsistentSubgraph(other)
+
+	def subgraph(self, element, Type = None):
+		if Type == None:
+			Type = eval(element.typ)
+		new_self = self.getElementGraphFromElement(element, Type)
+		new_self.updateArgs()
+		return new_self
 			
 	def __repr__(self):
 		self.updateArgs()
