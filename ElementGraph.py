@@ -33,6 +33,7 @@ class ElementGraph(Graph):
 		"""
 			INPLACE subgraph - still references same parent
 		"""
+		elm = EG.getElementById(elm.ID)
 		edges = EG.rGetDescendantEdges(elm)
 		elms = {edge.source for edge in edges}|{edge.sink for edge in edges}
 		return cls(elm.ID, elm.typ, name=None, root_element=elm, Elements=elms, Edges=edges)

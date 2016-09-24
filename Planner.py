@@ -119,13 +119,14 @@ class PlanSpacePlanner:
 		for ante in antecedents:
 			(anteaction, eff_link) = copy.deepcopy(ante)
 
+			new_plan = plan.deepcopy()
+
 			#set sink before replace internals
-			eff_link.sink = copy.deepcopy(precondition)
+			eff_link.sink = new_plan.getElementById(precondition.ID)
 			#check: eff_link.sink should till be precondition of s_need
 			anteaction.replaceInternals()
 
 			#add new stuff to new plan
-			new_plan = plan.deepcopy()
 			new_plan.elements.update(anteaction.elements)
 			new_plan.edges.update(anteaction.edges)
 
@@ -142,6 +143,8 @@ class PlanSpacePlanner:
 
 		gstep = self.GL[s_need.stepnumber]
 		ante_step_nums =  gstep.id_dict[precondition.replaced_ID]
+
+		#effect IDs are those effects on s_old
 		effect_IDs = gstep.eff_dict[precondition.replaced_ID]
 
 		for s_old in plan.Steps:
@@ -149,26 +152,21 @@ class PlanSpacePlanner:
 				#TODO: also check init steps
 				continue
 
-			eff_tokens = {edge.sink for edge in plan if edge.sink == s_old and edge.label == 'effect-of'}
-			eff_token = None
-			for edge in plan:
-				if edge.sink == s_old and edge.label == 'effect-of':
-					if edge.sink.replaced_ID in gstep.eff_dict[precondition.replaced_ID]:
-						eff_token = edge.sink
-						break
-			# if eff_token == None:
-			# 	raise ValueError('s_old {} lacks effect which is in s_need {}.eff_dict[{}]'.format(s_old.replaced_ID))
+			#eff_tokens = {edge.sink for edge in plan if edge.source == s_old and edge.label == 'effect-of'}
+			S_Old = plan.subgraph(s_old)
+			eff_tokens = {edge.sink for edge in S_Old.edges if edge.sink.replaced_ID in gstep.eff_dict[precondition.replaced_ID]}
+
+			#check if there's only 1, should only be one
+			eff_token = eff_tokens.pop()
 
 			new_plan = plan.deepcopy()
 			#The following works because subgraph is still referencing same elms and edges of new_plan
 			Sneed = new_plan.subgraph(s_need)
 			pre_link = Sneed.removeSubgraph(precondition)
+			pre_link.sink = new_plan.getElementById(eff_token.ID)
 
-
-
-
-			self.addStep(graph_copy, graph_copy.getEstablishingParent(eff), sneed, eff_token, new=False)
-			results.add(graph_copy)
+			self.addStep(new_plan, new_plan.getElementById(s_old.ID), new_plan.getElementById(s_need.ID), pre_link.sink,  new=False)
+			results.add(new_plan)
 
 		return results
 

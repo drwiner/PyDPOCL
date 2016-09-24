@@ -34,6 +34,7 @@ class Action(ElementGraph):
 		#self.isOrphan()
 
 	def RemoveSubgraph(self, elm):
+		elm = self.getElementById(elm.ID)
 		link = None
 		to_remove = set()
 		for edge in self.edges:
