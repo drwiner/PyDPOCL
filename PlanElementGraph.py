@@ -25,6 +25,8 @@ class Action(ElementGraph):
 		
 		""" Get consenting actors"""		
 		self.updateConsentingActors(scratch = True)
+
+		self.nonequals = set()
 											
 		#print('num_CONSENTING actors = {} in action {}'.format(len(self.consenting_actors),self.id))
 		
@@ -39,7 +41,7 @@ class Action(ElementGraph):
 				to_remove.add(edge)
 			if link is None:
 				if edge.sink == elm:
-					edge.sink = None
+					edge.sink = Element(ID = -1)
 					link = edge
 		self.elements -= {elm}
 		self.edges -= to_remove
@@ -102,16 +104,13 @@ class Action(ElementGraph):
 		return new_self
 
 	def replaceInternals(self):
-		new_self = self.copyGen()
-		new_self.ID = Action.stepnumber
-		new_self.root.arg_name = Action.stepnumber
-		Action.stepnumber += 1
+		self.ID = Action.stepnumber
+		self.root.arg_name = Action.stepnumber
+		#Action.stepnumber += 1
 
-		for elm in new_self.elements:
+		for elm in self.elements:
 			if not isinstance(elm, Argument):
-				elm.ID = uuid.uuid1(new_self.ID)
-
-		return new_self
+				elm.ID = uuid.uuid1(self.ID)
 
 	def isConsistentAntecedentFor(self, consequent, effect = None):
 		"""Returns set of (self.effect, action.precondition) that are coConsistent"""

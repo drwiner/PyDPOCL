@@ -228,22 +228,8 @@ class PlanSpacePlanner:
 		graph.CausalLinkGraph.addEdge(s_add, s_need, condition)
 
 		if new:
-			prc_edges = graph.getIncidentEdgesByLabel(s_add, 'precond-of')
-			#prcs = graph.getNeighborsByLabel(s_add, 'precond-of')
-			#preconditions = graph.getNeighborsByLabel(s_add, 'precond-of')
-			equalNames = {'equals', 'equal', '='}
-
-			#just edges of label 'precond'
-			noncodesg = {prc for prc in prc_edges if prc.sink.name in equalNames and not prc.sink.truth}
-
-			if len(noncodesg) > 0:
-				graph.edges -= noncodesg
-				if not graph.addNonEqualityRestrictions({nonco.sink for nonco in noncodesg}):
-					print('problem with adding nonequality restrictions')
-
-			new_flaws = (Flaw((s_add, prec.sink), 'opf') for prec in prc_edges if not prec in noncodesg)
-			for flaw in new_flaws:
-				graph.flaws.insert(graph,flaw)
+			for prec in graph.getIncidentEdgesByLabel(s_add, 'precond-of'):
+				graph.flaws.insert(graph, Flaw((s_add, prec.sink),'opf'))
 
 		#Good time as ever to updatePlan
 		graph.updatePlan()

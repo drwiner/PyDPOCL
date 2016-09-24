@@ -100,6 +100,18 @@ def forallFormula(formula, parent, relationship, elements, edges):
 				non_scoped = next(element for element in elements if child.key.name == element.arg_name)
 				edges.add(Edge(L,non_scoped,ARGLABELS[i]))
 
+def getNonEquals(formula, elements, edges):
+	global op_graph
+	#ARGLABELS
+	(c1, c2) = formula.children
+	arg1 = next(element for element in elements if c1.key.name == element.arg_name)
+	arg2 = next(element for element in elements if c2.key.name == element.arg_name)
+	edge1 = next(edge for edge in edges if edge.source.typ == 'Action' and edge.sink == arg1)
+	edge2 = next(edge for edge in edges if edge.source.typ == 'Action' and edge.sink == arg2)
+	i1 = ARGLABELS.index(edge1.label)
+	i2 = ARGLABELS.index(edge2.label)
+	op_graph.nonequals.add((i1,i2))
+
 def getSubFormulaGraph(formula, current_id = None, parent = None, relationship = None, elements = None, edges = None):
 	if elements ==None:
 		elements = set()
@@ -111,6 +123,9 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 		formula = next(iter(formula.children))
 		if formula.key == 'intends':
 			lit, formula = makeMotive(formula, current_id, parent, relationship, elements, edges, False)
+		elif formula.key == 'equals' or formula.key == '=' or formula.key == 'equal':
+			getNonEquals(formula, elements, edges)
+			return elements, edges
 		else:
 			lit, formula = makeLit(formula, current_id, parent, relationship, elements, edges, False)
 	elif formula.key == 'intends':
@@ -133,9 +148,9 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 		if relationship == 'actor-of':
 			edges.add(Edge(parent, arg, 'actor-of'))
 
-		elif lit.name == '=' or lit.name == 'equals' or lit.name == 'equal':
+		#elif lit.name == '=' or lit.name == 'equals' or lit.name == 'equal':
 			# TODO: test if ever receiving 'equals'
-			edges.add(Edge(lit, arg, 'arg-of'))
+			#edges.add(Edge(lit, arg, 'arg-of'))
 		else:
 			edges.add(Edge(lit, arg, ARGLABELS[i]))
 			
@@ -234,8 +249,7 @@ def domainToOperatorGraphs(domain):
 							type_graph = 'Action', \
 							name = action.name,\
 							root_element = op)
-		
-		
+		global op_graph
 		start_id += 1
 		#args = {}
 		'''First, create elements for all action parameters (variables)'''

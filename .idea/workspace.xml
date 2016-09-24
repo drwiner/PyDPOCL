@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Ground.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Ground.py" afterPath="$PROJECT_DIR$/Ground.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlanElementGraph.py" afterPath="$PROJECT_DIR$/PlanElementGraph.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Planner.py" afterPath="$PROJECT_DIR$/Planner.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pddlToGraphs.py" afterPath="$PROJECT_DIR$/pddlToGraphs.py" />
     </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -22,23 +26,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Graph.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Graph.py">
+      <file leaf-file-name="ElementGraph.py" pinned="true" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ElementGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="69" column="0" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#21#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="255">
+              <caret line="16" column="32" selection-start-line="16" selection-start-column="32" selection-end-line="16" selection-end-column="32" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ElementGraph.py" pinned="true" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ElementGraph.py">
+      <file leaf-file-name="ark-problem.pddl" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/domains/ark-problem.pddl">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1279">
-              <caret line="271" column="33" selection-start-line="271" selection-start-column="8" selection-end-line="271" selection-end-column="33" />
+            <state relative-caret-position="238">
+              <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -47,8 +49,8 @@
       <file leaf-file-name="Element.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Element.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="64" column="0" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
+            <state relative-caret-position="233">
+              <caret line="197" column="14" selection-start-line="197" selection-start-column="6" selection-end-line="197" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -69,8 +71,8 @@
       <file leaf-file-name="PlanElementGraph.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="748">
-              <caret line="405" column="30" selection-start-line="405" selection-start-column="30" selection-end-line="405" selection-end-column="30" />
+            <state relative-caret-position="476">
+              <caret line="28" column="30" selection-start-line="28" selection-start-column="30" selection-end-line="28" selection-end-column="30" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -78,31 +80,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ark-domain.pddl" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/domains/ark-domain.pddl">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="799">
-              <caret line="56" column="42" selection-start-line="56" selection-start-column="24" selection-end-line="56" selection-end-column="42" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="OrderingGraph.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="76" column="19" selection-start-line="76" selection-start-column="19" selection-end-line="76" selection-end-column="19" />
+            <state relative-caret-position="714">
+              <caret line="116" column="0" selection-start-line="116" selection-start-column="0" selection-end-line="116" selection-end-column="27" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Ground.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Ground.py">
+      <file leaf-file-name="ark-domain.pddl" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/domains/ark-domain.pddl">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
+            <state relative-caret-position="136">
+              <caret line="8" column="23" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -111,8 +103,8 @@
       <file leaf-file-name="pddlToGraphs.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
-              <caret line="136" column="50" selection-start-line="136" selection-start-column="44" selection-end-line="136" selection-end-column="50" />
+            <state relative-caret-position="-1641">
+              <caret line="257" column="76" selection-start-line="257" selection-start-column="76" selection-end-line="257" selection-end-column="76" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
               </folding>
@@ -120,11 +112,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Planner.py" pinned="true" current-in-tab="false">
+      <file leaf-file-name="Ground.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Ground.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="425">
+              <caret line="142" column="15" selection-start-line="142" selection-start-column="15" selection-end-line="142" selection-end-column="15" />
+              <folding>
+                <element signature="e#1#17#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Planner.py" pinned="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Planner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="530">
-              <caret line="156" column="91" selection-start-line="156" selection-start-column="91" selection-end-line="156" selection-end-column="91" />
+            <state relative-caret-position="437">
+              <caret line="224" column="0" selection-start-line="224" selection-start-column="0" selection-end-line="224" selection-end-column="0" />
               <folding>
                 <element signature="e#21#47#0" expanded="true" />
               </folding>
@@ -152,28 +156,28 @@
         <option value="$PROJECT_DIR$/test_elementGraph.py" />
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/domains/mini-indy-problem.pddl" />
-        <option value="$PROJECT_DIR$/pddl/pddl.py" />
         <option value="$PROJECT_DIR$/rGetInt.py" />
         <option value="$PROJECT_DIR$/shelftopack.py" />
         <option value="$PROJECT_DIR$/domains/mini-indy-domain.pddl" />
         <option value="$PROJECT_DIR$/pddl/parser.py" />
         <option value="$PROJECT_DIR$/pddl/tree_visitor.py" />
         <option value="$PROJECT_DIR$/domains/ark-problem.pddl" />
-        <option value="$PROJECT_DIR$/pddlToGraphs.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/nlk.py" />
-        <option value="$PROJECT_DIR$/domains/ark-domain.pddl" />
         <option value="$PROJECT_DIR$/Element.py" />
         <option value="$PROJECT_DIR$/CompileReq.py" />
         <option value="$PROJECT_DIR$/clockdeco.py" />
         <option value="$PROJECT_DIR$/Restrictions.py" />
         <option value="$PROJECT_DIR$/Graph.py" />
-        <option value="$PROJECT_DIR$/PlanElementGraph.py" />
         <option value="$PROJECT_DIR$/Flaws.py" />
         <option value="$PROJECT_DIR$/ElementGraph.py" />
-        <option value="$PROJECT_DIR$/Planner.py" />
         <option value="$PROJECT_DIR$/OrderingGraph.py" />
+        <option value="$PROJECT_DIR$/pddl/pddl.py" />
+        <option value="$PROJECT_DIR$/domains/ark-domain.pddl" />
+        <option value="$PROJECT_DIR$/PlanElementGraph.py" />
+        <option value="$PROJECT_DIR$/pddlToGraphs.py" />
         <option value="$PROJECT_DIR$/Ground.py" />
+        <option value="$PROJECT_DIR$/Planner.py" />
       </list>
     </option>
   </component>
@@ -282,7 +286,7 @@
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file://D:/Documents/Python/story-elements/domains/mini-indy-domain.pddl" />
   </component>
-  <component name="RunManager" selected="Python.Planner">
+  <component name="RunManager" selected="Python.Ground">
     <configuration default="false" name="Planner" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -296,23 +300,6 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="story-elements" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Planner.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
-    <configuration default="false" name="Graph" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="story-elements" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Graph.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -381,6 +368,23 @@
       <option name="PUREUNITTEST" value="true" />
       <option name="PARAMS" value="" />
       <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Ground" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="story-elements" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Ground.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
@@ -519,18 +523,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.Planner" />
-      <item index="1" class="java.lang.String" itemvalue="Python.Graph" />
-      <item index="2" class="java.lang.String" itemvalue="Python tests.Unittests in Restrictions" />
-      <item index="3" class="java.lang.String" itemvalue="Python tests.Unittests in OrderingGraph" />
-      <item index="4" class="java.lang.String" itemvalue="Python tests.Unittests in Graph" />
+      <item index="1" class="java.lang.String" itemvalue="Python tests.Unittests in Restrictions" />
+      <item index="2" class="java.lang.String" itemvalue="Python tests.Unittests in OrderingGraph" />
+      <item index="3" class="java.lang.String" itemvalue="Python tests.Unittests in Graph" />
+      <item index="4" class="java.lang.String" itemvalue="Python.Ground" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.Planner" />
-        <item index="1" class="java.lang.String" itemvalue="Python tests.Unittests in Graph" />
-        <item index="2" class="java.lang.String" itemvalue="Python tests.Unittests in OrderingGraph" />
-        <item index="3" class="java.lang.String" itemvalue="Python tests.Unittests in Restrictions" />
-        <item index="4" class="java.lang.String" itemvalue="Python.Graph" />
+        <item index="0" class="java.lang.String" itemvalue="Python.Ground" />
+        <item index="1" class="java.lang.String" itemvalue="Python.Planner" />
+        <item index="2" class="java.lang.String" itemvalue="Python tests.Unittests in Graph" />
+        <item index="3" class="java.lang.String" itemvalue="Python tests.Unittests in OrderingGraph" />
+        <item index="4" class="java.lang.String" itemvalue="Python tests.Unittests in Restrictions" />
       </list>
     </recent_temporary>
   </component>
@@ -547,20 +551,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
-    </task>
-    <task id="LOCAL-00051" summary="cleanup isle Graph.py">
-      <created>1471972005735</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1471972005735</updated>
-    </task>
-    <task id="LOCAL-00052" summary="cleanup unused">
-      <created>1472001346045</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1472001346045</updated>
     </task>
     <task id="LOCAL-00053" summary="Changed noncodesignation constraint method, removed noneq restriction">
       <created>1472062759541</created>
@@ -891,7 +881,21 @@
       <option name="project" value="LOCAL" />
       <updated>1474653946605</updated>
     </task>
-    <option name="localTasksCounter" value="100" />
+    <task id="LOCAL-00100" summary="Gsteps, glibs">
+      <created>1474666463393</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1474666463393</updated>
+    </task>
+    <task id="LOCAL-00101" summary="Gsteps, glibs">
+      <created>1474671521955</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1474671521955</updated>
+    </task>
+    <option name="localTasksCounter" value="102" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -935,7 +939,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.520687" sideWeight="0.50472814" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2747853" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36533958" sideWeight="0.4984127" order="7" side_tool="false" content_ui="tabs" x="-570" y="534" width="2560" height="400" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33645588" sideWeight="0.49527186" order="2" side_tool="false" content_ui="combo" x="2774" y="228" width="1505" height="1027" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.41920376" sideWeight="0.49527186" order="2" side_tool="false" content_ui="combo" x="2774" y="228" width="1505" height="1027" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24959743" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3297619" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -983,7 +987,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="working planner" />
     <MESSAGE value="  added to readme" />
     <MESSAGE value="added to readme" />
     <MESSAGE value="unusused method removed" />
@@ -1008,7 +1011,8 @@
     <MESSAGE value="debugged - newstep and reuse step are once again operational" />
     <MESSAGE value="clocking speed" />
     <MESSAGE value="bug fixed for new step/reuse" />
-    <option name="LAST_COMMIT_MESSAGE" value="bug fixed for new step/reuse" />
+    <MESSAGE value="Gsteps, glibs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Gsteps, glibs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1019,7 +1023,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="400" />
+      <option name="time" value="427" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1059,13 +1063,6 @@
     <entry file="file://$PROJECT_DIR$/search/a_star.py" />
     <entry file="file://$PROJECT_DIR$/search/searchspace.py" />
     <entry file="file://$PROJECT_DIR$/test_elementGraph.py" />
-    <entry file="file://$PROJECT_DIR$/pddl/test_parser_drw.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="680">
-          <caret line="41" column="28" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/Python/Lib/codeop.py" />
     <entry file="file://$PROJECT_DIR$/setup.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -1096,7 +1093,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/Python/Lib/codecs.py" />
     <entry file="file://$PROJECT_DIR$/rGetInt.py" />
     <entry file="file://$PROJECT_DIR$/shelftopack.py" />
     <entry file="file://$PROJECT_DIR$/domains/ark-domain_syntactic_sugar.pddl">
@@ -1121,13 +1117,6 @@
       </provider>
     </entry>
     <entry file="file://D:/Python/Lib/uuid.py" />
-    <entry file="file://$PROJECT_DIR$/pddl/pddl.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="83">
-          <caret line="25" column="19" selection-start-line="25" selection-start-column="17" selection-end-line="25" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pddl/parser.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
@@ -1175,13 +1164,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/domains/ark-problem.pddl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="196">
@@ -1224,14 +1206,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/domains/ark-domain.pddl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="799">
-          <caret line="56" column="42" selection-start-line="56" selection-start-column="24" selection-end-line="56" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Flaws.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="419">
@@ -1242,75 +1216,119 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Element.py">
+    <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="64" column="0" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
+        <state relative-caret-position="714">
+          <caret line="116" column="0" selection-start-line="116" selection-start-column="0" selection-end-line="116" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Graph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="69" column="0" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
+        <state relative-caret-position="274">
+          <caret line="32" column="0" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ElementGraph.py">
+    <entry file="file://D:/Python/Lib/codecs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1279">
-          <caret line="271" column="33" selection-start-line="271" selection-start-column="8" selection-end-line="271" selection-end-column="33" />
+        <state relative-caret-position="277">
+          <caret line="289" column="0" selection-start-line="289" selection-start-column="0" selection-end-line="289" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
+    <entry file="file://$PROJECT_DIR$/pddl/pddl.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="136" column="50" selection-start-line="136" selection-start-column="44" selection-end-line="136" selection-end-column="50" />
+        <state relative-caret-position="318">
+          <caret line="97" column="38" selection-start-line="97" selection-start-column="38" selection-end-line="97" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pddl/test_parser_drw.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="22" column="26" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Planner.py">
+    <entry file="file://$PROJECT_DIR$/ElementGraph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="530">
-          <caret line="156" column="91" selection-start-line="156" selection-start-column="91" selection-end-line="156" selection-end-column="91" />
-          <folding>
-            <element signature="e#21#47#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="255">
+          <caret line="16" column="32" selection-start-line="16" selection-start-column="32" selection-end-line="16" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Element.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="233">
+          <caret line="197" column="14" selection-start-line="197" selection-start-column="6" selection-end-line="197" selection-end-column="14" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="748">
-          <caret line="405" column="30" selection-start-line="405" selection-start-column="30" selection-end-line="405" selection-end-column="30" />
+        <state relative-caret-position="476">
+          <caret line="28" column="30" selection-start-line="28" selection-start-column="30" selection-end-line="28" selection-end-column="30" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
+    <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="76" column="19" selection-start-line="76" selection-start-column="19" selection-end-line="76" selection-end-column="19" />
-          <folding />
+        <state relative-caret-position="-1641">
+          <caret line="257" column="76" selection-start-line="257" selection-start-column="76" selection-end-line="257" selection-end-column="76" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Ground.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
+        <state relative-caret-position="425">
+          <caret line="142" column="15" selection-start-line="142" selection-start-column="15" selection-end-line="142" selection-end-column="15" />
+          <folding>
+            <element signature="e#1#17#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/ark-domain.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="23" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="23" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/ark-problem.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Planner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="437">
+          <caret line="224" column="0" selection-start-line="224" selection-start-column="0" selection-end-line="224" selection-end-column="0" />
+          <folding>
+            <element signature="e#21#47#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

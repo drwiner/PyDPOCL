@@ -24,7 +24,10 @@ class GStep:
 		return self._action.getPreconditionsOrEffects(label)
 
 	def replaceInternals(self):
-		return self._action.replaceInternals()
+		self._action.replaceInternals()
+
+	def deepcopy(self):
+		return copy.deepcopy(self._action)
 
 	@property
 	def name(self):
@@ -40,7 +43,15 @@ def groundStepList(operators, objects, obtypes):
 		cndts = [[obj for obj in objects if arg.typ == obj.typ or arg.typ in obtypes[obj.typ]] for arg in op.Args]
 		tuples = itertools.product(*cndts)
 		for t in tuples:
-			gstep = op.replaceInternals()
+			legaltuple = True
+			for (u,v) in op.nonequals:
+				if t[u] == t[v]:
+					legaltuple = False
+					break
+			if not legaltuple:
+				continue
+			gstep = copy.deepcopy(op)
+			gstep.replaceInternals()
 			gstep.replaceArgs(t)
 			gsteps.append(GStep(gstep))
 	return gsteps
@@ -69,14 +80,15 @@ def loadAnteSteps(_gsteps, _step, _pre):
 
 			#Defense 2
 			Effect = gstep.subgraph(_eff)
-			if Effect.Args == Precondition.Args:
+			if Effect.Args != Precondition.Args:
 				continue
 		#	if not Effect.isConsistentSubgraph(Precondition):
 			#	continue
 
 			#Create antestep
-			antestep = gstep.replaceInternals()
+			antestep = gstep.deepcopy()
 			eff_link = antestep.RemoveSubgraph(_eff)
+			antestep.replaceInternals()
 
 			#Add antestep to _step.pre_dict
 			_step.pre_dict[_pre].add(Antestep(antestep, eff_link))
@@ -87,11 +99,13 @@ class GLib:
 
 	def loadAll(self):
 		for _step in self._gsteps:
-			print('preprocessing step {}....'.format(_step))
+			print('\npreprocessing step {}....'.format(_step))
 			pre_tokens = _step.getPreconditionsOrEffects('precond-of')
 			for _pre in pre_tokens:
-				print('preprocessing precondition {}....'.format(_pre))
+				print('\npreprocessing precondition {} of step {}....\n'.format(_pre, _step))
 				loadAnteSteps(self._gsteps, _step, _pre)
+				for antestep in _step.pre_dict[_pre]:
+					print(antestep.action)
 
 	def __len__(self):
 		return len(self._gsteps)
@@ -126,16 +140,17 @@ if __name__ ==  '__main__':
 	GL = GLib(operators, objects, obtypes)
 	print("preprocessing ground actions.... \n")
 	GL.loadAll()
-
+	print('\n')
 
 	for gstep in GL:
 		print(gstep)
 		pre_tokens = gstep.getPreconditionsOrEffects('precond-of')
 		print('antes:')
 		for pre in pre_tokens:
-			print('pre: {}\n'.format(pre))
+			print('pre: {} of step {}....\n'.format(pre, gstep))
 			for ante in gstep.pre_dict[pre]:
 				print(ante.action)
+			print('\n')
 		print('\n')
 
 	#print(GL)
