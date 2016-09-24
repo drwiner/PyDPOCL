@@ -18,7 +18,7 @@ class GStep:
 		return self._action.subgraph(elm)
 
 	def RemoveSubgraph(self, elm):
-		return self._action.RemoveSubgraph(elm)
+		self.link = self._action.RemoveSubgraph(elm)
 
 	def getPreconditionsOrEffects(self, label):
 		return self._action.getPreconditionsOrEffects(label)
@@ -106,6 +106,8 @@ class GLib:
 				loadAnteSteps(self._gsteps, _step, _pre)
 				for antestep in _step.pre_dict[_pre]:
 					print(antestep.action)
+
+	def get
 
 	def __len__(self):
 		return len(self._gsteps)
