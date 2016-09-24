@@ -104,102 +104,68 @@ class PlanSpacePlanner:
 		#	graph.flaws.insert(graph,flaw)
 
 	@clock
-	def newStep(self, graph, flaw):
+	def newStep(self, plan, flaw):
 		"""
-			iterates through all operators, instantiating a step with effect that can absolve precondition of step in flaw
-			returns set of graphs which resolve the flaw
-			
-			method details:
-				"get instantiations": given two graphs, returns a set of unifications by accounting-for/absolving all edges in second with edges in first
-				"mergeGraph": 	given two graphs where the second had replaced some of the elements of the first,
-								the first graph merges the second one back in, tracking the elements it replaced
+		@param plan:
+		@param flaw:
+		@return:
 		"""
 
-		s_need, precondition = flaw.flaw
-		Precondition = graph.subgraph(precondition, Condition)
-		Precondition.updateArgs()
 		results = set()
+		s_need, precondition = flaw.flaw
 
-		for op in self.op_graphs:
-			for eff in op.getNeighborsByLabel(op.root, 'effect-of'):
+		#antecedent is of the form (antecedent_action_with_missing_eff_link, eff_link)
+		antecedents = self.GL.AntestepsByPreID(s_need.stepnumber, precondition.replaced_ID)
+		for ante in antecedents:
+			(anteaction, eff_link) = copy.deepcopy(ante)
 
-				if not eff.isConsistent(precondition):
-					continue
+			#set sink before replace internals
+			eff_link.sink = copy.deepcopy(precondition)
+			#check: eff_link.sink should till be precondition of s_need
+			anteaction.replaceInternals()
 
-				Effect = op.subgraph(eff, Condition)
+			#add new stuff to new plan
+			new_plan = plan.deepcopy()
+			new_plan.elements.update(anteaction.elements)
+			new_plan.edges.update(anteaction.edges)
 
-				#Can all edges in Precondition be matched to a consistent edge in Effect, without replacement
-				if not Effect.isConsistentSubgraph(Precondition):
-					continue
-
-				graph_copy = graph.deepcopy()
-
-				#precondition = precondition
-				#condition = graph_copy.getElementById(Precondition.root.ID)
-
-				#nei : new element id, to easily access element from graph
-				step_op, nei = op.instantiateOperator(old_element_id=eff.ID)
-				effect_token = step_op.getElementById(nei)
-				sneed = graph_copy.getElementById(s_need.ID)
-				pre_token = graph_copy.getElementById(precondition.ID)
-				pre_token.merge(effect_token)
-				arg_mapping = graph_copy.createArgMappingWithOther(pre_token, step_op, effect_token)
-
-				#precondition.merge(effect_token)
-				Effect = step_op.subgraph(effect_token, Condition)
-
-				## Bookkeeping for replacing effect of step_op with precondition
-				arg_labels = step_op.getArgLabels(tuple(Effect.Args))
-				step_op.edges = {edge for edge in step_op.edges if edge.sink != effect_token and edge.source !=
-							 effect_token}
-				step_op.elements = {elm for elm in step_op.elements if elm != effect_token}
-				step_op.updateArgs()
-				step_op.replaceArgsFromLabels(copy.deepcopy(Precondition.Args), arg_labels)
-				###
-
-
-				step_op.edges.add(Edge(step_op.root, pre_token, 'effect-of'))
-				graph_copy.edges.update(step_op.edges)
-				graph_copy.elements.update(step_op.elements)
-
-				graph_copy.Unify(arg_mapping)
-
-				self.addStep(graph_copy, step_op.root, sneed, pre_token, new=True)
-				graph_copy.flaws.addCndtsAndRisks(graph_copy, step_op.root)
-				# print('\ncreated child (newStep):\n')
-				# print(graph_copy)
-				# print('\n')
-				results.add(graph_copy)
+			self.addStep(new_plan, anteaction.root, copy.deepcopy(s_need), eff_link.sink, new=True)
+			new_plan.flaws.addCndtsAndRisks(new_plan, anteaction.root)
+			results.add(new_plan)
 
 		return results
 
 	@clock
-	def reuse(self, graph, flaw):
+	def reuse(self, plan, flaw):
 		results = set()
-		s_need, pre = flaw.flaw
-		Precondition = graph.subgraph(pre)
-		#limit search significantly by only considering precompliled cndts
-		for eff in graph.flaws.cndts[flaw]:
-			eff = graph.getElementById(eff.ID)
-			if not eff.isConsistent(pre):
+		s_need, precondition = flaw.flaw
+
+		gstep = self.GL[s_need.stepnumber]
+		ante_step_nums =  gstep.id_dict[precondition.replaced_ID]
+		effect_IDs = gstep.eff_dict[precondition.replaced_ID]
+
+		for s_old in plan.Steps:
+			if not s_old.stepnumber in ante_step_nums:
+				#TODO: also check init steps
 				continue
 
-			Effect = graph.subgraph(eff)
-			if not Effect.isConsistentSubgraph(Precondition):
-				continue
+			eff_tokens = {edge.sink for edge in plan if edge.sink == s_old and edge.label == 'effect-of'}
+			eff_token = None
+			for edge in plan:
+				if edge.sink == s_old and edge.label == 'effect-of':
+					if edge.sink.replaced_ID in gstep.eff_dict[precondition.replaced_ID]:
+						eff_token = edge.sink
+						break
+			# if eff_token == None:
+			# 	raise ValueError('s_old {} lacks effect which is in s_need {}.eff_dict[{}]'.format(s_old.replaced_ID))
 
-			graph_copy = graph.deepcopy()
-			eff_token = graph_copy.getElementById(eff.ID)
-			sneed = graph_copy.getElementById(s_need.ID)
-			pre_token = graph_copy.getElementById(pre.ID)
-			eff_token.merge(pre_token)
+			new_plan = plan.deepcopy()
+			#The following works because subgraph is still referencing same elms and edges of new_plan
+			Sneed = new_plan.subgraph(s_need)
+			pre_link = Sneed.removeSubgraph(precondition)
 
-			arg_mapping = graph_copy.createArgMapping(eff_token, pre_token)
 
-			graph_copy.edges -= {edge for edge in graph_copy.edges if edge.sink == pre or edge.source == pre}
-			graph_copy.elements -= {pre_token}
-			graph_copy.edges.add(Edge(sneed, eff_token, 'precond-of'))
-			graph_copy.Unify(arg_mapping)
+
 
 			self.addStep(graph_copy, graph_copy.getEstablishingParent(eff), sneed, eff_token, new=False)
 			results.add(graph_copy)

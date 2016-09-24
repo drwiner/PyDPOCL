@@ -29,6 +29,15 @@ class ElementGraph(Graph):
 		return new_self
 
 	@classmethod
+	def subgraph(cls, EG, elm):
+		"""
+			INPLACE subgraph - still references same parent
+		"""
+		edges = EG.rGetDescendantEdges(elm)
+		elms = {edge.source for edge in edges}|{edge.sink for edge in edges}
+		return cls(elm.ID, elm.typ, name=None, root_element=elm, Elements=elms, Edges=edges)
+
+	@classmethod
 	def makeElementGraph(cls, elementGraph, element):
 		edges = copy.deepcopy(elementGraph.rGetDescendantEdges(element))
 		elms = {edge.source for edge in edges}|{edge.sink for edge in edges}

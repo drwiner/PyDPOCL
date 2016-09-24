@@ -12,6 +12,8 @@ class GStep:
 	def __init__(self, action):
 		self._action = action
 		self.pre_dict = defaultdict(set)
+		self.id_dict = defaultdict(set)
+		self.eff_dict = defaultdict(set)
 		self.link = None
 
 	def subgraph(self, elm):
@@ -29,9 +31,32 @@ class GStep:
 	def deepcopy(self):
 		return copy.deepcopy(self._action)
 
+	def __getitem__(self, item):
+		return self.pre_dict[item]
+
 	@property
 	def name(self):
 		return self._action.name
+
+	@property
+	def elements(self):
+		return self._action.elements
+
+	@property
+	def edges(self):
+		return self._action.edges
+
+	@property
+	def root(self):
+		return self._action.root
+
+	@property
+	def typ(self):
+		return self._action.typ
+
+	@property
+	def ID(self):
+		return self._action.ID
 
 	def __repr__(self):
 		return self._action.__repr__()
@@ -92,6 +117,9 @@ def loadAnteSteps(_gsteps, _step, _pre):
 
 			#Add antestep to _step.pre_dict
 			_step.pre_dict[_pre].add(Antestep(antestep, eff_link))
+			_step.id_dict[_pre.ID].add(antestep.stepnumber)
+			#step's precondition associated with corresponding effect of antestep
+			_step.eff_dict[_pre.ID].add(eff_link.sink.ID)
 
 class GLib:
 	def __init__(self, operators, objects, obtypes):
@@ -99,15 +127,20 @@ class GLib:
 
 	def loadAll(self):
 		for _step in self._gsteps:
-			print('\npreprocessing step {}....'.format(_step))
+			print('preprocessing step {}....'.format(_step))
 			pre_tokens = _step.getPreconditionsOrEffects('precond-of')
 			for _pre in pre_tokens:
-				print('\npreprocessing precondition {} of step {}....\n'.format(_pre, _step))
+				print('preprocessing precondition {} of step {}....'.format(_pre, _step))
 				loadAnteSteps(self._gsteps, _step, _pre)
-				for antestep in _step.pre_dict[_pre]:
-					print(antestep.action)
 
-	def get
+	def Antesteps(self, stepnum, pre_token):
+		return self[stepnum].pre_dict[pre_token]
+
+	def AntestepsByPreID(self, stepnum, pre_ID):
+		gstep = self[stepnum]
+		for elm in gstep.elements:
+			if elm.ID == pre_ID:
+				return gstep[elm]
 
 	def __len__(self):
 		return len(self._gsteps)
@@ -119,9 +152,7 @@ class GLib:
 		return item in self._gsteps
 
 	def __repr__(self):
-		st= ' \n'
-		return st.join(self._gsteps)
-
+		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
 
 
 
@@ -143,18 +174,15 @@ if __name__ ==  '__main__':
 	print("preprocessing ground actions.... \n")
 	GL.loadAll()
 	print('\n')
+	print(GL)
 
-	for gstep in GL:
-		print(gstep)
-		pre_tokens = gstep.getPreconditionsOrEffects('precond-of')
-		print('antes:')
-		for pre in pre_tokens:
-			print('pre: {} of step {}....\n'.format(pre, gstep))
-			for ante in gstep.pre_dict[pre]:
-				print(ante.action)
-			print('\n')
-		print('\n')
-
-	#print(GL)
-
-	print('ok')
+	# for gstep in GL:
+	# 	print(gstep)
+	# 	pre_tokens = gstep.getPreconditionsOrEffects('precond-of')
+	# 	print('antes:')
+	# 	for pre in pre_tokens:
+	# 		print('pre: {} of step {}....\n'.format(pre, gstep))
+	# 		for ante in gstep.pre_dict[pre]:
+	# 			print(ante.action)
+	# 		print('\n')
+	# 	print('\n')

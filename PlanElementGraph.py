@@ -41,7 +41,6 @@ class Action(ElementGraph):
 				to_remove.add(edge)
 			if link is None:
 				if edge.sink == elm:
-					edge.sink = Element(ID = -1)
 					link = edge
 		self.elements -= {elm}
 		self.edges -= to_remove
@@ -50,15 +49,15 @@ class Action(ElementGraph):
 	def getPreconditionsOrEffects(self, label):
 		return {edge.sink for edge in self.edges if edge.label == label}
 
-	def subgraph(self, element, Type = None):
-		if Type == None:
-			Type = eval(element.typ)
-		new_self = self.getElementGraphFromElement(element, Type)
-		new_self.updateArgs()
-		return new_self
-
-	def subgraphFromID(self, element_ID, Type = None):
-		return self.subgraph(self.getElementById(element_ID), Type)
+	# def subgraph(self, element, Type = None):
+	# 	if Type == None:
+	# 		Type = eval(element.typ)
+	# 	new_self = self.getElementGraphFromElement(element, Type)
+	# 	new_self.updateArgs()
+	# 	return new_self
+	#
+	# def subgraphFromID(self, element_ID, Type = None):
+	# 	return self.subgraph(self.getElementById(element_ID), Type)
 						
 	def updateConsentingActors(self,scratch = None):
 		pass
@@ -110,6 +109,7 @@ class Action(ElementGraph):
 
 		for elm in self.elements:
 			if not isinstance(elm, Argument):
+				elm.replaced_ID = elm.ID
 				elm.ID = uuid.uuid1(self.ID)
 
 	def isConsistentAntecedentFor(self, consequent, effect = None):
@@ -259,14 +259,14 @@ class PlanElementGraph(ElementGraph):
 	def cost(self):
 		return len(self.Steps)
 
-	def subgraph(self, element, Type = None):
-		if Type == None:
-			Type = eval(element.typ)
-		return self.getElementGraphFromElement(element, Type)
-
-
-	def subgraphFromID(self, element_ID, Type = None):
-		return self.subgraph(self.getElementById(element_ID), Type)
+	# def subgraph(self, element, Type = None):
+	# 	if Type == None:
+	# 		Type = eval(element.typ)
+	# 	return self.getElementGraphFromElement(element, Type)
+	#
+	#
+	# def subgraphFromID(self, element_ID, Type = None):
+	# 	return self.subgraph(self.getElementById(element_ID), Type)
 
 	def isInternallyConsistent(self):
 		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent() and \
