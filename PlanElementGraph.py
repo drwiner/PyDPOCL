@@ -50,6 +50,16 @@ class Action(ElementGraph):
 	def getPreconditionsOrEffects(self, label):
 		return {edge.sink for edge in self.edges if edge.label == label}
 
+	def __getattr__(self, name):
+		if name == 'preconditions':
+			self.preconditions = self.getPreconditionsOrEffects('precond-of')
+			return self.preconditions
+		elif name == 'effects':
+			self.effects = self.getPreconditionsOrEffects('effect-of')
+			return self.effects
+		else:
+			raise AttributeError('no attribute {}'.format(name))
+
 	# def subgraph(self, element, Type = None):
 	# 	if Type == None:
 	# 		Type = eval(element.typ)
@@ -154,9 +164,13 @@ class Action(ElementGraph):
 	def __repr__(self):
 		self.updateArgs()
 		args = str(self.Args)
-		exe = self.root.executed
-		if exe == None:
+		if hasattr(self.root, 'executed'):
+			exe = self.root.executed
+			if exe is None:
+				exe = 'ex'
+		else:
 			exe = 'ex'
+
 		return '{}-{}-{}'.format(exe, self.root.name, self.root.arg_name) + args
 		
 		

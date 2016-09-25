@@ -4,32 +4,10 @@ import collections
 from heapq import heappush, heappop
 import itertools
 from clockdeco import clock
+from Ground import GLib
 
 """
 	Algorithm for Plan-Graph-Space search of Story Plan
-"""
-
-"""
-	(1) Read PDDL Domain and Problem (in another file, make test case)
-	(2) Create dummy initial and goal steps
-	(3) Create open precondition flaws for each element in goal
-	(4) Select Flaw based on heuristic
-	(5) Support the following operations pertaining to resolving open precondition flaws:
-		(5.A) Determine if an operator graph has an effect which is consistent/can-absolve with precondition in flaw
-		(5.B) Determine if an existing step has an effect which is consistent/can-absolve with precondition in flaw (if there is no ordering path from s_need to s_new)
-	(6) Support the following operations pertaining to resolving a threatened causal link flaw:
-		(6.A) Trivially, adding ordering edges
-		(6.B) Not as trivially, add bindings to prevent effect from co-designating with precondition.
-					Transform effect in E1 (condition) and preconditino in P1 (condition)
-							[Quick reference: 	arguments are named only if they refer to constants
-												arguments which are co-designated have the same ID
-												TODO: for each argument, track a set of IDs for non-designations]
-					For each matching outgoing-labeled edge sinks of E1 and P1, call them eA and pA, 
-							skip if they are codesignated or assigned the same name
-							otherwise, create deep copy of graph and add a non-codesignation relation
-							search through all arguments to create graphs which prevent unification in every possible way
-	(7) Detect Threatened Causal Link Flaws
-	(8) Recursive Invocation (but, log status of plan first)
 """
 
 class Frontier:
@@ -82,7 +60,7 @@ class PlanSpacePlanner:
 	def __setitem__(self, graph, position):
 		self._frontier[position] = graph
 
-	def setup(self, graph, start_action, end_action):
+	def setup(self, plan, start_action, end_action):
 		"""
 			Create step typed element DI, with effect edges to each condition of start_set
 			Create step typed element DG, with precondition edges to each condition of end_set
@@ -92,16 +70,13 @@ class PlanSpacePlanner:
 		dummy_start = start_action.root
 		dummy_final = end_action.root
 
-		graph.OrderingGraph.addOrdering(dummy_start, dummy_final)
+		plan.OrderingGraph.addOrdering(dummy_start, dummy_final)
 
 		#Add initial Open precondition flaws for dummy step
-		init_flaws = (Flaw((dummy_final, prec), 'opf') for prec in graph.getNeighborsByLabel(dummy_final, 'precond-of'))
+		init_flaws = (Flaw((dummy_final, prec), 'opf') for prec in plan.getNeighborsByLabel(dummy_final, 'precond-of'))
 		for flaw in init_flaws:
-			graph.flaws.insert(graph, flaw)
+			plan.flaws.insert(plan, flaw)
 
-		#For each flaw, determine candidate effects and risks, then insert into flawlib by bin
-		#for flaw in init_flaws:
-		#	graph.flaws.insert(graph,flaw)
 
 	@clock
 	def newStep(self, plan, flaw):
@@ -115,23 +90,31 @@ class PlanSpacePlanner:
 		s_need, precondition = flaw.flaw
 
 		#antecedent is of the form (antecedent_action_with_missing_eff_link, eff_link)
-		antecedents = self.GL.AntestepsByPreID(s_need.stepnumber, precondition.replaced_ID)
+		antecedents = self.GL.pre_dict[precondition.replaced_ID]
 		for ante in antecedents:
-			(anteaction, eff_link) = copy.deepcopy(ante)
 
+			#step 1 - make a copy
+			cndt = copy.deepcopy(ante)
+
+			#step 2 - replace its internals, to distinguish from other identical antesteps
+			(anteaction, eff_link) = cndt.replaceInternals()
+
+			#step 3 - make a copy of the plan
 			new_plan = plan.deepcopy()
 
-			#set sink before replace internals
+			#step 4 - set sink before replace internals
 			eff_link.sink = new_plan.getElementById(precondition.ID)
-			#check: eff_link.sink should till be precondition of s_need
-			anteaction.replaceInternals()
+			# check: eff_link.sink should till be precondition of s_need
 
-			#add new stuff to new plan
+			#step 5 - add new stuff to new plan
 			new_plan.elements.update(anteaction.elements)
 			new_plan.edges.update(anteaction.edges)
 
-			self.addStep(new_plan, anteaction.root, copy.deepcopy(s_need), eff_link.sink, new=True)
-			new_plan.flaws.addCndtsAndRisks(new_plan, anteaction.root)
+			#step 6 - update orderings and causal links, add flaws
+			self.addStep(new_plan, anteaction.root, new_plan.getElementById(s_need.ID), eff_link.sink, new=True)
+
+			#step 7 - add new_plan to open list
+			#new_plan.flaws.addCndtsAndRisks(new_plan, anteaction.root)
 			results.add(new_plan)
 
 		return results
@@ -141,36 +124,43 @@ class PlanSpacePlanner:
 		results = set()
 		s_need, precondition = flaw.flaw
 
-		gstep = self.GL[s_need.stepnumber]
-		ante_step_nums =  gstep.id_dict[precondition.replaced_ID]
-
-		#effect IDs are those effects on s_old
-		effect_IDs = gstep.eff_dict[precondition.replaced_ID]
+		#antecedents - a set of stepnumbers
+		antecedents = self.GL.id_dict[precondition.replaced_ID]
 
 		for s_old in plan.Steps:
-			if not s_old.stepnumber in ante_step_nums:
-				#TODO: also check init steps
+			if not s_old.stepnumber in antecedents:
 				continue
 
-			#eff_tokens = {edge.sink for edge in plan if edge.source == s_old and edge.label == 'effect-of'}
-			S_Old = plan.subgraph(s_old)
-			eff_tokens = {edge.sink for edge in S_Old.edges if edge.sink.replaced_ID in gstep.eff_dict[precondition.replaced_ID]}
-
-			#check if there's only 1, should only be one
-			eff_token = eff_tokens.pop()
-
+			#step 1 - make a copy of the plan, also replaces the plan number
 			new_plan = plan.deepcopy()
-			#The following works because subgraph is still referencing same elms and edges of new_plan
-			Sneed = new_plan.subgraph(s_need)
-			pre_link = Sneed.removeSubgraph(precondition)
-			pre_link.sink = new_plan.getElementById(eff_token.ID)
 
-			self.addStep(new_plan, new_plan.getElementById(s_old.ID), new_plan.getElementById(s_need.ID), pre_link.sink,  new=False)
+			#step 2 - Actionize the steps from new_plan
+			S_Old = Action.subgraph(new_plan, s_old)
+			S_Need = Action.subgraph(new_plan, s_need)
+
+			#step 3 - figure out which effect is the dependency
+			effect_token = None
+			for eff in S_Old.effects:
+				if eff.replaced_ID in self.GL.eff_dict[precondition.replaced_ID]:
+					effect_token = eff
+					break
+			if effect_token == None:
+				raise AttributeError('GL.eff_dict empty but id_dict has antecedent')
+
+
+			#step 4 - Remove the precondition and point to the effect_token
+			pre_link = S_Need.removeSubgraph(precondition)
+			pre_link.sink = effect_token
+
+			#step 5 - add orderings, causal links, and create flaws
+			self.addStep(new_plan, S_Old.root, S_Need.root, pre_link.sink,  new=False)
+
+			#step 6 - add new plan to open list
 			results.add(new_plan)
 
 		return results
 
-	def addStep(self, graph, s_add, s_need, condition, new=None):
+	def addStep(self, plan, s_add, s_need, condition, new=None):
 		"""
 			when a step is added/reused, 
 			add causal link and ordering edges (including to dummy steps)
@@ -179,25 +169,25 @@ class PlanSpacePlanner:
 		if new == None:
 			new = False
 
-		if not s_add == graph.initial_dummy_step:
-			graph.OrderingGraph.addEdge(graph.initial_dummy_step, s_add)
-			graph.OrderingGraph.addEdge(graph.initial_dummy_step, s_need)
+		if not s_add == plan.initial_dummy_step:
+			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_add)
+			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_need)
 
-		if not s_need == graph.final_dummy_step:
-			graph.OrderingGraph.addEdge(s_add, graph.final_dummy_step)
-			graph.OrderingGraph.addEdge(s_need, graph.final_dummy_step)
+		if not s_need == plan.final_dummy_step:
+			plan.OrderingGraph.addEdge(s_add, plan.final_dummy_step)
+			plan.OrderingGraph.addEdge(s_need, plan.final_dummy_step)
 
 		#Always add this ordering
-		graph.OrderingGraph.addEdge(s_add,s_need)
-		graph.CausalLinkGraph.addEdge(s_add, s_need, condition)
+		plan.OrderingGraph.addEdge(s_add, s_need)
+		plan.CausalLinkGraph.addEdge(s_add, s_need, condition)
 
 		if new:
-			for prec in graph.getIncidentEdgesByLabel(s_add, 'precond-of'):
-				graph.flaws.insert(graph, Flaw((s_add, prec.sink),'opf'))
+			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
+				plan.flaws.insert(plan, Flaw((s_add, prec.sink), 'opf'))
 
 		#Good time as ever to updatePlan
-		graph.updatePlan()
-		return graph
+		plan.updatePlan()
+		return plan
 
 	@clock
 	def resolveThreatenedCausalLinkFlaw(self, graph, flaw):
@@ -410,17 +400,9 @@ if __name__ ==  '__main__':
 
 	Argument.object_types = obtypes
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
+	planner.GL = GLib(operators, objects, obtypes)
 
-	###
-	#Task: create list of fully ground steps given domain actions (operators), and arguments (objects)
-	#gsteps = groundStepList(operators, objects)
-	#for g in gsteps:
-#		print(g)
-	#
-	###
-	#result = planner.POCL()
 	results = planner.POCL()
-	#result = results[0]
 
 	for result in results:
 		totOrdering = topoSort(result)

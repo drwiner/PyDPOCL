@@ -91,21 +91,13 @@ class Element:
 		
 class InternalElement(Element):
 	"""Internal Element is an Element with a possibly unimportant name, and a number of arguments
-			Plus, a dictionary mapping ids of superordinate elements to 'roles'
-				Only one role per ID... ?
-				Examples:			excavate.ID : 'precondition'
-									operator.ID : 'effect'
-									frame.ID	: 'initial'
-									frame.ID	: 'source'
 	"""
-	def __init__(self, ID, typ, name = None, arg_name = None, num_args = None, roles = None):
+
+	def __init__(self, ID, typ, name = None, arg_name = None, num_args = None):
 		super(InternalElement,self).__init__(ID,typ,name, arg_name)
 		if num_args == None:
 			num_args = 0
-		if roles == None:
-			roles = {}
 		self.num_args = num_args
-		self.roles = roles
 	
 	def isEquivalent(self, other):
 		"""Another element is equivalent with self iff 
@@ -137,10 +129,7 @@ class InternalElement(Element):
 			# if self.num_args == 0:
 				# if self.num_args != other.num_args:
 					# return False
-					
-						
-		if not self.isConsistentRoleDict(other):
-			return False
+
 				
 		return True
 			
@@ -160,10 +149,6 @@ class InternalElement(Element):
 			if self.name != other.name:
 				return False
 				
-						
-		if not self.isConsistentRoleDict(other):
-			return False
-				
 		return True
 		
 	def merge(self,other):
@@ -176,46 +161,26 @@ class InternalElement(Element):
 		if other.num_args > 0 and self.num_args == 0:
 			self.num_args = other.num_args
 			
-		self.roles.update(other.roles)
-			
 		return self
-		
-	def isConsistentRoleDict(self, other):
-		for ID, pos in other.roles.items():
-			if ID in self.roles:
-				if other.roles[ID] != self.roles[ID]:
-					return False
-		return True
-		
-	def isRole(self, role_str):
-		for ID, role in self.roles.items():
-			if role == role_str:
-				return ID
-		return False
 		
 
 		
 class Operator(InternalElement):
 	stepnumber = 0
 	""" An operator element is an internal element with an executed status and orphan status"""
-	def __init__(self, ID, typ, name = None, arg_name = None, num_args = None, roles = None, is_orphan = None, executed = None, instantiated = None):
+	def __init__(self, ID, typ, name = None, arg_name = None, num_args = None, executed = None, instantiated = None):
 		if instantiated == None:
 			instantiated = False
-		if is_orphan is None:
-			is_orphan = True
 		if num_args == None:
 			num_args = 0
-		if roles == None:
-			roles = {}
 		if arg_name == None:
 			arg_name = Operator.stepnumber
 			Operator.stepnumber+=1
 		else:
 			Operator.stepnumber = arg_name + 1
 		
-		super(Operator,self).__init__(ID,typ,name, arg_name, num_args, roles)
+		super(Operator,self).__init__(ID,typ,name, arg_name, num_args)
 		self.executed = executed
-		self.is_orphan = is_orphan
 		self.instantiated = instantiated
 		
 	def isConsistent(self,other):
@@ -239,11 +204,6 @@ class Operator(InternalElement):
 			self.instantiated = True
 			
 		return self
-		
-	def print_element(self):
-		print('executed: {}, orphan: {}, ({}, {}, {})'.format(self.executed, self.is_orphan, self.name, self.typ, self.ID))
-		for key,value in self.roles.items():
-			print('\t ID={}, role={}'.format(key, value))
 			
 	def __repr__(self):
 		if self.executed is None:
@@ -257,12 +217,11 @@ class Operator(InternalElement):
 class Literal(InternalElement):
 	""" A Literal element is an internal element with a truth status
 	"""
-	def __init__(self, ID, typ, name = None, arg_name = None, num_args = None, roles = None,truth = None):
+	def __init__(self, ID, typ, name = None, arg_name = None, num_args = None,truth = None):
 		if num_args == None:
 			num_args = 0
-		if roles == None:
-			roles = {}
-		super(Literal,self).__init__(ID,typ,name, arg_name, num_args, roles)
+
+		super(Literal,self).__init__(ID,typ,name, arg_name, num_args)
 		self.truth = truth
 
 	def isConsistent(self, other):
