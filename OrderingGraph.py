@@ -5,10 +5,10 @@ from ElementGraph import *
 
 class OrderingGraph(Graph):
 	
-	def __init__(self, ID, typ = None, name = None, Elements = None, Edges = None, Constraints= None):
+	def __init__(self, ID, typ = None, name = None, Elements = None, Edges = None):
 		if typ == None:
 			typ = 'ordering graph'
-		super(OrderingGraph,self).__init__(ID,typ,name,Elements,Edges,Constraints)
+		super(OrderingGraph,self).__init__(ID,typ,name,Elements,Edges,Restrictions=None)
 		
 	def isInternallyConsistent(self):
 		if self.detectCycle():

@@ -221,8 +221,7 @@ class PlanElementGraph(ElementGraph):
 				Elements = None,
 				planElement = None,
 				Edges = None,
-				 Restrictions = None):
-				 #, non_static_preds = None):
+				Restrictions = None):
 				
 		if type_graph == None:
 			type_graph = 'PlanElementGraph'
@@ -232,8 +231,6 @@ class PlanElementGraph(ElementGraph):
 			Edges=  set()
 		if Restrictions == None:
 			Restrictions = set()
-		#if non_static_preds == None:
-		#	non_static_preds = set()
 		
 		self.OrderingGraph = OrderingGraph(ID = uuid.uuid1(5))
 		self.CausalLinkGraph = CausalLinkGraph(ID = uuid.uuid1(6))
@@ -243,18 +240,11 @@ class PlanElementGraph(ElementGraph):
 		self.flaws = FlawLib()
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
-		
-		
+
 		if planElement is None:
 			planElement = PlanElement(ID =ID, typ=type_graph,name=name)
-		
-
-		#Edges.update( {Edge(planElement,IF, 'frame-of') for IF in self.IntentionFrames})
-		#Edges.update( {Edge(planElement,step, 'step-of') for step in self.Steps})
 									
 		super(PlanElementGraph,self).__init__(ID,type_graph,name,Elements,planElement,Edges,Restrictions)
-		
-		self.updateIntentionFrameAttributes()
 
 	def __lt__(self, other):
 		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
@@ -274,121 +264,27 @@ class PlanElementGraph(ElementGraph):
 	def cost(self):
 		return len(self.Steps)
 
-	# def subgraph(self, element, Type = None):
-	# 	if Type == None:
-	# 		Type = eval(element.typ)
-	# 	return self.getElementGraphFromElement(element, Type)
-	#
-	#
-	# def subgraphFromID(self, element_ID, Type = None):
-	# 	return self.subgraph(self.getElementById(element_ID), Type)
-
 	def isInternallyConsistent(self):
 		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent() and \
 			   super(PlanElementGraph, self).isInternallyConsistent()
 
 
-	def updateIntentionFrameAttributes(self):
-		for element in self.elements:
-			if type(element) == IntentionFrameElement:
-				element.external_update(self)
-			#Keeps intention frame element attributes up to date
-			#Must be done after super instantation because needs edges
-	
-	def updatePlan(self, Elements = None,Restrictions = None):
+	def updatePlan(self, Elements = None):
 		""" Updating plans to have accurate top-level Sets"""
 		if Elements is None:
 			Elements = self.elements
 		self.Steps = {element for element in Elements if type(element) is Operator}
 		self.Orderings = self.OrderingGraph.edges
 		self.Causal_Links = self.CausalLinkGraph.edges
-		self.IntentionFrames = {element for element in Elements if type(element) is IntentionFrameElement}
+		#self.IntentionFrames = {element for element in Elements if type(element) is IntentionFrameElement}
 		return self
-											
-	def getConsistentActors(self, subseteq):
-		""" Given subseteq of step elements in plan, return set of consistent actors (i.e. an actor that could be a consenting actor in each)
-		"""
-		step = next(iter(subseteq))
-		print('step {} used for starting actors'.format(step.ID))
-		Step = self.subgraph(step,Action)
-		S = copy.deepcopy(subseteq)
-		S = S - {action for action in S if action.ID == step.ID}
-		return self.rPickActorFromSteps(remaining_steps = S, potential_actors = Step.consenting_actors)
-			
-	def rPickActorFromSteps(self, remaining_steps = None, potential_actors = None):
-		if remaining_steps == None:
-			remaining_steps = set()
-		if potential_actors == None:
-			return set()
-		""" Pick a step and for each actor in consenting_actors, 
-			if consistent with potential_actors, 
-			invoke rPickActorFromSteps(remaining_steps-{step},potential_actors+{actor})
-			
-			Purpose:
-						In CPOCL, intention frames are initialized with an actor. In BiPOCL,
-							we may say that two steps are in the same plan.
-						Are there any other situations when we have to do the following:
-						
-			Problem:	Given a set of steps with consenting actors, find the subset of actors
-							that are consistent with one actor in every step.
-			
-			Strategy:	For each actor in potential_actors, remove if not consistent with any step actors
-		"""
-		
-		if len(remaining_steps) == 0:
-			return potential_actors
-		if len(potential_actors) == 0:
-			return set()
-		
 
-		step = remaining_steps.pop()
-		print(step)
-		step = self.getElementGraphFromElementID(step.ID,Action)
-		
-		to_remove = set()
-		to_add = set()
-		for actor in potential_actors:
-			print('potential actor: {}'.format(actor))
-			print('prospects: ')
-			for p in step.consenting_actors:
-				print(p)
-			prospects = {prospect for prospect in step.consenting_actors if actor.isConsistent(prospect)}
-			print('consistent prospects: ')
-			for p in prospects:
-				print(p)
-			if len(prospects) == 0:
-				to_remove.add(actor)
-				#potential_actors.remove(actor)
-			else:
-				to_add.update(prospects)
-		
-		potential_actors -= to_remove
-		potential_actors.update(to_add)
-		return self.rPickActorFromSteps(remaining_steps, potential_actors)
-	
-	
-	def instantiatePartialStep(self, partial, operator_choices, complete_steps = None):
-		if operator_choices == None:
-			return None
-		if partial == None:
-			return None
-		if complete_steps == None:
-			complete_steps = set()
-			
-		rnd =floor(random.random()*100)
-		Step = new_self.getElementGraphFromElementID(partial.ID, Action)
-		operatorClones = {op.instantiateOperator() for op in operator_choices}
-		for op in operatorClones:
-			#nStep = Step.copyGen()
-			complete_steps.update(op.UnifyWith(Step))
-		return complete_steps
-		
 	'''for debugging'''
 	def getActions(self):
-		return list(self.getElementGraphFromElement(step,Action) for step in self.Steps)
+		return list(Action.subgraph(self,step) for step in self.Steps)
 
 	@clock
-	def detectThreatenedCausalLinks(self):
+	def detectThreatenedCausalLinks(self, GL):
 		"""
 		A threatened causal link flaw is a tuple <causal link edge, threatening step element>
 			where if s --p--> t is a causal link edge and s_threat is the threatening step element,
@@ -399,21 +295,16 @@ class PlanElementGraph(ElementGraph):
 		"""
 
 		detectedThreatenedCausalLinks = set()
+		nonThreats = self.CausalLinkGraph.nonThreats
 		for causal_link in self.CausalLinkGraph.edges:
-			nonThreats = self.CausalLinkGraph.nonThreats
-			dependency = self.subgraph(causal_link.label,Condition)
-			reverse_dependency = copy.deepcopy(dependency)
-			# Reverse the truth status of the dependency
-			if reverse_dependency.root.truth == True:
-				reverse_dependency.root.truth = False
-			else:
-				reverse_dependency.root.truth = True
-
 			for step in self.Steps:
+
+				#defense 1
 				if step in nonThreats[causal_link]:
 					continue
-				# First, ignore steps which either are the source and sink of causal link, or which cannot be ordered
-				# between them
+
+				# defense 2-4 - First, ignore steps which either are the source and sink of causal link, or which cannot
+				#  be ordered between them
 				if step == causal_link.source or step == causal_link.sink:
 					nonThreats[causal_link].add(step)
 					continue
@@ -424,28 +315,12 @@ class PlanElementGraph(ElementGraph):
 					nonThreats[causal_link].add(step)
 					continue
 
-				# Is condition consistent?
-				num_edges = len(dependency.edges)
 				count = 0
-				effects = self.getNeighborsByLabel(step, 'effect-of')
-				for eff in effects:
-					if eff in nonThreats[causal_link]:
-						continue
-					cond_graph = self.subgraph(eff, Condition)
-					if len(cond_graph.edges) > num_edges:
-						if cond_graph.isConsistentSubgraph(reverse_dependency):
-							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
-							count+=1
-						#else:
-						#always add that it's not a threat anymore, because we don't want to reconsider the same tclf
-						#nonThreats[causal_link].add(eff)
-					elif num_edges >= len(cond_graph.edges):
-						if reverse_dependency.isConsistentSubgraph(cond_graph):
-							detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
-							count+=1
-						#else:
-						#	nonThreats[causal_link].add(eff)
-					nonThreats[causal_link].add(eff)
+				for eff in step.effects:
+					if eff.ID in GL.threat_dict[causal_link.label.replaced_ID]:
+						detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
+						count += 1
+
 				if count == 0:
 					nonThreats[causal_link].add(step)
 

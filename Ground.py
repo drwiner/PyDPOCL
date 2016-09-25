@@ -111,6 +111,7 @@ class GLib:
 		self.pre_dict = defaultdict(set)
 		self.id_dict = defaultdict(set)
 		self.eff_dict = defaultdict(set)
+		self.threat_dict = defaultdict(set)
 		self.loadAll()
 
 	def loadAll(self):
@@ -133,6 +134,14 @@ class GLib:
 			for _eff in gstep.effects:
 				# Defense 2
 				if not _eff.isConsistent(_pre):
+					# Defense 2.1
+					if not _eff.isOpposite(_pre):
+						continue
+					# Defense 2.2
+					Effect = gstep.subgraph(_eff)
+					if Effect.Args != Precondition.Args:
+						continue
+					self.threat_dict[_pre.ID].add(_eff.ID)
 					continue
 
 

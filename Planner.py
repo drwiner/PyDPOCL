@@ -40,9 +40,9 @@ class PlanSpacePlanner:
 		self.op_graphs = op_graphs
 		self.objects = objects
 
-		init_graph = PlanElementGraph(uuid.uuid1(0), Elements = objects | init_action.elements |
-																goal_action.elements, Edges = init_action.edges |
-																							  goal_action.edges)
+		init_graph = PlanElementGraph(uuid.uuid1(0), Elements = objects | init_action.elements | goal_action.elements,
+									  				 Edges = init_action.edges | goal_action.edges)
+
 		init_graph.initial_dummy_step = init_action.root
 		init_graph.final_dummy_step = goal_action.root
 
@@ -57,8 +57,8 @@ class PlanSpacePlanner:
 	def __getitem__(self, position):
 		return self._frontier[position]
 
-	def __setitem__(self, graph, position):
-		self._frontier[position] = graph
+	def __setitem__(self, plan, position):
+		self._frontier[position] = plan
 
 	def setup(self, plan, start_action, end_action):
 		"""
@@ -190,44 +190,24 @@ class PlanSpacePlanner:
 		return plan
 
 	@clock
-	def resolveThreatenedCausalLinkFlaw(self, graph, flaw):
+	def resolveThreatenedCausalLinkFlaw(self, plan, flaw):
 		"""
 			Promotion: Add ordering from sink to threat, and check if cycle
 			Demotion: Add ordering from threat to source, and check if cycle
-			Restriction: Add non-codesignation constraints to prevent unification of effect with condition of causal link
 		"""
 		results = set()
 		threat, effect, causal_link = flaw.flaw
 
 		#Promotion
-		promotion = graph.deepcopy()
+		promotion = plan.deepcopy()
 		promotion.OrderingGraph.addEdge(causal_link.sink, threat)
-		#if promotion.OrderingGraph.isInternallyConsistent():
-			#results.add((promotion, 'promotion'))
 		results.add(promotion)
-			#print('\ncreated child (promotion):\n')
-			#print(promotion)
-			#print('\n')
 
 
 		#Demotion
-		demotion = graph.deepcopy()
+		demotion = plan.deepcopy()
 		demotion.OrderingGraph.addEdge(threat, causal_link.source)
-		#if demotion.OrderingGraph.isInternallyConsistent():
 		results.add(demotion)
-			#print('\ncreated child (demotion):\n')
-			#print(demotion)
-			#print('\n')
-
-		#Restriction
-		restriction = graph.deepcopy()
-		if restriction.preventThreatWithRestriction(condition=causal_link.label, threat=effect):
-			results.add(restriction)
-			#print('\ncreated child (restriction):\n')
-
-		#	print(restriction)
-		#	print('\n')
-		#results.add((restriction, 'restriction'))
 
 		return results
 
@@ -254,32 +234,33 @@ class PlanSpacePlanner:
 		Visited = []
 		while len(self.Open) > 0:
 			#Select child
-			graph = self.Open.pop()
-			#print(graph)
-			if not graph.isInternallyConsistent():
+			plan = self.Open.pop()
+			#print(plan)
+			if not plan.isInternallyConsistent():
 				print('branch terminated')
 				continue
 
 
-			if len(graph.flaws) == 0:
+			if len(plan.flaws) == 0:
 				#print('solution selected')
-				Completed.append(graph)
+				Completed.append(plan)
 				if len(Completed) == 10:
 					return Completed
 				continue
-				#return graph
-			#print(graph.flaws)
+
+				#return plan
+			#print(plan.flaws)
 
 			#Select Flaw
-			flaw = graph.flaws.next()
+			flaw = plan.flaws.next()
 
 			print('selected : {}\n'.format(flaw))
 
 			#Add to Visited list, indicating that we've generated all its children
-			Visited.append((graph,flaw))
+			Visited.append((plan,flaw))
 
 			#Add children to Open List
-			children = self.generateChildren(graph, flaw)
+			children = self.generateChildren(plan, flaw)
 
 			print('generated children: {}'.format(len(children)))
 			for child in children:
@@ -358,18 +339,6 @@ def rFollowHierarchy(object_types, child_name, accumulated = set()):
 			if ob.name == child_name:
 				accumulated.add(ob.parent)
 				rFollowHierarchy(object_types, ob.parent, accumulated)
-
-def groundStepList(operators, objects):
-	gsteps = []
-	for op in operators:
-		op.updateArgs()
-		cndts = [[obj for obj in objects if arg.typ == obj.typ or arg.typ in obtypes[obj.typ]] for arg in op.Args]
-		tuples = itertools.product(*cndts)
-		for t in tuples:
-			gstep = copy.deepcopy(op)
-			gstep.replaceArgs(t)
-			gsteps.append(gstep)
-	return gsteps
 
 
 import sys

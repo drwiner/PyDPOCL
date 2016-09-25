@@ -233,6 +233,14 @@ class Literal(InternalElement):
 				return False
 	
 		return True
+
+	def isOpposite(self, other):
+		opp = copy.deepcopy(self)
+		if self.truth == True:
+			opp.truth = False
+		else:
+			opp.truth = True
+		return opp.isConsistent(other)
 		
 	def isEquivalent(self,other):
 		if not super(Literal, self).isEquivalent(other):
