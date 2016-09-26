@@ -173,9 +173,55 @@ class PlanElementGraph(ElementGraph):
 		self.edges -= to_remove
 		return link
 
+
+	def relaxedStep(self, GL, pre, goal_effs, count = None):
+		if count == None:
+			count = 0
+
+		if len(goal_effs) == 0:
+			return count
+
+		antecedents = GL.id_dict[pre.replaced_ID]
+		if not self.initial_dummy_step.stepnumber in antecedents:
+			count+=1
+			least = 1000
+			for ante in antecedents:
+				v = self.relaxedStep(GL, GL[ante], count)
+				if v < least:
+					least = v
+			return count + least
+		else:
+			#goal = GL[self.final_dummy_step.stepnumber]
+			#for eff in goal.effects:
+			for ge in goal_effs:
+				if ge.replaced_ID in GL.eff_dict[pre.replaced_ID]:
+					goal_effs-={ge}
+					break
+			return count
+
+
+		##while self.initial_dummy_step.stepnumber not in GL.id_dict[pre] for pre in step
+
+	def calculateHeuristic(self, GL):
+		value = 0
+		for oc in self.flaws.OCs():
+			_, pre = oc.flaw
+			c = self.relaxedStep(GL,pre,GL[-2].effects,0)
+			value += c
+		return value
+
 	@property
-	def heuristic(self):
+	def heuristic(self, GL):
+
+		"""
+		Strategy: number of steps, dropping deletes, needed to fulfill all open conditions
+		GList: GL.id_dict[pre.replaced_ID] for pre in step.preconditions
+					while init.stepnumber not in GL.id_dict[pre.replaced_ID:
+
+		@return:
+		"""
 		#return self.flaws.heuristic
+        #replace with
 		return len(self.flaws) + len(self.flaws.nonreusable)
 
 	@property
