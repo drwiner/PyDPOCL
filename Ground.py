@@ -113,6 +113,15 @@ def groundStepList(operators, objects, obtypes):
 			gsteps.append(gstep)
 	return gsteps
 
+
+def set_replaced_ID(action):
+	from Element import Argument
+	from uuid import uuid1
+	for elm in action.elements:
+		if not isinstance(elm, Argument):
+			elm.replaced_ID = uuid1(action.stepnumber)
+
+
 class GLib:
 	def __init__(self, operators, objects, obtypes, init_action, goal_action):
 		#self._gsteps = groundStepList(operators.union({init_action, goal_action}),objects, obtypes)
@@ -120,9 +129,13 @@ class GLib:
 
 		#init at [-2]
 		init_action.root.stepnumber =len(self._gsteps)
+		init_action._replaceInternals()
+		init_action.replaceInternals()
 		self._gsteps.append(init_action)
 		#goal at [-1]
 		goal_action.root.stepnumber= len(self._gsteps)
+		goal_action._replaceInternals()
+		goal_action.replaceInternals()
 		self._gsteps.append(goal_action)
 
 		#dictionaries
@@ -161,8 +174,8 @@ class GLib:
 					Effect = Condition.subgraph(gstep, _eff)
 					if Effect.Args != Precondition.Args:
 						continue
-					self.threat_dict[_pre.ID].add(_eff.ID)
-					self.threat_dict[_pre.ID].add(gstep.stepnumber)
+					self.threat_dict[_pre.replaced_ID].add(_eff.replaced_ID)
+					self.threat_dict[_pre.replaced_ID].add(gstep.stepnumber)
 					#self.threat_id_dict[_pre.ID].add(gstep.stepnumber)
 					continue
 
@@ -178,9 +191,9 @@ class GLib:
 				#eff_link.sink is not an antestep.element so its ID does not change
 				#antestep._replaceInternals()
 
-				self.pre_dict[_pre.ID].add(Antestep(antestep, eff_link))
-				self.id_dict[_pre.ID].add(antestep.stepnumber)
-				self.eff_dict[_pre.ID].add(eff_link.sink.ID)
+				self.pre_dict[_pre.replaced_ID].add(Antestep(antestep, eff_link))
+				self.id_dict[_pre.replaced_ID].add(antestep.stepnumber)
+				self.eff_dict[_pre.replaced_ID].add(eff_link.sink.replaced_ID)
 
 
 	def __len__(self):

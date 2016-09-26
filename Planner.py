@@ -154,6 +154,8 @@ class PlanSpacePlanner:
 
 		#antecedents - a set of stepnumbers
 		antecedents = self.GL.id_dict[precondition.replaced_ID]
+		if len(antecedents) == 0:
+			return set()
 
 		for s_old in plan.Steps:
 			if not s_old.stepnumber in antecedents:
@@ -179,8 +181,9 @@ class PlanSpacePlanner:
 
 
 			#step 4 - Remove the precondition and point to the effect_token
-			pre_token = new_plan.getElementById(precondition.ID)
-			pre_link = S_Need.RemoveSubgraph(pre_token)
+			#pre_token = new_plan.getElementById(precondition.ID)
+			pre_link = new_plan.RemoveSubgraph(precondition)
+			#pre_link = S_Need.RemoveSubgraph(pre_token)
 			try:
 				pre_link.sink = effect_token
 			except:
@@ -269,7 +272,7 @@ class PlanSpacePlanner:
 		while len(self.Open) > 0:
 			#Select child
 			plan = self.Open.pop()
-			#print(plan)
+			print(plan)
 			if not plan.isInternallyConsistent():
 				print('branch terminated')
 				continue
@@ -283,7 +286,7 @@ class PlanSpacePlanner:
 				continue
 
 				#return plan
-			#print(plan.flaws)
+			print(plan.flaws)
 
 			#Select Flaw
 			flaw = plan.flaws.next()

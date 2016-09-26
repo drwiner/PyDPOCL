@@ -59,20 +59,19 @@ class Action(ElementGraph):
 		return self.root.stepnumber
 
 	def replaceInternals(self):
-		self.ID = uuid.uuid1(self.root.stepnumber)
-
 		for elm in self.elements:
 			if not isinstance(elm, Argument):
 				elm.ID = uuid.uuid1(self.root.stepnumber)
+
 
 	def _replaceInternals(self):
-		self.ID = uuid.uuid1(self.root.stepnumber)
-
+		#self.ID = uuid.uuid1(self.root.stepnumber)
 		for elm in self.elements:
 			if not isinstance(elm, Argument):
-				# if elm.replaced_ID == -1:
-				elm.replaced_ID = elm.ID
-				elm.ID = uuid.uuid1(self.root.stepnumber)
+				elm.replaced_ID = uuid.uuid1(self.root.stepnumber)
+
+				#elm.ID = elm.replaced_ID
+				#elm.ID = uuid.uuid1(self.root.stepnumber)
 
 		
 	# '''for debugging'''
@@ -160,6 +159,19 @@ class PlanElementGraph(ElementGraph):
 		new_self.ID = uuid.uuid1(21)
 		return new_self
 
+	def RemoveSubgraph(self, literal):
+		elm = self.getElementById(literal.ID)
+		link = None
+		to_remove = set()
+		for edge in self.edges:
+			if edge.source == elm:
+				to_remove.add(edge)
+			if link is None:
+				if edge.sink == elm:
+					link = edge
+		self.elements -= {elm}
+		self.edges -= to_remove
+		return link
 
 	@property
 	def heuristic(self):
