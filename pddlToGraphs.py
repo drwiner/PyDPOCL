@@ -288,7 +288,7 @@ def problemToGraphs(problem):
 	#for condition in problem_initial_state:
 	init_elements = set()
 	init_edges = set()
-	init_op = Operator(ID = uuid.uuid1(114), typ = 'Action', name = 'dummy_init', arg_name = 0, num_args = 0, instantiated = True)
+	init_op = Operator(ID = uuid.uuid1(114), typ = 'Action', name = 'dummy_init', stepnumber= 0, num_args = 0, instantiated = True)
 	init_graph =			Action(	ID = uuid.uuid1(115),
 							type_graph = 'Action',
 							name = 'dummy_init',
@@ -302,7 +302,7 @@ def problemToGraphs(problem):
 			init_graph.edges.add(Edge(lit, Args[p],ARGLABELS[i]))
 	
 	goal_elements, goal_edges = getGoalSet(problem.goal.formula, Args)
-	goal_op = Operator(ID = uuid.uuid1(114), typ = 'Action', name = 'dummy_goal', arg_name = 1, num_args = 0, instantiated = True)
+	goal_op = Operator(ID = uuid.uuid1(114), typ = 'Action', name = 'dummy_goal', stepnumber= 1, num_args = 0, instantiated = True)
 	goal_graph =			Action(	ID = uuid.uuid1(115),
 							type_graph = 'Action',
 							name = 'dummy_goal',

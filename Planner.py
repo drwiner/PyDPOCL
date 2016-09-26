@@ -30,6 +30,16 @@ class Frontier:
 		for item in itera:
 			self.insert(item)
 
+import pickle
+def upload(GL):
+	afile = open("GL","wb")
+	pickle.dump(GL,afile)
+	afile.close()
+def reload():
+	afile = open("GL","rb")
+	GL = pickle.load(afile)
+	afile.close()
+	return GL
 
 
 class PlanSpacePlanner:
@@ -40,16 +50,30 @@ class PlanSpacePlanner:
 		self.op_graphs = op_graphs
 		self.objects = objects
 
-		init_graph = PlanElementGraph(uuid.uuid1(0), Elements = objects | init_action.elements | goal_action.elements,
-									  				 Edges = init_action.edges | goal_action.edges)
+		print('preprocessing...')
 
-		init_graph.initial_dummy_step = init_action.root
-		init_graph.final_dummy_step = goal_action.root
+		try:
+			self.GL = reload()
+			print(len(self.GL))
+		except:
+			self.GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
+			upload(self.GL)
+
+		init = copy.deepcopy(self.GL[-2])
+		init.replaceInternals()
+		goal = copy.deepcopy(self.GL[-1])
+		goal.replaceInternals()
+
+		init_plan = PlanElementGraph(uuid.uuid1(0), Elements = objects | init.elements | goal.elements,
+									  				 Edges = init.edges | goal.edges)
+
+		init_plan.initial_dummy_step = init.root
+		init_plan.final_dummy_step = goal.root
 
 		#create special dummy step for init_graph and add to graphs {}
-		self.setup(init_graph, init_action, goal_action)
+		self.setup(init_plan, init, goal)
 		self.Open =  Frontier()
-		self.Open.insert(init_graph)
+		self.Open.insert(init_plan)
 
 	def __len__(self):
 		return len(self._frontier)
@@ -75,7 +99,7 @@ class PlanSpacePlanner:
 		#Add initial Open precondition flaws for dummy step
 		init_flaws = (Flaw((dummy_final, prec), 'opf') for prec in plan.getNeighborsByLabel(dummy_final, 'precond-of'))
 		for flaw in init_flaws:
-			plan.flaws.insert(plan, flaw)
+			plan.flaws.insert(self.GL, plan, flaw)
 
 
 	@clock
@@ -92,18 +116,22 @@ class PlanSpacePlanner:
 		#antecedent is of the form (antecedent_action_with_missing_eff_link, eff_link)
 		antecedents = self.GL.pre_dict[precondition.replaced_ID]
 		for ante in antecedents:
-
+			if ante.action.name == 'dummy_init':
+				continue
 			#step 1 - make a copy
 			cndt = copy.deepcopy(ante)
 
 			#step 2 - replace its internals, to distinguish from other identical antesteps
-			(anteaction, eff_link) = cndt.replaceInternals()
+			(anteaction, eff_link) = cndt
+			anteaction.replaceInternals()
 
 			#step 3 - make a copy of the plan
 			new_plan = plan.deepcopy()
 
 			#step 4 - set sink before replace internals
+			preserve_original_id = eff_link.sink.replaced_ID
 			eff_link.sink = new_plan.getElementById(precondition.ID)
+			eff_link.sink.replaced_ID = preserve_original_id
 			# check: eff_link.sink should till be precondition of s_need
 
 			#step 5 - add new stuff to new plan
@@ -112,9 +140,9 @@ class PlanSpacePlanner:
 
 			#step 6 - update orderings and causal links, add flaws
 			self.addStep(new_plan, anteaction.root, new_plan.getElementById(s_need.ID), eff_link.sink, new=True)
+			new_plan.flaws.addCndtsAndRisks(self.GL, anteaction.root)
 
 			#step 7 - add new_plan to open list
-			#new_plan.flaws.addCndtsAndRisks(new_plan, anteaction.root)
 			results.add(new_plan)
 
 		return results
@@ -129,6 +157,8 @@ class PlanSpacePlanner:
 
 		for s_old in plan.Steps:
 			if not s_old.stepnumber in antecedents:
+				continue
+			if s_old == s_need:
 				continue
 
 			#step 1 - make a copy of the plan, also replaces the plan number
@@ -149,8 +179,12 @@ class PlanSpacePlanner:
 
 
 			#step 4 - Remove the precondition and point to the effect_token
-			pre_link = S_Need.removeSubgraph(precondition)
-			pre_link.sink = effect_token
+			pre_token = new_plan.getElementById(precondition.ID)
+			pre_link = S_Need.RemoveSubgraph(pre_token)
+			try:
+				pre_link.sink = effect_token
+			except:
+				print('why not')
 
 			#step 5 - add orderings, causal links, and create flaws
 			self.addStep(new_plan, S_Old.root, S_Need.root, pre_link.sink,  new=False)
@@ -183,7 +217,7 @@ class PlanSpacePlanner:
 
 		if new:
 			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
-				plan.flaws.insert(plan, Flaw((s_add, prec.sink), 'opf'))
+				plan.flaws.insert(self.GL, plan, Flaw((s_add, prec.sink), 'opf'))
 
 		#Good time as ever to updatePlan
 		plan.updatePlan()
@@ -212,18 +246,18 @@ class PlanSpacePlanner:
 		return results
 
 
-	def generateChildren(self, graph, flaw):
+	def generateChildren(self, plan, flaw):
 		results = set()
 		if flaw.name == 'opf':
-			results = self.reuse(graph, flaw)
-			results.update(self.newStep(graph, flaw))
+			results = self.reuse(plan, flaw)
+			results.update(self.newStep(plan, flaw))
 
 		if flaw.name == 'tclf':
-			results = self.resolveThreatenedCausalLinkFlaw(graph, flaw)
+			results = self.resolveThreatenedCausalLinkFlaw(plan, flaw)
 
 		#for result, res in results:
 		for result in results:
-			new_flaws = result.detectThreatenedCausalLinks()
+			new_flaws = result.detectThreatenedCausalLinks(self.GL)
 			result.flaws.threats.update(new_flaws)
 
 		return results
@@ -268,6 +302,7 @@ class PlanSpacePlanner:
 
 			print('open list number: {}'.format(len(self.Open)))
 			print('\n')
+		print('didnt go well')
 
 	@clock
 	def integrateRequirements(self, Plan, ReqSteps, ReqLinks, ReqOrderings):
@@ -369,7 +404,7 @@ if __name__ ==  '__main__':
 
 	Argument.object_types = obtypes
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
-	planner.GL = GLib(operators, objects, obtypes)
+	#planner.GL = GLib(operators, objects, obtypes, initAction, goalAction)
 
 	results = planner.POCL()
 

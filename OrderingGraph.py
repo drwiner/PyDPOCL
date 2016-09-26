@@ -84,10 +84,10 @@ class OrderingGraph(Graph):
 		
 		
 class CausalLinkGraph(OrderingGraph):
-	def __init__(self, ID, typ = None, name = None, Elements = None , Edges = None, Constraints = None):
+	def __init__(self, ID, typ = None, name = None, Elements = None , Edges = None):
 		if typ == None:
 			typ = 'causal link graph'
-		super(CausalLinkGraph,self).__init__(ID,typ,name,Elements,Edges,Constraints)
+		super(CausalLinkGraph,self).__init__(ID,typ,name,Elements,Edges)
 		self.nonThreats = defaultdict(set)
 	
 	def addEdge(self, source, sink, condition):

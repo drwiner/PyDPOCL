@@ -2,6 +2,7 @@
 import collections
 import bisect
 from Graph import isConsistentEdgeSet
+
 import itertools
 from clockdeco import clock
 #from PlanElementGraph import Condition
@@ -98,11 +99,8 @@ class simpleQueueWrapper(collections.deque):
 
 class FlawLib():
 	non_static_preds = set()
-	def __init__(self):
-		"""TODO: need way to manage multiple sets which have preference ranking and different ordering criterion (
-		 LR/MW-first/LIFO)"""
 
-		#self.non_static_preds = non_static_preds
+	def __init__(self):
 
 		#static = unchangeable (should do oldest first.)
 		self.statics = simpleQueueWrapper()
@@ -113,27 +111,17 @@ class FlawLib():
 		#threat = causal link dependency undone
 		self.threats = simpleQueueWrapper()
 
-		#unsafe = existing effect would undo
-		#		sorted by number of cndts
+		#unsafe = existing effect would undo sorted by number of cndts
 		self.unsafe = Flawque()
 
-		#reusable = open conditions consistent with at least one existing effect
-		#		sorted by number of cndts
+		#reusable = open conditions consistent with at least one existing effect sorted by number of cndts
 		self.reusable = Flawque()
 
-		#nonreusable = open conditions inconsistent with existing effect
-		#		sorted by number of cndts
+		#nonreusable = open conditions inconsistent with existing effect sorted by number of cndts
 		self.nonreusable = Flawque()
 
 		self.typs = [self.statics, self.inits, self.threats, self.unsafe, self.reusable, self.nonreusable]
-	#	self.typs = [self.sub_library, self.threats, self.unsafe, self.reusable, self.nonreusable]
 
-		#cndts is a dictionary mapping open conditions to candidate action effects
-		self.cndts = collections.defaultdict(set)
-
-		#risks is a dictionary mapping open conditions to potential undoing (i.e., unsafe)
-		# 		Can we use this to limit search for threatened causal link flaws?
-		self.risks = collections.defaultdict(set)
 
 	def __len__(self):
 		return sum(len(flaw_set) for flaw_set in self.typs)
@@ -144,8 +132,6 @@ class FlawLib():
 			if flaw in flaw_set:
 				return True
 		return False
-	#	return flaw in self.threats or flaw in self.unsafe or flaw in self.nonreusable or flaw in self.reusable or \
-	#		   flaw in self.statics
 
 	def OCs(self):
 		''' Generator for open conditions'''
@@ -162,86 +148,56 @@ class FlawLib():
 				return flaw_set.pop()
 		return None
 
-	def addCndtsAndRisks(self, graph, action):
+	def addCndtsAndRisks(self, GL, action):
 		""" For each effect of Action, add to open-condition mapping if consistent"""
 
-		for eff in graph.getNeighborsByLabel(action, 'effect-of'):
+		for oc in self.OCs():
+			s_need, pre = oc.flaw
 
-			Effect = graph.subgraph(eff)
-			for oc in self.OCs():
-				s_need, pre = oc.flaw
+			# step numbers of antecdent types
+			if action.stepnumber in GL.id_dict[pre.replaced_ID]:
+				oc.cndts += 1
 
-				# fogetaboutit if effect cannot be established before s_need
-				if graph.OrderingGraph.isPath(s_need, action):
-					continue
-
-				# if not eff.isConsistent(pre), eval if not-eff is consistent with pre.
-				if evalRisk(graph, eff, pre, Effect, self.risks[oc].add):
-					continue
-
-				# check if Effect can match edges with Precondition, check against restrictions
-				Precondition = graph.subgraph(pre)
-				if Effect.isConsistentSubgraph(Precondition):
-					self.cndts[oc].add(eff)
+			# step numbers of threatening steps
+			elif action.stepnumber in GL.threat_dict[s_need.stepnumber]:
+				oc.risks += 1
 
 
-	def insert(self, graph, flaw):
+	def insert(self, GL, plan, flaw):
 		''' for each effect of an existing step, check and update mapping to consistent effects'''
 
 		if flaw.name == 'tclf':
 			self.threats.add(flaw)
 			return
 
-		#First, determine if this flaw.flaw[1].name is in non_static_preds: if not, then let cndts be just those
-		# initial states with same predicate
+		#unpack flaw
 		s_need, pre = flaw.flaw
+
+		#if pre.predicate is static
 		if not pre.name in FlawLib.non_static_preds:
-			self.cndts[flaw].update({g for g in graph.getNeighbors(graph.initial_dummy_step) if g.name == pre.name})
-			flaw.cndts = len(self.cndts[flaw])
 			self.statics.add(flaw)
 			return
 
-		#Determine existing Cdnts and Risks for this flaw
-		Precondition = graph.subgraph(pre)
-		Cndts = graph.getEdgesByLabel('effect-of')
-		int_experiment = 0
-		for edge in Cndts:
+		#Eval number of existing candidates
+		ante_nums = GL.id_dict[pre.replaced_ID]
+		risk_nums = GL.threat_dict[s_need.replaced_ID]
 
-			if s_need == edge.source:
+		for step in plan.Steps:
+			#defense
+			if step == s_need:
 				continue
-
-			#fogetaboutit if effect cannot be established before s_need
-			if graph.OrderingGraph.isPath(s_need, edge.source):
+			if plan.OrderingGraph.isPath(s_need, step):
 				continue
+			if step.stepnumber in ante_nums:
+				flaw.cndts += 1
+				if step.name == 'dummy_init':
+					self.inits.add(flaw)
+			if step.replaced_ID in risk_nums:
+				flaw.risks += 1
 
-			eff = edge.sink
+		if flaw in self.inits:
+			return
 
-			#if not eff.isConsistent(pre), eval if not-eff is consistent with pre.
-			if evalRisk(graph, eff, pre, Precondition, self.risks[flaw].add):
-				continue
-
-			#check if Effect can match edges with Precondition, check against restrictions
-			Effect = graph.subgraph(eff)
-			if Effect.isConsistentSubgraph(Precondition):
-				self.cndts[flaw].add(eff)
-				if eff.num_args != Effect.numArgs():
-					int_experiment += 1
-
-
-		#Bin flaw into right list
-		flaw.cndts = len(self.cndts[flaw]) - int_experiment
-		flaw.risks = len(self.risks[flaw])
-
-		# for any cndt, if establishing step is initial, then flaw is static {t}
-		if flaw.cndts > 0:
-			for eff in self.cndts[flaw]:
-				parent = graph.getEstablishingParent(eff)
-				if parent.name == 'dummy_init':
-					if isConsistentEdgeSet(Rem = graph.subgraph(eff).edges, Avail = Precondition.edges):
-						self.inits.add(flaw)
-						return
-
-		#if has risks, then unsafe
 		if flaw.risks > 0:
 			self.unsafe.insert(flaw.switch())
 			return
@@ -266,48 +222,6 @@ class FlawLib():
 	#	return '\nFLAW LIBRARY: \n' + [flaw_set for flaw_set in flaw_str_list] + '\n'
 		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\ninits: \n' + inits + '\nthreats: \n' + threats + '\nunsafe: \n' +  unsafe + '\nreusable: \n' + reusable + '\nnonreusable: \n' + nonreusable + '\n'
 
-
-def evalRisk(graph, eff, pre, ExistingGraph, operation):
-	""" Returns True if not consistent, returns False if consistent"""
-
-	if not eff.isConsistent(pre):
-
-		#if its not consistent but has same name, then they have different truths
-		if pre.name == eff.name:
-
-			#Leverages the fact that there is an Existing Graph, instead of rebuilding
-			if ExistingGraph.root == eff:
-				R = graph.subgraph(pre)
-			else:
-				R = graph.subgraph(eff)
-
-			#whichever it is, has to be opposite
-			R.root.truth = not eff.truth
-
-			#match edges if consistent, check against restrictions
-			if R.isConsistentSubgraph(ExistingGraph):
-				operation(eff)
-		return True
-	return False
-
-
-# class FlawLibQue(collections.deque):
-# 	""" A deque where each item is a flaw library"""
-# 	@property
-# 	def flaws(self):
-# 		return sum(len(flaws) for flaws in self)
-#
-# 	@property
-# 	def reusableFlaws(self):
-# 		return sum(len(flaws.reusable) for flaws in self)
-#
-# 	@property
-# 	def heuristic(self):
-# 		return self.flaws + self.reusableFlaws
-#
-# 	def addCndtsAndRisks(self, graph, action):
-# 		for flaws in self:
-# 			flaws.addCndtsAndRisks(graph, action)
 
 import unittest
 class TestOrderingGraphMethods(unittest.TestCase):

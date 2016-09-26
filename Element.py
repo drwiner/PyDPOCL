@@ -168,18 +168,19 @@ class InternalElement(Element):
 class Operator(InternalElement):
 	stepnumber = 0
 	""" An operator element is an internal element with an executed status and orphan status"""
-	def __init__(self, ID, typ, name = None, arg_name = None, num_args = None, executed = None, instantiated = None):
+	def __init__(self, ID, typ, name = None, stepnumber = None, num_args = None, executed = None, instantiated = None):
 		if instantiated == None:
 			instantiated = False
 		if num_args == None:
 			num_args = 0
-		if arg_name == None:
-			arg_name = Operator.stepnumber
+		if stepnumber == None:
+			stepnumber = Operator.stepnumber
 			Operator.stepnumber+=1
 		else:
-			Operator.stepnumber = arg_name + 1
+			Operator.stepnumber = stepnumber + 1
 		
-		super(Operator,self).__init__(ID,typ,name, arg_name, num_args)
+		super(Operator,self).__init__(ID, typ, name, arg_name = stepnumber, num_args = num_args)
+		self.stepnumber = stepnumber
 		self.executed = executed
 		self.instantiated = instantiated
 		
@@ -315,16 +316,6 @@ class Actor(Argument):
 	""" An actor is an argument such that 
 			For each operator in arg_pos_dict where the argument is a consenting actor 'a',
 			then that operator needs to be part of an intention frame where 'a' is the intender
-			
-		An orphan_dict is a dictionary whose keys are operators where the actor is a consenting actor
-		and whose values are True or False depending on the actor's orphan status for that step
-			Example:		{operator.ID : True, another_operator.ID : False}
-			
-		When we instantiate an Action, we identify all consenting actor arguments
-				When this occurs, we add the {Operator.ID : False} to the orphan_dict of that actor
-		If we successfully add that Action to an intention frame, we add {Operator.ID : True} 
-				for the actor that matches the intention frame's intender
-		When we merge 2 actors, we merge the orphan_dicts with preference for True
 	"""
 	def __init__(self, ID, typ, name= None, arg_name = None, orphan_dict = None):
 		if orphan_dict == None:
@@ -338,13 +329,13 @@ class Actor(Argument):
 		if super(Actor,self).merge(other) is None:
 			return None
 			
-		if type(other) == Actor:
-			for operatorID, status in other.orphan_dict.items():
-				if operatorID not in self.orphan_dict:
-					self.orphan_dict[operatorID] = status
-				elif status != self.orphan_dict[operatorID]:
-					#One of them must be True if they are unequal
-					self.orphan_dict[operatorID] = True
+		# if type(other) == Actor:
+		# 	for operatorID, status in other.orphan_dict.items():
+		# 		if operatorID not in self.orphan_dict:
+		# 			self.orphan_dict[operatorID] = status
+		# 		elif status != self.orphan_dict[operatorID]:
+		# 			#One of them must be True if they are unequal
+		# 			self.orphan_dict[operatorID] = True
 		
 		return self
 		
