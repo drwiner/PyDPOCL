@@ -59,6 +59,9 @@ class PlanSpacePlanner:
 			self.GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
 			upload(self.GL)
 
+		from Relax import RelaxHeuristic
+		RelaxHeuristic(self.GL)
+
 		init = copy.deepcopy(self.GL[-2])
 		init.replaceInternals()
 		goal = copy.deepcopy(self.GL[-1])
@@ -115,9 +118,11 @@ class PlanSpacePlanner:
 
 		#antecedent is of the form (antecedent_action_with_missing_eff_link, eff_link)
 		antecedents = self.GL.pre_dict[precondition.replaced_ID]
+		#print('flaw precondition.replaced_ID: {}'.format(precondition.replaced_ID))
 		for ante in antecedents:
 			if ante.action.name == 'dummy_init':
 				continue
+
 			#step 1 - make a copy
 			cndt = copy.deepcopy(ante)
 
@@ -181,13 +186,8 @@ class PlanSpacePlanner:
 
 
 			#step 4 - Remove the precondition and point to the effect_token
-			#pre_token = new_plan.getElementById(precondition.ID)
 			pre_link = new_plan.RemoveSubgraph(precondition)
-			#pre_link = S_Need.RemoveSubgraph(pre_token)
-			try:
-				pre_link.sink = effect_token
-			except:
-				print('why not')
+			pre_link.sink = effect_token
 
 			#step 5 - add orderings, causal links, and create flaws
 			self.addStep(new_plan, S_Old.root, S_Need.root, pre_link.sink,  new=False)
@@ -226,14 +226,14 @@ class PlanSpacePlanner:
 		plan.updatePlan()
 		return plan
 
-	@clock
+	#@clock
 	def resolveThreatenedCausalLinkFlaw(self, plan, flaw):
 		"""
 			Promotion: Add ordering from sink to threat, and check if cycle
 			Demotion: Add ordering from threat to source, and check if cycle
 		"""
 		results = set()
-		threat, effect, causal_link = flaw.flaw
+		threat, causal_link = flaw.flaw
 
 		#Promotion
 		promotion = plan.deepcopy()
@@ -266,27 +266,38 @@ class PlanSpacePlanner:
 		return results
 
 	@clock
-	def POCL(self):
+	def POCL(self, num_plans = 5):
 		Completed = []
-		Visited = []
+		#Visited = []
 		while len(self.Open) > 0:
 			#Select child
+			#print('\n')
+			#for plan in self.Open:
+				#print('candidate plan:')
+				#for step in topoSort(plan):
+				#	print(Action.subgraph(plan, step))
+				#print('\n')
+
 			plan = self.Open.pop()
-			print(plan)
+			#print(plan)
+
+
 			if not plan.isInternallyConsistent():
 				print('branch terminated')
 				continue
 
+			#for step in topoSort(plan):
+				#print(Action.subgraph(plan, step))
 
 			if len(plan.flaws) == 0:
 				#print('solution selected')
 				Completed.append(plan)
-				if len(Completed) == 10:
+				if len(Completed) == num_plans:
 					return Completed
 				continue
 
 				#return plan
-			print(plan.flaws)
+			#print(plan.flaws)
 
 			#Select Flaw
 			flaw = plan.flaws.next()
@@ -294,7 +305,7 @@ class PlanSpacePlanner:
 			print('selected : {}\n'.format(flaw))
 
 			#Add to Visited list, indicating that we've generated all its children
-			Visited.append((plan,flaw))
+			#Visited.append((plan,flaw))
 
 			#Add children to Open List
 			children = self.generateChildren(plan, flaw)
@@ -305,7 +316,7 @@ class PlanSpacePlanner:
 
 			print('open list number: {}'.format(len(self.Open)))
 			print('\n')
-		print('didnt go well')
+
 
 	@clock
 	def integrateRequirements(self, Plan, ReqSteps, ReqLinks, ReqOrderings):
@@ -409,15 +420,14 @@ if __name__ ==  '__main__':
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	#planner.GL = GLib(operators, objects, obtypes, initAction, goalAction)
 
-	results = planner.POCL()
+	results = planner.POCL(11)
 
 	for result in results:
 		totOrdering = topoSort(result)
 		print('\n\n\n')
-		for step in totOrdering:
-			#Step = result.subgraph(step, Action)
-			print(result.subgraph(step, Action))
-		print(result)
+		for step in topoSort(result):
+			print(Action.subgraph(result, step))
+		#print(result)
 
 	#print('\n\n\n')
 	#print(result)

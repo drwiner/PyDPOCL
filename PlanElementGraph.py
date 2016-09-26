@@ -5,6 +5,7 @@ import uuid
 import random
 import itertools
 from clockdeco import clock
+from Relax import RelaxHeuristic
 
 class Action(ElementGraph):
 	#stepnumber = 2
@@ -25,10 +26,7 @@ class Action(ElementGraph):
 
 
 	def RemoveSubgraph(self, elm):
-		before = elm.ID
 		elm = self.getElementById(elm.ID)
-		if elm is None:
-			print('o')
 		link = None
 		to_remove = set()
 		for edge in self.edges:
@@ -59,13 +57,14 @@ class Action(ElementGraph):
 		return self.root.stepnumber
 
 	def replaceInternals(self):
+		self.ID = uuid.uuid1(self.root.stepnumber)
 		for elm in self.elements:
 			if not isinstance(elm, Argument):
 				elm.ID = uuid.uuid1(self.root.stepnumber)
 
 
 	def _replaceInternals(self):
-		#self.ID = uuid.uuid1(self.root.stepnumber)
+		self.ID = uuid.uuid1(self.root.stepnumber)
 		for elm in self.elements:
 			if not isinstance(elm, Argument):
 				elm.replaced_ID = uuid.uuid1(self.root.stepnumber)
@@ -99,9 +98,9 @@ class Action(ElementGraph):
 				exe = 'ex'
 		else:
 			exe = 'ex'
+		id = str(self.root.ID)[19:23]
+		return '{}-{}-{}-{}'.format(exe, self.root.name, self.root.arg_name,id) + args
 
-		return '{}-{}-{}'.format(exe, self.root.name, self.root.arg_name) + args
-		
 		
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
@@ -174,44 +173,54 @@ class PlanElementGraph(ElementGraph):
 		return link
 
 
-	def relaxedStep(self, GL, pre, goal_effs, count = None):
-		if count == None:
-			count = 0
+	def relaxedStep(self, GL, step, visited):
 
-		if len(goal_effs) == 0:
-			return count
+		cost = 0
+		for pre in step.preconditions:
+			v = self.relaxedPre(GL, pre, visited)
+			cost += v
+
+		return cost
+
+	def relaxedPre(self, GL, pre, visited = None):
+		if visited == None:
+			visited = collections.defaultdict(int)
 
 		antecedents = GL.id_dict[pre.replaced_ID]
+
+		if len(antecedents) == 0:
+			return 1000
+
+
 		if not self.initial_dummy_step.stepnumber in antecedents:
-			count+=1
 			least = 1000
 			for ante in antecedents:
-				v = self.relaxedStep(GL, GL[ante], count)
+
+				if ante in visited.keys():
+					v = visited[ante]
+				else:
+					visited[ante] = 1000
+					v = self.relaxedStep(GL, GL[ante],visited)
+					visited[ante] = v
 				if v < least:
 					least = v
-			return count + least
-		else:
-			#goal = GL[self.final_dummy_step.stepnumber]
-			#for eff in goal.effects:
-			for ge in goal_effs:
-				if ge.replaced_ID in GL.eff_dict[pre.replaced_ID]:
-					goal_effs-={ge}
-					break
-			return count
-
-
-		##while self.initial_dummy_step.stepnumber not in GL.id_dict[pre] for pre in step
+			return least + 1
+		return 0
 
 	def calculateHeuristic(self, GL):
 		value = 0
-		for oc in self.flaws.OCs():
+
+		for oc in self.flaws.flaws:
 			_, pre = oc.flaw
-			c = self.relaxedStep(GL,pre,GL[-2].effects,0)
+			c = self.relaxedPre(GL, pre)
+			oc.heuristic=c
+			#print('flaw: {} , heuristic = {}'.format(oc,c))
 			value += c
+
 		return value
 
 	@property
-	def heuristic(self, GL):
+	def heuristic(self):
 
 		"""
 		Strategy: number of steps, dropping deletes, needed to fulfill all open conditions
@@ -222,11 +231,18 @@ class PlanElementGraph(ElementGraph):
 		"""
 		#return self.flaws.heuristic
         #replace with
-		return len(self.flaws) + len(self.flaws.nonreusable)
+		#return len(self.flaws) + len(self.flaws.nonreusable)
+		#self.updatePlan()
+		k = self.calculateHeuristic(RelaxHeuristic.GL)
+		#return len(self.flaws) + k
+		return k# + len(self.flaws.nonreusable)
+		#return self.flaws.heuristic
 
 	@property
 	def cost(self):
-		return len(self.Steps)
+		#if not hasattr(self, 'Steps'):
+			#self.updatePlan()
+		return len(self.Steps) - 2
 
 	def isInternallyConsistent(self):
 		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent() and \
@@ -247,7 +263,7 @@ class PlanElementGraph(ElementGraph):
 	def getActions(self):
 		return list(Action.subgraph(self,step) for step in self.Steps)
 
-	@clock
+	#@clock
 	def detectThreatenedCausalLinks(self, GL):
 		"""
 		A threatened causal link flaw is a tuple <causal link edge, threatening step element>
@@ -279,15 +295,11 @@ class PlanElementGraph(ElementGraph):
 					nonThreats[causal_link].add(step)
 					continue
 
-				count = 0
-				Step = Action.subgraph(self,step)
-				for eff in Step.effects:
-					if eff.ID in GL.threat_dict[causal_link.label.replaced_ID]:
-						detectedThreatenedCausalLinks.add(Flaw((step, eff, causal_link), 'tclf'))
-						count += 1
-
-				if count == 0:
+				if not step.stepnumber in GL.threat_dict[causal_link.sink.stepnumber]:
 					nonThreats[causal_link].add(step)
+					continue
+
+				detectedThreatenedCausalLinks.add(Flaw((step, causal_link), 'tclf'))
 
 		return detectedThreatenedCausalLinks
 

@@ -18,6 +18,7 @@ class Flaw:
 		self.cndts = 0
 		self.risks = 0
 		self.criteria = self.cndts
+		self.heuristic = 0
 
 	def __hash__(self):
 		return hash(self.flaw)
@@ -40,7 +41,7 @@ class Flaw:
 
 		
 	def __repr__(self):
-		return 'Flaw(name={},tuple={})'.format(self.name, self.flaw)
+		return 'Flaw({}, h={}'.format(self.flaw, self.heuristic)
 
 
 class Flawque:
@@ -48,6 +49,7 @@ class Flawque:
 
 	def __init__(self):
 		self._flaws = collections.deque()
+	#	self._name = name
 
 	def add(self, flaw):
 		self.insert(flaw)
@@ -89,6 +91,9 @@ class Flawque:
 		return str(self._flaws)
 
 class simpleQueueWrapper(collections.deque):
+	#def __init__(self, name):
+		#super(simpleQueueWrapper, self).__init__()
+		#self._name = name
 	def add(self, item):
 		self.append(item)
 	def pop(self):
@@ -122,6 +127,14 @@ class FlawLib():
 
 		self.typs = [self.statics, self.inits, self.threats, self.unsafe, self.reusable, self.nonreusable]
 
+	@property
+	def heuristic(self):
+		value = 0
+		for i,flaw_set in enumerate(self.typs):
+			if i == 2:
+				continue
+			value+=i*len(flaw_set)
+		return value
 
 	def __len__(self):
 		return sum(len(flaw_set) for flaw_set in self.typs)
@@ -133,10 +146,17 @@ class FlawLib():
 				return True
 		return False
 
+	@property
+	def flaws(self):
+		return [flaw  for i, flaw_set in enumerate(self.typs) for flaw in flaw_set if i != 2]
+
+
 	def OCs(self):
 		''' Generator for open conditions'''
-		for flaw_set in self.typs:
-			if flaw_set == self.threats:
+		for i, flaw_set in enumerate(self.typs):
+			if len(flaw_set) == 0:
+				continue
+			if i == 2:
 				continue
 			g = (flaw for flaw in flaw_set)
 			yield(next(g))

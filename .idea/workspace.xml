@@ -2,10 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Relax.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Flaws.py" afterPath="$PROJECT_DIR$/Flaws.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Ground.py" afterPath="$PROJECT_DIR$/Ground.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/OrderingGraph.py" afterPath="$PROJECT_DIR$/OrderingGraph.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlanElementGraph.py" afterPath="$PROJECT_DIR$/PlanElementGraph.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Planner.py" afterPath="$PROJECT_DIR$/Planner.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/domains/ark-domain.pddl" afterPath="$PROJECT_DIR$/domains/ark-domain.pddl" />
     </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -25,21 +29,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Graph.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Graph.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="515">
-              <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="ElementGraph.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ElementGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="179">
-              <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+            <state relative-caret-position="68">
+              <caret line="5" column="13" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -48,8 +42,8 @@
       <file leaf-file-name="Element.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Element.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="295">
-              <caret line="24" column="32" selection-start-line="24" selection-start-column="24" selection-end-line="24" selection-end-column="32" />
+            <state relative-caret-position="226">
+              <caret line="237" column="18" selection-start-line="237" selection-start-column="8" selection-end-line="237" selection-end-column="18" />
               <folding />
             </state>
           </provider>
@@ -58,11 +52,9 @@
       <file leaf-file-name="Flaws.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Flaws.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="471">
-              <caret line="181" column="20" selection-start-line="181" selection-start-column="20" selection-end-line="181" selection-end-column="47" />
-              <folding>
-                <element signature="e#28#46#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="226">
+              <caret line="253" column="13" selection-start-line="253" selection-start-column="8" selection-end-line="253" selection-end-column="13" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -70,8 +62,8 @@
       <file leaf-file-name="PlanElementGraph.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1753">
-              <caret line="161" column="22" selection-start-line="161" selection-start-column="8" selection-end-line="161" selection-end-column="22" />
+            <state relative-caret-position="226">
+              <caret line="265" column="11" selection-start-line="265" selection-start-column="5" selection-end-line="265" selection-end-column="11" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -79,11 +71,21 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="ark-problem.pddl" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/domains/ark-problem.pddl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="11" column="21" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="OrderingGraph.py" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="376">
-              <caret line="86" column="82" selection-start-line="86" selection-start-column="82" selection-end-line="86" selection-end-column="82" />
+            <state relative-caret-position="444">
+              <caret line="99" column="78" selection-start-line="99" selection-start-column="78" selection-end-line="99" selection-end-column="78" />
               <folding />
             </state>
           </provider>
@@ -104,8 +106,8 @@
       <file leaf-file-name="Ground.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Ground.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="614">
-              <caret line="195" column="75" selection-start-line="195" selection-start-column="75" selection-end-line="195" selection-end-column="75" />
+            <state relative-caret-position="493">
+              <caret line="95" column="0" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
               <folding>
                 <element signature="e#1#17#0" expanded="true" />
               </folding>
@@ -116,8 +118,8 @@
       <file leaf-file-name="Planner.py" pinned="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Planner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="383">
-              <caret line="286" column="0" selection-start-line="286" selection-start-column="0" selection-end-line="286" selection-end-column="0" />
+            <state relative-caret-position="316">
+              <caret line="433" column="0" selection-start-line="433" selection-start-column="0" selection-end-line="433" selection-end-column="0" />
               <folding>
                 <element signature="e#21#47#0" expanded="true" />
               </folding>
@@ -125,11 +127,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="clockdeco.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/clockdeco.py">
+      <file leaf-file-name="ark-domain.pddl" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/domains/ark-domain.pddl">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+            <state relative-caret-position="-136">
+              <caret line="82" column="47" selection-start-line="82" selection-start-column="47" selection-end-line="82" selection-end-column="47" />
               <folding />
             </state>
           </provider>
@@ -168,12 +170,13 @@
         <option value="$PROJECT_DIR$/Restrictions.py" />
         <option value="$PROJECT_DIR$/Graph.py" />
         <option value="$PROJECT_DIR$/pddl/pddl.py" />
-        <option value="$PROJECT_DIR$/domains/ark-domain.pddl" />
         <option value="$PROJECT_DIR$/pddlToGraphs.py" />
-        <option value="$PROJECT_DIR$/OrderingGraph.py" />
-        <option value="$PROJECT_DIR$/Flaws.py" />
         <option value="$PROJECT_DIR$/ElementGraph.py" />
         <option value="$PROJECT_DIR$/Element.py" />
+        <option value="$PROJECT_DIR$/Relax.py" />
+        <option value="$PROJECT_DIR$/domains/ark-domain.pddl" />
+        <option value="$PROJECT_DIR$/Flaws.py" />
+        <option value="$PROJECT_DIR$/OrderingGraph.py" />
         <option value="$PROJECT_DIR$/PlanElementGraph.py" />
         <option value="$PROJECT_DIR$/Ground.py" />
         <option value="$PROJECT_DIR$/Planner.py" />
@@ -181,10 +184,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1" />
-    <option name="y" value="1" />
-    <option name="width" value="2558" />
-    <option name="height" value="1398" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="2576" />
+    <option name="height" value="1416" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -227,6 +230,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
@@ -270,13 +274,26 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="heuristics" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="story-elements" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="story-elements" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="domains" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -550,13 +567,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
-    </task>
-    <task id="LOCAL-00060" summary="forall and equality">
-      <created>1472311241702</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
-      <option name="project" value="LOCAL" />
-      <updated>1472311241702</updated>
     </task>
     <task id="LOCAL-00061" summary="object_types - element merges">
       <created>1472323935713</created>
@@ -894,7 +904,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474852735577</updated>
     </task>
-    <option name="localTasksCounter" value="109" />
+    <task id="LOCAL-00109" summary="bug fixed, but now not finding solution, generate open list of &gt; 9000">
+      <created>1474862636791</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1474862636791</updated>
+    </task>
+    <option name="localTasksCounter" value="110" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -929,21 +946,30 @@
       <configuration name="Unittests in Restrictions" configurationId="tests" />
     </history-entry>
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="1" y="1" width="2558" height="1398" extended-state="6" />
+    <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19801587" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19779354" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32943013" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.520687" sideWeight="0.50472814" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32699922" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2747853" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36500397" sideWeight="0.4984127" order="7" side_tool="false" content_ui="tabs" x="-570" y="534" width="2560" height="400" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.42517814" sideWeight="0.49527186" order="2" side_tool="false" content_ui="combo" x="2774" y="228" width="1505" height="1027" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2740047" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36455894" sideWeight="0.4984127" order="7" side_tool="false" content_ui="tabs" x="-570" y="534" width="2560" height="400" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.42466822" sideWeight="0.49527186" order="2" side_tool="false" content_ui="combo" x="2774" y="228" width="1505" height="1027" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24959743" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3297619" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40855107" sideWeight="0.49527186" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4082748" sideWeight="0.49527186" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -987,7 +1013,6 @@
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Clauses for considering all possible merges of one graph with another." />
     <MESSAGE value="Quick note on edge labels" />
     <MESSAGE value="CreatePossibleWorlds method for merging graphs" />
     <MESSAGE value="labeled r as root in isIsomorphic subgraph" />
@@ -1012,30 +1037,16 @@
     <MESSAGE value="new step and reuse , created not tested" />
     <MESSAGE value="detect threatened causal links revised" />
     <MESSAGE value="bug with precondition.replaced_ID..." />
-    <option name="LAST_COMMIT_MESSAGE" value="bug with precondition.replaced_ID..." />
+    <MESSAGE value="bug fixed, but now not finding solution, generate open list of &gt; 9000" />
+    <option name="LAST_COMMIT_MESSAGE" value="bug fixed, but now not finding solution, generate open list of &gt; 9000" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/Planner.py</url>
-          <line>307</line>
-          <option name="timeStamp" value="465" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Ground.py</url>
-          <line>138</line>
-          <option name="timeStamp" value="483" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/Ground.py</url>
-          <line>136</line>
-          <option name="timeStamp" value="484" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/Planner.py</url>
-          <line>63</line>
-          <option name="timeStamp" value="486" />
+          <line>114</line>
+          <option name="timeStamp" value="535" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -1045,31 +1056,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="488" />
+      <option name="time" value="536" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/ElementGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="27" column="40" selection-start-line="27" selection-start-column="40" selection-end-line="27" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5678">
-          <caret line="334" column="17" selection-start-line="334" selection-start-column="17" selection-end-line="334" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/search/searchspace.py" />
-    <entry file="file://$PROJECT_DIR$/search/a_star.py" />
     <entry file="file://$USER_HOME$/.PyCharm2016.2/system/python_stubs/-643338342/builtins.py" />
     <entry file="file://$PROJECT_DIR$/reuse_old" />
     <entry file="file://$PROJECT_DIR$/search/a_star.py" />
@@ -1151,7 +1142,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nlk.py" />
-    <entry file="file://D:/Python/Lib/copy.py" />
     <entry file="file://D:/Python/Lib/unittest/case.py" />
     <entry file="file://D:/Python/Lib/unittest/suite.py" />
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pycharm/tcunittest.py">
@@ -1196,7 +1186,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1204,7 +1193,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="269">
           <caret line="96" column="0" selection-start-line="96" selection-start-column="0" selection-end-line="123" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1212,7 +1200,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="277">
           <caret line="289" column="0" selection-start-line="289" selection-start-column="0" selection-end-line="289" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1228,9 +1215,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
           <caret line="22" column="26" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#30#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1238,22 +1222,53 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-236">
           <caret line="130" column="38" selection-start-line="130" selection-start-column="38" selection-end-line="130" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Graph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1156">
+          <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/domains/ark-domain.pddl">
+    <entry file="file://$PROJECT_DIR$/heuristics/relaxation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1088">
-          <caret line="8" column="23" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="23" />
+        <state relative-caret-position="-1122">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Element.py">
+    <entry file="file://$PROJECT_DIR$/Relax.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="24" column="32" selection-start-line="24" selection-start-column="24" selection-end-line="24" selection-end-column="32" />
+        <state relative-caret-position="34">
+          <caret line="2" column="38" selection-start-line="2" selection-start-column="38" selection-end-line="2" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydevd_bundle/pydevd_exec2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/clockdeco.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Python/Lib/copy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="573">
+          <caret line="173" column="0" selection-start-line="173" selection-start-column="0" selection-end-line="173" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1266,36 +1281,50 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Graph.py">
+    <entry file="file://D:/Python/Lib/functools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="515">
-          <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+        <state relative-caret-position="236">
+          <caret line="158" column="0" selection-start-line="158" selection-start-column="0" selection-end-line="158" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ElementGraph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="5" column="13" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="444">
+          <caret line="99" column="78" selection-start-line="99" selection-start-column="78" selection-end-line="99" selection-end-column="78" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Element.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="237" column="18" selection-start-line="237" selection-start-column="8" selection-end-line="237" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/ark-domain.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-136">
+          <caret line="82" column="47" selection-start-line="82" selection-start-column="47" selection-end-line="82" selection-end-column="47" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Flaws.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="471">
-          <caret line="181" column="20" selection-start-line="181" selection-start-column="20" selection-end-line="181" selection-end-column="47" />
-          <folding>
-            <element signature="e#28#46#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="376">
-          <caret line="86" column="82" selection-start-line="86" selection-start-column="82" selection-end-line="86" selection-end-column="82" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/clockdeco.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+        <state relative-caret-position="226">
+          <caret line="253" column="13" selection-start-line="253" selection-start-column="8" selection-end-line="253" selection-end-column="13" />
           <folding />
         </state>
       </provider>
@@ -1310,38 +1339,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ElementGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="179">
-          <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1753">
-          <caret line="161" column="22" selection-start-line="161" selection-start-column="8" selection-end-line="161" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Ground.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="614">
-          <caret line="195" column="75" selection-start-line="195" selection-start-column="75" selection-end-line="195" selection-end-column="75" />
+        <state relative-caret-position="493">
+          <caret line="95" column="0" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
           <folding>
             <element signature="e#1#17#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="265" column="11" selection-start-line="265" selection-start-column="5" selection-end-line="265" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Planner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="383">
-          <caret line="286" column="0" selection-start-line="286" selection-start-column="0" selection-end-line="286" selection-end-column="0" />
+        <state relative-caret-position="316">
+          <caret line="433" column="0" selection-start-line="433" selection-start-column="0" selection-end-line="433" selection-end-column="0" />
           <folding>
             <element signature="e#21#47#0" expanded="true" />
           </folding>

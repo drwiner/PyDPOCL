@@ -2,92 +2,11 @@
 import itertools
 import copy
 from collections import namedtuple, defaultdict
-from PlanElementGraph import Action, Condition
+from PlanElementGraph import Condition
 from Element import Operator
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
 Antestep = namedtuple('Antestep', 'action eff_link')
-
-# class GStep:
-# 	""" Container class for a ground action"""
-#
-# 	def __init__(self, action):
-# 		self._action = action
-#
-# 	def subgraph(self, elm):
-# 		return Condition.subgraph(self._action,elm)
-#
-# 	def RemoveSubgraph(self, elm):
-# 		new_action = self._action.deepcopy()
-# 		link = new_action.RemoveSubgraph(elm)
-# 		return (new_action, link)
-#
-# 	def getPreconditionsOrEffects(self, label):
-# 		return self._action.getPreconditionsOrEffects(label)
-#
-# 	def replaceInternals(self):
-# 		self._action.replaceInternals()
-#
-# 	def deepcopy(self):
-# 		return copy.deepcopy(self._action)
-#
-# 	#def __getitem__(self, item):
-# 	#	return self.pre_dict[item]
-# 	def __getattr__(self, name):
-# 		# if name == 'num_risks':
-# 		# 	risks = 0
-# 		# 	for pre in self.preconditions:
-# 		# 		risks += len(GL.id_dict[pre.replaced_ID])
-# 		# 	self.num_risks = risks
-# 		# 	return self.num_risks
-# 		if name == 'preconditions':
-# 			self.preconditions = self.getPreconditionsOrEffects('precond-of')
-# 			return self.preconditions
-# 		elif name == 'effects':
-# 			self.effects = self.getPreconditionsOrEffects('effect-of')
-# 			return self.effects
-# 		else:
-# 			raise AttributeError('no attribute {}'.format(name))
-# 	#
-# 	# @property
-# 	# def preconditions(self):
-# 	# 	return self.getPreconditionsOrEffects('precond-of')
-# 	#
-# 	# @property
-# 	# def effects(self):
-# 	# 	return self.getPreconditionsOrEffects('effect-of')
-#
-# 	@property
-# 	def name(self):
-# 		return self._action.name
-#
-# 	@property
-# 	def stepnumber(self):
-# 		return self._action.root.stepnumber
-#
-# 	@property
-# 	def elements(self):
-# 		return self._action.elements
-#
-# 	@property
-# 	def edges(self):
-# 		return self._action.edges
-#
-# 	@property
-# 	def root(self):
-# 		return self._action.root
-#
-# 	@property
-# 	def typ(self):
-# 		return self._action.typ
-#
-# 	@property
-# 	def ID(self):
-# 		return self._action.ID
-#
-# 	def __repr__(self):
-# 		return self._action.__repr__()
-
 
 def groundStepList(operators, objects, obtypes):
 	stepnum = 0
@@ -174,9 +93,8 @@ class GLib:
 					Effect = Condition.subgraph(gstep, _eff)
 					if Effect.Args != Precondition.Args:
 						continue
-					self.threat_dict[_pre.replaced_ID].add(_eff.replaced_ID)
-					self.threat_dict[_pre.replaced_ID].add(gstep.stepnumber)
-					#self.threat_id_dict[_pre.ID].add(gstep.stepnumber)
+
+					self.threat_dict[_step.stepnumber].add(gstep.stepnumber)
 					continue
 
 
@@ -188,6 +106,7 @@ class GLib:
 				# Create antestep
 				antestep = copy.deepcopy(gstep)
 				eff_link = antestep.RemoveSubgraph(_eff)
+				antestep.replaceInternals()
 				#eff_link.sink is not an antestep.element so its ID does not change
 				#antestep._replaceInternals()
 
@@ -207,7 +126,6 @@ class GLib:
 
 	def __repr__(self):
 		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
-
 
 
 from pddlToGraphs import parseDomainAndProblemToGraphs

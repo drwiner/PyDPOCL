@@ -96,7 +96,9 @@ class CausalLinkGraph(OrderingGraph):
 		self.edges.add(Edge(source, sink, condition))
 		
 	def __repr__(self):
-		return str(['{}-{} --{}-{}--> {}-{}'.format(edge.source.name, edge.source.arg_name, edge.label.truth, edge.label.name, edge.sink.name, edge.sink.arg_name) for edge in self.edges])
+		return str(['{}-{} --{}-{}-{}--> {}-{}'.format(edge.source.name, edge.source.arg_name, edge.label.truth,
+													   edge.label.replaced_ID, edge.label.name, edge.sink.name,
+					edge.sink.arg_name)	for edge in self.edges])
 
 import unittest
 class TestOrderingGraphMethods(unittest.TestCase):

@@ -64,7 +64,8 @@
 
   (:action steal
     :parameters   (?taker - character ?item - item ?victim - character ?place - place)
-	:precondition (and 
+	:precondition (and
+	                   (not (= ?taker ?victim))
                        (alive ?taker)
                        (at ?taker ?place)
                        (armed ?taker)
@@ -78,7 +79,8 @@
 
   (:action take-from-corpse
     :parameters   (?taker - character ?item - item ?victim - character ?place - place)
-	:precondition (and 
+	:precondition (and
+	                   (not (= ?taker ?victim))
                        (alive ?taker)
                        (at ?taker ?place)
                        (not (alive ?victim))
