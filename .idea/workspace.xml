@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Relax.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Flaws.py" afterPath="$PROJECT_DIR$/Flaws.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Ground.py" afterPath="$PROJECT_DIR$/Ground.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/OrderingGraph.py" afterPath="$PROJECT_DIR$/OrderingGraph.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PlanElementGraph.py" afterPath="$PROJECT_DIR$/PlanElementGraph.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Planner.py" afterPath="$PROJECT_DIR$/Planner.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/domains/ark-domain.pddl" afterPath="$PROJECT_DIR$/domains/ark-domain.pddl" />
     </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -118,8 +112,8 @@
       <file leaf-file-name="Planner.py" pinned="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Planner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="316">
-              <caret line="433" column="0" selection-start-line="433" selection-start-column="0" selection-end-line="433" selection-end-column="0" />
+            <state relative-caret-position="270">
+              <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
               <folding>
                 <element signature="e#21#47#0" expanded="true" />
               </folding>
@@ -568,13 +562,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00061" summary="object_types - element merges">
-      <created>1472323935713</created>
-      <option name="number" value="00061" />
-      <option name="presentableId" value="LOCAL-00061" />
-      <option name="project" value="LOCAL" />
-      <updated>1472323935713</updated>
-    </task>
     <task id="LOCAL-00062" summary="not enough arg labels&#10;">
       <created>1472402784935</created>
       <option name="number" value="00062" />
@@ -911,7 +898,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474862636791</updated>
     </task>
-    <option name="localTasksCounter" value="110" />
+    <task id="LOCAL-00110" summary="Ground step planner... finished!">
+      <created>1474927793031</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1474927793032</updated>
+    </task>
+    <option name="localTasksCounter" value="111" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1013,7 +1007,6 @@
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Quick note on edge labels" />
     <MESSAGE value="CreatePossibleWorlds method for merging graphs" />
     <MESSAGE value="labeled r as root in isIsomorphic subgraph" />
     <MESSAGE value=" formalizing new strategy for possible worlds and consistency for requirements" />
@@ -1038,7 +1031,8 @@
     <MESSAGE value="detect threatened causal links revised" />
     <MESSAGE value="bug with precondition.replaced_ID..." />
     <MESSAGE value="bug fixed, but now not finding solution, generate open list of &gt; 9000" />
-    <option name="LAST_COMMIT_MESSAGE" value="bug fixed, but now not finding solution, generate open list of &gt; 9000" />
+    <MESSAGE value="Ground step planner... finished!" />
+    <option name="LAST_COMMIT_MESSAGE" value="Ground step planner... finished!" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1361,8 +1355,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Planner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="433" column="0" selection-start-line="433" selection-start-column="0" selection-end-line="433" selection-end-column="0" />
+        <state relative-caret-position="270">
+          <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
           <folding>
             <element signature="e#21#47#0" expanded="true" />
           </folding>

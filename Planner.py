@@ -44,7 +44,7 @@ def reload():
 
 class PlanSpacePlanner:
 
-	def __init__(self, op_graphs, objects, init_action, goal_action):
+	def __init__(self, op_graphs, objects, init_action, goal_action, reload = False):
 		#Assumes these parameters are already read from file
 
 		self.op_graphs = op_graphs
@@ -53,8 +53,12 @@ class PlanSpacePlanner:
 		print('preprocessing...')
 
 		try:
-			self.GL = reload()
-			print(len(self.GL))
+			if not reload:
+				self.GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
+				upload(self.GL)
+			else:
+				self.GL = reload()
+				print(len(self.GL))
 		except:
 			self.GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
 			upload(self.GL)
