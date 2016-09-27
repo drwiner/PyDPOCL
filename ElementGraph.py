@@ -196,5 +196,8 @@ class TestInstantiations(unittest.TestCase):
 
 		assert True
 
+	def test_consistency(self):
+		pass
+
 if __name__ ==  '__main__':
 	unittest.main()

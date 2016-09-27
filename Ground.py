@@ -71,8 +71,6 @@ class GLib:
 	def loadAll(self):
 		for _step in self._gsteps:
 			#print('preprocessing step {}....'.format(_step))
-			if _step.name == 'dummy_goal':
-				print('check here')
 			pre_tokens = _step.preconditions
 			for _pre in pre_tokens:
 				#print('preprocessing precondition {} of step {}....'.format(_pre, _step))

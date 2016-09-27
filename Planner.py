@@ -31,10 +31,14 @@ class Frontier:
 			self.insert(item)
 
 import pickle
+
+@clock
 def upload(GL):
 	afile = open("GL","wb")
 	pickle.dump(GL,afile)
 	afile.close()
+
+@clock
 def reload():
 	afile = open("GL","rb")
 	GL = pickle.load(afile)
@@ -44,7 +48,7 @@ def reload():
 
 class PlanSpacePlanner:
 
-	def __init__(self, op_graphs, objects, init_action, goal_action, reload = False):
+	def __init__(self, op_graphs, objects, init_action, goal_action, preprocess = False):
 		#Assumes these parameters are already read from file
 
 		self.op_graphs = op_graphs
@@ -52,16 +56,19 @@ class PlanSpacePlanner:
 
 		print('preprocessing...')
 
-		try:
-			if not reload:
-				self.GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
-				upload(self.GL)
-			else:
-				self.GL = reload()
-				print(len(self.GL))
-		except:
+		if preprocess:
 			self.GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
 			upload(self.GL)
+			print(len(self.GL))
+		else:
+			try:
+				print('try to reload:')
+				self.GL = reload()
+				print(len(self.GL))
+			except:
+				print('could not reload')
+				self.GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
+				upload(self.GL)
 
 		from Relax import RelaxHeuristic
 		RelaxHeuristic(self.GL)
@@ -81,6 +88,7 @@ class PlanSpacePlanner:
 		self.setup(init_plan, init, goal)
 		self.Open =  Frontier()
 		self.Open.insert(init_plan)
+		print('finished preprocessing...')
 
 	def __len__(self):
 		return len(self._frontier)
@@ -109,7 +117,7 @@ class PlanSpacePlanner:
 			plan.flaws.insert(self.GL, plan, flaw)
 
 
-	@clock
+	#@clock
 	def newStep(self, plan, flaw):
 		"""
 		@param plan:
@@ -156,7 +164,7 @@ class PlanSpacePlanner:
 
 		return results
 
-	@clock
+	#@clock
 	def reuse(self, plan, flaw):
 		results = set()
 		s_need, precondition = flaw.flaw
@@ -283,14 +291,14 @@ class PlanSpacePlanner:
 			visited+=1
 
 			if not plan.isInternallyConsistent():
-				print('branch terminated')
+				#print('branch terminated')
 				continue
 
 			#for step in topoSort(plan):
 				#print(Action.subgraph(plan, step))
 
 			if len(plan.flaws) == 0:
-				print('solution found at {} nodes visited'.format(visited))
+				print('solution found at {} nodes visited and {} nodes expanded'.format(visited, len(self.Open)))
 				Completed.append(plan)
 				if len(Completed) == num_plans:
 					return Completed
@@ -302,7 +310,7 @@ class PlanSpacePlanner:
 			#Select Flaw
 			flaw = plan.flaws.next()
 
-			print('selected : {}\n'.format(flaw))
+			#print('selected : {}\n'.format(flaw))
 
 			#Add to Visited list, indicating that we've generated all its children
 			#Visited.append((plan,flaw))
@@ -310,12 +318,12 @@ class PlanSpacePlanner:
 			#Add children to Open List
 			children = self.generateChildren(plan, flaw)
 
-			print('generated children: {}'.format(len(children)))
+			#print('generated children: {}'.format(len(children)))
 			for child in children:
 				self.Open.insert(child)
 
-			print('open list number: {}'.format(len(self.Open)))
-			print('\n')
+			#print('open list number: {}'.format(len(self.Open)))
+			#print('\n')
 
 
 	@clock
@@ -420,7 +428,7 @@ if __name__ ==  '__main__':
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	#planner.GL = GLib(operators, objects, obtypes, initAction, goalAction)
 
-	results = planner.POCL(8)
+	results = planner.POCL(1)
 
 	for result in results:
 		totOrdering = topoSort(result)
