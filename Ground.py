@@ -59,6 +59,7 @@ class GLib:
 
 		#dictionaries
 		self.pre_dict = defaultdict(set)
+		self.ante_dict = defaultdict(set)
 		self.id_dict = defaultdict(set)
 		self.eff_dict = defaultdict(set)
 		self.threat_dict = defaultdict(set)
@@ -80,11 +81,12 @@ class GLib:
 		Precondition = Condition.subgraph(_step, _pre)
 		for gstep in self._gsteps:
 			# Defense pattern
-
+			count = 0
 			for _eff in gstep.effects:
 				# Defense 2
 				if not _eff.isConsistent(_pre):
 					# Defense 2.1
+
 					if not _eff.isOpposite(_pre):
 						continue
 					# Defense 2.2
@@ -105,12 +107,14 @@ class GLib:
 				antestep = copy.deepcopy(gstep)
 				eff_link = antestep.RemoveSubgraph(_eff)
 				antestep.replaceInternals()
-				#eff_link.sink is not an antestep.element so its ID does not change
-				#antestep._replaceInternals()
 
 				self.pre_dict[_pre.replaced_ID].add(Antestep(antestep, eff_link))
 				self.id_dict[_pre.replaced_ID].add(antestep.stepnumber)
 				self.eff_dict[_pre.replaced_ID].add(eff_link.sink.replaced_ID)
+				count += 1
+
+			if count > 0:
+				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
 
 
 	def __len__(self):

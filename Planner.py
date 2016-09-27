@@ -309,11 +309,7 @@ class PlanSpacePlanner:
 
 			#Select Flaw
 			flaw = plan.flaws.next()
-
 			#print('selected : {}\n'.format(flaw))
-
-			#Add to Visited list, indicating that we've generated all its children
-			#Visited.append((plan,flaw))
 
 			#Add children to Open List
 			children = self.generateChildren(plan, flaw)
@@ -325,8 +321,94 @@ class PlanSpacePlanner:
 			#print('open list number: {}'.format(len(self.Open)))
 			#print('\n')
 
+	def makeStepAssignment(self, required_steps):
+		Assignment = defaultdict(set)
+		for rs in required_steps:
+			for gs in self.GL:
+				if not rs.isConsistentSubgraph(gs):
+					continue
+				Assignment[rs.root].add(gs.stepnumber)
+		return Assignment
 
-	@clock
+
+
+	def integrateRquirements(self, Plan, RQ, RS):
+		"""
+		For now, we assume no couplings, and therefore all elms are new/replace any existing
+		@param Plan:
+		@param RQ: Requirement Graph
+		@param RS: Restriction Graph
+		@return:
+		"""
+		required_steps = {Action.subgraph(RQ, elm) for elm in RQ.elements if elm.typ == 'Action'}
+
+		#Assignment = collections.namedtuple('Assignment', 'rs gs')
+
+		Assignments = self.makeStepAssignment(required_steps)
+		for rs in required_steps:
+			if len(Assignments[rs.root]) == 0:
+				raise ValueError('empty')
+
+	#	assignments = {Assignment(rs, gs) for rs in required_steps for gs in self.GL if rs.isConsistentSubgraph(gs)}
+
+		orderings = {edge for edge in RQ.edges if edge.label == '<'}
+		links = {edge for edge in RQ.edges if type(edge.label) is Literal}
+
+		for link in links:
+
+			#cndt_source_nums = Assignments[link.source]
+			cndt_sink_nums = Assignments[link.sink]
+
+			dependency = link.label
+			if not dependency is None:
+				Dependency = Condition.subgraph(RQ, dependency)
+
+			for csm in cndt_sink_nums:
+				if dependency is None:
+					Assignments[link.source] = self.GL.ante_dict[csm]
+
+				for pre in self.GL[csm].preconditions:
+					if not pre.isConsistent(dependency):
+						continue
+					Precondition = Condition.subgraph(self.GS[csm], pre)
+					if Dependency.Args != Precondition.Args:
+						continue
+
+					Assignments[link.source] = self.GL.id_dict[pre.replaced_ID]
+					if len(Assignments[link.source]) == 0:
+						raise ValueError('um, is this link impossible?')
+
+
+
+
+			for rs, gs in sink_map:
+				ante_nums = self.GL.ante_dict[gs.stepnumber]
+				for ars, ags in source_map:
+					if ags.stepnumber not in ante_nums:
+				if dependency is None: #not even a partial literal here
+
+				else:
+					Dependency = Condition.subgraph(RQ,dependency)
+					#consistent_pretokens = {pre for pre in gs.preconditions if pre.isConsistent(dependency)}
+					for pre in gs.preconditions:
+						if not pre.isConsistent(dependency):
+							continue
+						Precondition = Condition.subgraph(gs,pre)
+						if Dependency.Args != Precondition.Args:
+							continue
+						#found consistent precondition
+						if rs in
+
+
+					#if the dependency is a partial literal, then need to pick some consistent precondition.
+					#else, find corresponding
+					ante_nums = self.GL.id_dict[]
+				inconsistent_maps = {asmt for asmt in source_map if asmt[1].stepnumber not in
+			self.GL.ante_dict[st.stepnumber] for rs,gs in sink_map
+
+
+
+	#@clock
 	def integrateRequirements(self, Plan, ReqSteps, ReqLinks, ReqOrderings):
 		S = Plan.Steps
 		D = self.op_graphs
