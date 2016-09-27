@@ -272,19 +272,15 @@ class PlanSpacePlanner:
 	@clock
 	def POCL(self, num_plans = 5):
 		Completed = []
+		visited = 0
 		#Visited = []
+
 		while len(self.Open) > 0:
+
 			#Select child
-			#print('\n')
-			#for plan in self.Open:
-				#print('candidate plan:')
-				#for step in topoSort(plan):
-				#	print(Action.subgraph(plan, step))
-				#print('\n')
-
 			plan = self.Open.pop()
-			#print(plan)
 
+			visited+=1
 
 			if not plan.isInternallyConsistent():
 				print('branch terminated')
@@ -294,13 +290,13 @@ class PlanSpacePlanner:
 				#print(Action.subgraph(plan, step))
 
 			if len(plan.flaws) == 0:
-				#print('solution selected')
+				print('solution found at {} nodes visited'.format(visited))
 				Completed.append(plan)
 				if len(Completed) == num_plans:
 					return Completed
 				continue
 
-				#return plan
+			#print(plan)
 			#print(plan.flaws)
 
 			#Select Flaw
@@ -424,7 +420,7 @@ if __name__ ==  '__main__':
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 	#planner.GL = GLib(operators, objects, obtypes, initAction, goalAction)
 
-	results = planner.POCL(11)
+	results = planner.POCL(8)
 
 	for result in results:
 		totOrdering = topoSort(result)
