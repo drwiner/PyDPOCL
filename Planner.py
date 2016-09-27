@@ -356,7 +356,7 @@ class PlanSpacePlanner:
 
 		return TMap
 
-
+@clock
 def preprocessDomain(operators):
 	#get all effect predicates
 	pred_set = set()

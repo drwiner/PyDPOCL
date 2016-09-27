@@ -3,7 +3,7 @@
 		element.ID is unique across all data structures
 		element.typ refers to the typ of an elementgraph with that element as the root
 		element.name sometimes refers to the predicate name or operator name. otherwise None
-		num_args is 0 means that num_args is in essence None. If predicate with no args, then this will cause problems
+		num_args is 0 means that num_args is in essence None. If predicate with no args, then this may cause problems
 	Properties:
 		Another element is consistent with self iff for each non-None parameter in self, the other's parameter is None or ==
 		Another element is equivalent with self iff for each non-None parameter in self, other's parameter == and cannot be None
@@ -16,11 +16,10 @@ import copy
 
 class Element:
 
-	"""Element is a token or label"""
+	"""Element is a token or label with the following attributes"""
 	def __init__(self, ID, typ = None, name = None, arg_name = None):
 		self.ID = ID
 		self.typ = typ
-		#Optional:
 		self.name = name
 		self.arg_name = arg_name
 		self.replaced_ID = -1
@@ -313,29 +312,14 @@ class Argument(Element):
 	
 
 class Actor(Argument):
-	""" An actor is an argument such that 
-			For each operator in arg_pos_dict where the argument is a consenting actor 'a',
-			then that operator needs to be part of an intention frame where 'a' is the intender
+	""" An actor is an argument
 	"""
-	def __init__(self, ID, typ, name= None, arg_name = None, orphan_dict = None):
-		if orphan_dict == None:
-			orphan_dict = {}
-			
+	def __init__(self, ID, typ, name= None, arg_name = None):
 		super(Actor,self).__init__(ID,typ,name,arg_name)
-		self.orphan_dict=  orphan_dict
-		
 		
 	def merge(self, other):
 		if super(Actor,self).merge(other) is None:
 			return None
-			
-		# if type(other) == Actor:
-		# 	for operatorID, status in other.orphan_dict.items():
-		# 		if operatorID not in self.orphan_dict:
-		# 			self.orphan_dict[operatorID] = status
-		# 		elif status != self.orphan_dict[operatorID]:
-		# 			#One of them must be True if they are unequal
-		# 			self.orphan_dict[operatorID] = True
 		
 		return self
 		
@@ -350,124 +334,3 @@ class PlanElement(Element):
 			typ = 'PlanElementGraph'
 			
 		super(PlanElement,self).__init__(ID,typ,name, arg_name)
-		
-class IntentionFrameElement(Element):
-	def __init__(self, ID, type_graph=None, name= None, arg_name = None, ms=None, motivation = None, intender = None,
-				 goal = None, sat = None, steps = None):
-		if steps == None:
-			steps = set()
-		if type_graph == None:
-			type_graph='IntentionFrame'
-			
-		super(IntentionFrameElement,self).__init__(ID,type_graph,name, arg_name)
-		
-		self.ms = ms
-		self.motivation = motivation
-		self.intender = intender
-		self.goal = goal
-		self.sat = sat
-		self.subplan = steps
-		
-	def external_update(self, PLAN):
-		"""updates frame slots, edges, and constraints"""
-		
-		if not self.sat is None:
-			if not self.sat in self.subplan:
-				self.subplan.add(self.sat)
-		
-		""" If the slot is filled but the edge isn't' there, fill it in"""
-		incident_edges = PLAN.getIncidentEdges(self.ID)
-		labels = {ie.label for ie in incident_edges}
-		if not self.goal is None:
-			if 'goal-of' not in labels:
-				PLAN.edges.add(Edge(self, self.goal, 'goal-of'))
-		if not self.ms is None:
-			if 'motivating-step-of' not in labels:
-				PLAN.edges.add(Edge(self, self.ms, 'motivating-step-of'))
-		if not self.sat is None:
-			if 'sat-step-of' not in labels:
-				PLAN.edges.add(Edge(self, self.sat,'sat-step-of'))
-		if not self.intender is None:
-			if 'actor-of' not in labels:
-				PLAN.edges.add(Edge(self, self.intender, 'actor-of'))
-		if len(self.subplan) == 0:
-			neighbs = {ie.sink for ie in incident_edges if ie.label == 'in-subplan-of'}
-			for step in self.subplan:
-				if step not in neighbs:
-					PLAN.edges.add(Edge(self, step, 'in-subplan-of'))
-				
-			
-		""" If there's an edge but slot is None, fill it in"""
-		for incident_edge in PLAN.edges:
-			if incident_edge.source.ID == self.ID:
-				if self.goal is None:
-					if incident_edge.label == 'goal-of':
-						self.goal = incident_edge.sink
-				if self.ms is None:
-					if incident_edge.label == 'motive-of':
-						self.ms = incident_edge.sink
-				if self.intender is None:
-					if incident_edge.label == 'actor-of':
-						self.intender = incident_edge.sink
-				if self.sat is None:
-					if incident_edge.label == 'sat-of':
-						self.sat = incident_edge.sink
-						if not self.sat in self.subplan:
-							self.subplan.add(self.sat)
-				if incident_edge.label == 'in-subplan-of':
-					if incident_edge.sink not in self.subplan:
-						self.subplan.add(incident_edge.sink)
-		
-		""" Add ordering constraints if not there """
-		if len(self.subplan) > 0:
-			for step in self.subplan:
-				if not self.ms is None:
-					# self.ms < step
-					pass
-				if not self.sat is None:
-					if not self.sat is step:
-						#step < self.sat
-						pass
-
-		""" consenting Actors """
-		if self.intender is None:
-			actors = PLAN.getConsentingActors(self.subplan)
-			if len(actors) == 1:
-				self.intender = actors.pop()
-			if len(actors) == 0:
-				print('the subplan of intention frame {} in plan {} will have no consistent consenting actors'.format(self.ID, PLAN.ID))
-			if len(actors) > 1:
-				pass
-				#could keep them like dis: self.actors = actors
-				
-		""" NOTE: combine all actors """
-		if not self.intender is None:
-			#Can we just access all actors in plan willy nillier than this?
-			pass
-			
-			#for step in self.subplan:
-			#	{self.intender.combine(nb) for nb in PLAN.getNeighborsByLabel(step, 'actor-of') if self.ID in nb.arg_pos_dict}
-				#WHEN adding a step to an intention frame, make sure to update actors with new arg_pos_dict for intention frame
-				
-			
-		return self
-	
-				
-					
-		
-class Motivation(Literal):
-	def __init__(self, ID, typ=None, name=None, arg_name = None, num_args = None, truth = None, intender=None, goal=None):
-		if num_args == None:
-			num_args = 1
-		if name == None:
-			name = 'intends'
-		if typ == None:
-			typ = 'motivation'
-		if truth == None:
-			truth = True
-		super(Motivation,self).__init__(ID=ID,typ=typ,name=name,arg_name = arg_name, num_args=num_args,truth =truth)
-		
-			
-		self.actor = intender
-		self.goal = goal #Goal is a literal. THIS is a case where... a Literal has-a Literal
-		

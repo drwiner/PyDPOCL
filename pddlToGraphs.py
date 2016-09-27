@@ -4,7 +4,7 @@ from pddl.parser import Parser
 from math import floor
 import collections
 from PlanElementGraph import *
-
+from clockdeco import clock
 
 
 #from Flaws import *
@@ -16,6 +16,7 @@ def parseDomain(domain_file):
 	parser = Parser(domain_file)
 	domain = parser.parse_domain_drw()
 	return domain
+
 
 def parse(domain_file, problem_file):
 	# Parsing
@@ -157,6 +158,7 @@ def getSubFormulaGraph(formula, current_id = None, parent = None, relationship =
 	return elements, edges
 	
 """ Get a precondition, effect, or set of prerequisites from pddl operator to element graph"""
+
 def getFormulaGraph(formula, current_id = None, parent = None, relationship = None, elements = None, edges = None):
 	if current_id == None:
 		current_id = 1
@@ -236,6 +238,7 @@ def rPrintFormulaElements(formula):
 	print('\n')
 		
 """ Convert pddl file to set of operator graphs"""
+@clock
 def domainToOperatorGraphs(domain):
 	start_id = 15
 	opGraphs = set()
@@ -275,6 +278,7 @@ def domainToOperatorGraphs(domain):
 	return opGraphs
 	
 """ Convert pddl problem file to usable structures"""
+@clock
 def problemToGraphs(problem):
 	"""
 		Returns a dictionary:
@@ -364,7 +368,8 @@ def domainAxiomsToGraphs(domain):
 	for ax in domain.axioms:
 		domain.actions.append(ActionStmt(name = ax.name, parameters = ax.vars_, precond = ax.context,
 										 effect = ax.implies))
-	
+
+@clock
 def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	""" Returns tuple 
 			1) Operator Graphs
