@@ -330,15 +330,20 @@ class PlanSpacePlanner:
 				Assignment[rs.root].add(gs.stepnumber)
 		return Assignment
 
-
+	def consistentConditions(self, Dependency, csm):
+		c_precs = set()
+		for pre in self.GL[csm].preconditions:
+			if not pre.isConsistent(Dependency.root):
+				continue
+			Precondition = Condition.subgraph(self.GS[csm], pre)
+			if Dependency.Args != Precondition.Args:
+				continue
+			c_precs.add(pre.replaced_ID)
+		return c_precs
 
 	def integrateRquirements(self, Plan, RQ, RS):
 		"""
 		For now, we assume no couplings, and therefore all elms are new/replace any existing
-		@param Plan:
-		@param RQ: Requirement Graph
-		@param RS: Restriction Graph
-		@return:
 		"""
 		required_steps = {Action.subgraph(RQ, elm) for elm in RQ.elements if elm.typ == 'Action'}
 
@@ -355,7 +360,6 @@ class PlanSpacePlanner:
 		links = {edge for edge in RQ.edges if type(edge.label) is Literal}
 
 		for link in links:
-
 			#cndt_source_nums = Assignments[link.source]
 			cndt_sink_nums = Assignments[link.sink]
 
@@ -364,48 +368,32 @@ class PlanSpacePlanner:
 				Dependency = Condition.subgraph(RQ, dependency)
 
 			for csm in cndt_sink_nums:
+
+				antes = self.GL.ante_dict[csm]
+
+				if len(antes) == 0:
+					Assignments[link.sink] -= {csm}
+					if len(Assignments[link.sink]) == 0:
+						raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
+					continue
+
 				if dependency is None:
-					Assignments[link.source] = self.GL.ante_dict[csm]
+					Assignments[link.source] = antes
+					continue
 
-				for pre in self.GL[csm].preconditions:
-					if not pre.isConsistent(dependency):
-						continue
-					Precondition = Condition.subgraph(self.GS[csm], pre)
-					if Dependency.Args != Precondition.Args:
-						continue
-
-					Assignments[link.source] = self.GL.id_dict[pre.replaced_ID]
-					if len(Assignments[link.source]) == 0:
-						raise ValueError('um, is this link impossible?')
+				c_precs = self.consistentConditions(Dependency, csm)
+				Assignments[link.source] = set()
+				for cp in c_precs:
+					Assignments[link.source].update(self.GL.id_dict[cp])
+				if len(Assignments[link.source]) == 0:
+					raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
 
 
-
-
-			for rs, gs in sink_map:
-				ante_nums = self.GL.ante_dict[gs.stepnumber]
-				for ars, ags in source_map:
-					if ags.stepnumber not in ante_nums:
-				if dependency is None: #not even a partial literal here
-
-				else:
-					Dependency = Condition.subgraph(RQ,dependency)
-					#consistent_pretokens = {pre for pre in gs.preconditions if pre.isConsistent(dependency)}
-					for pre in gs.preconditions:
-						if not pre.isConsistent(dependency):
-							continue
-						Precondition = Condition.subgraph(gs,pre)
-						if Dependency.Args != Precondition.Args:
-							continue
-						#found consistent precondition
-						if rs in
-
-
-					#if the dependency is a partial literal, then need to pick some consistent precondition.
-					#else, find corresponding
-					ante_nums = self.GL.id_dict[]
-				inconsistent_maps = {asmt for asmt in source_map if asmt[1].stepnumber not in
-			self.GL.ante_dict[st.stepnumber] for rs,gs in sink_map
-
+		#Each required step has a mapping to one or more gstepnumbers
+		#Find combinations of steps
+		#create child plans
+		#for each link and ordering, find gstep to replace it and then put those links and orderings and steps in th
+					# plan
 
 
 	#@clock
