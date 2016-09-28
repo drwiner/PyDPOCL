@@ -358,8 +358,9 @@ class PlanSpacePlanner:
 
 		orderings = {edge for edge in RQ.edges if edge.label == '<'}
 		links = {edge for edge in RQ.edges if type(edge.label) is Literal}
-
+		link_nums = set()
 		for link in links:
+			link_nums.add((required_steps.index(link.source), required_steps.index(link.sink)))
 			#cndt_source_nums = Assignments[link.source]
 			cndt_sink_nums = Assignments[link.sink]
 
@@ -387,6 +388,14 @@ class PlanSpacePlanner:
 					Assignments[link.source].update(self.GL.id_dict[cp])
 				if len(Assignments[link.source]) == 0:
 					raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
+
+		tuples = itertools.product(list(Assignments[rs.source]) for rs in required_steps)
+		for t in tuples:
+
+			#
+			pass
+			#for each causal link,
+			#create possible world
 
 
 		#Each required step has a mapping to one or more gstepnumbers
