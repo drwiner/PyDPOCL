@@ -325,7 +325,9 @@ class PlanSpacePlanner:
 		Assignment = defaultdict(set)
 		for rs in required_steps:
 			for gs in self.GL:
-				if not rs.isConsistentSubgraph(gs):
+				if not gs.root.isConsistent(rs.root):
+					continue
+				if not gs.isConsistentSubgraph(rs):
 					continue
 				Assignment[rs.root].add(gs.stepnumber)
 		return Assignment
@@ -341,13 +343,11 @@ class PlanSpacePlanner:
 			c_precs.add(pre.replaced_ID)
 		return c_precs
 
-	def integrateRquirements(self, Plan, RQ, RS):
+	def integrateRquirements(self, Plan, RQ):
 		"""
 		For now, we assume no couplings, and therefore all elms are new/replace any existing
 		"""
-		required_steps = {Action.subgraph(RQ, elm) for elm in RQ.elements if elm.typ == 'Action'}
-
-		#Assignment = collections.namedtuple('Assignment', 'rs gs')
+		required_steps = {Action.subgraph(RQ, step) for step in RQ.Steps}
 
 		Assignments = self.makeStepAssignment(required_steps)
 		for rs in required_steps:
@@ -356,11 +356,12 @@ class PlanSpacePlanner:
 
 	#	assignments = {Assignment(rs, gs) for rs in required_steps for gs in self.GL if rs.isConsistentSubgraph(gs)}
 
-		orderings = {edge for edge in RQ.edges if edge.label == '<'}
-		links = {edge for edge in RQ.edges if type(edge.label) is Literal}
-		link_nums = set()
+		orderings = RQ.Orderings
+		links = RQ.CausalLinks
+
+		#link_nums = set()
 		for link in links:
-			link_nums.add((required_steps.index(link.source), required_steps.index(link.sink)))
+			#link_nums.add((required_steps.index(link.source), required_steps.index(link.sink)))
 			#cndt_source_nums = Assignments[link.source]
 			cndt_sink_nums = Assignments[link.sink]
 
@@ -390,6 +391,7 @@ class PlanSpacePlanner:
 					raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
 
 		tuples = itertools.product(list(Assignments[rs.source]) for rs in required_steps)
+
 		for t in tuples:
 
 			#
@@ -397,7 +399,7 @@ class PlanSpacePlanner:
 			#for each causal link,
 			#create possible world
 
-
+		return RQ
 		#Each required step has a mapping to one or more gstepnumbers
 		#Find combinations of steps
 		#create child plans
@@ -519,7 +521,7 @@ class TestPlanner(unittest.TestCase):
 		doperators, dobjects, dobject_types, dinitAction, dgoalAction = parseDomainAndProblemToGraphs(domain_file,
 																								problem_file)
 		#dplanner = PlanSpacePlanner(operators, objects, initAction, goalAction)
-
+		plan = planner.Open.pop()
 		for op in doperators:
 			op.updateArgs()
 			print(op)
@@ -527,28 +529,19 @@ class TestPlanner(unittest.TestCase):
 			print('discourse /decomp name {}'.format(decomp.name))
 		#	print(decomp.root)
 			decomp.updatePlan()
-			for ds in decomp.Steps:
-
-
-
-				DS = Action.subgraph(decomp,ds)
-				#print('ds action')
-
-				print(DS)
-
-
-
-				for GS in planner.GL:
-					if not GS.root.isConsistent(ds):
-						continue
-					if GS.isConsistentSubgraph(DS):
-						print(GS)
-						print(DS)
-
-
-						print('\n')
-			print(decomp.OrderingGraph)
-			print(decomp.CausalLinkGraph)
+			planner.integrateRquirements(plan,decomp)
+			# for ds in decomp.Steps:
+			# 	DS = Action.subgraph(decomp,ds)
+			# 	print(DS)
+			# 	for GS in planner.GL:
+			# 		if not GS.root.isConsistent(ds):
+			# 			continue
+			# 		if GS.isConsistentSubgraph(DS):
+			# 			print(GS)
+			# 			print(DS)
+			# 			print('\n')
+			# print(decomp.OrderingGraph)
+			# print(decomp.CausalLinkGraph)
 
 		print('ok')
 
