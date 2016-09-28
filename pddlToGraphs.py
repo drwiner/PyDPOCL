@@ -218,7 +218,40 @@ def getGoalSet(goal_formula, objects):
 		goal_edges.update(edges)
 				
 	return (goal_elements, goal_edges)
-	
+
+def getDecomp(formula, decomp_graph):
+	if formula.key == 'not':
+		pass
+		print('not doing this yet')
+		R = Restriction()
+		decomp_graph.Restrictions.add(R)
+		return
+
+	for i, child in enumerate(formula.children):
+
+		elm = next(element for element in decomp_graph.elements if child.key.name == element.arg_name)
+
+		if relationship == 'actor-of':
+			edges.add(Edge(parent, arg, 'actor-of'))
+
+		# elif lit.name == '=' or lit.name == 'equals' or lit.name == 'equal':
+		# TODO: test if ever receiving 'equals'
+		# edges.add(Edge(lit, arg, 'arg-of'))
+		else:
+			edges.add(Edge(lit, arg, ARGLABELS[i]))
+
+	#if formula.key == ''
+
+def getDecompGraph(formula, decomp_graph, params):
+
+	for i,param in enumerate(params):
+		createElementByType(i,param,decomp_graph)
+
+	if formula.key == 'and':
+		for child in formula.children:
+			getDecomp(child, decomp_graph)
+	else:
+		getDecomp(formula, decomp_graph)
 		
 def rPrintFormulaElements(formula):
 		
@@ -236,6 +269,22 @@ def rPrintFormulaElements(formula):
 
 
 	print('\n')
+
+def createElementByType(i, parameter, decomp):
+	if 'character' in parameter.types or 'actor' in parameter.types:
+		elm = Actor(ID=uuid.uuid1(i), typ='character', arg_name=parameter.name)
+	elif 'arg' in parameter.types:
+		arg_type = next(iter(parameter.types))
+		elm = Argument(ID=uuid.uuid1(i), typ=arg_type, arg_name=parameter.name)
+	elif 'step' in parameter.types:
+		elm = Operator(ID=uuid.uuid1(i), typ='Action')
+	elif 'literal' in parameter.types or 'lit' in parameter.types:
+		elm = Literal(ID = uuid.uuid1(i), typ='Condition')
+	else:
+		raise ValueError('parameter {} not story element'.format(parameter.name))
+
+	decomp.elements.add(elm)
+	return
 		
 """ Convert pddl file to set of operator graphs"""
 @clock
@@ -270,9 +319,13 @@ def domainToOperatorGraphs(domain):
 				op_graph.elements.add(arg)#, arg_pos_dict=	{op_id :  i}))
 			op_graph.edges.add(Edge(op_graph.root, arg, ARGLABELS[i]))
 			start_id += 1
-		
-		getFormulaGraph(action.precond.formula, start_id, parent = op, relationship = 'precond-of',elements= op_graph.elements, edges=op_graph.edges)
+
+		if not action.precond is None:
+			getFormulaGraph(action.precond.formula, start_id, parent = op, relationship = 'precond-of',elements= op_graph.elements, edges=op_graph.edges)
 		getFormulaGraph(action.effect.formula, start_id, parent = op, relationship = 'effect-of', elements = op_graph.elements,edges= op_graph.edges)
+		if hasattr(action, 'decomp'):
+			decomp_graph = PlanElementGraph(ID = uuid.uuid1(1))
+			getDecompGraph(action.decomp.formula, decomp_graph, action.parameters)
 		##getFormulaGraph(action.agents.formula, start_id, parent = op, relationship = 'actor-of', elements = op_graph.elements,edges= op_graph.edges)
 		opGraphs.add(op_graph)
 	return opGraphs

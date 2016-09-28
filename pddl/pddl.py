@@ -95,7 +95,7 @@ class Effect:
 
 
 class Action:
-    def __init__(self, name, signature, precondition, effect):
+    def __init__(self, name, signature, precondition, effect, decomp = None):
         """
         name: The name identifying the action
         signature: A list of tuples (name, [types]) to represent a list of
@@ -108,7 +108,7 @@ class Action:
         self.signature = signature
         self.precondition = precondition
         self.effect = effect
-
+        self.decomp = decomp
 
 class Domain:
     def __init__(self, name, types, predicates, actions, constants={}):

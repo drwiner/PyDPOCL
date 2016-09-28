@@ -247,18 +247,7 @@ import unittest
 class TestOrderingGraphMethods(unittest.TestCase):
 
 	def test_flaw_counter(self):
-		A = Flaw(('a'), 'A')
-		A.cndts = 12
-		B = Flaw(('b'), 'B')
-		B.cndts = 11
-		print(Flaw.counter) #0
-		Flaw.counter+= 1
-		print(Flaw.counter) #1
-		print(B.counter) #0
-		B.cndts = Flaw.counter
-		B.cndts +=1
-		print(B.cndts) #2
-		print(Flaw.counter) #1
+		assert True
 
 
 if __name__ ==  '__main__':

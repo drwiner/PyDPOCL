@@ -124,24 +124,30 @@ class PredicateInstance(Visitable):
 		self.name = name
 		self.parameters = parameters  # a list of object names
 
-class QuantifierInstance(Visitable):
-	def __init__(self, name, parameters=[], predicates=[]):
-		self._visitorName = 'visite_quantifier_instance'
-		self.name = name
-		self.parameters = parameters
-		self.predicates = predicates
-
 class RequirementsStmt(Visitable):
 	"""This class represents the AST node for a pddl requirements statement."""
 
 	def __init__(self, keywords=None):
 		""" Construct a new RequirementsStmt.
-
 		Keyword arguments:
 		keywords -- the list of requirements, represented as keywords
 		"""
 		self._visitorName = 'visit_requirements_stmt'
 		self.keywords = keywords or []	# a list of keywords
+
+class DecompStmt(Visitable):
+	"""This class represents the AST node for a pddl requirements statement."""
+
+	def __init__(self, formula):
+		""" Construct a new RequirementsStmt - a formula (an 'and' literal where each sub-literal's terms are vars,
+		or a single literal whose terms are vars.
+
+		Keyword arguments:
+		keywords -- the list of requirements, represented as keywords
+		"""
+		self._visitorName = 'visit_decomp_stmt'
+		#self.keywords = keywords or []	# a list of keywords
+		self.formula = formula
 
 
 class DomainStmt(Visitable):
@@ -180,7 +186,7 @@ class PrereqStmt(Visitable):
 class AgentsStmt(Visitable):
 	"""This class represents the AST node for a pddl prerequisite."""
 	def __init__(self, formula):
-		self._visitorName = 'visit_prereq_stmt'
+		self._visitorName = 'visit_agents_stmt'
 		self.formula = formula #formula
 
 class EffectStmt(Visitable):
@@ -221,7 +227,7 @@ class Formula(Visitable):
 class ActionStmt(Visitable):
 	"""This class represents the AST node for a pddl action."""
 
-	def __init__(self, name, parameters, precond, effect, prereq = None, agents = None):
+	def __init__(self, name, parameters, precond, effect, decomp = None, agents = None):
 		""" Construct a new Action.
 
 		Keyword arguments:
@@ -237,7 +243,7 @@ class ActionStmt(Visitable):
 		# right now also a Formula << EffectStmt
 		# --> should be checked when traversing the tree
 		self.effect  = effect
-		self.prereq = prereq
+		self.decomp = decomp
 		self.agents = agents
 
 class AxiomStmt(Visitable):
@@ -542,17 +548,6 @@ def parse_implies(iter):
 	formula = parse_formula(next(iter))
 	return Implies(formula)
 
-def parse_requirements_stmt(iter):
-	""" Parse the pddl requirements definition.
-		Returns an RequirementsStmt.
-	"""
-	# check for requirements keyword
-	if not iter.try_match(':requirements'):
-		raise ValueError('Error requirements list must contain keyword '
-						 '":requirements"')
-	keywords = parse_keyword_list(iter)
-	return RequirementsStmt(keywords)
-
 
 def _parse_types_with_error(iter, keyword, classt):
 	if not iter.try_match(keyword):
@@ -660,7 +655,10 @@ def _parse_precondition_or_effect(iter, keyword, type):
 	if not iter.try_match(keyword):
 		raise ValueError('Error: %s must start with "%s" keyword' %
 						 (type.__name__, keyword))
-	cond = parse_formula(next(iter))
+	ni = next(iter)
+	if ni.empty():
+		return None
+	cond = parse_formula(ni)
 	return type(cond)
 
 
@@ -671,9 +669,21 @@ def parse_precondition_stmt(it):
 def parse_effect_stmt(it):
 	return _parse_precondition_or_effect(it, ':effect', EffectStmt)
 
+def parse_requirements_stmt(iter):
+	""" Parse the pddl requirements definition.
+		Returns an RequirementsStmt.
+	"""
+	# check for requirements keyword
+	if not iter.try_match(':requirements'):
+		raise ValueError('Error requirements list must contain keyword '
+						 '":requirements"')
+	keywords = parse_keyword_list(iter)
+	return RequirementsStmt(keywords)
+
 	
-def parse_prereq_stmt(it):
-	return _parse_precondition_or_effect(it, ':prerequisite', PrereqStmt)
+def parse_decomp_stmt(it):
+	return _parse_precondition_or_effect(it, ':decomp', DecompStmt)
+
 	
 def parse_agents_stmt(it):
 	return _parse_precondition_or_effect(it, ':agents', AgentsStmt)
@@ -709,9 +719,10 @@ def parse_action_stmt(iter):
 	param = parse_parameters(iter)
 	pre = parse_precondition_stmt(iter)
 	eff = parse_effect_stmt(iter)
+
 	try:
-		prereq = parse_prereq_stmt(iter)
-		return ActionStmt(name, param, pre, eff, prereq)
+		decomp = parse_decomp_stmt(iter)
+		return ActionStmt(name, param, pre, eff, decomp)
 	except:
 		try:
 			Agents = parse_agents_stmt(iter)

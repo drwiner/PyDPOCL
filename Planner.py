@@ -484,37 +484,36 @@ import sys
 # 	def testIntegrateRequirements(self):
 
 
-
-if __name__ ==  '__main__':
-	num_args = len(sys.argv)
-	if num_args >1:
-		domain_file = sys.argv[1]
-		if num_args > 2:
-			problem_file = sys.argv[2]
-	else:
-		#domain_file = 'domains/mini-indy-domain.pddl'
-		#problem_file = 'domains/mini-indy-problem.pddl'
+import unittest
+class TestPlanner(unittest.TestCase):
+	def testArk(self):
 		domain_file = 'domains/ark-domain.pddl'
 		problem_file = 'domains/ark-problem.pddl'
+		operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file,
+																								 problem_file)
+		FlawLib.non_static_preds = preprocessDomain(operators)
+		obtypes = obTypesDict(object_types)
+		Argument.object_types = obtypes
+		planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 
-	#f = open('workfile', 'w')
-	operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
-	#non_static_preds = preprocessDomain(operators)
-	FlawLib.non_static_preds = preprocessDomain(operators)
-	obtypes = obTypesDict(object_types)
+		n = 2
+		results = planner.POCL(n)
+		assert len(results) == n
+		for result in results:
+			totOrdering = topoSort(result)
+			print('\n\n\n')
+			for step in topoSort(result):
+				print(Action.subgraph(result, step))
 
-	Argument.object_types = obtypes
-	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
-	#planner.GL = GLib(operators, objects, obtypes, initAction, goalAction)
+	def testDecomp(self):
+		domain_file = 'domains/ark-requirements-domain.pddl'
+		problem_file = 'domains/ark-requirements-problem.pddl'
+		operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file,
+																								problem_file)
+		print('ok')
 
-	results = planner.POCL(1)
-
-	for result in results:
-		totOrdering = topoSort(result)
-		print('\n\n\n')
-		for step in topoSort(result):
-			print(Action.subgraph(result, step))
-		#print(result)
-
-	#print('\n\n\n')
-	#print(result)
+if __name__ ==  '__main__':
+	tp = TestPlanner()
+	tp.testDecomp()
+	#unittest.testDecomp()
+	#unittest.main()

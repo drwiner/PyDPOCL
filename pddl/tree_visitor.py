@@ -100,8 +100,10 @@ class PDDLVisitor:
 	def visit_action_stmt(self, node):
 		for p in node.parameters:
 			p.accept(self)
-		node.precond.accept(self)
+		if not node.precond is None:
+			node.precond.accept(self)
 		node.effect.accept(self)
+		node.decomp.accept(self)
 
 	def visit_formula(self, node):
 		for c in node.children:
@@ -114,6 +116,9 @@ class PDDLVisitor:
 		node.formula.accept(self)
 
 	def visit_precondition_stmt(self, node):
+		node.formula.accept(self)
+
+	def visit_decomp_stmt(self, node):
 		node.formula.accept(self)
 
 	def visit_requirements_stmt(self, node):
@@ -252,6 +257,23 @@ class TraversePDDLDomain(PDDLVisitor):
 		else:
 			self.set_in(node, pddl.Type(node.name, node.parent))
 
+	def visit_decomp_stmt(self, node):
+		"""Visits a PDDL requirement statement."""
+		from pddl.parser import Variable
+
+		decomp = pddl.Effect()
+		formula = node.formula
+
+
+		# For now we only allow 'and' in the effect.
+		if formula.key == 'and':
+			for c in formula.children:
+				self.add_decomp(decomp, c)
+		else:
+			self.add_decomp(decomp, formula)
+		# Store precondition in node.
+		self.set_in(node, decomp)
+
 	def visit_requirements_stmt(self, node):
 		"""Visits a PDDL requirement statement."""
 		# Visit all requirement keywords...
@@ -320,15 +342,70 @@ class TraversePDDLDomain(PDDLVisitor):
 			signature.append(signatureTuple)
 
 		# Visit the precondition statement.
-		node.precond.accept(self)
-		precond = self.get_in(node.precond)
+		if not node.precond is None:
+			node.precond.accept(self)
+			precond = self.get_in(node.precond)
+		else:
+			precond = None
 
 		# Visit the effect statement.
 		node.effect.accept(self)
 		effect = self.get_in(node.effect)
 
+		#Visit the decomp statement
+		try:
+			node.decomp.accept(self)
+			decomp = self.get_in(node.decomp)
+			self.set_in(node, pddl.Action(node.name, signature, precond, effect, decomp))
+		except:
 		# Create new PDDL action and store in node.
-		self.set_in(node, pddl.Action(node.name, signature, precond, effect))
+			self.set_in(node, pddl.Action(node.name, signature, precond, effect))
+
+	def add_decomp(self, decomp, c):
+		from pddl.parser import Variable
+		nextPredicate = None
+		isNegative = False
+		if c.key == 'not':
+			# This is a negative effect, only one child allowed.
+			if len(c.children) != 1:
+				raise SemanticError('Error not statement with multiple '
+									'children in decomp of action')
+			nextPredicate = c.children[0]
+			isNegative = True
+		else:
+			nextPredicate = c
+
+		if not nextPredicate.key in self._predicates:
+			raise SemanticError('Error: unknown predicate %s used in decomp '
+								'of action' % nextPredicate.key)
+
+		if nextPredicate == None:
+			raise SemanticError('Error: NoneType predicate used in decomp of '
+								'action')
+		#############################################################
+
+		predDef = self._predicates[nextPredicate.key]
+		signature = list()
+		count = 0
+		# Check whether predicate is used with the correct signature.
+		if len(nextPredicate.children) != len(predDef.signature):
+			raise SemanticError('Error: wrong number of arguments for predicate ' + nextPredicate.key +
+								' in decomp of action')
+
+		# Apply to all parameters.
+		for v in nextPredicate.children:
+			if isinstance(v.key, Variable):
+				signature.append((v.key.name, predDef.signature[count][1]))
+
+			else:
+				signature.append((v.key, predDef.signature[count][1]))
+			count += 1
+
+		if isNegative:
+			decomp.dellist.add(pddl.Predicate(nextPredicate.key, signature))
+		else:
+			decomp.addlist.add(pddl.Predicate(nextPredicate.key, signature))
+
 
 	def add_precond(self, precond, c):
 		"""Helper function for visit_precondition_stmt.
