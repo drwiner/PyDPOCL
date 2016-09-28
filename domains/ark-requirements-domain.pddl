@@ -2,7 +2,7 @@
   (:requirements)
   (:types step literal arg n name-str - object
           actor - arg
-          1 2 3 4 5 - n)
+          0 1 2 3 4 5 - n)
 
   (:predicates (name ?obj - object ?name - name-str)
                (bel-occurs ?step - step)
@@ -31,7 +31,7 @@
      :effect (bel-occurs ?excavate)
      :decomp (and (name ?excavate excavate)
                   (name ?indy indy)
-                  (nth-step-arg 1 ?excavate ?indy)))
+                  (nth-step-arg 0 ?excavate ?indy)))
 
     (:action indy-gets-ark
      :parameters (?indy - actor ?ark - arg ?excavate - step)
@@ -50,11 +50,11 @@
                   (name ?indy indy)
                   (name ?ark - ark)
                   (name ?tanis - tanis)
-                  (occurs ?excavate ?indy ?ark ?tanis)))
+                  (occurs (?excavate ?indy ?ark ?tanis))))
 
     (:action link-excavate-steal
      :parameters (?excavate - step ?steal - step)
-     :precondition ()
+     :precondition (not (= ?excavate ?steal))
      :effect (bel-linked ?excavate ?steal)
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
@@ -63,7 +63,7 @@
 
     (:action steal-before-excavate
      :parameters (?excavate - step ?steal - step)
-     :precondition ()
+     :precondition (not (= ?excavate ?steal))
      :effect (bel-precedes ?steal ?excavate)
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
@@ -71,10 +71,10 @@
 
     (:action impossible-sequence
      :parameters (?excavate - step ?steal - step)
-     :precondition ()
+     :precondition (not (= ?excavate ?steal))
      :effect (and (bel-linked ?excavate ?steal) (bel-precedes ?steal ?excavate))
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
                   (linked ?excavate ?steal)
-                  (< ?excavate ?steal)))
+                  (< ?steal ?excavate)))
 )

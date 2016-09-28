@@ -492,8 +492,7 @@ class TestPlanner(unittest.TestCase):
 		operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file,
 																								 problem_file)
 		FlawLib.non_static_preds = preprocessDomain(operators)
-		obtypes = obTypesDict(object_types)
-		Argument.object_types = obtypes
+		Argument.object_types = obTypesDict(object_types)
 		planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
 
 		n = 2
@@ -506,14 +505,55 @@ class TestPlanner(unittest.TestCase):
 				print(Action.subgraph(result, step))
 
 	def testDecomp(self):
+		sdomain_file = 'domains/ark-domain.pddl'
+		sproblem_file = 'domains/ark-problem.pddl'
+		operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(sdomain_file,
+																								 sproblem_file)
+		FlawLib.non_static_preds = preprocessDomain(operators)
+		Argument.object_types = obTypesDict(object_types)
+		planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
+
+
 		domain_file = 'domains/ark-requirements-domain.pddl'
 		problem_file = 'domains/ark-requirements-problem.pddl'
-		operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file,
+		doperators, dobjects, dobject_types, dinitAction, dgoalAction = parseDomainAndProblemToGraphs(domain_file,
 																								problem_file)
+		#dplanner = PlanSpacePlanner(operators, objects, initAction, goalAction)
+
+		for op in doperators:
+			op.updateArgs()
+			print(op)
+			decomp = next(iter(op.subgraphs))
+			print('discourse /decomp name {}'.format(decomp.name))
+		#	print(decomp.root)
+			decomp.updatePlan()
+			for ds in decomp.Steps:
+
+
+
+				DS = Action.subgraph(decomp,ds)
+				#print('ds action')
+
+				print(DS)
+
+
+
+				for GS in planner.GL:
+					if not GS.root.isConsistent(ds):
+						continue
+					if GS.isConsistentSubgraph(DS):
+						print(GS)
+						print(DS)
+
+
+						print('\n')
+			print(decomp.OrderingGraph)
+			print(decomp.CausalLinkGraph)
+
 		print('ok')
 
 if __name__ ==  '__main__':
 	tp = TestPlanner()
 	tp.testDecomp()
 	#unittest.testDecomp()
-	#unittest.main()
+	# unittest.main()

@@ -63,7 +63,7 @@ class Graph(Element):
 		super(Graph,self).__init__(ID,typ,name)
 		self.elements = Elements
 		self.edges = Edges
-		self.restrictions = Restrictions
+		self.subgraphs = Restrictions
 	
 	def getElementById(self, ID):
 		for element in self.elements:
@@ -78,7 +78,8 @@ class Graph(Element):
 					return element
 		return None
 
-			
+
+	@clock
 	def replaceWith(self, oldsnk, newsnk):
 		''' removes oldsnk from self.elements, replaces all edges with snk = oldsnk with newsnk'''
 
@@ -92,7 +93,7 @@ class Graph(Element):
 		for incoming in (edge for edge in self.edges if edge.sink == oldsnk):
 			incoming.sink = newsnk
 		#update constraint edges which might reference specific elements being replaced
-		for r in self.restrictions:
+		for r in self.subgraphs:
 			for r_edge in r.edges:
 				if r_edge.source == oldsnk:
 					if r_edge.source in r.elements:
@@ -179,10 +180,12 @@ class Graph(Element):
 		return not self.equivalentWithRestrictions()
 
 	def equivalentWithRestrictions(self):
-		if len(self.restrictions) == 0:
+		if len(self.subplans) == 0:
 			return False
 
-		for restriction in self.restrictions:
+		for restriction in self.subgraphs:
+			if restriction.type_graph != 'Restriction':
+				continue
 			if restriction.isIsomorphicSubgraphOf(self):
 				return True
 		return False

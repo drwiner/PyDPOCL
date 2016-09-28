@@ -167,9 +167,8 @@ class InternalElement(Element):
 class Operator(InternalElement):
 	stepnumber = 0
 	""" An operator element is an internal element with an executed status and orphan status"""
-	def __init__(self, ID, typ, name = None, stepnumber = None, num_args = None, executed = None, instantiated = None):
-		if instantiated == None:
-			instantiated = False
+	def __init__(self, ID, typ, name = None, stepnumber = None, num_args = None, executed = None, arg_name = None):
+
 		if num_args == None:
 			num_args = 0
 		if stepnumber == None:
@@ -178,10 +177,9 @@ class Operator(InternalElement):
 		else:
 			Operator.stepnumber = stepnumber + 1
 		
-		super(Operator,self).__init__(ID, typ, name, arg_name = stepnumber, num_args = num_args)
+		super(Operator,self).__init__(ID, typ, name, arg_name, num_args = num_args)
 		self.stepnumber = stepnumber
 		self.executed = executed
-		self.instantiated = instantiated
 		
 	def isConsistent(self,other):
 		if not super(Operator,self).isConsistent(other):
@@ -211,7 +209,7 @@ class Operator(InternalElement):
 		else:
 			exe = self.executed
 		id = str(self.ID)[19:23]
-		return 'operator({}-{}-{}-{})'.format(exe, self.name, self.arg_name, id)
+		return 'operator({}-{}-{}-{})'.format(exe, self.name, self.stepnumber, id)
 
 		
 class Literal(InternalElement):
@@ -308,7 +306,7 @@ class Argument(Element):
 		
 	def __repr__(self):
 		id = str(self.ID)[19:23]
-		return '(Arg {}-{}-{})'.format(id, self.typ, self.name)
+		return '|Arg: {} {} {} {}|'.format(id, self.typ, self.name, self.arg_name)
 	
 
 class Actor(Argument):
@@ -325,7 +323,7 @@ class Actor(Argument):
 		
 	def __repr__(self):
 		id = str(self.ID)[19:23]
-		return '(Actor {}-{}-{})'.format(id, self.typ, self.name)
+		return '|Actor: {} {} {} {}|'.format(id, self.typ, self.name, self.arg_name)
 
 class PlanElement(Element):
 

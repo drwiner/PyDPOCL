@@ -219,6 +219,77 @@ def getGoalSet(goal_formula, objects):
 				
 	return (goal_elements, goal_edges)
 
+def decorateElm(child, DG):
+	if child.key == 'name':
+		elm = whichElm(child.children[0].key.name, DG)
+		elm.name = child.children[1].key
+	elif child.key == 'nth-step-arg' or child.key == 'nth-lit-arg':
+		args = child.children
+		label = ARGLABELS[int(args[0].key)]
+		parent_elm = whichElm(args[1].key.name,DG)
+		child_elm = whichElm(args[2].key.name, DG)
+		DG.edges.add(Edge(parent_elm, child_elm, label))
+	elif child.key == 'includes':
+		arg1, arg2 = child.children
+		DG.edges.add(Edge(whichElm(arg1.key.name,DG),whichElm(arg2.key.name,DG),'arg-of'))
+	elif child.key == 'effect' or child.key == 'precond':
+		label = child.key + '-of'
+		arg1, arg2 = child.children
+		if len(arg2.children) > 0:
+			child_elm = litFromArg(arg2,DG)
+		else:
+			child_elm = whichElm(arg2.key.name,DG)
+		DG.edges.add(Edge(whichElm(arg1.key.name,DG), child_elm, label))
+	elif child.key == 'linked':
+		arg1, arg2 = child.children
+		DG.CausalLinkGraph.addEdge(whichElm(arg1.key.name, DG), whichElm(arg2.key.name, DG), Literal(ID = -20,
+																									 typ='Condition',
+																									 truth=True))
+	elif child.key == '<':
+		arg1, arg2 = child.children
+		DG.OrderingGraph.addEdge(whichElm(arg1.key.name, DG), whichElm(arg2.key.name, DG))
+	elif child.key == 'linked-by':
+		arg1, arg2, by = child.children
+		try:
+			dep = whichElm(by.key.name, DG)
+		except:
+			dep = litFromArg(arg2,DG)
+		DG.CausalLinkGraph.addEdge(whichElm(arg1.key.name, DG), whichElm(arg2.key.name, DG), dep)
+	elif child.key == 'consents':
+		arg1, arg2, by = child.children
+		DG.edges.add(Edge(whichElm(arg1.key.name, arg2.key.name, 'actor-of')))
+	elif child.key == 'occurs':
+		#then, first argument is step element name and second argument is an operator with children args
+		stepFromArg(child,DG)
+	elif child.key == 'is-state':
+		litFromArg(child,DG)
+	else:
+
+		raise NameError('No definition implemented for decomp predicate {}'.format(child.key))
+
+def stepFromArg(arg, DG):
+	step_elm = whichElm(arg.children[0].key, DG)
+	args = [whichElm(child.key.name, DG) for child in arg.children[0].children]
+	for i,arg in enumerate(args):
+		DG.edges.add(Edge(step_elm,arg,ARGLABELS[i]))
+
+def litFromArg(arg,DG):
+	neg = True
+	if arg.key == 'not':
+		neg = False
+		arg = arg.children[0]
+	# arg 2 is written out
+	lit_name = arg.key
+	lit_elm = Literal(ID=uuid.uuid1(256), typ = 'Condition', name=lit_name, num_args=len(arg.children), truth=neg)
+	for i, ch in enumerate(arg.children):
+		e_i = whichElm(ch.key.name, DG)
+		DG.edges.add(Edge(lit_elm, e_i, ARGLABELS[i]))
+	return lit_elm
+
+def whichElm(name, dg):
+	return next(element for element in dg.elements if name == element.arg_name)
+
+
 def getDecomp(formula, decomp_graph):
 	if formula.key == 'not':
 		pass
@@ -227,20 +298,11 @@ def getDecomp(formula, decomp_graph):
 		decomp_graph.Restrictions.add(R)
 		return
 
-	for i, child in enumerate(formula.children):
 
-		elm = next(element for element in decomp_graph.elements if child.key.name == element.arg_name)
-
-		if relationship == 'actor-of':
-			edges.add(Edge(parent, arg, 'actor-of'))
-
-		# elif lit.name == '=' or lit.name == 'equals' or lit.name == 'equal':
-		# TODO: test if ever receiving 'equals'
-		# edges.add(Edge(lit, arg, 'arg-of'))
-		else:
-			edges.add(Edge(lit, arg, ARGLABELS[i]))
-
-	#if formula.key == ''
+	for child in formula.children:
+		if len(child.children) > 0:
+			#elm = whichElm(child.key.name,decomp_graph)
+			decorateElm(child,decomp_graph)
 
 def getDecompGraph(formula, decomp_graph, params):
 
@@ -249,9 +311,11 @@ def getDecompGraph(formula, decomp_graph, params):
 
 	if formula.key == 'and':
 		for child in formula.children:
-			getDecomp(child, decomp_graph)
+			decorateElm(child, decomp_graph)
+			#getDecomp(child, decomp_graph)
 	else:
-		getDecomp(formula, decomp_graph)
+		decorateElm(formula, decomp_graph)
+		#getDecomp(formula, decomp_graph)
 		
 def rPrintFormulaElements(formula):
 		
@@ -277,15 +341,17 @@ def createElementByType(i, parameter, decomp):
 		arg_type = next(iter(parameter.types))
 		elm = Argument(ID=uuid.uuid1(i), typ=arg_type, arg_name=parameter.name)
 	elif 'step' in parameter.types:
-		elm = Operator(ID=uuid.uuid1(i), typ='Action')
+		elm = Operator(ID=uuid.uuid1(i), typ='Action', arg_name = parameter.name)
 	elif 'literal' in parameter.types or 'lit' in parameter.types:
-		elm = Literal(ID = uuid.uuid1(i), typ='Condition')
+		elm = Literal(ID = uuid.uuid1(i), typ='Condition', arg_name = parameter.name)
 	else:
 		raise ValueError('parameter {} not story element'.format(parameter.name))
 
 	decomp.elements.add(elm)
 	return
-		
+
+
+
 """ Convert pddl file to set of operator graphs"""
 @clock
 def domainToOperatorGraphs(domain):
@@ -295,7 +361,7 @@ def domainToOperatorGraphs(domain):
 		start_id += 1
 		op_id = uuid.uuid1(start_id)
 		#Element types correspond to their type of graph
-		op = Operator(ID = op_id, typ = 'Action', name = action.name, num_args = len(action.parameters), instantiated = True)
+		op = Operator(ID = op_id, typ = 'Action', name = action.name, num_args = len(action.parameters))
 		
 		op_graph =			Action(	ID = uuid.uuid1(start_id),\
 							type_graph = 'Action', \
@@ -323,9 +389,10 @@ def domainToOperatorGraphs(domain):
 		if not action.precond is None:
 			getFormulaGraph(action.precond.formula, start_id, parent = op, relationship = 'precond-of',elements= op_graph.elements, edges=op_graph.edges)
 		getFormulaGraph(action.effect.formula, start_id, parent = op, relationship = 'effect-of', elements = op_graph.elements,edges= op_graph.edges)
-		if hasattr(action, 'decomp'):
-			decomp_graph = PlanElementGraph(ID = uuid.uuid1(1))
+		if hasattr(action, 'decomp') and not action.decomp is None:
+			decomp_graph = PlanElementGraph(ID = uuid.uuid1(1), name=action.name, type_graph = 'decomp')
 			getDecompGraph(action.decomp.formula, decomp_graph, action.parameters)
+			op_graph.subgraphs.add(decomp_graph)
 		##getFormulaGraph(action.agents.formula, start_id, parent = op, relationship = 'actor-of', elements = op_graph.elements,edges= op_graph.edges)
 		opGraphs.add(op_graph)
 	return opGraphs
@@ -345,7 +412,7 @@ def problemToGraphs(problem):
 	#for condition in problem_initial_state:
 	init_elements = set()
 	init_edges = set()
-	init_op = Operator(ID = uuid.uuid1(114), typ = 'Action', name = 'dummy_init', stepnumber= 0, num_args = 0, instantiated = True)
+	init_op = Operator(ID = uuid.uuid1(114), typ = 'Action', name = 'dummy_init', stepnumber= 0, num_args = 0)
 	init_graph =			Action(	ID = uuid.uuid1(115),
 							type_graph = 'Action',
 							name = 'dummy_init',
@@ -359,7 +426,7 @@ def problemToGraphs(problem):
 			init_graph.edges.add(Edge(lit, Args[p],ARGLABELS[i]))
 	
 	goal_elements, goal_edges = getGoalSet(problem.goal.formula, Args)
-	goal_op = Operator(ID = uuid.uuid1(114), typ = 'Action', name = 'dummy_goal', stepnumber= 1, num_args = 0, instantiated = True)
+	goal_op = Operator(ID = uuid.uuid1(114), typ = 'Action', name = 'dummy_goal', stepnumber= 1, num_args = 0)
 	goal_graph =			Action(	ID = uuid.uuid1(115),
 							type_graph = 'Action',
 							name = 'dummy_goal',
@@ -436,11 +503,13 @@ def parseDomainAndProblemToGraphs(domain_file, problem_file):
 	global args
 	args, init, goal = problemToGraphs(problem)
 	objects = set(args.values())
+
 	addNegativeInitStates(domain.predicates.predicates, init, objects)
 
 	#parse Domain after parsing problem - so that for-all/exists statements can create edges for each legal typed object
 	# treats axioms as actions, TODO: consider if this affects heuristics drastically enough to change.
 	domainAxiomsToGraphs(domain)
+
 	op_graphs = domainToOperatorGraphs(domain)
 
 	return (op_graphs, objects, domain.types, init, goal)

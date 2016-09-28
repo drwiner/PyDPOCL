@@ -22,7 +22,7 @@ class Action(ElementGraph):
 
 		self.nonequals = set()
 			
-		super(Action,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Restrictions = None)
+		super(Action,self).__init__(ID,type_graph,name,Elements,root_element,Edges)
 
 
 	def RemoveSubgraph(self, elm):
@@ -99,7 +99,7 @@ class Action(ElementGraph):
 		else:
 			exe = 'ex'
 		id = str(self.root.ID)[19:23]
-		return '{}-{}-{}-{}'.format(exe, self.root.name, self.root.arg_name,id) + args
+		return '{}-{}-{}-{}'.format(exe, self.root.name, self.root.stepnumber,id) + args
 
 		
 class Condition(ElementGraph):
