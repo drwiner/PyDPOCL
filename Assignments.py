@@ -29,7 +29,6 @@ class AssignmentLib:
 		return self._assignments[position]
 
 	def __setitem__(self, key, value):
-		#assignments = self[key]
 		self[key]._gstepnums = value
 
 	def remove(self, rs, gstepnum):

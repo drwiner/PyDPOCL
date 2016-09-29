@@ -379,22 +379,10 @@ class PlanSpacePlanner:
 				if len(step_map[link.source.stepnumber]) == 0:
 					raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
 
-		step_map.permutations
-		#tuples = itertools.product(*[list(step_map[rs.root.stepnumber]) for rs in step_map])
-
-		#for t in tuples:
-		#	print(str([self.GL[i] for i in t]))
-
-			#pass
-			#for each causal link,
-			#create possible world
+		for p in step_map.permutations:
+			print(p)
 
 		return step_map
-		#Each required step has a mapping to one or more gstepnumbers
-		#Find combinations of steps
-		#create child plans
-		#for each link and ordering, find gstep to replace it and then put those links and orderings and steps in th
-					# plan
 
 
 @clock
