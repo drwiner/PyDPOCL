@@ -352,7 +352,7 @@ class PlanSpacePlanner:
 		links = RQ.CausalLinkGraph.edges
 
 		for link in links:
-			cndt_sink_nums = step_map[link.sink]
+			cndt_sink_nums = step_map[link.sink.stepnumber]
 
 			dependency = link.label
 			if not dependency.arg_name is None:
@@ -364,31 +364,32 @@ class PlanSpacePlanner:
 
 				if len(antes) == 0:
 					step_map[link.sink] -= {csm}
-					if len(step_map[link.sink]) == 0:
+					if len(step_map[link.sink.stepnumber]) == 0:
 						raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
 					continue
 
 				if dependency.arg_name is None:
-					step_map[link.source] = antes
+					step_map[link.source.stepnumber] = list(antes)
 					continue
 
 				c_precs = self.consistentConditions(Dependency, csm)
-				step_map[link.source] = set()
+				step_map[link.source.stepnumber] = []
 				for cp in c_precs:
-					step_map[link.source].update(self.GL.id_dict[cp])
-				if len(step_map[link.source]) == 0:
+					step_map[link.source.stepnumber].extend(list(self.GL.id_dict[cp]))
+				if len(step_map[link.source.stepnumber]) == 0:
 					raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
 
-		tuples = itertools.product(*[list(step_map[rs.root]) for rs in step_map])
+		step_map.permutations
+		#tuples = itertools.product(*[list(step_map[rs.root.stepnumber]) for rs in step_map])
 
-		for t in tuples:
-			print(str([self.GL[i] for i in t]))
+		#for t in tuples:
+		#	print(str([self.GL[i] for i in t]))
 
-			pass
+			#pass
 			#for each causal link,
 			#create possible world
 
-		return Assignments
+		return step_map
 		#Each required step has a mapping to one or more gstepnumbers
 		#Find combinations of steps
 		#create child plans
