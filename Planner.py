@@ -399,9 +399,8 @@ class PlanSpacePlanner:
 		tuples = itertools.product(*[list(Assignments[rs.root]) for rs in required_steps])
 
 		for t in tuples:
-			print(t)
-			print('\n')
-			#
+			print(str([self.GL[i] for i in t]))
+
 			pass
 			#for each causal link,
 			#create possible world
