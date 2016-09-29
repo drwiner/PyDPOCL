@@ -1,3 +1,4 @@
+import itertools
 class AssignmentLib:
 	def __init__(self, required_steps, GL):
 		self._assignments = [_Assignment(i, rs) for i, rs in enumerate(required_steps)]
@@ -24,6 +25,14 @@ class AssignmentLib:
 
 	def remove(self, rs, gstepnum):
 		self._assignments[rs.stepnumber].remove(gstepnum)
+
+	def narrowByLink(self, link):
+
+		pass
+
+	@property
+	def permutations(self):
+		return itertools.product(*[list(self[rs.root]) for rs in self])
 
 class _Assignment:
 	def __init__(self, stepnum, rs):

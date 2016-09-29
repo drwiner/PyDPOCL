@@ -352,9 +352,6 @@ class PlanSpacePlanner:
 		links = RQ.CausalLinkGraph.edges
 
 		for link in links:
-
-			#cndt_source_nums = Assignments[link.source]
-
 			cndt_sink_nums = step_map[link.sink]
 
 			dependency = link.label
@@ -364,26 +361,25 @@ class PlanSpacePlanner:
 			for csm in cndt_sink_nums:
 
 				antes = self.GL.ante_dict[csm]
-				#antes are all step numbers deemed as consistent antecedents. However,
 
 				if len(antes) == 0:
-					Assignments[link.sink] -= {csm}
-					if len(Assignments[link.sink]) == 0:
+					step_map[link.sink] -= {csm}
+					if len(step_map[link.sink]) == 0:
 						raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
 					continue
 
 				if dependency.arg_name is None:
-					Assignments[link.source] = antes
+					step_map[link.source] = antes
 					continue
 
 				c_precs = self.consistentConditions(Dependency, csm)
-				Assignments[link.source] = set()
+				step_map[link.source] = set()
 				for cp in c_precs:
-					Assignments[link.source].update(self.GL.id_dict[cp])
-				if len(Assignments[link.source]) == 0:
+					step_map[link.source].update(self.GL.id_dict[cp])
+				if len(step_map[link.source]) == 0:
 					raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
 
-		tuples = itertools.product(*[list(Assignments[rs.root]) for rs in required_steps])
+		tuples = itertools.product(*[list(step_map[rs.root]) for rs in step_map])
 
 		for t in tuples:
 			print(str([self.GL[i] for i in t]))
