@@ -1,4 +1,5 @@
 import itertools
+from PlanElementGraph import Condition
 class AssignmentLib:
 	def __init__(self, required_steps, GL):
 		self._assignments = [_Assignment(i, rs) for i, rs in enumerate(required_steps)]
@@ -34,8 +35,13 @@ class AssignmentLib:
 	def remove(self, rs, gstepnum):
 		self._assignments[rs.stepnumber].remove(gstepnum)
 
-	def narrowByLink(self, link):
-
+	def narrowByLinks(self, RQ):
+		links = RQ.CausalLinkGraph.edges
+		for link in links:
+			cndt_sink_nums = self[link.sink.stepnumber]
+			dependency = link.label
+			if not dependency.arg_name is None:
+				Dependency = Condition.subgraph(RQ, dependency)
 		pass
 
 	@property
