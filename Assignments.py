@@ -21,6 +21,11 @@ class AssignmentLib:
 		return len(self._assignments)
 
 	def __getitem__(self, position):
+		if not type(position) is int:
+			try:
+				position = position.stepnumber
+			except:
+				raise ValueError('get item on assignments, trying to use {}'.format(position))
 		return self._assignments[position]
 
 	def __setitem__(self, key, value):
@@ -50,6 +55,8 @@ class _Assignment:
 		return len(self._gstepnums)
 
 	def __getitem__(self, position):
+		if not type(position) is int:
+			position = position.stepnumber
 		return self._gstepnums[position]
 
 	def __setitem__(self, key, value):
