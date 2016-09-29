@@ -337,7 +337,7 @@ def rPrintFormulaElements(formula):
 def createElementByType(i, parameter, decomp):
 	if 'character' in parameter.types or 'actor' in parameter.types:
 		elm = Actor(ID=uuid.uuid1(i), typ='character', arg_name=parameter.name)
-	elif 'arg' in parameter.types:
+	elif 'arg' in parameter.types or 'item' in parameter.types or 'place' in parameter.types:
 		arg_type = next(iter(parameter.types))
 		elm = Argument(ID=uuid.uuid1(i), typ=arg_type, arg_name=parameter.name)
 	elif 'step' in parameter.types:

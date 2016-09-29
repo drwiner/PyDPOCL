@@ -347,6 +347,7 @@ class PlanSpacePlanner:
 		"""
 		For now, we assume no couplings, and therefore all elms are new/replace any existing
 		"""
+		RQ.updatePlan()
 		required_steps = {Action.subgraph(RQ, step) for step in RQ.Steps}
 
 		Assignments = self.makeStepAssignment(required_steps)
@@ -356,8 +357,13 @@ class PlanSpacePlanner:
 
 	#	assignments = {Assignment(rs, gs) for rs in required_steps for gs in self.GL if rs.isConsistentSubgraph(gs)}
 
-		orderings = RQ.Orderings
-		links = RQ.CausalLinks
+		if hasattr(RQ,"Orderings"):
+			orderings = RQ.Orderings
+		#else
+		if hasattr(RQ,'CausalLinks'):
+			links = RQ.CausalLinks
+		else:
+			links = []
 
 		#link_nums = set()
 		for link in links:
@@ -390,16 +396,17 @@ class PlanSpacePlanner:
 				if len(Assignments[link.source]) == 0:
 					raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
 
-		tuples = itertools.product(list(Assignments[rs.source]) for rs in required_steps)
+		tuples = itertools.product(*[list(Assignments[rs.root]) for rs in required_steps])
 
 		for t in tuples:
-
+			print(t)
+			print('\n')
 			#
 			pass
 			#for each causal link,
 			#create possible world
 
-		return RQ
+		return Assignments
 		#Each required step has a mapping to one or more gstepnumbers
 		#Find combinations of steps
 		#create child plans
@@ -529,7 +536,7 @@ class TestPlanner(unittest.TestCase):
 			print('discourse /decomp name {}'.format(decomp.name))
 		#	print(decomp.root)
 			decomp.updatePlan()
-			planner.integrateRquirements(plan,decomp)
+			assignments = planner.integrateRquirements(plan,decomp)
 			# for ds in decomp.Steps:
 			# 	DS = Action.subgraph(decomp,ds)
 			# 	print(DS)

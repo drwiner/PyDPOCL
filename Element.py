@@ -306,7 +306,11 @@ class Argument(Element):
 		
 	def __repr__(self):
 		id = str(self.ID)[19:23]
-		return '|Arg: {} {} {} {}|'.format(id, self.typ, self.name, self.arg_name)
+		if self.arg_name is None:
+			arg_name = ''
+		else:
+			arg_name = self.arg_name
+		return '|Arg: {} {} {} {}|'.format(id, self.typ, self.name,  arg_name)
 	
 
 class Actor(Argument):
@@ -323,7 +327,11 @@ class Actor(Argument):
 		
 	def __repr__(self):
 		id = str(self.ID)[19:23]
-		return '|Actor: {} {} {} {}|'.format(id, self.typ, self.name, self.arg_name)
+		if self.arg_name is None:
+			arg_name = ''
+		else:
+			arg_name = self.arg_name
+		return '|Actor: {} {} {} {}|'.format(id, self.typ, self.name, arg_name)
 
 class PlanElement(Element):
 
