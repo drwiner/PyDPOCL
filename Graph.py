@@ -166,14 +166,16 @@ class Graph(Element):
 			
 		return Descendant_Edges
 
-	def isConsistentSubgraph(self, other):
+	def isConsistentSubgraph(self, cndt_subgraph, return_map = False):
 		"""
 		@param other: a graph which may be a consistent subgraph of self
 		@return: if for each other.edge, there is a consistent self.edge, following the shared-endpoints rule of edge sets
 		"""
-		if isConsistentEdgeSet(Rem = copy.deepcopy(other.edges), Avail = copy.deepcopy(self.edges)):
-			#if not self.equivalentWithRestrictions():
-			return True
+		possible_map = isConsistentEdgeSet(Rem = copy.deepcopy(cndt_subgraph.edges), Avail = copy.deepcopy(self.edges),
+										   return_map = return_map)
+		if not possible_map is False:
+			#returns True when return_map  is False
+			return possible_map
 		return False
 		
 	def isInternallyConsistent(self):
@@ -200,16 +202,14 @@ class Graph(Element):
 # consistent edge sets following shared endpoints clause    ####
 ################################################################
 
-def isConsistentEdgeSet(Rem = None, Avail = None, map_ = None):
-	if Rem == None:
-		Rem = set()
-	if Avail == None:
-		Avail = set()
+def isConsistentEdgeSet(Rem, Avail, map_ = None, return_map = False):
 	if map_ == None:
 		map_ = {}
 
 	#Base Case - all Remaining edges
 	if len(Rem) == 0:
+		if return_map:
+			return map_
 		return True
 
 	edge_match = Rem.pop()
@@ -231,6 +231,8 @@ def isConsistentEdgeSet(Rem = None, Avail = None, map_ = None):
 		if not cndt.sink in map_:
 			Map_[edge_match.sink] = cndt.sink
 		if isConsistentEdgeSet(copy.deepcopy(Rem), Avail-{cndt}, Map_):
+			if return_map:
+				return Map_
 			return True
 	return False
 

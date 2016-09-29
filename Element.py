@@ -26,9 +26,19 @@ class Element:
 		
 	def isConsistent(self, other):
 		""" Returns True if self and other have same name or unassigned"""
+		if not self.isConsistentType(other):
+			return False
+		if not self.isConsistentName(other):
+			return False
+		return True
+
+	def isConsistentType(self, other):
 		if not self.typ is None and not other.typ is None:
 			if self.typ != other.typ:
 				return False
+		return True
+
+	def isConsistentName(self, other):
 		if not self.name is None and not other.name is None:
 			if self.name != other.name:
 				return False
@@ -291,10 +301,15 @@ class Argument(Element):
 				return False		
 		return True
 
-	def isConsistent(self, other):
-		if not super(Argument, self).isConsistent(other):
+	def isConsistentType(self, other):
+		if not self.typ == other.typ:
 			if not self.typ in self.object_types[other.typ] and not other.typ in self.object_types[self.typ]:
 				return False
+		return True
+
+	def isConsistent(self, other):
+		if not super(Argument, self).isConsistent(other):
+			return False
 		return True
 
 	def merge(self, other):

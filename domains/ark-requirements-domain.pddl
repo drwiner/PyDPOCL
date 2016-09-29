@@ -53,11 +53,13 @@
                   (occurs (?excavate ?indy ?ark ?tanis))))
 
     (:action link-excavate-steal
-     :parameters (?excavate - step ?steal - step)
+     :parameters (?excavate - step ?steal - step ?stolen - item)
      :precondition (not (= ?excavate ?steal))
      :effect (bel-linked ?excavate ?steal)
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
+                  (nth-step-arg 1 ?excavate ?stolen)
+                  (nth-step-arg 1 ?steal ?stolen)
                   (linked ?excavate ?steal)))
 
 

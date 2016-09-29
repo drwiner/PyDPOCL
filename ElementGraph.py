@@ -136,8 +136,14 @@ class ElementGraph(Graph):
 			self.replaceArg(original, arg_list[i])
 		self.updateArgs()
 
+	def Unify(self, other, _map):
+		for elm in self.elements:
+			for olm in other.elements:
+				pass
+		return self
 
-	def Unify(self, mapping_tuples):
+
+	def UnifyWithMap(self, mapping_tuples):
 		"""
 
 		@param mapping_tuples: [0] receives merge from [1]. All edges in self to [1] go to [0]

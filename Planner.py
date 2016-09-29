@@ -321,16 +321,6 @@ class PlanSpacePlanner:
 			#print('open list number: {}'.format(len(self.Open)))
 			#print('\n')
 
-	def makeStepAssignment(self, required_steps):
-		Assignment = defaultdict(set)
-		for rs in required_steps:
-			for gs in self.GL:
-				if not gs.root.isConsistent(rs.root):
-					continue
-				if not gs.isConsistentSubgraph(rs):
-					continue
-				Assignment[rs.root].add(gs.stepnumber)
-		return Assignment
 
 	def consistentConditions(self, Dependency, csm):
 		c_precs = set()
@@ -343,41 +333,38 @@ class PlanSpacePlanner:
 			c_precs.add(pre.replaced_ID)
 		return c_precs
 
-	def integrateRquirements(self, Plan, RQ):
-		"""
-		For now, we assume no couplings, and therefore all elms are new/replace any existing
-		"""
+	def hasSameArgsWithArgNames(self, A, gstepA, B, gstepB):
+		for a in A.elements:
+			for b in B.elements:
+				if a.arg_name == b.arg_name:
+					pass
+					#if not a.isConsistent
+		return True
+
+	def decompSteps_2_groundSteps(self, RQ):
+		from Assignments import AssignmentLib
+
 		RQ.updatePlan()
-		required_steps = {Action.subgraph(RQ, step) for step in RQ.Steps}
 
-		Assignments = self.makeStepAssignment(required_steps)
-		for rs in required_steps:
-			if len(Assignments[rs.root]) == 0:
-				raise ValueError('empty')
+		step_map = AssignmentLib([Action.subgraph(RQ, step) for step in RQ.Steps], self.GL)
 
-	#	assignments = {Assignment(rs, gs) for rs in required_steps for gs in self.GL if rs.isConsistentSubgraph(gs)}
+		orderings = RQ.OrderingGraph.edges
+		links = RQ.CausalLinkGraph.edges
 
-		if hasattr(RQ,"Orderings"):
-			orderings = RQ.Orderings
-		#else
-		if hasattr(RQ,'CausalLinks'):
-			links = RQ.CausalLinks
-		else:
-			links = []
-
-		#link_nums = set()
 		for link in links:
-			#link_nums.add((required_steps.index(link.source), required_steps.index(link.sink)))
+
 			#cndt_source_nums = Assignments[link.source]
-			cndt_sink_nums = Assignments[link.sink]
+
+			cndt_sink_nums = step_map[link.sink]
 
 			dependency = link.label
-			if not dependency is None:
+			if not dependency.arg_name is None:
 				Dependency = Condition.subgraph(RQ, dependency)
 
 			for csm in cndt_sink_nums:
 
 				antes = self.GL.ante_dict[csm]
+				#antes are all step numbers deemed as consistent antecedents. However,
 
 				if len(antes) == 0:
 					Assignments[link.sink] -= {csm}
@@ -385,7 +372,7 @@ class PlanSpacePlanner:
 						raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
 					continue
 
-				if dependency is None:
+				if dependency.arg_name is None:
 					Assignments[link.source] = antes
 					continue
 
@@ -412,36 +399,6 @@ class PlanSpacePlanner:
 		#for each link and ordering, find gstep to replace it and then put those links and orderings and steps in th
 					# plan
 
-
-	#@clock
-	def integrateRequirements(self, Plan, ReqSteps, ReqLinks, ReqOrderings):
-		S = Plan.Steps
-		D = self.op_graphs
-		TMap = {t: {s for s in S if t.isIsomorphicSubgraphOf(s, consistency=True)}
-				for t in ReqSteps}
-		DMap = {t: {d for d in D if t.isIsomorphicSubgraphOf(d, consistency=True)}
-				for t in ReqSteps}
-
-		for (ti, tj) in ReqOrderings:
-			removable = {(si, sj) for si in TMap[ti] for sj in TMap[tj] if Plan.OrderingGraph.isPath(sj, si)}
-			for (si, sj) in removable:
-				TMap[ti] -= si
-				TMap[tj] -= sj
-
-		TMap.update(DMap)
-		for (ti, tj, te) in ReqLinks:
-			removable = {(si, sj) for si in TMap[ti] for sj in TMap[tj] if Plan.OrderingGraph.isPath(sj, si)}
-			for (si, sj) in removable:
-				TMap[ti] -= si
-				TMap[tj] -= sj
-
-			removable = {(si, sj) for si in TMap[ti] for sj in TMap[tj] if
-						 not si.isConsistentAntecedentFor(sj, effect=te)}
-			for (si, sj) in removable:
-				TMap[ti] -= si
-				TMap[tj] -= sj
-
-		return TMap
 
 @clock
 def preprocessDomain(operators):
@@ -501,7 +458,7 @@ class TestPlanner(unittest.TestCase):
 																								 problem_file)
 		FlawLib.non_static_preds = preprocessDomain(operators)
 		Argument.object_types = obTypesDict(object_types)
-		planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
+		planner = PlanSpacePlanner(operators, objects, initAction, goalAction,preprocess = True)
 
 		n = 2
 		results = planner.POCL(n)
@@ -519,7 +476,7 @@ class TestPlanner(unittest.TestCase):
 																								 sproblem_file)
 		FlawLib.non_static_preds = preprocessDomain(operators)
 		Argument.object_types = obTypesDict(object_types)
-		planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
+		planner = PlanSpacePlanner(operators, objects, initAction, goalAction,preprocess = False)
 
 
 		domain_file = 'domains/ark-requirements-domain.pddl'
@@ -530,12 +487,15 @@ class TestPlanner(unittest.TestCase):
 		plan = planner.Open.pop()
 		for op in doperators:
 			op.updateArgs()
+			print('\n')
 			print(op)
 			decomp = next(iter(op.subgraphs))
-			print('discourse /decomp name {}'.format(decomp.name))
+			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
+			if decomp.name == 'indy-gets-ark':
+				print('um')
 		#	print(decomp.root)
 			decomp.updatePlan()
-			assignments = planner.integrateRquirements(plan,decomp)
+			assignments = planner.decompSteps_2_groundSteps(decomp)
 			# for ds in decomp.Steps:
 			# 	DS = Action.subgraph(decomp,ds)
 			# 	print(DS)
