@@ -309,8 +309,12 @@ class Argument(Element):
 		if self.arg_name is None:
 			arg_name = ''
 		else:
-			arg_name = self.arg_name
-		return '|Arg: {} {} {} {}|'.format(id, self.typ, self.name,  arg_name)
+			arg_name = ' ' + self.arg_name
+		if self.name is None:
+			name = ''
+		else:
+			name = ' ' + self.name
+		return '|Arg: {} {}{}{}|'.format(id, self.typ, name,  arg_name)
 	
 
 class Actor(Argument):
@@ -330,8 +334,12 @@ class Actor(Argument):
 		if self.arg_name is None:
 			arg_name = ''
 		else:
-			arg_name = self.arg_name
-		return '|Actor: {} {} {} {}|'.format(id, self.typ, self.name, arg_name)
+			arg_name = ' ' + self.arg_name
+		if self.name is None:
+			name = ''
+		else:
+			name = ' ' + self.name
+		return '|Actor: {} {}{}{}|'.format(id, self.typ, name, arg_name)
 
 class PlanElement(Element):
 
