@@ -364,9 +364,6 @@ def rFollowHierarchy(object_types, child_name, accumulated = set()):
 				accumulated.add(ob.parent)
 				rFollowHierarchy(object_types, ob.parent, accumulated)
 
-
-
-
 import unittest
 
 
@@ -412,6 +409,10 @@ class TestPlanner(unittest.TestCase):
 			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
 			decomp.updatePlan()
 			assignments = AssignmentLib(decomp, story_planner.GL, objects)
+			# for world in assignments.Possible_Worlds:
+			# 	for w in world:
+			# 		print(story_planner.GL[w.stepnumber])
+			#print(assignments)
 
 		print('ok')
 

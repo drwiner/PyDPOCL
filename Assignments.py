@@ -50,6 +50,10 @@ class AssignmentLib:
 			self.narrowByGroundElms()
 			if len(RQ.CausalLinkGraph.edges) > 0:
 				self.narrowByLinks(RQ, GL)
+		for PW in self.Possible_Worlds:
+			for world in PW:
+				print(GL[world.stepnumber])
+			print('\n')
 
 	def makeAssignments(self, GL):
 		for AS in self._assignments:
@@ -77,7 +81,7 @@ class AssignmentLib:
 
 	def narrowByGroundElms(self):
 		Possible_Worlds = []
-		Action_Permutations = self.permutations
+		Action_Permutations = self.Possible_Worlds
 
 		#APT = action permutation tuple
 		for APT in Action_Permutations:
@@ -85,16 +89,8 @@ class AssignmentLib:
 			#PGS = Partially Ground Step
 			if isArgNameConsistent([PGS for PGS in APT]):
 				Possible_Worlds.append(APT)
-		self.Possible_Worlds = Possible_Worlds
 
-	def narrowByLinkCondition(self, World, DP, wlsis, wlsos, GL):
-		CPR = consistentConditions(GL[wlsis], DP)
-		for cpr in CPR:
-			valid_ante_stepnums = GL.id_dict[cpr]
-			if not wlsos in valid_ante_stepnums:
-				self.Possible_Worlds.remove(World)
-				return False
-		return True
+		self.Possible_Worlds = Possible_Worlds
 
 	def narrowByLinks(self, RQ, GL):
 		links = RQ.CausalLinkGraph.edges
@@ -104,6 +100,7 @@ class AssignmentLib:
 			if not link.label.arg_name is None:
 				DP = Condition.subgraph(RQ, link.label)
 
+			Removable_Worlds = []
 			for World in self.Possible_Worlds:
 				# position assigned during _Assignment
 				wlsis = World[link.sink.position].stepnumber
@@ -111,12 +108,18 @@ class AssignmentLib:
 
 				if DP is None: #then limit just by valid antecedent stepnumbers
 					if not wlsos in GL.ante_dict[wlsis]:
-						self.Possible_Worlds.remove(World)
-						continue
+						Removable_Worlds.append(World)
+						#self.Possible_Worlds.remove(World)
+
 				else: #link has a condition,
 					for cpr in consistentConditions(GL[wlsis], DP):
 						if not wlsos in GL.id_dict[cpr]:
-							self.Possible_Worlds.remove(World)
+							Removable_Worlds.append(World)
+							#self.Possible_Worlds.remove(World)
+							break
+			for world in Removable_Worlds:
+				self.Possible_Worlds.remove(world)
+
 
 			if len(self.Possible_Worlds) == 0:
 				raise ValueError('Cannot satisfy link {} criteria in decomp operator {}'.format(link, RQ.name))
@@ -124,6 +127,9 @@ class AssignmentLib:
 	@property
 	def permutations(self):
 		return itertools.product(*[list(self[AS.position]) for AS in self])
+
+	def __repr__(self):
+		return str([world for world in self.Possible_Worlds])
 
 class _Assignment:
 	def __init__(self, i, RS):
