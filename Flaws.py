@@ -252,15 +252,3 @@ class TestOrderingGraphMethods(unittest.TestCase):
 
 if __name__ ==  '__main__':
 	unittest.main()
-
-
-"""
-An open precondition flaw is a tuple <step element, precondition element>
-	where precondition element is a literal element,
-	there is a precondition edge from the step element to the precondition element,
-	and there is no causal link in the graph from another step to the precondition element with label 'effect'
-	It's important to consider this last point
-		because with this approach, you could instantiate an element which already has some preconditions in causal links
-
-		********Consider above for resolve "uninstantiated step flaw"
-"""
