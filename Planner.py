@@ -5,6 +5,7 @@ from heapq import heappush, heappop
 import itertools
 from clockdeco import clock
 from Ground import GLib
+from Assignments import AssignmentLib
 
 """
 	Algorithm for Plan-Graph-Space search of Story Plan
@@ -322,69 +323,6 @@ class PlanSpacePlanner:
 			#print('\n')
 
 
-	def consistentConditions(self, Dependency, csm):
-		c_precs = set()
-		for pre in self.GL[csm].preconditions:
-			if not pre.isConsistent(Dependency.root):
-				continue
-			Precondition = Condition.subgraph(self.GS[csm], pre)
-			if Dependency.Args != Precondition.Args:
-				continue
-			c_precs.add(pre.replaced_ID)
-		return c_precs
-
-	def hasSameArgsWithArgNames(self, A, gstepA, B, gstepB):
-		for a in A.elements:
-			for b in B.elements:
-				if a.arg_name == b.arg_name:
-					pass
-					#if not a.isConsistent
-		return True
-
-	def decompSteps_2_groundSteps(self, RQ):
-		from Assignments import AssignmentLib
-
-		RQ.updatePlan()
-
-		step_map = AssignmentLib(RQ, self.GL)
-		AssignmentLib.narrowByLinks()
-		orderings = RQ.OrderingGraph.edges
-		links = RQ.CausalLinkGraph.edges
-
-		for link in links:
-			cndt_sink_nums = step_map[link.sink.stepnumber]
-
-			dependency = link.label
-			if not dependency.arg_name is None:
-				Dependency = Condition.subgraph(RQ, dependency)
-
-			for csm in cndt_sink_nums:
-
-				antes = self.GL.ante_dict[csm]
-
-				if len(antes) == 0:
-					step_map[link.sink] -= {csm}
-					if len(step_map[link.sink.stepnumber]) == 0:
-						raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
-					continue
-
-				if dependency.arg_name is None:
-					step_map[link.source.stepnumber] = list(antes)
-					continue
-
-				c_precs = self.consistentConditions(Dependency, csm)
-				step_map[link.source.stepnumber] = []
-				for cp in c_precs:
-					step_map[link.source.stepnumber].extend(list(self.GL.id_dict[cp]))
-				if len(step_map[link.source.stepnumber]) == 0:
-					raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
-
-		for p in step_map.permutations:
-			print(p)
-
-		return step_map
-
-
 @clock
 def preprocessDomain(operators):
 	#get all effect predicates
@@ -435,6 +373,8 @@ import sys
 
 
 import unittest
+
+
 class TestPlanner(unittest.TestCase):
 	def testArk(self):
 		domain_file = 'domains/ark-domain.pddl'
@@ -473,26 +413,10 @@ class TestPlanner(unittest.TestCase):
 		for op in doperators:
 			op.updateArgs()
 			print('\n')
-			print(op)
 			decomp = next(iter(op.subgraphs))
 			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
-			if decomp.name == 'indy-gets-ark':
-				print('um')
-		#	print(decomp.root)
 			decomp.updatePlan()
-			assignments = planner.decompSteps_2_groundSteps(decomp)
-			# for ds in decomp.Steps:
-			# 	DS = Action.subgraph(decomp,ds)
-			# 	print(DS)
-			# 	for GS in planner.GL:
-			# 		if not GS.root.isConsistent(ds):
-			# 			continue
-			# 		if GS.isConsistentSubgraph(DS):
-			# 			print(GS)
-			# 			print(DS)
-			# 			print('\n')
-			# print(decomp.OrderingGraph)
-			# print(decomp.CausalLinkGraph)
+			assignments = AssignmentLib(decomp, self.GL)
 
 		print('ok')
 
