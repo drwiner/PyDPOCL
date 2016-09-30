@@ -60,6 +60,7 @@ class GLib:
 		#dictionaries
 		self.pre_dict = defaultdict(set)
 		self.ante_dict = defaultdict(set)
+		#id_dict - given precondition.replaced_ID as key, returns valid stepnumbers
 		self.id_dict = defaultdict(set)
 		self.eff_dict = defaultdict(set)
 		self.threat_dict = defaultdict(set)

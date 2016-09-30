@@ -2,119 +2,161 @@ import itertools
 from PlanElementGraph import Condition, Action
 
 
-def consistentConditions(GL, Dependency, csm):
+def consistentConditions(GSIS, DP):
+	"""
+
+	@param GSIS:  Ground Sink Step
+	@param DP: Link Condition
+	@return: GSIS preconditions cosnistent with Dependency
+	"""
 	c_precs = set()
-	for pre in GL[csm].preconditions:
-		if not pre.isConsistent(Dependency.root):
+	for pre in GSIS.preconditions:
+		if not pre.isConsistent(DP.root):
 			continue
-		Precondition = Condition.subgraph(GL[csm], pre)
-		if Dependency.Args != Precondition.Args:
+		PC = Condition.subgraph(GSIS, pre)
+		if DP.Args != PC.Args:
 			continue
 		c_precs.add(pre.replaced_ID)
 	return c_precs
 
+def partialUnify(AS, _map):
+	NS = AS.RS.deepcopy()
+	for elm in NS.elements:
+		if elm in _map:
+			g_elm = _map[elm]
+			elm.merge(g_elm)
+			elm.replaced_ID = g_elm.replaced_ID
+	NS.root.stepnumber = AS.root.stepnumber
+	return NS
+
+def isArgNameConsistent(Partially_Ground_Steps):
+	arg_name_dict = {}
+	for PGS in Partially_Ground_Steps:
+		for elm in PGS.elements:
+			if not elm.arg_name is None:
+				if elm.arg_name in arg_name_dict.keys():
+					if not elm.isConsistent(arg_name_dict[elm.arg_name]):
+						return False
+				else:
+					arg_name_dict[elm.arg_name] = elm
+	return True
+
 class AssignmentLib:
-	def __init__(self, RQ, GL):
-		self._assignments = [_Assignment(i, rs) for i, rs in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
+	def __init__(self, RQ, GL, objects):
+		self._assignments = [_Assignment(i, RS) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
 		self.makeAssignments(GL)
-		self.narrowByLinks(RQ, GL)
+		self.Possible_Worlds = self.permutations
+		if len(RQ.Steps) > 1:
+			self.narrowByGroundElms()
+			if len(RQ.CausalLinkGraph.edges) > 0:
+				self.narrowByLinks(RQ, GL)
 
 	def makeAssignments(self, GL):
-		for rs in self._assignments:
+		for AS in self._assignments:
 			for gs in GL:
-				if not gs.root.isConsistent(rs.root):
+				if not gs.root.isConsistent(AS.root):
 					continue
-				possible_map = gs.isConsistentSubgraph(rs, return_map=True)
+				possible_map = gs.isConsistentSubgraph(AS, return_map=True)
 				if possible_map is False:
 					continue
-				rs._gstepnums.append(gs.stepnumber)
-				rs._maps.append(possible_map)
-			if len(rs) == 0:
-				raise ValueError('no gstep compatible with rs {}'.format(rs))
+				AS.append(partialUnify(AS, possible_map), gs.stepnumber)
+			if len(AS) == 0:
+				raise ValueError('no gstep compatible with RS {}'.format(AS))
 
 	def __len__(self):
 		return len(self._assignments)
 
 	def __getitem__(self, position):
-		if not type(position) is int:
-			try:
-				position = position.stepnumber
-			except:
-				raise ValueError('get item on assignments, trying to use {}'.format(position))
 		return self._assignments[position]
 
-	def __setitem__(self, key, value):
-		self[key]._gstepnums = value
+	# def __setitem__(self, key, value):
+	# 	self[key]._unifies = value
 
-	def remove(self, rs, gstepnum):
-		self._assignments[rs.stepnumber].remove(gstepnum)
+	def remove(self, AS, position):
+		self._assignments[AS.position].remove(position)
+
+	def narrowByGroundElms(self):
+		Possible_Worlds = []
+		Action_Permutations = self.permutations
+
+		#APT = action permutation tuple
+		for APT in Action_Permutations:
+
+			#PGS = Partially Ground Step
+			if isArgNameConsistent([PGS for PGS in APT]):
+				Possible_Worlds.append(APT)
+		self.Possible_Worlds = Possible_Worlds
+
+	def narrowByLinkCondition(self, World, DP, wlsis, wlsos, GL):
+		CPR = consistentConditions(GL[wlsis], DP)
+		for cpr in CPR:
+			valid_ante_stepnums = GL.id_dict[cpr]
+			if not wlsos in valid_ante_stepnums:
+				self.Possible_Worlds.remove(World)
+				return False
+		return True
 
 	def narrowByLinks(self, RQ, GL):
 		links = RQ.CausalLinkGraph.edges
 		for link in links:
-			cndt_sink_nums = self[link.sink.stepnumber]
-			dependency = link.label
-			if not dependency.arg_name is None:
-				Dependency = Condition.subgraph(RQ, dependency)
 
-			for csm in cndt_sink_nums:
-				antes = GL.ante_dict[csm]
+			DP = None
+			if not link.label.arg_name is None:
+				DP = Condition.subgraph(RQ, link.label)
 
-				if len(antes) == 0:
-					self[link.sink] -= {csm}
-					if len(self[link.sink.stepnumber]) == 0:
-						raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
-					continue
+			for World in self.Possible_Worlds:
+				# position assigned during _Assignment
+				wlsis = World[link.sink.position].stepnumber
+				wlsos = World[link.source.position].stepnumber
 
-				if dependency.arg_name is None:
-					self[link.source.stepnumber] = list(antes)
-					continue
+				if DP is None: #then limit just by valid antecedent stepnumbers
+					if not wlsos in GL.ante_dict[wlsis]:
+						self.Possible_Worlds.remove(World)
+						continue
+				else: #link has a condition,
+					for cpr in consistentConditions(GL[wlsis], DP):
+						if not wlsos in GL.id_dict[cpr]:
+							self.Possible_Worlds.remove(World)
 
-				c_precs = consistentConditions(GL, Dependency, csm)
-				self[link.source.stepnumber] = []
-				for cp in c_precs:
-					self[link.source.stepnumber].extend(list(GL.id_dict[cp]))
-				if len(self[link.source.stepnumber]) == 0:
-					raise ValueError('There is no link to satisfy the criteria of {}'.format(link))
+			if len(self.Possible_Worlds) == 0:
+				raise ValueError('Cannot satisfy link {} criteria in decomp operator {}'.format(link, RQ.name))
 
 	@property
 	def permutations(self):
-		return itertools.product(*[list(self[rs.root.stepnumber]) for rs in self])
+		return itertools.product(*[list(self[AS.position]) for AS in self])
 
 class _Assignment:
-	def __init__(self, stepnum, rs):
-		rs.root.stepnumber = stepnum
-		self.rs = rs
-		self.root = rs.root
-		self._gstepnums = []
-		self._maps = []
+	def __init__(self, i, RS):
+		#RS.root.stepnumber = stepnum
+		self.position = i
+		RS.root.position = i
+		self.RS = RS
+		self.root = RS.root
+		self._unifies = []
 
 	def __len__(self):
-		return len(self._gstepnums)
+		return len(self._unifies)
 
 	def __getitem__(self, position):
-		if not type(position) is int:
-			position = position.stepnumber
-		return self._gstepnums[position]
+		return self._unifies[position]
 
 	def __setitem__(self, key, value):
-		self._gstepnums[key] = value
+		self._unifies[key] = value
+
+	def append(self, item, stepnum):
+		item.root.stepnumber = stepnum
+		self._unifies.append(item)
 
 	@property
 	def edges(self):
-		return self.rs.edges
+		return self.RS.edges
 
 	@property
 	def elements(self):
-		return self.rs.elements
+		return self.RS.elements
 
 	def __contains__(self, item):
-		return item in self._gstepnums
+		return item in self._unifies
 
-	def remove(self, stepnum):
-		try:
-			i = self._gstepnums.index(stepnum)
-			self._gstepnums.remove(stepnum)
-		except:
-			raise ValueError('step num {} not in assignment of rs root {}'.format(stepnum, self.rs))
-		del self._maps[i]
+	def __repr__(self):
+		return self.RS.__repr__()

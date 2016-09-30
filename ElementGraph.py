@@ -16,13 +16,13 @@ class ElementGraph(Graph):
 		super(ElementGraph, self).__init__(ID, type_graph, name, Elements, Edges, Restrictions)
 		self.root = root_element
 
-	def copyGen(self):
+	def deepcopy(self):
 		new_self = copy.deepcopy(self)
 		new_self.ID = uuid.uuid1(21)
 		return new_self
 
 	def copyWithNewIDs(self, from_this_num):
-		new_self = self.copyGen()
+		new_self = self.deepcopy()
 		for element in new_self.elements:
 			element.ID = from_this_num
 			from_this_num = from_this_num + 1
@@ -52,7 +52,7 @@ class ElementGraph(Graph):
 		if Type == None:
 			Type = eval(element.typ)
 		if self.root == element:
-			return self.copyGen()
+			return self.deepcopy()
 		return Type.makeElementGraph(self, element)
 
 	def getElementGraphFromElementID(self, element_ID, Type = None):
@@ -175,7 +175,7 @@ class ElementGraph(Graph):
 		return zip(ConditionA.Args, ConditionB.Args)
 
 def assimilate(EG, ee, pe):
-	new_self = EG.copyGen()
+	new_self = EG.deepcopy()
 	self_source = new_self.getElementById(ee.source.ID)  # source from new_self
 	self_source.merge(pe.source)  # source merge
 	self_source.replaced_ID = pe.source.ID

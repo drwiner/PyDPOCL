@@ -365,11 +365,6 @@ def rFollowHierarchy(object_types, child_name, accumulated = set()):
 				rFollowHierarchy(object_types, ob.parent, accumulated)
 
 
-import sys
-
-# import unittest
-# class TestRequirements(unittest.TestCase):
-# 	def testIntegrateRequirements(self):
 
 
 import unittest
@@ -401,22 +396,22 @@ class TestPlanner(unittest.TestCase):
 																								 sproblem_file)
 		FlawLib.non_static_preds = preprocessDomain(operators)
 		Argument.object_types = obTypesDict(object_types)
-		planner = PlanSpacePlanner(operators, objects, initAction, goalAction,preprocess = False)
+		story_planner = PlanSpacePlanner(operators, objects, initAction, goalAction,preprocess = False)
 
 
 		domain_file = 'domains/ark-requirements-domain.pddl'
 		problem_file = 'domains/ark-requirements-problem.pddl'
 		doperators, dobjects, dobject_types, dinitAction, dgoalAction = parseDomainAndProblemToGraphs(domain_file,
 																								problem_file)
-		#dplanner = PlanSpacePlanner(operators, objects, initAction, goalAction)
-		plan = planner.Open.pop()
+
+		#empty_plan = story_planner.Open.pop()
 		for op in doperators:
 			op.updateArgs()
 			print('\n')
 			decomp = next(iter(op.subgraphs))
 			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
 			decomp.updatePlan()
-			assignments = AssignmentLib(decomp, self.GL)
+			assignments = AssignmentLib(decomp, story_planner.GL, objects)
 
 		print('ok')
 

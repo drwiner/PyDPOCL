@@ -208,18 +208,15 @@ class Operator(InternalElement):
 		if not other.executed is None and self.executed is None:
 			self.executed = other.executed
 			
-		if other.instantiated:
-			self.instantiated = True
-			
 		return self
 			
 	def __repr__(self):
 		if self.executed is None:
-			exe = 'ex'
+			exe = ''
 		else:
-			exe = self.executed
+			exe = '-' + self.executed
 		id = str(self.ID)[19:23]
-		return 'operator({}-{}-{}-{})'.format(exe, self.name, self.stepnumber, id)
+		return 'operator{}-{}-{}-{}'.format(exe, self.name, self.stepnumber, id)
 
 		
 class Literal(InternalElement):
@@ -324,12 +321,12 @@ class Argument(Element):
 		if self.arg_name is None:
 			arg_name = ''
 		else:
-			arg_name = ' ' + self.arg_name
+			arg_name = '-' + self.arg_name
 		if self.name is None:
 			name = ''
 		else:
-			name = ' ' + self.name
-		return '|Arg: {} {}{}{}|'.format(id, self.typ, name,  arg_name)
+			name = '-' + self.name
+		return 'Arg-{}-{}{}{}'.format(id, self.typ, name,  arg_name)
 	
 
 class Actor(Argument):
@@ -349,12 +346,12 @@ class Actor(Argument):
 		if self.arg_name is None:
 			arg_name = ''
 		else:
-			arg_name = ' ' + self.arg_name
+			arg_name = '-' + self.arg_name
 		if self.name is None:
 			name = ''
 		else:
-			name = ' ' + self.name
-		return '|Actor: {} {}{}{}|'.format(id, self.typ, name, arg_name)
+			name = '-' + self.name
+		return 'Actor-{}-{}{}{}'.format(id, self.typ, name, arg_name)
 
 class PlanElement(Element):
 
