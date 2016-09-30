@@ -403,17 +403,9 @@ class TestPlanner(unittest.TestCase):
 
 		#empty_plan = story_planner.Open.pop()
 		for op in doperators:
-			op.updateArgs()
-			print('\n')
 			decomp = next(iter(op.subgraphs))
 			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
-			decomp.updatePlan()
 			assignments = AssignmentLib(decomp, story_planner.GL, objects)
-			# for world in assignments.Possible_Worlds:
-			# 	for w in world:
-			# 		print(story_planner.GL[w.stepnumber])
-			#print(assignments)
-
 		print('ok')
 
 if __name__ ==  '__main__':

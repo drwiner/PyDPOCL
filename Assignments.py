@@ -43,6 +43,7 @@ def isArgNameConsistent(Partially_Ground_Steps):
 
 class AssignmentLib:
 	def __init__(self, RQ, GL, objects):
+		RQ.updatePlan()
 		self._assignments = [_Assignment(i, RS) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
 		self.makeAssignments(GL)
 		self.Possible_Worlds = self.permutations
@@ -72,9 +73,6 @@ class AssignmentLib:
 
 	def __getitem__(self, position):
 		return self._assignments[position]
-
-	# def __setitem__(self, key, value):
-	# 	self[key]._unifies = value
 
 	def remove(self, AS, position):
 		self._assignments[AS.position].remove(position)
@@ -124,6 +122,10 @@ class AssignmentLib:
 			if len(self.Possible_Worlds) == 0:
 				raise ValueError('Cannot satisfy link {} criteria in decomp operator {}'.format(link, RQ.name))
 
+	def constructWorld(self, World, GL):
+
+		pass
+
 	@property
 	def permutations(self):
 		return itertools.product(*[list(self[AS.position]) for AS in self])
@@ -165,4 +167,5 @@ class _Assignment:
 		return item in self._unifies
 
 	def __repr__(self):
+
 		return self.RS.__repr__()
