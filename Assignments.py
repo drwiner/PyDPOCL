@@ -1,9 +1,11 @@
 import itertools
-from PlanElementGraph import Condition
+from PlanElementGraph import Condition, Action
 class AssignmentLib:
-	def __init__(self, required_steps, GL):
-		self._assignments = [_Assignment(i, rs) for i, rs in enumerate(required_steps)]
+	def __init__(self, RQ, GL):
+		self.decomp = RQ
+		self._assignments = [_Assignment(i, rs) for i, rs in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
 		self.makeAssignments(GL)
+		self.narrowByLinks(RQ, GL)
 
 	def makeAssignments(self, GL):
 		for rs in self._assignments:

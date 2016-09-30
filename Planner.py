@@ -346,8 +346,8 @@ class PlanSpacePlanner:
 
 		RQ.updatePlan()
 
-		step_map = AssignmentLib([Action.subgraph(RQ, step) for step in RQ.Steps], self.GL)
-		AssignmentLib.narrowByLinks(RQ)
+		step_map = AssignmentLib(RQ, self.GL)
+		AssignmentLib.narrowByLinks()
 		orderings = RQ.OrderingGraph.edges
 		links = RQ.CausalLinkGraph.edges
 
