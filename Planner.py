@@ -5,7 +5,7 @@ from heapq import heappush, heappop
 import itertools
 from clockdeco import clock
 from Ground import GLib
-from Assignments import AssignmentLib
+from Plannify import TopicLib
 
 """
 	Algorithm for Plan-Graph-Space search of Story Plan
@@ -188,27 +188,22 @@ class PlanSpacePlanner:
 			S_Old = Action.subgraph(new_plan, s_old)
 			S_Need = Action.subgraph(new_plan, s_need)
 
-			#step 3 - figure out which effect is the dependency
-			effect_token = None
-			for eff in S_Old.effects:
-				if eff.replaced_ID in self.GL.eff_dict[precondition.replaced_ID]:
-					effect_token = eff
-					break
-			if effect_token == None:
-				raise AttributeError('GL.eff_dict empty but id_dict has antecedent')
-
-
-			#step 4 - Remove the precondition and point to the effect_token
-			pre_link = new_plan.RemoveSubgraph(precondition)
-			pre_link.sink = effect_token
+			#step 3-4 retarget precondition to be s_old effect
+			pre_link_sink = self.RetargetPrecondition(new_plan, S_Old, precondition)
 
 			#step 5 - add orderings, causal links, and create flaws
-			self.addStep(new_plan, S_Old.root, S_Need.root, pre_link.sink,  new=False)
+			self.addStep(new_plan, S_Old.root, S_Need.root, pre_link_sink,  new=False)
 
 			#step 6 - add new plan to open list
 			results.add(new_plan)
 
 		return results
+
+	def RetargetPrecondition(self, plan,  S_Old, precondition):
+		effect_token = self.GL.getConsistentEffect(S_Old, precondition)
+		pre_link = plan.RemoveSubgraph(precondition)
+		pre_link.sink = effect_token
+		return pre_link.sink
 
 	def addStep(self, plan, s_add, s_need, condition, new=None):
 		"""
@@ -405,7 +400,7 @@ class TestPlanner(unittest.TestCase):
 		for op in doperators:
 			decomp = next(iter(op.subgraphs))
 			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
-			assignments = AssignmentLib(decomp, story_planner.GL, objects)
+			assignments = TopicLib(decomp, story_planner.GL, objects)
 		print('ok')
 
 if __name__ ==  '__main__':

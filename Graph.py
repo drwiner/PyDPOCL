@@ -175,6 +175,7 @@ class Graph(Element):
 										   return_map = return_map)
 		if not possible_map is False:
 			#returns True when return_map  is False
+			#return_map = possible_map
 			return possible_map
 		return False
 		

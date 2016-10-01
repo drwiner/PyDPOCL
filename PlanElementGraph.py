@@ -139,7 +139,6 @@ class PlanElementGraph(ElementGraph):
 		
 		self.OrderingGraph = OrderingGraph(ID = uuid.uuid1(5))
 		self.CausalLinkGraph = CausalLinkGraph(ID = uuid.uuid1(6))
-		self.updatePlan(Elements)
 
 		self.flaws = FlawLib()
 		self.initial_dummy_step = None
@@ -149,6 +148,16 @@ class PlanElementGraph(ElementGraph):
 			planElement = PlanElement(ID =ID, typ=type_graph,name=name)
 									
 		super(PlanElementGraph,self).__init__(ID,type_graph,name,Elements,planElement,Edges,Restrictions)
+
+	@classmethod
+	def Actions_2_Plan(cls, Actions):
+		elements = set().union(*[A.elements for A in Actions])
+		edges = set().union(*[A.edges for A in Actions])
+		Plan = cls(uuid.uuid1(2), name = 'Action_2_Plan', Elements = elements, Edges = edges)
+		Plan.OrderingGraph = OrderingGraph(ID=uuid.uuid1(5))
+		Plan.CausalLinkGraph = CausalLinkGraph(ID=uuid.uuid1(6))
+		return Plan
+
 
 	def __lt__(self, other):
 		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
@@ -248,14 +257,18 @@ class PlanElementGraph(ElementGraph):
 		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent() and \
 			   super(PlanElementGraph, self).isInternallyConsistent()
 
+	@property
+	def Steps(self):
+		if not hasattr(self, 'Steps'):
+			self.Steps = [element for element in self.elements if type(element) is Operator]
+
+
 
 	def updatePlan(self, Elements = None):
 		""" Updating plans to have accurate top-level Sets"""
 		if Elements is None:
 			Elements = self.elements
-		self.Steps = {element for element in Elements if type(element) is Operator}
-		self.Orderings = self.OrderingGraph.edges
-		self.Causal_Links = self.CausalLinkGraph.edges
+		self.Steps = [element for element in Elements if type(element) is Operator]
 		#self.IntentionFrames = {element for element in Elements if type(element) is IntentionFrameElement}
 		return self
 

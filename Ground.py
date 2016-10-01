@@ -117,6 +117,15 @@ class GLib:
 			if count > 0:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
 
+	def getConsistentEffect(self, S_Old, precondition):
+		effect_token = None
+		for eff in S_Old.effects:
+			if eff.replaced_ID in self.eff_dict[precondition.replaced_ID]:
+				effect_token = eff
+				break
+		if effect_token == None:
+			raise AttributeError('GL.eff_dict empty but id_dict has antecedent')
+		return effect_token
 
 	def __len__(self):
 		return len(self._gsteps)
