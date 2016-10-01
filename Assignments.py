@@ -56,6 +56,13 @@ class AssignmentLib:
 				print(GL[world.stepnumber])
 			print('\n')
 
+	def groundWorld(self, World, GL):
+		#For each step in the world, if the step is not a link-source, then get its ground counterpart
+			#if the step is a link source,
+			# if the ground step is not already in the slot, then get the ground step from pre_dict where the pre is the link condition
+			#if there is no link condition, then, how to determine which condition it is that connects it? Is there a reverse dictionary lookup (for key,value pair, if value == antecdent, then key is the precondition.replaced_ID. Then, use pre_dict[replaced_ID] to get the modified antecedent with missing effect
+		pass
+
 	def makeAssignments(self, GL):
 		for AS in self._assignments:
 			for gs in GL:
@@ -121,11 +128,6 @@ class AssignmentLib:
 
 			if len(self.Possible_Worlds) == 0:
 				raise ValueError('Cannot satisfy link {} criteria in decomp operator {}'.format(link, RQ.name))
-
-	def constructWorld(self, World, GL):
-
-
-		pass
 
 	@property
 	def permutations(self):
