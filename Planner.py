@@ -402,12 +402,12 @@ class TestPlanner(unittest.TestCase):
 			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
 			plans = Plannify(decomp, story_planner.GL)
 			#print('\n')
-			for plan in plans:
-				for step in plan.Steps:
-					print(Action.subgraph(plan,step))
-				print(plan.isInternallyConsistent())
-				print('\n')
-			print('check')
+			#for plan in plans:
+				#for step in plan.Steps:
+					#print(Action.subgraph(plan,step))
+				#print(plan.isInternallyConsistent())
+				#print('\n')
+			#print('check')
 			#assignments = TopicLib(decomp, story_planner.GL, objects)
 		print('ok')
 

@@ -1,7 +1,9 @@
 import itertools
-from PlanElementGraph import Condition, Action, PlanElementGraph
+from PlanElementGraph import Action, PlanElementGraph
 from Graph import Edge
+from clockdeco import clock
 
+@clock
 def Plannify(RQ, GL):
 	#An ActionLib for steps in RQ - ActionLib is a container w/ all of its possible instances as ground steps
 	Libs = [ActionLib(i, RS, GL) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
@@ -20,21 +22,6 @@ def Plannify(RQ, GL):
 
 	return Plans
 
-def consistentConditions(GSIS, DP):
-	"""
-	@param GSIS:  Ground Sink Step
-	@param DP: Link Condition
-	@return: GSIS preconditions consistent with Dependency
-	"""
-	c_precs = set()
-	for pre in GSIS.preconditions:
-		if not pre.isConsistent(DP.root):
-			continue
-		PC = Condition.subgraph(GSIS, pre)
-		if DP.Args != PC.Args:
-			continue
-		c_precs.add(pre.replaced_ID)
-	return c_precs
 
 def partialUnify(PS, _map):
 	if _map is False:
@@ -81,7 +68,7 @@ def isArgNameConsistent(Partially_Ground_Steps):
 def productByPosition(Libs):
 	return itertools.product(*[list(Libs[T.position]) for T in Libs])
 
-
+@clock
 def Linkify(Planets, RQ, GL):
 	#Planets are plans containing steps which may not be ground steps from GL
 	orderings = RQ.OrderingGraph.edges
@@ -117,9 +104,8 @@ def Linkify(Planets, RQ, GL):
 
 	return True
 
-
+@clock
 def Groundify(Planets, GL, has_links):
-
 
 	for Planet in Planets:
 		for step in Planet.Steps:
@@ -157,6 +143,7 @@ def Groundify(Planets, GL, has_links):
 
 
 class ActionLib:
+
 	def __init__(self, i, RS, GL):
 		#RS.root.stepnumber = stepnum
 		self.position = i
@@ -210,6 +197,7 @@ class ActionLib:
 
 
 class LinkLib:
+
 	def __init__(self, position, link, GL):
 		"""
 		@param position: in list of links of Planet
