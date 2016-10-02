@@ -1,8 +1,24 @@
 import itertools
 from PlanElementGraph import Condition, Action, PlanElementGraph
 from Graph import Edge
-import copy
-from Ground import Antestep
+
+def Plannify(RQ, GL):
+	#An ActionLib for steps in RQ - ActionLib is a container w/ all of its possible instances as ground steps
+	Libs = [ActionLib(i, RS, GL) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
+
+	#A World is a combination of one ground-instance from each step
+	Worlds = productByPosition(Libs)
+
+	#A Planet is a plan s.t. all steps are "arg_name consistent", but a step may not be equiv to some ground step
+	Planets = [PlanElementGraph.Actions_2_Plan(W) for W in Worlds if isArgNameConsistent(W)]
+
+	#Linkify installs orderings and causal links from RQ/decomp to Planets, rmvs Planets which cannot support links
+	has_links = Linkify(Planets, RQ, GL)
+
+	#Groundify is the process of replacing partial steps with its ground step, and removing inconsistent planets
+	Plans = Groundify(Planets, GL, has_links)
+
+	return Plans
 
 def consistentConditions(GSIS, DP):
 	"""
@@ -36,21 +52,22 @@ def partialUnify(PS, _map):
 	NS.root.stepnumber = PS.root.stepnumber
 	return NS
 
+
 def isArgNameConsistent(Partially_Ground_Steps):
 	"""
 		@param Partially_Ground_Steps <-- partially ground required steps (PGRS), reach required step associated with ground step
 	"""
 	arg_name_dict = {}
-	for PGS in Partially_Ground_Steps:
-		for edge in PGS.edges:
-			if edge.label == 'precond-of':
-				elm = edge.sink
-				if not elm.arg_name is None:
-					if elm.arg_name in arg_name_dict.keys():
-						if not elm.isConsistent(arg_name_dict[elm.arg_name]):
-							return False
-					else:
-						arg_name_dict[elm.arg_name] = elm
+	preconditions = {edge.sink for PGS in Partially_Ground_Steps for edge in PGS.edges if edge.label == 'precond-of'}
+	for elm in preconditions:
+		if elm.arg_name is None:
+			continue
+		if elm.arg_name in arg_name_dict.keys():
+			if not elm.isConsistent(arg_name_dict[elm.arg_name]):
+				return False
+		else:
+			arg_name_dict[elm.arg_name] = elm
+
 	for PGS in Partially_Ground_Steps:
 		for elm in PGS.elements:
 			if not elm.arg_name is None:
@@ -64,27 +81,6 @@ def isArgNameConsistent(Partially_Ground_Steps):
 def productByPosition(Libs):
 	return itertools.product(*[list(Libs[T.position]) for T in Libs])
 
-# def GroundWorlds(Sub_Libs, GL):
-# 	return itertools.product(*[list(GL[SL[SL.position].stepnumber]) for SL in Sub_Libs])
-
-def Plannify(RQ, GL):
-	#An ActionLib for steps in RQ - ActionLib is a container w/ all of its possible instances as ground steps
-	Libs = [ActionLib(i, RS, GL) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
-
-	#A World is a combination of one ground-instance from each step
-	Worlds = productByPosition(Libs)
-
-	#A Planet is a plan s.t. all steps are "arg_name consistent", but a step may not be equiv to some ground step
-	Planets = [PlanElementGraph.Actions_2_Plan(W) for W in Worlds if isArgNameConsistent(W)]
-
-	#Linkify installs orderings and causal links from RQ/decomp to Planets, rmvs Planets which cannot support links
-	has_links = Linkify(Planets, RQ, GL)
-
-	#Groundify is the process of replacing partial steps with its ground step, and removing inconsistent planets
-	Plans = Groundify(Planets, GL, has_links)
-
-	return Plans
-
 
 def Linkify(Planets, RQ, GL):
 	#Planets are plans containing steps which may not be ground steps from GL
@@ -95,7 +91,7 @@ def Linkify(Planets, RQ, GL):
 			try:
 				Planet.OrderingGraph.edges = {Edge(GtElm(ord.source.ID), GtElm(ord.sink.ID),'<') for ord in orderings}
 			except:
-				print('no')
+				raise AttributeError('why can I not use add ordering here?')
 
 	links = RQ.CausalLinkGraph.edges
 	if len(links) == 0:
@@ -146,11 +142,9 @@ def Groundify(Planets, GL, has_links):
 		for lw in LW:
 			NP = Plan.deepcopy()
 			for _link in lw:
-				#remove the precondition and let prelink.sink = effect
-				try:
-					eff_token = GL.getConsistentEffect(Action.subgraph(NP, _link.source), _link.label)
-				except:
-					print('no good reason')
+
+				eff_token = GL.getConsistentEffect(Action.subgraph(NP, _link.source), _link.label)
+
 				try:
 					pre_link = NP.RemoveSubgraph(_link.label)
 				except:
@@ -181,10 +175,6 @@ class ActionLib:
 					self.RS.root.merge(gs.root)
 					self.RS.root.replaced_ID = gs.root.replaced_ID
 				self.append(partialUnify(self.RS, map), gs.stepnumber)
-			# possible_map = gs.isConsistentSubgraph(self.RS, return_map=True)
-			# if possible_map is False:
-			# 	continue
-			# self.append(partialUnify(self.RS,possible_map),gs.stepnumber)
 		if len(self) == 0:
 			raise ValueError('no gstep compatible with RS {}'.format(self))
 
