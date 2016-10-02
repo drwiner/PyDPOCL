@@ -69,6 +69,12 @@ class Action(ElementGraph):
 			if not isinstance(elm, Argument):
 				elm.replaced_ID = uuid.uuid1(self.root.stepnumber)
 
+	def deepcopy(self, replace_internals = False):
+		new_self = copy.deepcopy(self)
+		if replace_internals:
+			new_self.replaceInternals()
+		return new_self
+
 				#elm.ID = elm.replaced_ID
 				#elm.ID = uuid.uuid1(self.root.stepnumber)
 
@@ -156,6 +162,7 @@ class PlanElementGraph(ElementGraph):
 		Plan = cls(uuid.uuid1(2), name = 'Action_2_Plan', Elements = elements, Edges = edges)
 		Plan.OrderingGraph = OrderingGraph(ID=uuid.uuid1(5))
 		Plan.CausalLinkGraph = CausalLinkGraph(ID=uuid.uuid1(6))
+		#Plan.Steps = [A.root for A in Actions]
 		return Plan
 
 
@@ -259,8 +266,10 @@ class PlanElementGraph(ElementGraph):
 
 	@property
 	def Steps(self):
-		if not hasattr(self, 'Steps'):
-			self.Steps = [element for element in self.elements if type(element) is Operator]
+		return [element for element in self.elements if type(element) is Operator]
+		# if not hasattr(self, 'Steps'):
+		# 	self.Steps = [element for element in self.elements if type(element) is Operator]
+		#return self.Steps
 
 
 

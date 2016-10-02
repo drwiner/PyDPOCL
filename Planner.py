@@ -231,7 +231,7 @@ class PlanSpacePlanner:
 				plan.flaws.insert(self.GL, plan, Flaw((s_add, prec.sink), 'opf'))
 
 		#Good time as ever to updatePlan
-		plan.updatePlan()
+		#plan.updatePlan()
 		return plan
 
 	#@clock
@@ -361,7 +361,7 @@ def rFollowHierarchy(object_types, child_name, accumulated = set()):
 
 import unittest
 
-
+from Plannify import Plannify
 class TestPlanner(unittest.TestCase):
 	def testArk(self):
 		domain_file = 'domains/ark-domain.pddl'
@@ -400,7 +400,8 @@ class TestPlanner(unittest.TestCase):
 		for op in doperators:
 			decomp = next(iter(op.subgraphs))
 			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
-			assignments = TopicLib(decomp, story_planner.GL, objects)
+			Plannify(decomp, story_planner.GL)
+			#assignments = TopicLib(decomp, story_planner.GL, objects)
 		print('ok')
 
 if __name__ ==  '__main__':

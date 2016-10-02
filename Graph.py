@@ -71,11 +71,10 @@ class Graph(Element):
 				return element
 		return None
 	
-	def getElementByReplacedId(self, ID):
+	def getElmByRID(self, ID):
 		for element in self.elements:
-			if hasattr(element, 'replaced_ID'):
-				if element.replaced_ID == ID:
-					return element
+			if element.replaced_ID == ID:
+				return element
 		return None
 
 
