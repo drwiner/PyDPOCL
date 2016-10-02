@@ -25,22 +25,22 @@
                (< ?source - step ?sink - step)
                (linked-by ?source - step ?sink - step ?dependency - literal))
 
-    (:action indy-excavates
-     :parameters (?indy - actor ?excavate - step)
-     :precondition ()
-     :effect (bel-occurs ?excavate)
-     :decomp (and (name ?excavate excavate)
-                  (name ?indy indiana)
-                  (nth-step-arg 0 ?excavate ?indy)))
+   ; (:action indy-excavates
+   ;  :parameters (?indy - actor ?excavate - step)
+   ;  :precondition ()
+   ;  :effect (bel-occurs ?excavate)
+   ;  :decomp (and (name ?excavate excavate)
+   ;               (name ?indy indiana)
+   ;               (nth-step-arg 0 ?excavate ?indy)))
 
-    (:action indy-gets-ark
-     :parameters (?indy - actor ?ark - item ?excavate - step)
-     :precondition ()
-     :effect (bel-occurs ?excavate)
-     :decomp (and
-                  (name ?indy indiana)
-                  (name ?ark ark)
-                  (effect ?excavate (has ?indy ?ark))))
+    ;(:action indy-gets-ark
+    ; :parameters (?indy - actor ?ark - item ?excavate - step)
+    ; :precondition ()
+    ; :effect (bel-occurs ?excavate)
+    ; :decomp (and
+     ;             (name ?indy indiana)
+     ;             (name ?ark ark)
+     ;             (effect ?excavate (has ?indy ?ark))))
 
     (:action indy-excavates-ark-tanis
      :parameters (?indy - actor ?ark - item ?tanis - place ?excavate - step)
@@ -62,21 +62,31 @@
                   (nth-step-arg 1 ?steal ?stolen)
                   (linked ?excavate ?steal)))
 
-
-    (:action steal-before-excavate
-     :parameters (?excavate - step ?steal - step)
+   (:action linked-by-has-indy-ark
+     :parameters (?excavate - step ?steal - step ?indy - actor ?ark - item)
      :precondition (not (= ?excavate ?steal))
-     :effect (bel-precedes ?steal ?excavate)
+     :effect (bel-linked ?excavate ?steal)
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
-                  (< ?steal ?excavate)))
+                  (name ?ark ark)
+                  (name ?indy indiana)
+                  (linked-by ?excavate ?steal (has ?indy ?ark))))
 
-    ;(:action impossible-sequence
-     ;:parameters (?excavate - step ?steal - step)
-     ;:precondition (not (= ?excavate ?steal))
-     ;:effect (and (bel-linked ?excavate ?steal) (bel-precedes ?steal ?excavate))
+
+  ;  (:action steal-before-excavate
+   ;  :parameters (?excavate - step ?steal - step)
+    ; :precondition (not (= ?excavate ?steal))
+     ;:effect (bel-precedes ?steal ?excavate)
      ;:decomp (and (name ?excavate excavate)
       ;            (name ?steal steal)
-       ;           (linked ?excavate ?steal)
-        ;          (< ?steal ?excavate)))
+       ;           (< ?steal ?excavate)))
+
+    (:action impossible-sequence
+     :parameters (?excavate - step ?steal - step)
+     :precondition (not (= ?excavate ?steal))
+     :effect (and (bel-linked ?excavate ?steal) (bel-precedes ?steal ?excavate))
+     :decomp (and (name ?excavate excavate)
+                  (name ?steal steal)
+                  (linked ?excavate ?steal)
+                  (< ?steal ?excavate)))
 )

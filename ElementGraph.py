@@ -35,7 +35,7 @@ class ElementGraph(Graph):
 		"""
 		elm = EG.getElementById(elm.ID)
 		edges = EG.rGetDescendantEdges(elm)
-		elms = {edge.source for edge in edges}|{edge.sink for edge in edges}
+		elms = {edge.source for edge in edges}|{edge.sink for edge in edges}|{elm}
 		new_EG= cls(elm.ID, elm.typ, name=None, root_element=elm, Elements=elms, Edges=edges)
 		new_EG.updateArgs()
 		return new_EG

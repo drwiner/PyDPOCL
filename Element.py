@@ -222,9 +222,14 @@ class Operator(InternalElement):
 class Literal(InternalElement):
 	""" A Literal element is an internal element with a truth status
 	"""
-	def __init__(self, ID, typ, name = None, arg_name = None, num_args = None,truth = None):
-		if num_args == None:
+	def __init__(self, ID = None, typ = None, name = None, arg_name = None, num_args = None,truth = None):
+		if num_args is None:
 			num_args = 0
+		if ID is None:
+			from uuid import uuid1
+			ID = uuid1(1337)
+		if typ is None:
+			typ = 'Condition'
 
 		super(Literal,self).__init__(ID,typ,name, arg_name, num_args)
 		self.truth = truth
@@ -272,7 +277,7 @@ class Literal(InternalElement):
 		
 	def __repr__(self):
 		id = str(self.ID)[19:23]
-		return '{}-{}-{}-{}'.format(self.typ, self.truth, self.name,id)
+		return 'literal-{}-{}-{}'.format(id, self.truth, self.name)
 
 		
 		
@@ -326,7 +331,7 @@ class Argument(Element):
 			name = ''
 		else:
 			name = '-' + self.name
-		return 'Arg-{}-{}{}{}'.format(id, self.typ, name,  arg_name)
+		return 'arg-{}-{}{}{}'.format(id, self.typ, name,  arg_name)
 	
 
 class Actor(Argument):
@@ -351,7 +356,7 @@ class Actor(Argument):
 			name = ''
 		else:
 			name = '-' + self.name
-		return 'Actor-{}-{}{}{}'.format(id, self.typ, name, arg_name)
+		return 'actor-{}-{}{}{}'.format(id, self.typ, name, arg_name)
 
 class PlanElement(Element):
 

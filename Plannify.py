@@ -29,21 +29,28 @@ def partialUnify(PS, _map):
 			g_elm = _map[elm]
 			elm.merge(g_elm)
 			elm.replaced_ID = g_elm.replaced_ID
+			if elm.replaced_ID == -1:
+				#this is an object
+				elm.replaced_ID = g_elm.ID
+				elm.ID = g_elm.ID
 	NS.root.stepnumber = PS.root.stepnumber
 	return NS
-
-def Unify(P, G):
-	#new_elms = {elm for elm in G if elm.name not in (elm.name for elm in P.elements)}
-	NG = G.deepcopy(replace_internals = True)
-	P.elements.update({elm for elm in NG.elements if elm.replaced_ID not in (elm.replaced_ID for elm in P.elements)})
-	P.edges.update({Edge(P.getElmByRID(edge.source.replaced_ID), P.getElmByRID(edge.sink.replaced_ID),edge.label)
-					for edge in NG.edges})
 
 def isArgNameConsistent(Partially_Ground_Steps):
 	"""
 		@param Partially_Ground_Steps <-- partially ground required steps (PGRS), reach required step associated with ground step
 	"""
 	arg_name_dict = {}
+	for PGS in Partially_Ground_Steps:
+		for edge in PGS.edges:
+			if edge.label == 'precond-of':
+				elm = edge.sink
+				if not elm.arg_name is None:
+					if elm.arg_name in arg_name_dict.keys():
+						if not elm.isConsistent(arg_name_dict[elm.arg_name]):
+							return False
+					else:
+						arg_name_dict[elm.arg_name] = elm
 	for PGS in Partially_Ground_Steps:
 		for elm in PGS.elements:
 			if not elm.arg_name is None:
@@ -71,7 +78,7 @@ def Plannify(RQ, GL):
 	Planets = [PlanElementGraph.Actions_2_Plan(W) for W in Worlds if isArgNameConsistent(W)]
 
 	#Linkify installs orderings and causal links from RQ/decomp to Planets, rmvs Planets which cannot support links
-	has_links = Linkify(Planets, RQ)
+	has_links = Linkify(Planets, RQ, GL)
 
 	#Groundify is the process of replacing partial steps with its ground step, and removing inconsistent planets
 	Plans = Groundify(Planets, GL, has_links)
@@ -85,7 +92,10 @@ def Linkify(Planets, RQ, GL):
 	if len(orderings) > 0:
 		for Planet in Planets:
 			GtElm = Planet.getElementById
-			Planet.OrderingGraph.edges = {Edge(GtElm(ord.source.ID), GtElm(ord.sink.ID),'<') for ord in orderings}
+			try:
+				Planet.OrderingGraph.edges = {Edge(GtElm(ord.source.ID), GtElm(ord.sink.ID),'<') for ord in orderings}
+			except:
+				print('no')
 
 	links = RQ.CausalLinkGraph.edges
 	if len(links) == 0:
@@ -93,27 +103,18 @@ def Linkify(Planets, RQ, GL):
 
 	removable = set()
 	for link in links:
-		DP = None
-		if not link.label.arg_name is None:
-			DP = Condition.subgraph(RQ, link.label)
-
 		for i, Planet in enumerate(Planets):
 			src = Planet.getElementById(link.source.ID)
 			snk = Planet.getElementById(link.sink.ID)
-			if DP is None:
-				if not src.stepnumber in GL.ante_dict[snk.stepnumber]:
-					removable.add(i)
-					break
-			else:
-				for cpr in consistentConditions(GL[snk.stepnumber], DP):
-					if not src.stepnumber in GL.id_dict[cpr]:
-						removable.add(i)
-						break
-					else:
-						#ought we store possible consistent conditions?
-						pass
-			if not i in removable:
-				Planet.CausalLinkGraph.edges.add(src,snk,link.label)
+			cond = Planet.getElementById(link.label.ID)
+
+			#just checking... but shouldn't need to
+			if not src.stepnumber in GL.id_dict[cond.replaced_ID]:
+				removable.add(i)
+
+			Planet.CausalLinkGraph.addEdge(src, snk, cond)
+			Planet.OrderingGraph.addEdge(src,snk)
+
 		Planets[:] = [Planet for i, Planet in enumerate(Planets) if not i in removable]
 		if len(Planets) == 0:
 			raise ValueError('no Planet could support links in {}'.format(RQ.name))
@@ -122,13 +123,12 @@ def Linkify(Planets, RQ, GL):
 
 
 def Groundify(Planets, GL, has_links):
-	Discovered_Planets = set()
-	Removable_Planets = set()
+
 
 	for Planet in Planets:
 		for step in Planet.Steps:
 			Step = Action.subgraph(Planet, step)
-			Unify(Step, GL[step.stepnumber])
+			Planet.Unify(Step, GL[step.stepnumber])
 
 	if not has_links:
 		#we're done
@@ -145,40 +145,21 @@ def Groundify(Planets, GL, has_links):
 
 		for lw in LW:
 			NP = Plan.deepcopy()
-			for pre in lw:
+			for _link in lw:
 				#remove the precondition and let prelink.sink = effect
-				eff_token = GL.getConsistentEffect(Action.subgraph(NP, link.source), pre)
 				try:
-					pre_link = NP.RemoveSubgraph(pre)
+					eff_token = GL.getConsistentEffect(Action.subgraph(NP, _link.source), _link.label)
 				except:
-					raise ValueError('condition {} in Link World {} not found in plan {}'.format(pre,lw,Plan))
+					print('no good reason')
+				try:
+					pre_link = NP.RemoveSubgraph(_link.label)
+				except:
+					raise ValueError('condition {} in Link World {} not found in plan {}'.format(_link.label,lw,Plan))
 				pre_link.sink = eff_token
+				pre_link.sink.replaced_ID = eff_token.replaced_ID
 			Discovered_Planets.append(NP)
 
 	return Discovered_Planets
-
-
-		for link in Planet.CausalLinkGraph.edges:
-			DP = None
-			if not link.label.arg_name is None:
-				DP = Condition.subgraph(Planet, link.label)
-			else:
-				#create new worlds for each possible causal link
-				Sink = Action.subgraph(Planet, link.sink)
-				for pre in Sink.preconditions:
-					try:
-						eff = GL.getConsistentEffect(Action.subgraph(Planet,link.source),pre)
-					except:
-						continue
-
-					#NP = Planet.deepcopy()
-					pre_link = NP.RemoveSubgraph(pre)
-					pre_link.sink = eff
-					Discovered_Planets.add(NP)
-					Removable_Planets.add(Planet)
-
-				{dep for dep in GL.id_dict}
-				consistentConditions(link.sink.stepnumber, DP)
 
 
 class ActionLib:
@@ -188,29 +169,37 @@ class ActionLib:
 		RS.root.position = i
 		self.RS = RS
 		self.root = RS.root
-		self._subtopics = []
+		self._cndts = []
 		for gs in GL:
 			if not gs.root.isConsistent(self.RS.root):
 				continue
-			possible_map = gs.isConsistentSubgraph(self.RS, return_map=True)
-			if possible_map is False:
+			elm_maps = gs.findConsistentSubgraph(self.RS)
+			if len(elm_maps) == 0:
 				continue
-			self.append(partialUnify(self.RS,possible_map),gs.stepnumber)
+			for map in elm_maps:
+				if len(map) == 0:
+					self.RS.root.merge(gs.root)
+					self.RS.root.replaced_ID = gs.root.replaced_ID
+				self.append(partialUnify(self.RS, map), gs.stepnumber)
+			# possible_map = gs.isConsistentSubgraph(self.RS, return_map=True)
+			# if possible_map is False:
+			# 	continue
+			# self.append(partialUnify(self.RS,possible_map),gs.stepnumber)
 		if len(self) == 0:
 			raise ValueError('no gstep compatible with RS {}'.format(self))
 
 	def __len__(self):
-		return len(self._subtopics)
+		return len(self._cndts)
 
 	def __getitem__(self, position):
-		return self._subtopics[position]
+		return self._cndts[position]
 
 	def __setitem__(self, key, value):
-		self._subtopics[key] = value
+		self._cndts[key] = value
 
 	def append(self, item, stepnum):
 		item.root.stepnumber = stepnum
-		self._subtopics.append(item)
+		self._cndts.append(item)
 
 	@property
 	def edges(self):
@@ -221,7 +210,7 @@ class ActionLib:
 		return self.RS.elements
 
 	def __contains__(self, item):
-		return item in self._subtopics
+		return item in self._cndts
 
 	def __repr__(self):
 
@@ -242,20 +231,23 @@ class LinkLib:
 		self.position = position
 		self.source = link.source
 		self.sink = link.sink
+		self.condition = link.label
 
 		#LinkLib is a library of potential conditions, just 1 if already specified
-		self._conditions = []
+		self._links = []
 
 		if not link.label.arg_name is None:
-			self._conditions = [link.label]
+			#linked-by
+			self._links = [Edge(link.source, link.sink,self.condition)]
 		else:
 			# add new condition for each potential condition
-			self._conditions = GL.getPotentialLinkConditions(link.source.stepnumber, link.sink.stepnumber)
+			self._links = GL.getPotentialLinkConditions(link.source, link.sink)
 
 	def __len__(self):
-		return len(self._conditions)
+		return len(self._links)
+
 	def __getitem__(self, position):
-		return self._conditions[position]
+		return self._links[position]
 
 	def __repr__(self):
 		return '{}-- link-pos {} --> {}'.format(self.source, self.position, self.sink)

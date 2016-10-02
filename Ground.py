@@ -117,12 +117,13 @@ class GLib:
 			if count > 0:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
 
-	def getPotentialLinkConditions(self, src_num, snk_num):
+	def getPotentialLinkConditions(self, src, snk):
+		from Graph import Edge
 		cndts = []
-		for pre in self[snk_num].preconditions:
-			if not snk_num in self.id_dict[pre.replaced_ID]:
+		for pre in self[snk.stepnumber].preconditions:
+			if not src.stepnumber in self.id_dict[pre.replaced_ID]:
 				continue
-			cndts.add(pre)
+			cndts.add(Edge(src,snk,pre))
 		return cndts
 
 	def getConsistentEffect(self, S_Old, precondition):

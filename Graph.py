@@ -177,12 +177,15 @@ class Graph(Element):
 			#return_map = possible_map
 			return possible_map
 		return False
+
+	def findConsistentSubgraph(self, cndt_subgraph):
+		return findConsistentEdgeMap(Rem = copy.deepcopy(cndt_subgraph.edges), Avail = copy.deepcopy(self.edges))
 		
 	def isInternallyConsistent(self):
 		return not self.equivalentWithRestrictions()
 
 	def equivalentWithRestrictions(self):
-		if len(self.subplans) == 0:
+		if not hasattr(self, 'subplans') or len(self.subplans) == 0:
 			return False
 
 		for restriction in self.subgraphs:
@@ -230,11 +233,50 @@ def isConsistentEdgeSet(Rem, Avail, map_ = None, return_map = False):
 			Map_[edge_match.source] = cndt.source
 		if not cndt.sink in map_:
 			Map_[edge_match.sink] = cndt.sink
-		if isConsistentEdgeSet(copy.deepcopy(Rem), Avail-{cndt}, Map_):
+		_Map = isConsistentEdgeSet(copy.deepcopy(Rem), Avail-{cndt}, Map_, return_map)
+		if not _Map is False:
 			if return_map:
-				return Map_
-			return True
+				return _Map
+		#if isConsistentEdgeSet(copy.deepcopy(Rem), Avail-{cndt}, Map_):
+		#	if return_map:
+		#		return Map_
+		#	return True
 	return False
+
+
+
+def findConsistentEdgeMap(Rem, Avail, map_ = None, Super_Maps = None):
+	if map_ is None:
+		map_ = {}
+	if Super_Maps is None:
+		Super_Maps = []
+
+	#Base Case - all Remaining edges
+	if len(Rem) == 0:
+		Super_Maps.append(map_)
+		return Super_Maps
+
+	edge_match = Rem.pop()
+
+	cndt_edges = {edge for edge in Avail if edge.isConsistent(edge_match)}
+
+	if edge_match.source in map_:
+		cndt_edges -= {edge for edge in cndt_edges if not edge.source == map_[edge_match.source]}
+	if edge_match.sink in map_:
+		cndt_edges -= {edge for edge in cndt_edges if not edge.sink == map_[edge_match.sink]}
+
+	if len(cndt_edges) == 0:
+		return Super_Maps
+
+	for cndt in cndt_edges:
+		Map_ = copy.deepcopy(map_)
+		if not cndt.source in map_:
+			Map_[edge_match.source] = cndt.source
+		if not cndt.sink in map_:
+			Map_[edge_match.sink] = cndt.sink
+		findConsistentEdgeMap(copy.deepcopy(Rem), Avail-{cndt}, Map_, Super_Maps)
+
+	return Super_Maps
 
 #A method - unify - which given two graphs, will merge. currently performed by mergeGraph
 # def Unify(_Map = None, R = None, A = None):

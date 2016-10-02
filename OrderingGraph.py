@@ -9,8 +9,15 @@ class OrderingGraph(Graph):
 		if typ == None:
 			typ = 'ordering graph'
 		super(OrderingGraph,self).__init__(ID,typ,name,Elements,Edges,Restrictions=None)
+
+	def __len__(self):
+		return len(self.edges)
 		
 	def isInternallyConsistent(self):
+
+		if len(self) == 0:
+			return True
+
 		if self.detectCycle():
 			return False
 		return True

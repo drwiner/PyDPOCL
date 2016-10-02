@@ -242,19 +242,26 @@ def decorateElm(child, DG):
 		DG.edges.add(Edge(whichElm(arg1.key.name,DG), child_elm, label))
 	elif child.key == 'linked':
 		arg1, arg2 = child.children
-		DG.CausalLinkGraph.addEdge(whichElm(arg1.key.name, DG), whichElm(arg2.key.name, DG), Literal(ID = -20,
-																									 typ='Condition',
-																									 truth=True))
+		dep = Literal(typ='Condition', arg_name='link-condition')
+		Src = whichElm(arg1.key.name, DG)
+		Snk = whichElm(arg2.key.name, DG)
+		DG.CausalLinkGraph.addEdge(Src, Snk, dep)
+		DG.edges.add(Edge(Snk, dep, 'precond-of'))
+		DG.edges.add(Edge(Src, dep, 'effect-of'))
 	elif child.key == '<':
 		arg1, arg2 = child.children
 		DG.OrderingGraph.addEdge(whichElm(arg1.key.name, DG), whichElm(arg2.key.name, DG))
 	elif child.key == 'linked-by':
-		arg1, arg2, by = child.children
+		src, snk, by = child.children
 		try:
 			dep = whichElm(by.key.name, DG)
 		except:
-			dep = litFromArg(arg2,DG)
-		DG.CausalLinkGraph.addEdge(whichElm(arg1.key.name, DG), whichElm(arg2.key.name, DG), dep)
+			dep = litFromArg(by,DG)
+		Src = whichElm(src.key.name, DG)
+		Snk =  whichElm(snk.key.name, DG)
+		DG.CausalLinkGraph.addEdge(Src,Snk, dep)
+		DG.edges.add(Edge(Snk, dep, 'precond-of'))
+		DG.edges.add(Edge(Src, dep, 'effect-of'))
 	elif child.key == 'consents':
 		arg1, arg2, by = child.children
 		DG.edges.add(Edge(whichElm(arg1.key.name, arg2.key.name, 'actor-of')))
@@ -280,7 +287,7 @@ def litFromArg(arg,DG):
 		arg = arg.children[0]
 	# arg 2 is written out
 	lit_name = arg.key
-	lit_elm = Literal(ID=uuid.uuid1(256), typ = 'Condition', name=lit_name, num_args=len(arg.children), truth=neg)
+	lit_elm = Literal(ID=uuid.uuid1(256), typ = 'Condition', arg_name=lit_name, num_args=len(arg.children), truth=neg)
 	for i, ch in enumerate(arg.children):
 		e_i = whichElm(ch.key.name, DG)
 		DG.edges.add(Edge(lit_elm, e_i, ARGLABELS[i]))

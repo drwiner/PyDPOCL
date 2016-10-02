@@ -5,7 +5,7 @@ from heapq import heappush, heappop
 import itertools
 from clockdeco import clock
 from Ground import GLib
-from Plannify import TopicLib
+
 
 """
 	Algorithm for Plan-Graph-Space search of Story Plan
@@ -400,7 +400,14 @@ class TestPlanner(unittest.TestCase):
 		for op in doperators:
 			decomp = next(iter(op.subgraphs))
 			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
-			Plannify(decomp, story_planner.GL)
+			plans = Plannify(decomp, story_planner.GL)
+			#print('\n')
+			for plan in plans:
+				for step in plan.Steps:
+					print(Action.subgraph(plan,step))
+				print(plan.isInternallyConsistent())
+				print('\n')
+			print('check')
 			#assignments = TopicLib(decomp, story_planner.GL, objects)
 		print('ok')
 
