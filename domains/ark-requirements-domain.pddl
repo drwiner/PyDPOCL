@@ -25,22 +25,22 @@
                (< ?source - step ?sink - step)
                (linked-by ?source - step ?sink - step ?dependency - literal))
 
-   ; (:action indy-excavates
-   ;  :parameters (?indy - actor ?excavate - step)
-   ;  :precondition ()
-   ;  :effect (bel-occurs ?excavate)
-   ;  :decomp (and (name ?excavate excavate)
-   ;               (name ?indy indiana)
-   ;               (nth-step-arg 0 ?excavate ?indy)))
+    (:action indy-excavates
+     :parameters (?indy - actor ?excavate - step)
+     :precondition ()
+     :effect (bel-occurs ?excavate)
+     :decomp (and (name ?excavate excavate)
+                  (name ?indy indiana)
+                  (nth-step-arg 0 ?excavate ?indy)))
 
-    ;(:action indy-gets-ark
-    ; :parameters (?indy - actor ?ark - item ?excavate - step)
-    ; :precondition ()
-    ; :effect (bel-occurs ?excavate)
-    ; :decomp (and
-     ;             (name ?indy indiana)
-     ;             (name ?ark ark)
-     ;             (effect ?excavate (has ?indy ?ark))))
+    (:action indy-gets-ark
+     :parameters (?indy - actor ?ark - item ?excavate - step)
+     :precondition ()
+     :effect (bel-occurs ?excavate)
+     :decomp (and
+                  (name ?indy indiana)
+                  (name ?ark ark)
+                  (effect ?excavate (has ?indy ?ark))))
 
     (:action indy-excavates-ark-tanis
      :parameters (?indy - actor ?ark - item ?tanis - place ?excavate - step)
@@ -72,7 +72,7 @@
                   (name ?indy indiana)
                   (linked-by ?excavate ?steal (has ?indy ?ark))))
 
-
+; there's a lot, so I'm not including it
   ;  (:action steal-before-excavate
    ;  :parameters (?excavate - step ?steal - step)
     ; :precondition (not (= ?excavate ?steal))
