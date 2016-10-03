@@ -8,6 +8,7 @@ def Plannify(RQ, GL):
 	#An ActionLib for steps in RQ - ActionLib is a container w/ all of its possible instances as ground steps
 	Libs = [ActionLib(i, RS, GL) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
 
+
 	#A World is a combination of one ground-instance from each step
 	Worlds = productByPosition(Libs)
 
@@ -15,8 +16,6 @@ def Plannify(RQ, GL):
 	Planets = [PlanElementGraph.Actions_2_Plan(W) for W in Worlds if isArgNameConsistent(W)]
 
 	#Linkify installs orderings and causal links from RQ/decomp to Planets, rmvs Planets which cannot support links
-	if RQ.name == 'multi-sink':
-		print('here')
 	has_links = Linkify(Planets, RQ, GL)
 
 	#Groundify is the process of replacing partial steps with its ground step, and removing inconsistent planets
@@ -85,6 +84,9 @@ def Linkify(Planets, RQ, GL):
 	if len(links) == 0:
 		return False
 
+	if RQ.name == 'multi-sink':
+		print("ok")
+
 	removable = set()
 	for link in links:
 		for i, Planet in enumerate(Planets):
@@ -108,7 +110,10 @@ def Linkify(Planets, RQ, GL):
 			# print(src.stepnumber in GL.id_dict[cond.replaced_ID])
 			# print('\n')
 
+		if len(removable) > 0:
+			print('oh')
 		Planets[:] = [Planet for i, Planet in enumerate(Planets) if not i in removable]
+		removable = set()
 		if len(Planets) == 0:
 			raise ValueError('no Planet could support links in {}'.format(RQ.name))
 
@@ -226,7 +231,7 @@ class LinkLib:
 
 		if not link.label.arg_name is None:
 			#linked-by
-			self._links = [Edge(link.source, link.sink,self.condition)]
+			self._links = [Edge(link.source, link.sink, self.condition)]
 		else:
 			# add new condition for each potential condition
 			self._links = GL.getPotentialLinkConditions(link.source, link.sink)

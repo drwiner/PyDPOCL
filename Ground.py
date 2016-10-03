@@ -123,7 +123,8 @@ class GLib:
 		for pre in self[snk.stepnumber].preconditions:
 			if not src.stepnumber in self.id_dict[pre.replaced_ID]:
 				continue
-			cndts.add(Edge(src,snk,pre))
+
+			cndts.add(Edge(src,snk,copy.deepcopy(pre)))
 		return cndts
 
 	def getConsistentEffect(self, S_Old, precondition):
