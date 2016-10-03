@@ -273,6 +273,7 @@ class PlanSpacePlanner:
 
 		return results
 
+
 	@clock
 	def POCL(self, num_plans = 5):
 		Completed = []
@@ -370,16 +371,20 @@ class TestPlanner(unittest.TestCase):
 																								 problem_file)
 		FlawLib.non_static_preds = preprocessDomain(operators)
 		Argument.object_types = obTypesDict(object_types)
-		planner = PlanSpacePlanner(operators, objects, initAction, goalAction,preprocess = True)
+		planner = PlanSpacePlanner(operators, objects, initAction, goalAction,preprocess = False)
 
-		n = 2
+		n = 6
+		print('\nRunning Story Planner on ark-domain and problem to find {} solutions'.format(n))
+
 		results = planner.POCL(n)
 		assert len(results) == n
 		for result in results:
-			totOrdering = topoSort(result)
-			print('\n\n\n')
+			#totOrdering = topoSort(result)
+			print('\n')
 			for step in topoSort(result):
 				print(Action.subgraph(result, step))
+		print('\n\n')
+		pass
 
 	def testDecomp(self):
 		sdomain_file = 'domains/ark-domain.pddl'
@@ -396,23 +401,23 @@ class TestPlanner(unittest.TestCase):
 		doperators, dobjects, dobject_types, dinitAction, dgoalAction = parseDomainAndProblemToGraphs(domain_file,
 																								problem_file)
 
+		print('Reading story requirements from ark-requirements-domain and ark-requirements-problem')
 		#empty_plan = story_planner.Open.pop()
 		for op in doperators:
 			decomp = next(iter(op.subgraphs))
 			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
 			plans = Plannify(decomp, story_planner.GL)
-			#print('\n')
-			#for plan in plans:
-				#for step in plan.Steps:
-					#print(Action.subgraph(plan,step))
+			print('\n')
+			for plan in plans:
+				for step in plan.Steps:
+					print(Action.subgraph(plan,step))
 				#print(plan.isInternallyConsistent())
-				#print('\n')
+				print('\n')
 			#print('check')
-			#assignments = TopicLib(decomp, story_planner.GL, objects)
 		print('ok')
 
 if __name__ ==  '__main__':
-	tp = TestPlanner()
-	tp.testDecomp()
+	#tp = TestPlanner()
+	#tp.testDecomp()
 	#unittest.testDecomp()
-	# unittest.main()
+	unittest.main()

@@ -20,7 +20,7 @@ def Plannify(RQ, GL):
 	#Groundify is the process of replacing partial steps with its ground step, and removing inconsistent planets
 	Plans = Groundify(Planets, GL, has_links)
 
-	return Plans
+	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
 
 
 def partialUnify(PS, _map):
@@ -68,7 +68,6 @@ def isArgNameConsistent(Partially_Ground_Steps):
 def productByPosition(Libs):
 	return itertools.product(*[list(Libs[T.position]) for T in Libs])
 
-@clock
 def Linkify(Planets, RQ, GL):
 	#Planets are plans containing steps which may not be ground steps from GL
 	orderings = RQ.OrderingGraph.edges
@@ -91,12 +90,21 @@ def Linkify(Planets, RQ, GL):
 			snk = Planet.getElementById(link.sink.ID)
 			cond = Planet.getElementById(link.label.ID)
 
+			#if not src.stepnumber in GL.ante_dict[snk.stepnumber] and src.stepnumber in GL.id_dict[cond.replaced_ID]:
+			#	print('\nFACK\n')
 			#just checking... but shouldn't need to
-			if not src.stepnumber in GL.id_dict[cond.replaced_ID]:
+			if not src.stepnumber in GL.id_dict[cond.replaced_ID] or not src.stepnumber in GL.ante_dict[snk.stepnumber]:
 				removable.add(i)
+				continue
 
 			Planet.CausalLinkGraph.addEdge(src, snk, cond)
 			Planet.OrderingGraph.addEdge(src,snk)
+			#
+			# print(GL[src.stepnumber])
+			# print(cond)
+			# print(GL[snk.stepnumber])
+			# print(src.stepnumber in GL.id_dict[cond.replaced_ID])
+			# print('\n')
 
 		Planets[:] = [Planet for i, Planet in enumerate(Planets) if not i in removable]
 		if len(Planets) == 0:
@@ -104,7 +112,7 @@ def Linkify(Planets, RQ, GL):
 
 	return True
 
-@clock
+
 def Groundify(Planets, GL, has_links):
 
 	for Planet in Planets:

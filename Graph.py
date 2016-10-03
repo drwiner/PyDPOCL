@@ -331,56 +331,58 @@ def findConsistentEdgeMap(Rem, Avail, map_ = None, Super_Maps = None):
 import unittest
 
 class TestGraph(unittest.TestCase):
-	def test_consistent_edge_set(self):
-		"""
-				Full Graph
-				1 --> 2 --> 3 --> 5
-					  2 --> 4 --> 5
-
-				Requirements
-				[2]  --> [3]
-				[2]  --> [4]
-
-
-			"""
-		G = 	  ['buffer',
-				   Element(ID=1,name=1, typ='1'),
-				   Element(ID=2,name=2, typ='2'),
-				   Element(ID=3,name=3, typ='3'),
-				   Element(ID=4,name=4, typ='4'),
-				   Element(ID=5,name=5, typ='5')]
-		O =		  [Element(ID=20, typ='2'),
-				   Element(ID=30, typ='3'),
-				   Element(ID=40, typ='4')]
-
-		Avail = {Edge(G[1],G[2],'a'),
-			   Edge(G[2],G[3], 'b'),
-			   Edge(G[2],G[4], 'c'),
-			   Edge(G[3],G[5], 'd'),
-			   Edge(G[4],G[5], 'e')}
-		Rem = {
-				Edge(O[0],O[1], 'b'),
-				Edge(O[0],O[2], 'c')}
-
-
-		isit = isConsistentEdgeSet(Rem, Avail)
-		assert(isit)
-		assert(not isConsistentEdgeSet(Avail, Rem))
-		print(isit)
-
-		#With LARGER example to look through
-		G = ['buffer']
-		G+= [Element(ID=i, name=i, typ=str(i)) for i in range(1,900)]
-		Avail = {Edge(G[i],G[i+1],'m') for i in range(1,700)}
-		Avail.update({Edge(G[1],G[2],'a'),
-			   Edge(G[2],G[3], 'b'),
-			   Edge(G[2],G[4], 'c'),
-			   Edge(G[3],G[5], 'd'),
-			   Edge(G[4],G[5], 'e')})
-
-		isit = isConsistentEdgeSet(Rem, Avail)
-		assert (isit)
-		print(isit)
+	pass
+	# def test_consistent_edge_set(self):
+	# 	"""
+	# 			Full Graph
+	# 			1 --> 2 --> 3 --> 5
+	# 				  2 --> 4 --> 5
+	#
+	# 			Requirements
+	# 			[2]  --> [3]
+	# 			[2]  --> [4]
+	#
+	#
+	# 		"""
+	# 	G = 	  ['buffer',
+	# 			   Element(ID=1,name=1, typ='1'),
+	# 			   Element(ID=2,name=2, typ='2'),
+	# 			   Element(ID=3,name=3, typ='3'),
+	# 			   Element(ID=4,name=4, typ='4'),
+	# 			   Element(ID=5,name=5, typ='5')]
+	# 	O =		  [Element(ID=20, typ='2'),
+	# 			   Element(ID=30, typ='3'),
+	# 			   Element(ID=40, typ='4')]
+	#
+	# 	Avail = {Edge(G[1],G[2],'a'),
+	# 		   Edge(G[2],G[3], 'b'),
+	# 		   Edge(G[2],G[4], 'c'),
+	# 		   Edge(G[3],G[5], 'd'),
+	# 		   Edge(G[4],G[5], 'e')}
+	# 	Rem = {
+	# 			Edge(O[0],O[1], 'b'),
+	# 			Edge(O[0],O[2], 'c')}
+	#
+	#
+	# 	isit = isConsistentEdgeSet(Rem, Avail)
+	# 	assert(isit)
+	# 	assert(not isConsistentEdgeSet(Avail, Rem))
+	# 	print(isit)
+	#
+	# 	#With LARGER example to look through
+	# 	G = ['buffer']
+	# 	G+= [Element(ID=i, name=i, typ=str(i)) for i in range(1,900)]
+	# 	Avail = {Edge(G[i],G[i+1],'m') for i in range(1,700)}
+	# 	Avail.update({Edge(G[1],G[2],'a'),
+	# 		   Edge(G[2],G[3], 'b'),
+	# 		   Edge(G[2],G[4], 'c'),
+	# 		   Edge(G[3],G[5], 'd'),
+	# 		   Edge(G[4],G[5], 'e')})
+	#
+	# 	isit = isConsistentEdgeSet(Rem, Avail)
+	# 	assert (isit)
+	# 	print(isit)
 
 if __name__ ==  '__main__':
-	unittest.main()
+	pass
+	#unittest.main()
