@@ -417,7 +417,7 @@ class TestPlanner(unittest.TestCase):
 		print('ok')
 
 if __name__ ==  '__main__':
-	#tp = TestPlanner()
-	#tp.testDecomp()
+	tp = TestPlanner()
+	tp.testDecomp()
 	#unittest.testDecomp()
-	unittest.main()
+	#unittest.main()

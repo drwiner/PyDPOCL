@@ -15,6 +15,8 @@ def Plannify(RQ, GL):
 	Planets = [PlanElementGraph.Actions_2_Plan(W) for W in Worlds if isArgNameConsistent(W)]
 
 	#Linkify installs orderings and causal links from RQ/decomp to Planets, rmvs Planets which cannot support links
+	if RQ.name == 'multi-sink':
+		print('here')
 	has_links = Linkify(Planets, RQ, GL)
 
 	#Groundify is the process of replacing partial steps with its ground step, and removing inconsistent planets

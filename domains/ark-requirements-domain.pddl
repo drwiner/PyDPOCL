@@ -89,4 +89,24 @@
                   (name ?steal steal)
                   (linked ?excavate ?steal)
                   (< ?steal ?excavate)))
+
+    (:action multi-sink
+     :parameters (?excavate - step ?steal - step ?travel - step)
+     :precondition (and (not (= ?excavate ?steal)) (not (= ?excavate ?travel)) (not (= ?steal ?travel)))
+     :effect (and (bel-linked ?excavate ?steal) (bel-linked ?travel ?steal))
+     :decomp (and (name ?excavate excavate)
+                  (name ?steal steal)
+                  (name ?travel travel)
+                  (linked ?travel ?steal)
+                  (linked ?excavate ?steal)))
+
+    ;(:action multi-sink
+    ; :parameters (?excavate - step ?steal - step ?open-ark - step)
+    ; :precondition (and (not (= ?excavate ?steal)) (not (= ?excavate ?open-ark)) (not (= ?steal ?open-ark)))
+    ; :effect (and (bel-linked ?excavate ?open-ark) (bel-linked ?steal ?open-ark))
+    ; :decomp (and (name ?excavate excavate)
+     ;             (name ?steal steal)
+      ;            (name ?open-ark open-ark)
+       ;           (linked ?steal ?open-ark)
+        ;          (linked ?excavate ?open-ark)))
 )

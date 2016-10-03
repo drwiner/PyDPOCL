@@ -219,6 +219,7 @@ def getGoalSet(goal_formula, objects):
 				
 	return (goal_elements, goal_edges)
 
+
 def decorateElm(child, DG):
 	if child.key == 'name':
 		elm = whichElm(child.children[0].key.name, DG)
@@ -242,7 +243,7 @@ def decorateElm(child, DG):
 		DG.edges.add(Edge(whichElm(arg1.key.name,DG), child_elm, label))
 	elif child.key == 'linked':
 		arg1, arg2 = child.children
-		dep = Literal(typ='Condition', arg_name='link-condition')
+		dep = Literal(typ='Condition', arg_name='link-condition'+str(uuid.uuid1(1))[19:23])
 		Src = whichElm(arg1.key.name, DG)
 		Snk = whichElm(arg2.key.name, DG)
 		DG.CausalLinkGraph.addEdge(Src, Snk, dep)
