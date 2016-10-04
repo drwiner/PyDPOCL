@@ -127,6 +127,17 @@ class GLib:
 			cndts.add(Edge(src,snk,copy.deepcopy(pre)))
 		return cndts
 
+	def getPotentialEffectLinkConditions(self, src, snk):
+		from Graph import Edge
+		cndts = []
+		for eff in self[src.stepnumber].effects:
+			for pre in self[snk.stepnumber].preconditions:
+				if not eff.replaced_ID in self.id_dict[pre.replaced_ID]:
+					continue
+				cndts.add(Edge(src, snk, copy.deepcopy(eff)))
+
+		return cndts
+
 	def getConsistentEffect(self, S_Old, precondition):
 		effect_token = None
 		for eff in S_Old.effects:
@@ -136,6 +147,22 @@ class GLib:
 		if effect_token == None:
 			raise AttributeError('GL.eff_dict empty but id_dict has antecedent')
 		return effect_token
+
+	def hasConsistentPrecondition(self, Sink, effect):
+		for pre in Sink.preconditions:
+			if effect.replaced_ID in self.eff_dict[pre.replaced_ID]:
+				return True
+		return False
+
+	def getConsistentPrecondition(self, Sink, effect):
+		pre_token = None
+		for pre in Sink.preconditions:
+			if effect.replaced_ID in self.eff_dict[pre.replaced_ID]:
+				pre_token = pre
+				break
+		if pre_token == None:
+			raise AttributeError('effect {} not in GL.eff_Dict for Sink {}'.format(effect, Sink))
+		return pre_token
 
 	def __len__(self):
 		return len(self._gsteps)
