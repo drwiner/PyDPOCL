@@ -211,9 +211,13 @@ class PlanElementGraph(ElementGraph):
 				#else, this v-step is to be reused by u-step
 				_map[step] = U.Steps[i]
 
-
-
-
+		for ordering in V.OrderingGraph.edges:
+			U.OrderingGraph.addEdge(_map[ordering.source], _map[ordering.sink])
+		for link in V.CausalLinkGraph.edges:
+			#get the effect of the mapped u-step (possibly former vstep)
+			condition = Action.subgraph(U,_map[link.source]).getElmByRID(link.label.replaced_ID)
+			U.CausalLinkGraph.addEdge(_map[link.source],_map[link.sink],condition)
+		return U
 
 	def __lt__(self, other):
 		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
