@@ -199,6 +199,21 @@ class PlanElementGraph(ElementGraph):
 		#Combine
 		pass
 
+	def Integrate(U, W, V):
+		#W is [1,..., k] where  1--> k are the indices of V.Steps
+		_map = {}
+		for i, step in enumerate(W):
+			if step in V.Steps:
+				#then, add this step,
+				U.AddSubgraph(Action.subgraph(V,step))
+				_map[step] = step
+			else:
+				#else, this v-step is to be reused by u-step
+				_map[step] = U.Steps[i]
+
+
+
+
 
 	def __lt__(self, other):
 		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
@@ -221,6 +236,10 @@ class PlanElementGraph(ElementGraph):
 		self.elements -= {elm}
 		self.edges -= to_remove
 		return link
+
+	def AddSubgraph(self, subgraph):
+		self.elements.update(subgraph.elements)
+		self.edges.update(subgraph.edges)
 
 
 	def relaxedStep(self, GL, step, visited):

@@ -241,3 +241,11 @@ class LinkLib:
 
 	def __repr__(self):
 		return '{}-- link-pos {} --> {}'.format(self.source, self.position, self.sink)
+
+
+class ReuseLib:
+	def __init__(self, i, vstep, U):
+		self.position = i
+		self.step = vstep
+		self._cndts = [ustep for ustep in U.Steps if ustep.stepnumber == vstep.stepnumber]
+		self._cndts.append(vstep)
