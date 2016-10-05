@@ -161,26 +161,20 @@ class PlanElementGraph(ElementGraph):
 		edges = set().union(*[A.edges for A in Actions])
 		Plan = cls(uuid.uuid1(2), name='Action_2_Plan', Elements=elements, Edges=edges)
 		for edge in Plan.edges:
-			if edge.label == 'precond-of':
+			if edge.label == 'effect-of':
 				elm = Plan.getElementById(edge.sink.ID)
 				elm.replaced_ID = edge.sink.replaced_ID
-				#for e in Plan.edges:
-				#	if e.sink.ID == elm.ID and e != edge:
-				#		e.sink.replaced_ID = edge.sink.replaced_ID
+
 		Plan.OrderingGraph = OrderingGraph(ID=uuid.uuid1(5))
 		Plan.CausalLinkGraph = CausalLinkGraph(ID=uuid.uuid1(6))
 		#Plan.Steps = [A.root for A in Actions]
 		return Plan
 
 	def Unify(self, P, G):
-		# new_elms = {elm for elm in G if elm.name not in (elm.name for elm in P.elements)}
+
 		NG = G.deepcopy(replace_internals=True)
-		#old_elms = {elm.replaced_ID for elm in P.elements}
-		#self.elements.update({elm for elm in NG.elements if elm.replaced_ID not in old_elms})
 
-
-
-		for edge in G.edges:
+		for edge in NG.edges:
 
 			if edge.sink.replaced_ID == -1:
 				sink = copy.deepcopy(edge.sink)
@@ -198,38 +192,6 @@ class PlanElementGraph(ElementGraph):
 				self.elements.add(source)
 
 			self.edges.add(Edge(source, sink, edge.label))
-		#
-		# 	if edge.source.re
-		#
-		# for arg in NG.elements:
-		# 	if not arg in self.elements:
-		# 		if arg.replaced_ID == -1:
-		# 			new_arg = copy.deepcopy(arg)
-		# 			new_arg.replaced_ID = arg.ID
-		# 		else:
-		# 			try:
-		# 				self.getElmByRID(new_arg.replaced_ID)
-		# 				continue
-		# 			except:
-		# 				new_arg = copy.deepcopy(arg)
-		# 		self.elements.add(new_arg)
-		# 			#if new_arg.name == 'excavate' or new_arg.name == 'steal':
-		# 			#	print('dude')
-
-
-		# for edge in NG.edges:
-		# 	if not edge in self.edges:
-		# 		if edge.sink.replaced_ID != -1:
-		# 			self.edges.add(Edge(self.getElmByRID(edge.source.replaced_ID),
-		# 								self.getElmByRID(edge.sink.replaced_ID),
-		# 								edge.label))
-		# 		else:
-		# 			try:
-		# 				self.edges.add(Edge(self.getElmByRID(edge.source.replaced_ID),
-		# 								self.getElmByRID(edge.sink.ID),
-		# 								edge.label))
-		# 			except:
-		# 				print('check')
 
 
 	def __lt__(self, other):

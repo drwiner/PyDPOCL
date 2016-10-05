@@ -30,47 +30,22 @@ def partialUnify(PS, _map):
 	if _map is False:
 		return False
 	NS = PS.deepcopy()
-	for edge in NS.edges:
-		if edge.label == 'effect-of':
-			elm = edge.sink
-			if elm in _map:
-				g_elm = _map[elm]
-				elm.merge(g_elm)
-				elm.replaced_ID = g_elm.replaced_ID
-				if elm.replaced_ID == -1:
-					# this is an object
-					elm.replaced_ID = g_elm.ID
-					elm.ID = g_elm.ID
-	for edge in NS.edges:
-		elm = edge.source
+	effects = [edge.sink for edge in NS.edges if edge.label == 'effect-of']
+	for elm in effects:
 		if elm in _map:
 			g_elm = _map[elm]
 			elm.merge(g_elm)
 			elm.replaced_ID = g_elm.replaced_ID
-			if elm.replaced_ID == -1:
-				#this is an object
-				elm.replaced_ID = g_elm.ID
-				elm.ID = g_elm.ID
-		elm = edge.sink
-		if elm in _map:
-			g_elm = _map[elm]
-			elm.merge(g_elm)
-			elm.replaced_ID = g_elm.replaced_ID
-			if elm.replaced_ID == -1:
-				# this is an object
-				elm.replaced_ID = g_elm.ID
-				elm.ID = g_elm.ID
-	NS.elements = {edge.source for edge in NS.edges}|{edge.sink for edge in NS.edges}
 
-	# for elm in NS.elements:
-	# 	if elm in _map:
-	# 		g_elm = _map[elm]
-	# 		elm.merge(g_elm)
-	# 		elm.replaced_ID = g_elm.replaced_ID
-	# 		if elm.replaced_ID == -1:
-	# 			#this is an object
-	# 			elm.replaced_ID = g_elm.ID
-	# 			elm.ID = g_elm.ID
+	for elm in NS.elements:
+		if elm in _map:
+			g_elm = _map[elm]
+			elm.merge(g_elm)
+			elm.replaced_ID = g_elm.replaced_ID
+			if elm.replaced_ID == -1:
+				# this is an object/constant
+				elm.replaced_ID = g_elm.ID
+				elm.ID = g_elm.ID
 	NS.root.stepnumber = PS.root.stepnumber
 	return NS
 
@@ -80,15 +55,6 @@ def isArgNameConsistent(Partially_Ground_Steps):
 		@param Partially_Ground_Steps <-- partially ground required steps (PGRS), reach required step associated with ground step
 	"""
 	arg_name_dict = {}
-	effects = {edge.sink for PGS in Partially_Ground_Steps for edge in PGS.edges if edge.label == 'effect-of'}
-	for elm in effects:
-		if elm.arg_name is None:
-			continue
-		if elm.arg_name in arg_name_dict.keys():
-			if not elm.isConsistent(arg_name_dict[elm.arg_name]):
-				return False
-		else:
-			arg_name_dict[elm.arg_name] = elm
 
 	for PGS in Partially_Ground_Steps:
 		for elm in PGS.elements:
@@ -118,13 +84,6 @@ def Linkify(Planets, RQ, GL):
 	if len(links) == 0:
 		return False
 
-	if RQ.name == 'multi-sink':
-		print("ok")
-
-	#for Planet in Planets:
-	#	for edge in Planet.edges:
-#	#		if
-
 	removable = set()
 	for link in links:
 		for i, Planet in enumerate(Planets):
@@ -140,24 +99,9 @@ def Linkify(Planets, RQ, GL):
 				removable.add(i)
 				continue
 
-			# if not snk.stepnumber in GL.eff_id_dict[cond.replaced_ID]:
-			# 	continue
-
-			#if not src.stepnumber in GL.ante_dict[snk.stepnumber] and src.stepnumber in GL.id_dict[cond.replaced_ID]:
-			#	print('\nFACK\n')
-			#just checking... but shouldn't need to
-			# if not src.stepnumber in GL.id_dict[cond.replaced_ID] or not src.stepnumber in GL.ante_dict[snk.stepnumber]:
-			# 	removable.add(i)
-			# 	continue
-
 			Planet.CausalLinkGraph.addEdge(src, snk, cond)
 			Planet.OrderingGraph.addEdge(src,snk)
-			#
-			# print(GL[src.stepnumber])
-			# print(cond)
-			# print(GL[snk.stepnumber])
-			# print(src.stepnumber in GL.id_dict[cond.replaced_ID])
-			# print('\n')
+
 
 		Planets[:] = [Planet for i, Planet in enumerate(Planets) if not i in removable]
 		removable = set()
@@ -190,21 +134,10 @@ def Groundify(Planets, GL, has_links):
 		for lw in LW:
 			NP = Plan.deepcopy()
 			for _link in lw:
-				pre_token = GL.getConsistentPrecondition(Action.Subgraph(NP, _link.sink), _link.label)
+				pre_token = GL.getConsistentPrecondition(Action.subgraph(NP, _link.sink), _link.label)
 				pre_link = NP.RemoveSubgraph(pre_token)
 				pre_link.sink = _link.label
 
-				#eff_token = GL.getConsistentEffect(Action.subgraph(NP, _link.source), _link.label)
-
-				# pre_link.sink = _link.label
-				#
-                #
-				# try:
-				# 	#eff_link = NP.RemoveSubgraph(_link.label)
-				# except:
-				# 	raise ValueError('condition {} in Link World {} not found in plan {}'.format(_link.label,lw,Plan))
-				# pre_link.sink = eff_token
-				# pre_link.sink.replaced_ID = eff_token.replaced_ID
 			Discovered_Planets.append(NP)
 
 	return Discovered_Planets
