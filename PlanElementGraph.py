@@ -170,7 +170,7 @@ class PlanElementGraph(ElementGraph):
 		#Plan.Steps = [A.root for A in Actions]
 		return Plan
 
-	def Unify(self, P, G):
+	def UnifyActions(self, P, G):
 
 		NG = G.deepcopy(replace_internals=True)
 
@@ -192,6 +192,12 @@ class PlanElementGraph(ElementGraph):
 				self.elements.add(source)
 
 			self.edges.add(Edge(source, sink, edge.label))
+
+	def Unify(self, other, bindings = None):
+		#Unify two ground subplans
+		#Combine elements,
+		#Combine
+		pass
 
 
 	def __lt__(self, other):

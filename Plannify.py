@@ -15,8 +15,6 @@ def Plannify(RQ, GL):
 	#A Planet is a plan s.t. all steps are "arg_name consistent", but a step may not be equiv to some ground step
 	Planets = [PlanElementGraph.Actions_2_Plan(W) for W in Worlds if isArgNameConsistent(W)]
 
-	if len(Planets) == 0:
-		raise ValueError('ok')
 	#Linkify installs orderings and causal links from RQ/decomp to Planets, rmvs Planets which cannot support links
 	has_links = Linkify(Planets, RQ, GL)
 
@@ -25,6 +23,18 @@ def Plannify(RQ, GL):
 
 	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
 
+@clock
+def Reuse(U, V):
+	#Create library of possible U-steps to reuse steps in V
+	Reuse = [[u for u in U.Steps if u.stepnumber == v.stepnumber].append(v) for v in V.Steps]
+
+	#Create step lists where either "u" is reused to unify with "v" or "v" is added
+	Worlds = itertools.product(*Reuse)
+
+	#Create new U-Plans to Integrate V info (links and orderings) or add v-steps not reused (or both)
+	Plans = [U.Integrate(W, V) for W in Worlds]
+
+	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
 
 def partialUnify(PS, _map):
 	if _map is False:
@@ -116,7 +126,7 @@ def Groundify(Planets, GL, has_links):
 	for Planet in Planets:
 		for step in Planet.Steps:
 			Step = Action.subgraph(Planet, step)
-			Planet.Unify(Step, GL[step.stepnumber])
+			Planet.UnifyActions(Step, GL[step.stepnumber])
 
 	if not has_links:
 		#we're done

@@ -136,12 +136,6 @@ class ElementGraph(Graph):
 			self.replaceArg(original, arg_list[i])
 		self.updateArgs()
 
-	def Unify(self, other, _map):
-		for elm in self.elements:
-			for olm in other.elements:
-				pass
-		return self
-
 
 	def UnifyWithMap(self, mapping_tuples):
 		"""
@@ -154,9 +148,9 @@ class ElementGraph(Graph):
 
 		for (receiver, old_element) in mapping_tuples:
 			if not old_element in self.elements:
-				raise ValueError('old element {} in mapping_tuple in Unify was not found elements...'.format(old_element.ID))
+				raise ValueError('old element {} in mapping_tuple in UnifyActions was not found elements...'.format(old_element.ID))
 			if not receiver in self.elements:
-				raise ValueError('receiver element {} in mapping_tuple in Unify was not found in elements...'.format(receiver.ID))
+				raise ValueError('receiver element {} in mapping_tuple in UnifyActions was not found in elements...'.format(receiver.ID))
 			receiver.merge(old_element)
 			self.replaceWith(old_element, receiver)
 

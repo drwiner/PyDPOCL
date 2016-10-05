@@ -279,7 +279,7 @@ def findConsistentEdgeMap(Rem, Avail, map_ = None, Super_Maps = None):
 	return Super_Maps
 
 #A method - unify - which given two graphs, will merge. currently performed by mergeGraph
-# def Unify(_Map = None, R = None, A = None):
+# def UnifyActions(_Map = None, R = None, A = None):
 # 	"""
 #
 # 	@param _Map: dictonary
