@@ -35,13 +35,13 @@ import pickle
 
 @clock
 def upload(GL):
-	afile = open("GL","wb")
+	afile = open("story_GL","wb")
 	pickle.dump(GL,afile)
 	afile.close()
 
 @clock
 def reload():
-	afile = open("GL","rb")
+	afile = open("story_GL","rb")
 	GL = pickle.load(afile)
 	afile.close()
 	return GL
@@ -49,47 +49,25 @@ def reload():
 
 class PlanSpacePlanner:
 
-	def __init__(self, op_graphs, objects, init_action, goal_action, preprocess = False):
+	def __init__(self, story_ops, story_objs, story_GL, disc_ops=None, disc_objects=None, disc_GL=None):
 		#Assumes these parameters are already read from file
 
-		self.op_graphs = op_graphs
-		self.objects = objects
+		self.story_ops = story_ops
+		self.story_objs = story_objs
 
-		print('preprocessing...')
-
-		if preprocess:
-			self.GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
-			upload(self.GL)
-			print(len(self.GL))
+		self.story_GL = story_GL
+		s_plan = self.setup(self.story_GL)
+		self.Open = Frontier()
+		if not disc_ops is None:
+			self.disc_GL = disc_GL
+			self.disc_ops = disc_ops
+			self.disc_objects = disc_objects
+			d_plan = self.setup(self.disc_ops)
+			self.Open.insert((s_plan, d_plan))
 		else:
-			try:
-				print('try to reload:')
-				self.GL = reload()
-				print(len(self.GL))
-			except:
-				print('could not reload')
-				self.GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
-				upload(self.GL)
+			self.Open.insert((s_plan))
 
-		from Relax import RelaxHeuristic
-		RelaxHeuristic(self.GL)
 
-		init = copy.deepcopy(self.GL[-2])
-		init.replaceInternals()
-		goal = copy.deepcopy(self.GL[-1])
-		goal.replaceInternals()
-
-		init_plan = PlanElementGraph(uuid.uuid1(0), Elements = objects | init.elements | goal.elements,
-									  				 Edges = init.edges | goal.edges)
-
-		init_plan.initial_dummy_step = init.root
-		init_plan.final_dummy_step = goal.root
-
-		#create special dummy step for init_graph and add to graphs {}
-		self.setup(init_plan, init, goal)
-		self.Open =  Frontier()
-		self.Open.insert(init_plan)
-		print('finished preprocessing...')
 
 	def __len__(self):
 		return len(self._frontier)
@@ -100,22 +78,31 @@ class PlanSpacePlanner:
 	def __setitem__(self, plan, position):
 		self._frontier[position] = plan
 
-	def setup(self, plan, start_action, end_action):
+	def setup(self, GL):
 		"""
 			Create step typed element DI, with effect edges to each condition of start_set
 			Create step typed element DG, with precondition edges to each condition of end_set
 			Add ordering from DI to DG
 		"""
 
-		dummy_start = start_action.root
-		dummy_final = end_action.root
+		s_init = copy.deepcopy([-2])
+		s_init.replaceInternals()
+		s_goal = copy.deepcopy([-1])
+		s_goal.replaceInternals()
 
-		plan.OrderingGraph.addOrdering(dummy_start, dummy_final)
+		s_init_plan = PlanElementGraph(uid(0), Elements=objects | s_init.elements | s_goal.elements,
+									   Edges=s_init.edges | s_goal.edges)
+
+		s_init_plan.initial_dummy_step = s_init.root
+		s_init_plan.final_dummy_step = s_goal.root
+
+		s_init_plan.OrderingGraph.addOrdering(s_init.root, s_goal.root)
 
 		#Add initial Open precondition flaws for dummy step
-		init_flaws = (Flaw((dummy_final, prec), 'opf') for prec in plan.getNeighborsByLabel(dummy_final, 'precond-of'))
+		init_flaws = (Flaw((dummy_final, prec), 'opf') for prec in s_init_plan.getNeighborsByLabel(dummy_final, 'precond-of'))
 		for flaw in init_flaws:
-			plan.flaws.insert(self.GL, plan, flaw)
+			s_init_plan.flaws.insert(GL, s_init_plan, flaw)
+		return s_init_plan
 
 
 	#@clock
@@ -130,7 +117,7 @@ class PlanSpacePlanner:
 		s_need, precondition = flaw.flaw
 
 		#antecedent is of the form (antecedent_action_with_missing_eff_link, eff_link)
-		antecedents = self.GL.pre_dict[precondition.replaced_ID]
+		antecedents = self.story_GL.pre_dict[precondition.replaced_ID]
 		#print('flaw precondition.replaced_ID: {}'.format(precondition.replaced_ID))
 		for ante in antecedents:
 			if ante.action.name == 'dummy_init':
@@ -150,6 +137,7 @@ class PlanSpacePlanner:
 			preserve_original_id = eff_link.sink.replaced_ID
 			eff_link.sink = new_plan.getElementById(precondition.ID)
 			eff_link.sink.replaced_ID = preserve_original_id
+			new_plan.edges.add(eff_link)
 			# check: eff_link.sink should till be precondition of s_need
 
 			#step 5 - add new stuff to new plan
@@ -158,7 +146,7 @@ class PlanSpacePlanner:
 
 			#step 6 - update orderings and causal links, add flaws
 			self.addStep(new_plan, anteaction.root, new_plan.getElementById(s_need.ID), eff_link.sink, new=True)
-			new_plan.flaws.addCndtsAndRisks(self.GL, anteaction.root)
+			new_plan.flaws.addCndtsAndRisks(self.story_GL, anteaction.root)
 
 			#step 7 - add new_plan to open list
 			results.add(new_plan)
@@ -171,7 +159,7 @@ class PlanSpacePlanner:
 		s_need, precondition = flaw.flaw
 
 		#antecedents - a set of stepnumbers
-		antecedents = self.GL.id_dict[precondition.replaced_ID]
+		antecedents = self.story_GL.id_dict[precondition.replaced_ID]
 		if len(antecedents) == 0:
 			return set()
 
@@ -200,9 +188,10 @@ class PlanSpacePlanner:
 		return results
 
 	def RetargetPrecondition(self, plan,  S_Old, precondition):
-		effect_token = self.GL.getConsistentEffect(S_Old, precondition)
+		effect_token = self.story_GL.getConsistentEffect(S_Old, precondition)
 		pre_link = plan.RemoveSubgraph(precondition)
 		pre_link.sink = effect_token
+		self.edges.add(pre_link)
 		return pre_link.sink
 
 	def addStep(self, plan, s_add, s_need, condition, new=None):
@@ -228,7 +217,7 @@ class PlanSpacePlanner:
 
 		if new:
 			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
-				plan.flaws.insert(self.GL, plan, Flaw((s_add, prec.sink), 'opf'))
+				plan.flaws.insert(self.story_GL, plan, Flaw((s_add, prec.sink), 'opf'))
 
 		#Good time as ever to updatePlan
 		#plan.updatePlan()
@@ -268,7 +257,7 @@ class PlanSpacePlanner:
 
 		#for result, res in results:
 		for result in results:
-			new_flaws = result.detectThreatenedCausalLinks(self.GL)
+			new_flaws = result.detectThreatenedCausalLinks(self.story_GL)
 			result.flaws.threats.update(new_flaws)
 
 		return results
@@ -371,7 +360,23 @@ class TestPlanner(unittest.TestCase):
 																								 problem_file)
 		FlawLib.non_static_preds = preprocessDomain(operators)
 		Argument.object_types = obTypesDict(object_types)
-		planner = PlanSpacePlanner(operators, objects, initAction, goalAction,preprocess = False)
+
+		print('preprocessing...')
+		if preprocess:
+			GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
+			upload(GL)
+			print(len(GL))
+		else:
+			try:
+				print('try to reload:')
+				GL = reload()
+				print(len(GL))
+			except:
+				print('could not reload')
+				GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
+				upload(GL)
+
+		planner = PlanSpacePlanner(operators, objects, GL)
 
 		n = 6
 		print('\nRunning Story Planner on ark-domain and problem to find {} solutions'.format(n))
@@ -393,7 +398,7 @@ class TestPlanner(unittest.TestCase):
 																								 sproblem_file)
 		FlawLib.non_static_preds = preprocessDomain(operators)
 		Argument.object_types = obTypesDict(object_types)
-		story_planner = PlanSpacePlanner(operators, objects, initAction, goalAction,preprocess = False)
+		story_planner = PlanSpacePlanner(operators, objects, initAction, goalAction,preprocess=False)
 
 
 		domain_file = 'domains/ark-requirements-domain.pddl'
@@ -403,18 +408,24 @@ class TestPlanner(unittest.TestCase):
 
 		print('Reading story requirements from ark-requirements-domain and ark-requirements-problem')
 		#empty_plan = story_planner.Open.pop()
-		for op in doperators:
-			decomp = next(iter(op.subgraphs))
-			print('\ndiscourse /decomp name {}\n'.format(decomp.name))
-			plans = Plannify(decomp, story_planner.GL)
-			print('\n')
-			for plan in plans:
-				for step in plan.Steps:
-					print(Action.subgraph(plan,step))
-				#print(plan.isInternallyConsistent())
-				print('\n')
-			#print('check')
-		print('ok')
+
+		from Plannify import GroundDiscOps
+		GDOs = GroundDiscOps(doperators, [Plannify(next(iter(op.subgraphs)), story_planner.story_GL) for op in doperators])
+		discourse_planner = PlanSpacePlanner(doperators, objects, dinitAction, dgoalAction, preprocess=False)
+		# Ground_Discourse_Operators = []
+		# for op in doperators:
+		# 	decomp = next(iter(op.subgraphs))
+		# 	print('\ndiscourse /decomp name {}\n'.format(decomp.name))
+		# 	plans = Plannify(decomp, story_planner.story_GL)
+		# 	print('\n')
+		# 	for plan in plans:
+		# 		#gdo = copy.deepcopy(op)
+		# 		for step in plan.Steps:
+		# 			print(Action.subgraph(plan,step))
+		# 		#print(plan.isInternallyConsistent())
+		# 		print('\n')
+		# 	#print('check')
+		# print('ok')
 
 if __name__ ==  '__main__':
 	tp = TestPlanner()

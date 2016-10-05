@@ -29,7 +29,7 @@ if __name__ ==  '__main__':
 
 	Argument.object_types = obtypes
 	planner = PlanSpacePlanner(operators, objects, initAction, goalAction)
-	#planner.GL = GLib(operators, objects, obtypes, initAction, goalAction)
+	#planner.story_GL = GLib(operators, story_objs, obtypes, initAction, goalAction)
 
 	results = planner.POCL(1)
 

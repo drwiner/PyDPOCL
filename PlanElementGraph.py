@@ -1,11 +1,10 @@
 from OrderingGraph import *
 from Flaws import *
 from collections import deque
-import uuid
+from uuid import uuid1 as uid
 import random
 import itertools
 from clockdeco import clock
-from Relax import RelaxHeuristic
 
 class Action(ElementGraph):
 	#stepnumber = 2
@@ -15,7 +14,7 @@ class Action(ElementGraph):
 			Edges = set()
 
 		if root_element is None:
-			root_element = Operator(uuid.uuid1(200),typ='Action')
+			root_element = Operator(uid(200),typ='Action')
 			
 		if Elements == None:
 			Elements = {root_element}
@@ -57,17 +56,17 @@ class Action(ElementGraph):
 		return self.root.stepnumber
 
 	def replaceInternals(self):
-		self.ID = uuid.uuid1(self.root.stepnumber)
+		self.ID = uid(self.root.stepnumber)
 		for elm in self.elements:
 			if not isinstance(elm, Argument):
-				elm.ID = uuid.uuid1(self.root.stepnumber)
+				elm.ID = uid(self.root.stepnumber)
 
 
 	def _replaceInternals(self):
-		self.ID = uuid.uuid1(self.root.stepnumber)
+		self.ID = uid(self.root.stepnumber)
 		for elm in self.elements:
 			if not isinstance(elm, Argument):
-				elm.replaced_ID = uuid.uuid1(self.root.stepnumber)
+				elm.replaced_ID = uid(self.root.stepnumber)
 
 	def deepcopy(self, replace_internals=False):
 		new_self = copy.deepcopy(self)
@@ -76,7 +75,7 @@ class Action(ElementGraph):
 		return new_self
 
 				#elm.ID = elm.replaced_ID
-				#elm.ID = uuid.uuid1(self.root.stepnumber)
+				#elm.ID = uid(self.root.stepnumber)
 
 		
 	# '''for debugging'''
@@ -143,8 +142,8 @@ class PlanElementGraph(ElementGraph):
 		if Restrictions == None:
 			Restrictions = set()
 		
-		self.OrderingGraph = OrderingGraph(ID = uuid.uuid1(5))
-		self.CausalLinkGraph = CausalLinkGraph(ID = uuid.uuid1(6))
+		self.OrderingGraph = OrderingGraph(ID=uid(5))
+		self.CausalLinkGraph = CausalLinkGraph(ID=uid(6))
 
 		self.flaws = FlawLib()
 		self.initial_dummy_step = None
@@ -159,14 +158,14 @@ class PlanElementGraph(ElementGraph):
 	def Actions_2_Plan(cls, Actions):
 		elements = set().union(*[A.elements for A in Actions])
 		edges = set().union(*[A.edges for A in Actions])
-		Plan = cls(uuid.uuid1(2), name='Action_2_Plan', Elements=elements, Edges=edges)
+		Plan = cls(uid(2), name='Action_2_Plan', Elements=elements, Edges=edges)
 		for edge in Plan.edges:
 			if edge.label == 'effect-of':
 				elm = Plan.getElementById(edge.sink.ID)
 				elm.replaced_ID = edge.sink.replaced_ID
 
-		Plan.OrderingGraph = OrderingGraph(ID=uuid.uuid1(5))
-		Plan.CausalLinkGraph = CausalLinkGraph(ID=uuid.uuid1(6))
+		Plan.OrderingGraph = OrderingGraph(ID=uid(5))
+		Plan.CausalLinkGraph = CausalLinkGraph(ID=uid(6))
 		#Plan.Steps = [A.root for A in Actions]
 		return Plan
 
@@ -181,12 +180,12 @@ class PlanElementGraph(ElementGraph):
 				sink.replaced_ID = edge.sink.ID
 				self.elements.add(sink)
 			else:
-				sink = self.getElmByRID(edge.sink.replaced_ID)
+				sink = P.getElmByRID(edge.sink.replaced_ID)
 				if sink is None:
 					sink = copy.deepcopy(edge.sink)
 					self.elements.add(sink)
 
-			source = self.getElmByRID(edge.source.replaced_ID)
+			source = P.getElmByRID(edge.source.replaced_ID)
 			if source is None:
 				source = copy.deepcopy(edge.source)
 				self.elements.add(source)
@@ -199,16 +198,26 @@ class PlanElementGraph(ElementGraph):
 		#Combine
 		pass
 
-	def Integrate(U, W, V):
+	def Integrate(U, W, V, B):
 		#W is [1,..., k] where  1--> k are the indices of V.Steps
 		_map = {}
 		for i, step in enumerate(W):
 			if step in V.Steps:
-				#then, add this step,
+				#don't add B if
+				if (u.ID, v.ID, 1) in B:
+					continue
+				# then, add this step,
 				U.AddSubgraph(Action.subgraph(V,step))
 				_map[step] = step
 			else:
-				#else, this v-step is to be reused by u-step
+
+				# if u and v must be distinct
+				if (u.ID, v.ID, 0) in B:
+					continue
+				if (_, v.ID, 1) in B:
+					if not _ == u.ID:
+						continue
+				# else, this v-step is to be reused by u-step
 				_map[step] = U.Steps[i]
 
 		for ordering in V.OrderingGraph.edges:
@@ -224,7 +233,7 @@ class PlanElementGraph(ElementGraph):
 
 	def deepcopy(self):
 		new_self = copy.deepcopy(self)
-		new_self.ID = uuid.uuid1(21)
+		new_self.ID = uid(21)
 		return new_self
 
 	def RemoveSubgraph(self, literal):
@@ -297,8 +306,8 @@ class PlanElementGraph(ElementGraph):
 
 		"""
 		Strategy: number of steps, dropping deletes, needed to fulfill all open conditions
-		GList: GL.id_dict[pre.replaced_ID] for pre in step.preconditions
-					while init.stepnumber not in GL.id_dict[pre.replaced_ID:
+		GList: story_GL.id_dict[pre.replaced_ID] for pre in step.preconditions
+					while init.stepnumber not in story_GL.id_dict[pre.replaced_ID:
 
 		@return:
 		"""

@@ -678,11 +678,11 @@ class TraversePDDLProblem(PDDLVisitor):
 	def visit_object(self, node):
 		""" Visits a PDDL-problem object definition."""
 		type_def = None
-		# Check for multiple definition of objects.
+		# Check for multiple definition of story_objs.
 		if node.name in self._objects:
 			raise SemanticError('Error multiple defines of object with name ' +
 								node.name)
-		# Untyped objects get the standard type 'object'.
+		# Untyped story_objs get the standard type 'object'.
 		if node.typeName == None:
 			type_def = self._domain.types['object']
 		else:
@@ -782,7 +782,7 @@ class TraversePDDLProblem(PDDLVisitor):
 		# Visit all parameters.
 		for o in node.parameters:
 			o_type = None
-			# Check whether predicate was introduced in objects or domain
+			# Check whether predicate was introduced in story_objs or domain
 			# constants.
 			if not (o in self._objects or o in self._domain.constants):
 				raise SemanticError('Error: object ' + o + ' referenced in '

@@ -8,7 +8,6 @@ def Plannify(RQ, GL):
 	#An ActionLib for steps in RQ - ActionLib is a container w/ all of its possible instances as ground steps
 	Libs = [ActionLib(i, RS, GL) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
 
-
 	#A World is a combination of one ground-instance from each step
 	Worlds = productByPosition(Libs)
 
@@ -24,7 +23,9 @@ def Plannify(RQ, GL):
 	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
 
 @clock
-def Reuse(U, V):
+def Unify(U, V, B = None):
+	if B is None:
+		B = set()
 	#Create library of possible U-steps to reuse steps in V
 	Reuse = [[u for u in U.Steps if u.stepnumber == v.stepnumber].append(v) for v in V.Steps]
 
@@ -36,10 +37,32 @@ def Reuse(U, V):
 
 	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
 
+def GroundDiscourseOperator(DO, Subplans):
+	#For each ground subplan in Subplans, make a copy of DO s.t. each
+	Ground_Discourse_Operators = []
+	for sp in Subplans:
+		GDO = copy.deepcopy(DO)
+		for elm in sp.elements:
+			for ex_elm in GDO.elements:
+				if elm.arg_name == ex_elm.arg_name:
+					ex_elm.ID = elm.ID
+					ex_elm.replaced_ID = elm.replaced_ID
+		GDO.ground_subplan = sp
+		Ground_Discourse_Operators.append(GDO)
+	return Ground_Discourse_Operators
+
+def GroundDiscOps(DOs, ListOfSubplans):
+	Ground_Discourse_Operators = []
+	for i, DO in enumerate(DOs):
+		Ground_Discourse_Operators.extend(GroundDiscourseOperator(DO,ListOfSubplans[i]))
+	return Ground_Discourse_Operators
+
 def partialUnify(PS, _map):
 	if _map is False:
 		return False
-	NS = PS.deepcopy()
+#	NS = PS.deepcopy()
+	import copy
+	NS = copy.deepcopy(PS)
 	effects = [edge.sink for edge in NS.edges if edge.label == 'effect-of']
 	for elm in effects:
 		if elm in _map:
@@ -80,7 +103,7 @@ def productByPosition(Libs):
 	return itertools.product(*[list(Libs[T.position]) for T in Libs])
 
 def Linkify(Planets, RQ, GL):
-	#Planets are plans containing steps which may not be ground steps from GL
+	#Planets are plans containing steps which may not be ground steps from story_GL
 	orderings = RQ.OrderingGraph.edges
 	if len(orderings) > 0:
 		for Planet in Planets:
@@ -231,7 +254,7 @@ class LinkLib:
 		else:
 			# add new condition for each potential condition
 			self._links = GL.getPotentialEffectLinkConditions(link.source, link.sink)
-			#self._links = GL.getPotentialLinkConditions(link.source, link.sink)
+			#self._links = story_GL.getPotentialLinkConditions(link.source, link.sink)
 
 	def __len__(self):
 		return len(self._links)

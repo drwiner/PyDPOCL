@@ -62,7 +62,7 @@ _domain_input = """
 
 _problem_input = """(define (problem BLOCKS-5-0)
 (:domain BLOCKS)
-(:objects B E A C D - block)
+(:story_objs B E A C D - block)
 (:INIT (CLEAR D) (CLEAR C) (ONTABLE D) (ONTABLE A) (ON C E) (ON E B) (ON B A)
  (HANDEMPTY))
 (:goal (AND (ON A E) (ON E B) (ON B D) (ON D C)))
@@ -460,7 +460,7 @@ def test_constants_multiple():
 def test_problem_name_collision():
     _problem_input_2 = """(define (problem BLOCKS-5-0)
     (:domain huibuh)
-    (:objects B E A C D - block)
+    (:story_objs B E A C D - block)
     (:INIT (CLEAR D) (CLEAR C) (ONTABLE D) (ONTABLE A) (ON C E) (ON E B)
      (ON B A) (HANDEMPTY))
     (:goal (AND (ON A E) (ON E B) (ON B D) (ON D C)))
@@ -475,7 +475,7 @@ def test_problem_name_collision():
 def test_problem_object_unkown_type():
     _problem_input_2 = """(define (problem BLOCKS-5-0)
     (:domain BLOCKS)
-    (:objects B - unkownType E A C D)
+    (:story_objs B - unkownType E A C D)
     (:INIT (CLEAR D) (CLEAR C) (ONTABLE D) (ONTABLE A) (ON C E) (ON E B)
      (ON B A) (HANDEMPTY))
     (:goal (AND (ON A E) (ON E B) (ON B D) (ON D C)))
@@ -490,7 +490,7 @@ def test_problem_object_unkown_type():
 def test_problem_object_multiple():
     _problem_input_2 = """(define (problem BLOCKS-5-0)
     (:domain BLOCKS)
-    (:objects B B E A C D)
+    (:story_objs B B E A C D)
     (:INIT (CLEAR D) (CLEAR C) (ONTABLE D) (ONTABLE A) (ON C E) (ON E B)
      (ON B A) (HANDEMPTY))
     (:goal (AND (ON A E) (ON E B) (ON B D) (ON D C)))
@@ -504,7 +504,7 @@ def test_problem_object_multiple():
 def test_problem_object_multiple_2():
     _problem_input_2 = """(define (problem BLOCKS-5-0)
     (:domain BLOCKS)
-    (:objects B -parent B - parent2 E A C D - object)
+    (:story_objs B -parent B - parent2 E A C D - object)
     (:INIT (CLEAR D) (CLEAR C) (ONTABLE D) (ONTABLE A) (ON C E) (ON E B)
      (ON B A) (HANDEMPTY))
     (:goal (AND (ON A E) (ON E B) (ON B D) (ON D C)))
@@ -518,7 +518,7 @@ def test_problem_object_multiple_2():
 def test_problem_goal_unknown_predicate():
     _problem_input_2 = """(define (problem BLOCKS-5-0)
     (:domain BLOCKS)
-    (:objects B E A C D)
+    (:story_objs B E A C D)
     (:INIT (CLEAR D) (CLEAR C) (ONTABLE D) (ONTABLE A) (ON C E) (ON E B)
      (ON B A) (HANDEMPTY))
     (:goal (AND (OFF A E) (ON E B) (ON B D) (ON D C)))
@@ -532,7 +532,7 @@ def test_problem_goal_unknown_predicate():
 def test_problem_goal_predicate_signature():
     _problem_input_2 = """(define (problem BLOCKS-5-0)
     (:domain BLOCKS)
-    (:objects B E A C D)
+    (:story_objs B E A C D)
     (:INIT (CLEAR D) (CLEAR C) (ONTABLE D) (ONTABLE A) (ON C E) (ON E B)
      (ON B A) (HANDEMPTY))
     (:goal (AND (ON A E D) (ON E B) (ON B D) (ON D C)))
@@ -546,7 +546,7 @@ def test_problem_goal_predicate_signature():
 def test_problem_goal_cnf():
     _problem_input_2 = """(define (problem BLOCKS-5-0)
     (:domain BLOCKS)
-    (:objects B E A C D)
+    (:story_objs B E A C D)
     (:INIT (CLEAR D) (CLEAR C) (ONTABLE D) (ONTABLE A) (ON C E) (ON E B)
      (ON B A) (HANDEMPTY))
     (:goal (OR (ON A E) (ON E B) (ON B D) (ON D C)))
@@ -560,7 +560,7 @@ def test_problem_goal_cnf():
 def test_problem_goal_single_predicate():
     _problem_input_2 = """(define (problem BLOCKS-5-0)
     (:domain BLOCKS)
-    (:objects B E A C D)
+    (:story_objs B E A C D)
     (:INIT (CLEAR D) (CLEAR C) (ONTABLE D) (ONTABLE A) (ON C E) (ON E B)
      (ON B A) (HANDEMPTY))
     (:goal (ON A E))

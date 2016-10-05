@@ -319,7 +319,7 @@ class ProblemDef(Visitable):
 			Keyword arguments:
 			name -- the problem name
 			domainName -- the domain name that corresponds to this problem
-			objects -- a list of objects defined in the problem file
+			story_objs -- a list of story_objs defined in the problem file
 			init -- an initial condition represented by an InitStmt
 			goal -- a  goal condition represented by an GoalStmt
 		"""
@@ -339,7 +339,7 @@ class Object(Visitable):
 
 		Keyword arguments:
 		name -- the name of the object
-		type -- the name of this objects Type
+		type -- the name of this story_objs Type
 		"""
 		self._visitorName = 'visit_object'
 		self.name = name
@@ -387,8 +387,8 @@ def parse_name(iter, father):
 def parse_list_template(f, iter):
 	""" This function implements a common pattern used in this parser.
 
-	It tries to parse a list of 'f' objects from the string 'string[i:end]'.
-	The 'f' objects must be seperated by whitespace
+	It tries to parse a list of 'f' story_objs from the string 'string[i:end]'.
+	The 'f' story_objs must be seperated by whitespace
 	Returns a tuple of the position after the parsed list and the list.
 	"""
 	result = list()
@@ -409,16 +409,16 @@ def _parse_type_helper(iter, type_class):
 
 	It parses a list consisting either of Objects or Variables or Types
 	which can all have additional type inheritance information.
-	A list of objects could for example be defined as:
+	A list of story_objs could for example be defined as:
 	o1 o2 o3 o4 - car
-	Which would represent 4 objects (o1-o4) of type car.
+	Which would represent 4 story_objs (o1-o4) of type car.
 	Since Variable- and Typelists are specified using the same pattern for
 	type/supertype information this function takes the 'type_class' as an
 	argument and parses an appropriate list of type_class instances.
 
 	Returns the parsed list of instances.
 	"""
-	# there may be several objects with the same type
+	# there may be several story_objs with the same type
 	# hence we need to store each parsed object in a list and attach a new type
 	# instance whenever a type is specified
 	result = list()
@@ -440,7 +440,7 @@ def _parse_type_helper(iter, type_class):
 				while len(tmpList) != 0:
 					result.append(type_class(tmpList.pop(), tlist))
 			else:
-				# found type information --> flush objects into result list
+				# found type information --> flush story_objs into result list
 				ctype = next(iter).get_word()
 				while len(tmpList) != 0:
 					if type_class == Variable:
@@ -456,7 +456,7 @@ def _parse_type_helper(iter, type_class):
 			else:
 				tmpList.insert(0, var)
 	while len(tmpList) != 0:
-		# append all left over objects --> these are untyped !!
+		# append all left over story_objs --> these are untyped !!
 		result.append(type_class(tmpList.pop(), None))
 	return result
 
@@ -559,7 +559,7 @@ def _parse_types_with_error(iter, keyword, classt):
 # Constants / Objects and types can be parsed in the same way because of their
 # familiar structure.
 # Hence instantiate them with _parse_types_with_error.
-_common_types = [(':types', Type), (':objects', Object),
+_common_types = [(':types', Type), (':story_objs', Object),
 				 (':constants', Object)]
 (parse_types_stmt, parse_objects_stmt, parse_constants_stmt) = \
 	map(lambda tup: lambda it: _parse_types_with_error(it, tup[0], tup[1]),
@@ -829,7 +829,7 @@ def parse_problem_def(iter):
 	dom = parse_problem_domain_stmt(next(iter))
 	# parse all object definitions
 	objects = dict()
-	if iter.peek_tag() == ':objects':
+	if iter.peek_tag() == ':story_objs':
 		objects = parse_objects_stmt(next(iter))
 	init = parse_init_stmt(next(iter))
 	goal = parse_goal_stmt(next(iter))

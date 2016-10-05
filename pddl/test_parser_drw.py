@@ -18,7 +18,7 @@ problem = parse('D:\python-workspace\story-elements\domain.pddl','D:\python-work
 """ Problem attributes"""
         # self.name = name
         # self.domain = domain
-        # self.objects = objects
+        # self.story_objs = story_objs
         # self.initial_state = init
         # self.goal = goal
 		

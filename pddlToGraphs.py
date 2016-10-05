@@ -75,7 +75,7 @@ def forallFormula(formula, parent, relationship, elements, edges):
 	scoped_var = formula.children[0]
 	typ = next(iter(elm.typ for elm in elements if elm.arg_name == scoped_var.key.name))
 
-	#scoped_args = objects from planning problem which share a typ with scoped_var
+	#scoped_args = story_objs from planning problem which share a typ with scoped_var
 	scoped_args = {arg for arg in arg_elements if arg.typ ==typ}
 	lit = formula.children[1]
 

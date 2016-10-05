@@ -43,7 +43,7 @@ def set_replaced_ID(action):
 
 class GLib:
 	def __init__(self, operators, objects, obtypes, init_action, goal_action):
-		#self._gsteps = groundStepList(operators.union({init_action, goal_action}),objects, obtypes)
+		#self._gsteps = groundStepList(operators.union({init_action, goal_action}),story_objs, obtypes)
 		self._gsteps = groundStepList(operators, objects, obtypes)
 
 		#init at [-2]
@@ -145,7 +145,7 @@ class GLib:
 				effect_token = eff
 				break
 		if effect_token == None:
-			raise AttributeError('GL.eff_dict empty but id_dict has antecedent')
+			raise AttributeError('story_GL.eff_dict empty but id_dict has antecedent')
 		return effect_token
 
 	def hasConsistentPrecondition(self, Sink, effect):
@@ -161,7 +161,7 @@ class GLib:
 				pre_token = pre
 				break
 		if pre_token == None:
-			raise AttributeError('effect {} not in GL.eff_Dict for Sink {}'.format(effect, Sink))
+			raise AttributeError('effect {} not in story_GL.eff_Dict for Sink {}'.format(effect, Sink))
 		return pre_token
 
 	def __len__(self):
@@ -197,7 +197,7 @@ if __name__ ==  '__main__':
 	print('\n')
 	print(GL)
 
-	# for gstep in GL:
+	# for gstep in story_GL:
 	# 	print(gstep)
 	# 	pre_tokens = gstep.getPreconditionsOrEffects('precond-of')
 	# 	print('antes:')

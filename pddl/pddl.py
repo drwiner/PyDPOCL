@@ -140,7 +140,7 @@ class Problem:
         """
         name: The name of the problem
         domain: The domain in which the problem has to be solved
-        objects: A dict name->type of objects that are used in the problem
+        story_objs: A dict name->type of story_objs that are used in the problem
         init: A list of predicates describing the initial state
         goal: A list of predicates describing the goal state
         """

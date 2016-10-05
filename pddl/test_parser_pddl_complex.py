@@ -313,7 +313,7 @@ def test_predList4():
 
 
 def test_parseObjectsStmt():
-    test = ["""(:objects
+    test = ["""(:story_objs
       apn1 - airplane
       apt2 apt1 - airport
        pos2 pos1 - location
@@ -413,7 +413,7 @@ def test_parseProblemDef():
     test = ["""
     (define (problem logistics-4-1)
     (:domain logistics)
-    (:objects
+    (:story_objs
       apn1 - airplane
       apt2 apt1 - airport
       pos2 pos1 - location
