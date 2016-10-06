@@ -58,16 +58,26 @@ class GLib:
 		self._gsteps.append(goal_action)
 
 		#dictionaries
-		self.pre_dict = defaultdict(set)
-		self.ante_dict = defaultdict(set)
-		#id_dict - given precondition.replaced_ID as key, returns valid stepnumbers
-		self.id_dict = defaultdict(set)
-		self.eff_dict = defaultdict(set)
-		self.threat_dict = defaultdict(set)
+		self.initDicts()
 
 		#load dictionaries
 		self.loadAll()
 		print('{} ground steps created'.format(len(self)))
+
+	@classmethod
+	def FromGroundSteps(cls, Ground_Step_List):
+		GL = cls()
+		GL._gsteps = Ground_Step_List
+		GL.initDicts()
+		GL.loadAll()
+
+	def initDicts(self):
+		self.pre_dict = defaultdict(set)
+		self.ante_dict = defaultdict(set)
+		# id_dict - given precondition.replaced_ID as key, returns valid stepnumbers
+		self.id_dict = defaultdict(set)
+		self.eff_dict = defaultdict(set)
+		self.threat_dict = defaultdict(set)
 
 
 	def loadAll(self):

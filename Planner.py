@@ -410,6 +410,7 @@ class TestPlanner(unittest.TestCase):
 		#empty_plan = story_planner.Open.pop()
 
 		from Plannify import GroundDiscOps
+		DGL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
 		GDOs = GroundDiscOps(doperators, [Plannify(next(iter(op.subgraphs)), story_planner.story_GL) for op in doperators])
 		discourse_planner = PlanSpacePlanner(doperators, objects, dinitAction, dgoalAction, preprocess=False)
 		# Ground_Discourse_Operators = []
