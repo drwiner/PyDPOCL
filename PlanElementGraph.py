@@ -130,6 +130,8 @@ class Condition(ElementGraph):
 		
 class PlanElementGraph(ElementGraph):
 
+	GL = None
+
 	def __init__(self,ID,type_graph =None,name=None,Elements = None, planElement = None, Edges = None,
 				 Restrictions = None):
 				
@@ -311,13 +313,15 @@ class PlanElementGraph(ElementGraph):
 
 		@return:
 		"""
-		#return self.flaws.heuristic
-        #replace with
-		#return len(self.flaws) + len(self.flaws.nonreusable)
-		#self.updatePlan()
-		k = self.calculateHeuristic(RelaxHeuristic.GL)
+
+		from GlobalContainer import GC
+		if self.name == 'story':
+			return self.calculateHeuristic(GC.SGL)
+		return self.calculateHeuristic(GC.DGL)
+
 		#return len(self.flaws) + k
-		return k# + len(self.flaws.nonreusable)
+
+	# + len(self.flaws.nonreusable)
 		#return self.flaws.heuristic
 
 	@property

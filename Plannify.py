@@ -37,26 +37,6 @@ def Unify(U, V, B = None):
 
 	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
 
-def GroundDiscourseOperator(DO, Subplans):
-	#For each ground subplan in Subplans, make a copy of DO s.t. each
-	Ground_Discourse_Operators = []
-	for sp in Subplans:
-		GDO = copy.deepcopy(DO)
-		for elm in sp.elements:
-			for ex_elm in GDO.elements:
-				if elm.arg_name == ex_elm.arg_name:
-					ex_elm.ID = elm.ID
-					ex_elm.replaced_ID = elm.replaced_ID
-		GDO.ground_subplan = sp
-		Ground_Discourse_Operators.append(GDO)
-	return Ground_Discourse_Operators
-
-def GroundDiscOps(DOs, ListOfSubplans):
-	Ground_Discourse_Operators = []
-	for i, DO in enumerate(DOs):
-		Ground_Discourse_Operators.extend(GroundDiscourseOperator(DO,ListOfSubplans[i]))
-	return Ground_Discourse_Operators
-
 def partialUnify(PS, _map):
 	if _map is False:
 		return False

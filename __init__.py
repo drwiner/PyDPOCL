@@ -1,5 +1,5 @@
 import sys
-from pddlToGraphs import parseDomainAndProblemToGraphs
+from pddlToGraphs import parseDomAndProb
 from Planner import preprocessDomain
 from Flaws import FlawLib
 from Planner import obTypesDict
@@ -22,7 +22,7 @@ if __name__ ==  '__main__':
 		problem_file = 'domains/ark-problem.pddl'
 
 	#f = open('workfile', 'w')
-	operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
+	operators, objects, object_types, initAction, goalAction = parseDomAndProb(domain_file, problem_file)
 	#non_static_preds = preprocessDomain(operators)
 	FlawLib.non_static_preds = preprocessDomain(operators)
 	obtypes = obTypesDict(object_types)

@@ -497,8 +497,8 @@ def domainAxiomsToGraphs(domain):
 		domain.actions.append(ActionStmt(name = ax.name, parameters = ax.vars_, precond = ax.context,
 										 effect = ax.implies))
 
-@clock
-def parseDomainAndProblemToGraphs(domain_file, problem_file):
+
+def parseDomAndProb(domain_file, problem_file):
 	""" Returns tuple 
 			1) Operator Graphs
 			2) Object Elements
@@ -520,7 +520,30 @@ def parseDomainAndProblemToGraphs(domain_file, problem_file):
 
 	op_graphs = domainToOperatorGraphs(domain)
 
-	return (op_graphs, objects, domain.types, init, goal)
+	FlawLib.non_static_preds = set()
+	for op in op_graphs:
+		FlawLib.non_static_preds.union(op.effects)
+
+	Argument.object_types = obTypesDict(domain.types)
+
+	return (op_graphs, objects, Argument.object_types, init, goal)
+
+def obTypesDict(object_types):
+	obtypes = defaultdict(set)
+	for t in object_types:
+		obtypes[t.name].add(t.parent)
+		accumulated = set()
+		rFollowHierarchy(object_types, t.parent, accumulated)
+		obtypes[t.name].update(accumulated)
+	return obtypes
+
+
+def rFollowHierarchy(object_types, child_name, accumulated = set()):
+	for ob in object_types:
+		if not ob.name in accumulated:
+			if ob.name == child_name:
+				accumulated.add(ob.parent)
+				rFollowHierarchy(object_types, ob.parent, accumulated)
 	
 import sys	
 if __name__ ==  '__main__':

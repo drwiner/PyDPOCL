@@ -3,6 +3,7 @@ import itertools
 import copy
 from collections import namedtuple, defaultdict
 from PlanElementGraph import Condition
+from clockdeco import clock
 from Element import Operator
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
@@ -32,6 +33,28 @@ def groundStepList(operators, objects, obtypes):
 			gsteps.append(gstep)
 	return gsteps
 
+def GroundDiscourseOperator(DO, Subplans):
+	#For each ground subplan in Subplans, make a copy of DO s.t. each
+	Ground_Discourse_Operators = []
+
+	for sp in Subplans:
+		GDO = copy.deepcopy(DO)
+		for elm in sp.elements:
+			for ex_elm in GDO.elements:
+				if elm.arg_name == ex_elm.arg_name:
+					ex_elm = elm
+					#ex_elm.ID = elm.ID
+					#ex_elm.replaced_ID = elm.replaced_ID
+		GDO.ground_subplan = sp
+		Ground_Discourse_Operators.append(GDO)
+	return Ground_Discourse_Operators
+
+def GroundDiscOps(DOs, ListOfSubplans):
+	Ground_Discourse_Operators = []
+	for i, DO in enumerate(DOs):
+		Ground_Discourse_Operators.extend(GroundDiscourseOperator(DO,ListOfSubplans[i]))
+	return Ground_Discourse_Operators
+
 
 def set_replaced_ID(action):
 	from Element import Argument
@@ -41,10 +64,33 @@ def set_replaced_ID(action):
 			elm.replaced_ID = uuid1(action.stepnumber)
 
 
+import pickle
+
+@clock
+def upload(GL, name):
+	afile = open(name,"wb")
+	pickle.dump(GL, afile)
+	afile.close()
+
+@clock
+def reload(name):
+	afile = open(name,"rb")
+	GL = pickle.load(afile)
+	afile.close()
+	return GL
+
+
 class GLib:
-	def __init__(self, operators, objects, obtypes, init_action, goal_action):
+
+	def __init__(self, operators, objects, obtypes, init_action, goal_action, storyGL=None):
 		#self._gsteps = groundStepList(operators.union({init_action, goal_action}),story_objs, obtypes)
-		self._gsteps = groundStepList(operators, objects, obtypes)
+
+		if storyGL is not None:
+			from Plannify import Plannify
+			ListOfSubplans = [Plannify(next(iter(op.subgraphs)), storyGL) for op in operators]
+			self._gsteps = GroundDiscOps(operators, ListOfSubplans)
+		else:
+			self._gsteps = groundStepList(operators, objects, obtypes)
 
 		#init at [-2]
 		init_action.root.stepnumber =len(self._gsteps)
@@ -64,17 +110,16 @@ class GLib:
 		self.loadAll()
 		print('{} ground steps created'.format(len(self)))
 
-	@classmethod
-	def FromGroundSteps(cls, Ground_Step_List):
-		GL = cls()
-		GL._gsteps = Ground_Step_List
-		GL.initDicts()
-		GL.loadAll()
+		print('uploading')
+		if storyGL is not None:
+			upload(self, 'DGL')
+		else:
+			upload(self, 'SGL')
+
 
 	def initDicts(self):
 		self.pre_dict = defaultdict(set)
 		self.ante_dict = defaultdict(set)
-		# id_dict - given precondition.replaced_ID as key, returns valid stepnumbers
 		self.id_dict = defaultdict(set)
 		self.eff_dict = defaultdict(set)
 		self.threat_dict = defaultdict(set)
@@ -187,7 +232,7 @@ class GLib:
 		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
 
 
-from pddlToGraphs import parseDomainAndProblemToGraphs
+from pddlToGraphs import parseDomAndProb
 from Flaws import FlawLib
 
 
@@ -195,7 +240,7 @@ if __name__ ==  '__main__':
 	domain_file = 'domains/ark-domain.pddl'
 	problem_file = 'domains/ark-problem.pddl'
 
-	operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file, problem_file)
+	operators, objects, object_types, initAction, goalAction = parseDomAndProb(domain_file, problem_file)
 
 	from Planner import preprocessDomain, obTypesDict
 	FlawLib.non_static_preds = preprocessDomain(operators)

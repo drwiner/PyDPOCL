@@ -31,21 +31,6 @@ class Frontier:
 		for item in itera:
 			self.insert(item)
 
-import pickle
-
-@clock
-def upload(GL):
-	afile = open("story_GL","wb")
-	pickle.dump(GL,afile)
-	afile.close()
-
-@clock
-def reload():
-	afile = open("story_GL","rb")
-	GL = pickle.load(afile)
-	afile.close()
-	return GL
-
 
 class PlanSpacePlanner:
 
@@ -56,13 +41,13 @@ class PlanSpacePlanner:
 		self.story_objs = story_objs
 
 		self.story_GL = story_GL
-		s_plan = self.setup(self.story_GL)
+		s_plan = self.setup(self.story_GL, 'story')
 		self.Open = Frontier()
 		if not disc_ops is None:
 			self.disc_GL = disc_GL
 			self.disc_ops = disc_ops
 			self.disc_objects = disc_objects
-			d_plan = self.setup(self.disc_ops)
+			d_plan = self.setup(self.disc_ops, 'disc')
 			self.Open.insert((s_plan, d_plan))
 		else:
 			self.Open.insert((s_plan))
@@ -78,7 +63,7 @@ class PlanSpacePlanner:
 	def __setitem__(self, plan, position):
 		self._frontier[position] = plan
 
-	def setup(self, GL):
+	def setup(self, GL, plan_name):
 		"""
 			Create step typed element DI, with effect edges to each condition of start_set
 			Create step typed element DG, with precondition edges to each condition of end_set
@@ -90,7 +75,7 @@ class PlanSpacePlanner:
 		s_goal = copy.deepcopy([-1])
 		s_goal.replaceInternals()
 
-		s_init_plan = PlanElementGraph(uid(0), Elements=objects | s_init.elements | s_goal.elements,
+		s_init_plan = PlanElementGraph(uid(0), name=plan_name, Elements=objects | s_init.elements | s_goal.elements,
 									   Edges=s_init.edges | s_goal.edges)
 
 		s_init_plan.initial_dummy_step = s_init.root
@@ -308,14 +293,6 @@ class PlanSpacePlanner:
 			#print('\n')
 
 
-@clock
-def preprocessDomain(operators):
-	#get all effect predicates
-	pred_set = set()
-	for op in operators:
-		pred_set.update({eff.name for eff in  op.getNeighborsByLabel(op.root, 'effect-of')})
-	return pred_set
-
 def topoSort(graph):
 	OG  = copy.deepcopy(graph.OrderingGraph)
 	L =[]
@@ -332,49 +309,31 @@ def topoSort(graph):
 		return
 	return L
 
-def obTypesDict(object_types):
-	obtypes = defaultdict(set)
-	for t in object_types:
-		obtypes[t.name].add(t.parent)
-		accumulated = set()
-		rFollowHierarchy(object_types, t.parent, accumulated)
-		obtypes[t.name].update(accumulated)
-	return obtypes
-
-
-def rFollowHierarchy(object_types, child_name, accumulated = set()):
-	for ob in object_types:
-		if not ob.name in accumulated:
-			if ob.name == child_name:
-				accumulated.add(ob.parent)
-				rFollowHierarchy(object_types, ob.parent, accumulated)
 
 import unittest
 
-from Plannify import Plannify
+from Ground import reload, GLib
 class TestPlanner(unittest.TestCase):
 	def testArk(self):
 		domain_file = 'domains/ark-domain.pddl'
 		problem_file = 'domains/ark-problem.pddl'
-		operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(domain_file,
-																								 problem_file)
-		FlawLib.non_static_preds = preprocessDomain(operators)
-		Argument.object_types = obTypesDict(object_types)
+		operators, objects, initAction, goalAction = parseDomAndProb(domain_file, problem_file)
+		obtypes = Argument.object_types
+
 
 		print('preprocessing...')
+		preprocess=False
 		if preprocess:
-			GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
-			upload(GL)
+			GL = GLib(op_graphs, objects, obtypes, initAction, goalAction)
 			print(len(GL))
 		else:
 			try:
 				print('try to reload:')
-				GL = reload()
+				GL = reload('SGL')
 				print(len(GL))
 			except:
 				print('could not reload')
-				GL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
-				upload(GL)
+				GL = GLib(op_graphs, objects,obtypes, initAction, goalAction)
 
 		planner = PlanSpacePlanner(operators, objects, GL)
 
@@ -384,35 +343,42 @@ class TestPlanner(unittest.TestCase):
 		results = planner.POCL(n)
 		assert len(results) == n
 		for result in results:
-			#totOrdering = topoSort(result)
 			print('\n')
 			for step in topoSort(result):
 				print(Action.subgraph(result, step))
 		print('\n\n')
 		pass
 
+
+
 	def testDecomp(self):
-		sdomain_file = 'domains/ark-domain.pddl'
-		sproblem_file = 'domains/ark-problem.pddl'
-		operators, objects, object_types, initAction, goalAction = parseDomainAndProblemToGraphs(sdomain_file,
-																								 sproblem_file)
-		FlawLib.non_static_preds = preprocessDomain(operators)
-		Argument.object_types = obTypesDict(object_types)
-		story_planner = PlanSpacePlanner(operators, objects, initAction, goalAction,preprocess=False)
+		#operators, objects, object_types, initAction, goalAction = \
+		from GlobalContainer import GC
+		story = parseDomAndProb('domains/ark-domain.pddl', 'domains/ark-problem.pddl')
+
+		disc = parseDomAndProb('domains/ark-requirements-domain.pddl', 'domains/ark-requirements-problem.pddl')
+		try:
+			SGL = reload('SGL')
+			GC.SGL = SGL
+		except:
+
+			SGL = GLib(*story)
+			GC.SGL = SGL
 
 
-		domain_file = 'domains/ark-requirements-domain.pddl'
-		problem_file = 'domains/ark-requirements-problem.pddl'
-		doperators, dobjects, dobject_types, dinitAction, dgoalAction = parseDomainAndProblemToGraphs(domain_file,
-																								problem_file)
+		try:
+			DGL = reload('DGL')
+			GC.DGL = DGL
+		except:
+			DGL = GLib(*disc, storyGL=SGL)
+			GC.DGL = DGL
+
+
 
 		print('Reading story requirements from ark-requirements-domain and ark-requirements-problem')
 		#empty_plan = story_planner.Open.pop()
 
-		from Plannify import GroundDiscOps
-		DGL = GLib(op_graphs, objects, Argument.object_types, init_action, goal_action)
-		GDOs = GroundDiscOps(doperators, [Plannify(next(iter(op.subgraphs)), story_planner.story_GL) for op in doperators])
-		discourse_planner = PlanSpacePlanner(doperators, objects, dinitAction, dgoalAction, preprocess=False)
+
 		# Ground_Discourse_Operators = []
 		# for op in doperators:
 		# 	decomp = next(iter(op.subgraphs))

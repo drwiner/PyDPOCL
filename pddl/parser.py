@@ -559,7 +559,7 @@ def _parse_types_with_error(iter, keyword, classt):
 # Constants / Objects and types can be parsed in the same way because of their
 # familiar structure.
 # Hence instantiate them with _parse_types_with_error.
-_common_types = [(':types', Type), (':story_objs', Object),
+_common_types = [(':types', Type), (':objects', Object),
 				 (':constants', Object)]
 (parse_types_stmt, parse_objects_stmt, parse_constants_stmt) = \
 	map(lambda tup: lambda it: _parse_types_with_error(it, tup[0], tup[1]),
@@ -829,7 +829,7 @@ def parse_problem_def(iter):
 	dom = parse_problem_domain_stmt(next(iter))
 	# parse all object definitions
 	objects = dict()
-	if iter.peek_tag() == ':story_objs':
+	if iter.peek_tag() == ':objects':
 		objects = parse_objects_stmt(next(iter))
 	init = parse_init_stmt(next(iter))
 	goal = parse_goal_stmt(next(iter))
