@@ -525,9 +525,10 @@ def parseDomAndProb(domain_file, problem_file):
 	for op in op_graphs:
 		FlawLib.non_static_preds.union(op.effects)
 
-	Argument.object_types.update(obTypesDict(domain.types))
+	from GlobalContainer import GC
+	GC.object_types.update(obTypesDict(domain.types))
 
-	return (op_graphs, objects, Argument.object_types, init, goal)
+	return (op_graphs, objects, GC.object_types, init, goal)
 
 def obTypesDict(object_types):
 	obtypes = defaultdict(set)

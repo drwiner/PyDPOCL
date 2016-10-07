@@ -13,11 +13,12 @@
 """ 
 
 import copy
+from GlobalContainer import GC
 
 class Element:
 
 	"""Element is a token or label with the following attributes"""
-	def __init__(self, ID, typ = None, name = None, arg_name = None):
+	def __init__(self, ID, typ=None, name=None, arg_name=None):
 		self.ID = ID
 		self.typ = typ
 		self.name = name
@@ -282,7 +283,7 @@ class Literal(InternalElement):
 		
 		
 class Argument(Element):
-	object_types = {}
+	#object_types = {}
 	def __init__(self, ID, typ, name= None, arg_name = None):
 		super(Argument,self).__init__(ID,typ,name, arg_name)		
 	
@@ -292,7 +293,7 @@ class Argument(Element):
 			
 		"""
 		if not super(Argument,self).isEquivalent(other):
-			if not self.typ in self.object_types[other.typ] and not other.typ in self.object_types[self.typ]:
+			if not self.typ in GC.object_types[other.typ] and not other.typ in GC.object_types[self.typ]:
 				return False
 		
 		if not self.name is None:
@@ -306,7 +307,8 @@ class Argument(Element):
 	def isConsistentType(self, other):
 		if not self.typ == other.typ:
 			try:
-				if not self.typ in self.object_types[other.typ] and not other.typ in self.object_types[self.typ]:
+				if not self.typ in GC.object_types[other.typ.lower()] and \
+						not other.typ in GC.object_types[self.typ.lower()]:
 					return False
 			except:
 				raise TypeError('what self {} / other {} typs are these?'.format(self.typ, other.typ))
@@ -320,7 +322,7 @@ class Argument(Element):
 	def merge(self, other):
 		if super(Argument, self).merge(other) is None:
 			return None
-		if self.typ in self.object_types[other.typ]:
+		if self.typ in GC.object_types[other.typ.lower()]:
 			self.typ = other.typ
 		return self
 		
@@ -340,7 +342,8 @@ class Argument(Element):
 class Actor(Argument):
 	""" An actor is an argument
 	"""
-	def __init__(self, ID, typ, name= None, arg_name = None):
+
+	def __init__(self, ID, typ, name=None, arg_name=None):
 		super(Actor,self).__init__(ID,typ,name,arg_name)
 		
 	def merge(self, other):

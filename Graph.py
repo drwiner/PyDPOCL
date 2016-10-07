@@ -82,10 +82,8 @@ class Graph(Element):
 		return None
 
 
-	@clock
 	def replaceWith(self, oldsnk, newsnk):
 		''' removes oldsnk from self.elements, replaces all edges with snk = oldsnk with newsnk'''
-
 
 		if oldsnk == newsnk:
 			return
@@ -155,7 +153,7 @@ class Graph(Element):
 		return {edge for edge in self.edges if edge.sink == element and edge.source.typ == typ and edge.label == label}
 		
 	######       rGet       ####################
-	def rGetDescendants(self, element, Descendants = None):
+	def rGetDescendants(self, element, Descendants=None):
 		if Descendants == None:
 			Descendants = set()
 			
@@ -172,7 +170,7 @@ class Graph(Element):
 			Descendants = self.rGetDescendants(edge.sink, Descendants)
 		return Descendants
 
-	def rGetDescendantEdges(self, element, Descendant_Edges = None):
+	def rGetDescendantEdges(self, element, Descendant_Edges=None):
 		if Descendant_Edges == None:
 			Descendant_Edges = set()
 		#Base Case
@@ -187,13 +185,14 @@ class Graph(Element):
 			
 		return Descendant_Edges
 
-	def isConsistentSubgraph(self, cndt_subgraph, return_map = False):
+	def isConsistentSubgraph(self, cndt_subgraph, return_map=False):
 		"""
 		@param other: a graph which may be a consistent subgraph of self
+		@param return_map
 		@return: if for each other.edge, there is a consistent self.edge, following the shared-endpoints rule of edge sets
 		"""
-		possible_map = isConsistentEdgeSet(Rem = copy.deepcopy(cndt_subgraph.edges), Avail = copy.deepcopy(self.edges),
-										   return_map = return_map)
+		possible_map = isConsistentEdgeSet(Rem=copy.deepcopy(cndt_subgraph.edges), Avail=copy.deepcopy(self.edges),
+										   return_map=return_map)
 		if not possible_map is False:
 			#returns True when return_map  is False
 			#return_map = possible_map
@@ -227,7 +226,7 @@ class Graph(Element):
 # consistent edge sets following shared endpoints clause    ####
 ################################################################
 
-def isConsistentEdgeSet(Rem, Avail, map_ = None, return_map = False):
+def isConsistentEdgeSet(Rem, Avail, map_=None, return_map=False):
 	if map_ == None:
 		map_ = {}
 

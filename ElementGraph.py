@@ -21,12 +21,21 @@ class ElementGraph(Graph):
 		new_self.ID = uuid.uuid1(21)
 		return new_self
 
-	def copyWithNewIDs(self, from_this_num):
-		new_self = self.deepcopy()
-		for element in new_self.elements:
-			element.ID = from_this_num
-			from_this_num = from_this_num + 1
-		return new_self
+
+	def isConsistent(self, other):
+		if isinstance(other) is not ElementGraph:
+			return False
+		#may have issue with inital and goal dummy steps - check here
+		if self.name == 'dummy_init' or self.name == 'dummy_goal':
+			if other.name == 'dummy_init' or other.name =='dummy_goal':
+				print('Could be issue here')
+				if self.name == other.name:
+					return True
+				else:
+					raise NameError("{} vs {}, assert ==".format(self.name, other.name))
+		if self.Args == other.Args:
+			return True
+		return False
 
 	@classmethod
 	def subgraph(cls, EG, elm):
@@ -40,24 +49,6 @@ class ElementGraph(Graph):
 		new_EG.updateArgs()
 		return new_EG
 
-	def addRealRestriction(self, source, sink, label):
-		""" It's 'real' because the source and sink must be ID-identical in a graph for the Restriction to be
-		considered an isomorphic subgraph"""
-		R = Restriction()
-		R.elements.add(source)
-		R.elements.add(sink)
-		R.edges.add(Edge(source,sink, label))
-		self.restrictions.add(R)
-
-
-	def mergeUnifiedEffect(self, effabs):
-		for element in effabs.elements:
-			if element.replaced_ID != -1:
-				existing_element = self.getElementById(element.replaced_ID)
-				existing_element.merge(element)
-			else:
-				element.replaced_ID = element.ID
-		return self
 
 	def getSingleArgByLabel(self, label):
 		for edge in self.edges:

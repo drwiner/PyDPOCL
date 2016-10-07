@@ -2,14 +2,14 @@
 import itertools
 import copy
 from collections import namedtuple, defaultdict
-from PlanElementGraph import Condition
+from PlanElementGraph import Condition, Action
 from clockdeco import clock
 from Element import Operator
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
 Antestep = namedtuple('Antestep', 'action eff_link')
 
-def groundStepList(operators, objects, obtypes):
+def groundStoryList(operators, objects, obtypes):
 	stepnum = 0
 	gsteps = []
 	for op in operators:
@@ -33,36 +33,29 @@ def groundStepList(operators, objects, obtypes):
 			gsteps.append(gstep)
 	return gsteps
 
-def GroundDiscourseOperator(DO, Subplans):
+def groundDiscList(operators, SGL):
+	from Plannify import Plannify
 	#For each ground subplan in Subplans, make a copy of DO s.t. each
-	Ground_Discourse_Operators = []
-
-	for sp in Subplans:
-		GDO = copy.deepcopy(DO)
-		for elm in sp.elements:
-			ex_elms = iter(DO.elements)
-			for ex_elm in ex_elms:
-				if elm.arg_name == ex_elm.arg_name and elm.arg_name is not None:
-					EG = eval(elm.typ).subgraph(sp,elm)
-					GDO.assign(ex_elm, EG)
-		GDO.ground_subplan = sp
-		Ground_Discourse_Operators.append(GDO)
-	return Ground_Discourse_Operators
-
-def GroundDiscOps(DOs, ListOfSubplans):
-	Ground_Discourse_Operators = []
-	for i, DO in enumerate(DOs):
-		Ground_Discourse_Operators.extend(GroundDiscourseOperator(DO,ListOfSubplans[i]))
-	return Ground_Discourse_Operators
-
-
-def set_replaced_ID(action):
-	from Element import Argument
-	from uuid import uuid1
-	for elm in action.elements:
-		if not isinstance(elm, Argument):
-			elm.replaced_ID = uuid1(action.stepnumber)
-
+	gsteps = []
+	stepnum = 0
+	for op in operators:
+		Subplans = Plannify(next(iter(op.subgraphs)), SGL)
+		for sp in Subplans:
+			GDO = copy.deepcopy(op)
+			for elm in sp.elements:
+				ex_elms = iter(op.elements)
+				for ex_elm in ex_elms:
+					if elm.arg_name == ex_elm.arg_name and elm.arg_name is not None:
+						if elm.typ in {'Action','Condition'}:
+							EG = eval(elm.typ).subgraph(sp,elm)
+						else:
+							EG = elm
+						GDO.assign(ex_elm, EG)
+			GDO.ground_subplan = sp
+			GDO.root.stepnumber = stepnum
+			stepnum+=1
+			gsteps.append(GDO)
+	return gsteps
 
 import pickle
 
@@ -83,14 +76,12 @@ def reload(name):
 class GLib:
 
 	def __init__(self, operators, objects, obtypes, init_action, goal_action, storyGL=None):
-		#self._gsteps = groundStepList(operators.union({init_action, goal_action}),story_objs, obtypes)
+
 
 		if storyGL is not None:
-			from Plannify import Plannify
-			ListOfSubplans = [Plannify(next(iter(op.subgraphs)), storyGL) for op in operators]
-			self._gsteps = GroundDiscOps(operators, ListOfSubplans)
+			self._gsteps = groundDiscList(operators, storyGL)
 		else:
-			self._gsteps = groundStepList(operators, objects, obtypes)
+			self._gsteps = groundStoryList(operators, objects, obtypes)
 
 		#init at [-2]
 		init_action.root.stepnumber =len(self._gsteps)

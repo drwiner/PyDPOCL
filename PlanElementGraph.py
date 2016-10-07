@@ -162,6 +162,7 @@ class PlanElementGraph(ElementGraph):
 									
 		super(PlanElementGraph,self).__init__(ID,type_graph,name,Elements,planElement,Edges,Restrictions)
 
+
 	@classmethod
 	def Actions_2_Plan(cls, Actions):
 		elements = set().union(*[A.elements for A in Actions])

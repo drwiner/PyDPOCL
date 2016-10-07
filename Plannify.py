@@ -6,20 +6,25 @@ from clockdeco import clock
 @clock
 def Plannify(RQ, GL):
 	#An ActionLib for steps in RQ - ActionLib is a container w/ all of its possible instances as ground steps
+	print('ActionLibs')
 	Libs = [ActionLib(i, RS, GL) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
 
 	#A World is a combination of one ground-instance from each step
 	Worlds = productByPosition(Libs)
 
+	print('Planets')
 	#A Planet is a plan s.t. all steps are "arg_name consistent", but a step may not be equiv to some ground step
 	Planets = [PlanElementGraph.Actions_2_Plan(W) for W in Worlds if isArgNameConsistent(W)]
 
+	print('Linkify')
 	#Linkify installs orderings and causal links from RQ/decomp to Planets, rmvs Planets which cannot support links
 	has_links = Linkify(Planets, RQ, GL)
 
+	print('Groundify')
 	#Groundify is the process of replacing partial steps with its ground step, and removing inconsistent planets
 	Plans = Groundify(Planets, GL, has_links)
 
+	print('returning consistent')
 	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
 
 @clock
@@ -37,6 +42,7 @@ def Unify(U, V, B = None):
 
 	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
 
+
 def partialUnify(PS, _map):
 	if _map is False:
 		return False
@@ -50,7 +56,8 @@ def partialUnify(PS, _map):
 			elm.merge(g_elm)
 			elm.replaced_ID = g_elm.replaced_ID
 
-	for elm in NS.elements:
+	NSE = iter(NS.elements)
+	for elm in NSE:
 		if elm in _map:
 			g_elm = _map[elm]
 			elm.merge(g_elm)
@@ -64,7 +71,6 @@ def partialUnify(PS, _map):
 				#elm.ID = g_elm.ID
 	NS.root.stepnumber = PS.root.stepnumber
 	return NS
-
 
 def isArgNameConsistent(Partially_Ground_Steps):
 	"""
