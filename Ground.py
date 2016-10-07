@@ -55,6 +55,7 @@ def groundDiscList(operators, SGL):
 			GDO.root.stepnumber = stepnum
 			stepnum+=1
 			gsteps.append(GDO)
+
 	return gsteps
 
 import pickle
@@ -72,6 +73,17 @@ def reload(name):
 	afile.close()
 	return GL
 
+def discotize(literal):
+	cndts = [[obj for obj in objects if arg.typ == obj.typ or arg.typ in obtypes[obj.typ]] for arg in literal.Args]
+	for arg in literal.Args:
+		pass
+		#this arg is an elementgraph or an arg
+		#if its actually an arg, just pick some object
+		#if its a Condition, pick some predicate from initial state, if no truth status, then create for both true
+	# and false
+		#if its an Action, pick some action from storyGL
+		#Idea: for each argument, create a library of possible alternatives, then take itertools.prodcut for each
+	# goal world.
 
 class GLib:
 
@@ -80,6 +92,8 @@ class GLib:
 
 		if storyGL is not None:
 			self._gsteps = groundDiscList(operators, storyGL)
+			init_actions = discotize(init_action)
+			goal_actions = discotize(goal_action)
 		else:
 			self._gsteps = groundStoryList(operators, objects, obtypes)
 
@@ -221,6 +235,17 @@ class GLib:
 
 	def __repr__(self):
 		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
+
+
+
+class DiscLib:
+	def __init__(self, story_element, SGL, ):
+		self.element = story_element
+		self.typ = self.element.typ
+		#what if we limit to just those elements which are args in a DGL?
+			#idea: iterate through DGL and identify all story-elements. Then, those story-elements become the problem
+	#  objects. Then, for each problem object in goal state, create world for each possible goal world. Basically,
+	# just take the story element in the goal condition, and see which DGL story elements
 
 
 from pddlToGraphs import parseDomAndProb
