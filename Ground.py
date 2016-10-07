@@ -92,8 +92,9 @@ class GLib:
 
 		if storyGL is not None:
 			self._gsteps = groundDiscList(operators, storyGL)
-			init_actions = discotize(init_action)
-			goal_actions = discotize(goal_action)
+
+			#init_actions = discotize(init_action)
+			#goal_actions = discotize(goal_action)
 		else:
 			self._gsteps = groundStoryList(operators, objects, obtypes)
 
@@ -177,6 +178,19 @@ class GLib:
 			if count > 0:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
 
+	def makeGoal(self, objects, goal_action):
+		from ElementGraph import ElementGraph
+		from Element import Argument
+
+		story_elements = {elm for dgl in self for elm in dgl.elements if isinstance(elm, ElementGraph) or isinstance(
+			elm, Argument)}
+		# [se for se in story_elements if elm.isConsistent() for elm in goal_action.elements if elm ]
+		# for elm in goal_action.elements:
+		# 	for se in story_elements:
+		# 		if se
+
+		#for each arg, make a library of possible candidates. this should all be done in some sort of DiscLib
+
 	def getPotentialLinkConditions(self, src, snk):
 		from Graph import Edge
 		cndts = []
@@ -237,11 +251,6 @@ class GLib:
 		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
 
 
-
-class DiscLib:
-	def __init__(self, story_element, SGL, ):
-		self.element = story_element
-		self.typ = self.element.typ
 		#what if we limit to just those elements which are args in a DGL?
 			#idea: iterate through DGL and identify all story-elements. Then, those story-elements become the problem
 	#  objects. Then, for each problem object in goal state, create world for each possible goal world. Basically,

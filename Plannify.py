@@ -261,3 +261,47 @@ class ReuseLib:
 		self.step = vstep
 		self._cndts = [ustep for ustep in U.Steps if ustep.stepnumber == vstep.stepnumber]
 		self._cndts.append(vstep)
+
+
+
+from uuid import uuid1 as uid
+from Element import Argument, Actor, Operator, Literal
+from ElementGraph import ElementGraph
+
+class DiscLib:
+	def __init__(self, i, story_element, DGL):
+		self.arg_to_elm(i, story_element)
+		self.findCandidates()
+
+	def __len__(self):
+		return len(self._cndts)
+
+	def __getitem__(self, position):
+		return self._cndts[position]
+
+	def arg_to_elm(self, i, arg):
+
+		if arg.typ == 'character' or arg.typ == 'actor':
+			elm = Actor(ID=uid(i), name=arg.name, typ='character', arg_name=arg.arg_name)
+		elif arg.typ == 'arg' or arg.typ == 'item' or arg.typ == 'place':
+			elm = Argument(ID=uid(i), name=arg.name, typ=arg.typ, arg_name=arg.arg_name)
+		elif arg.typ == 'step':
+			elm = Operator(ID=uid(i), name=arg.name, typ='Action', arg_name=arg.arg_name)
+		elif arg.typ == 'literal' or arg.typ == 'lit':
+			elm = Literal(ID=uid(i), name=arg.name, typ='Condition', arg_name=arg.arg_name)
+		else:
+			raise ValueError('whose typ is this anyway? {}'.format(arg.typ))
+		self.element = elm
+		self.typ = elm.typ
+
+	def findCandidates(self):
+		cndts = []
+		for dgl in DGL:
+			for elm in dgl.elements:
+				if isinstance(elm,ElementGraph):
+					if elm.root.typ == self.typ:
+						cndts.append(elm)
+				elif isinstance(elm,Argument):
+					if elm.isConsistent(self.element):
+						cndts.append(elm)
+		self._cndts = cndts

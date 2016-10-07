@@ -68,6 +68,13 @@ class Graph(Element):
 		self.elements = Elements
 		self.edges = Edges
 		self.subgraphs = Restrictions
+
+	def __len__(self):
+		return len(self.elements)
+
+	def __iter__(self):
+		elms = iter(self.elements)
+		yield next(elms)
 	
 	def getElementById(self, ID):
 		for element in self.elements:

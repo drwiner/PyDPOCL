@@ -82,11 +82,11 @@ def forallFormula(formula, parent, relationship, elements, edges):
 	negative = False
 	num_args = 0
 	if lit.key == 'not':
-		Lit, formula = makeLit(next(iter(lit.children)),7,parent = parent,relationship= relationship,
-							elements =elements,edges = edges,bit= False, noAdd = True)
+		Lit, formula = makeLit(next(iter(lit.children)),7, parent=parent, relationship=relationship,
+							elements=elements, edges=edges, bit=False, noAdd=True)
 	else:
-		Lit, formula = makeLit(lit,7,parent = parent,relationship= relationship, elements =elements,edges = edges,
-							bit= True, noAdd = True)
+		Lit, formula = makeLit(lit, 7, parent=parent,relationship= relationship, elements=elements, edges=edges,
+							bit=True, noAdd=True)
 
 	for arg in scoped_args:
 		L = copy.deepcopy(Lit)
@@ -201,6 +201,7 @@ def getSubFormulaNoParent(formula, objects):
 		#children are list
 		arg = next(ob_element for ob_name, ob_element in objects.items() if child.key == ob_name)
 		edges.add(Edge(lit, arg, ARGLABELS[i]))
+		elements.add(arg)
 	return (elements, edges)
 	
 def getGoalSet(goal_formula, objects):
