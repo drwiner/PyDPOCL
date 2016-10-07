@@ -174,9 +174,7 @@ class GLib:
 	def makeGoal(self, objects, goal_action):
 		from Plannify import DiscLib
 
-		#story_elements = {elm for dgl in self for elm in dgl.elements if isStoryElement(elm)}
-		DiscLibs = [DiscLib(elm, self) for elm in goal_action.elements if isStoryElement(elm)]
-		DiscWorlds = itertools.product(DiscLibs)
+		DiscWorlds = itertools.product([DiscLib(elm, self) for elm in goal_action.elements if isStoryElement(elm)])
 
 	def getPotentialLinkConditions(self, src, snk):
 		from Graph import Edge
