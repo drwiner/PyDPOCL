@@ -270,8 +270,8 @@ from ElementGraph import ElementGraph
 
 class DiscLib:
 	def __init__(self, i, story_element, DGL):
-		self.arg_to_elm(i, story_element)
-		self.findCandidates()
+		self.element, self.typ = self.arg_to_elm(i, story_element)
+		self._cndts = self.findCandidates(DGL)
 
 	def __len__(self):
 		return len(self._cndts)
@@ -291,10 +291,9 @@ class DiscLib:
 			elm = Literal(ID=uid(i), name=arg.name, typ='Condition', arg_name=arg.arg_name)
 		else:
 			raise ValueError('whose typ is this anyway? {}'.format(arg.typ))
-		self.element = elm
-		self.typ = elm.typ
+		return elm, elm.typ
 
-	def findCandidates(self):
+	def findCandidates(self, DGL):
 		cndts = []
 		for dgl in DGL:
 			for elm in dgl.elements:
@@ -304,4 +303,4 @@ class DiscLib:
 				elif isinstance(elm,Argument):
 					if elm.isConsistent(self.element):
 						cndts.append(elm)
-		self._cndts = cndts
+		return cndts
