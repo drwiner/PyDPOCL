@@ -85,7 +85,7 @@ class GLib:
 
 		if storyGL is not None:
 			self._gsteps = groundDiscList(operators, storyGL)
-
+			goal_conditions = self.groundDiscGoal(goal_action)
 			#init_actions = discotize(init_action)
 			#goal_actions = discotize(goal_action)
 		else:
@@ -171,10 +171,13 @@ class GLib:
 			if count > 0:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
 
-	def makeGoal(self, objects, goal_action):
+	def groundDiscGoal(self, goal_action):
 		from Plannify import DiscLib
-
-		DiscWorlds = itertools.product([DiscLib(elm, self) for elm in goal_action.elements if isStoryElement(elm)])
+		Disc_Worlds = itertools.product([DiscLib(elm, self) for elm in goal_action.elements if isStoryElement(elm)])
+		#then, for each discworld, create a new goal action by swapping the former arguments with the new ground
+	# story elemetns
+		#then return those.
+		return Disc_Worlds
 
 	def getPotentialLinkConditions(self, src, snk):
 		from Graph import Edge
