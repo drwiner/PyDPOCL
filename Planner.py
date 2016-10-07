@@ -356,15 +356,15 @@ class TestPlanner(unittest.TestCase):
 		from GlobalContainer import GC
 		story = parseDomAndProb('domains/ark-domain.pddl', 'domains/ark-problem.pddl')
 
-		disc = parseDomAndProb('domains/ark-requirements-domain.pddl', 'domains/ark-requirements-problem.pddl')
+
 		try:
 			SGL = reload('SGL')
 			GC.SGL = SGL
 		except:
-
 			SGL = GLib(*story)
 			GC.SGL = SGL
 
+		disc = parseDomAndProb('domains/ark-requirements-domain.pddl', 'domains/ark-requirements-problem.pddl')
 
 		try:
 			DGL = reload('DGL')

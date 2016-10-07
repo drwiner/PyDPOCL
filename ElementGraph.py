@@ -40,24 +40,6 @@ class ElementGraph(Graph):
 		new_EG.updateArgs()
 		return new_EG
 
-	@classmethod
-	def makeElementGraph(cls, elementGraph, element):
-		edges = copy.deepcopy(elementGraph.rGetDescendantEdges(element))
-		elms = {edge.source for edge in edges}|{edge.sink for edge in edges}
-		element_copy = next(iter(elm for elm in elms if elm.ID == element.ID))
-		return cls(element.ID, element.typ, name=None, root_element=element_copy,Elements= elms, Edges = edges,
-				   Restrictions=elementGraph.restrictions)
-
-	def getElementGraphFromElement(self, element, Type=None):
-		if Type == None:
-			Type = eval(element.typ)
-		if self.root == element:
-			return self.deepcopy()
-		return Type.makeElementGraph(self, element)
-
-	def getElementGraphFromElementID(self, element_ID, Type = None):
-		return self.getElementGraphFromElement(self.getElementById(element_ID), Type)
-
 	def addRealRestriction(self, source, sink, label):
 		""" It's 'real' because the source and sink must be ID-identical in a graph for the Restriction to be
 		considered an isomorphic subgraph"""

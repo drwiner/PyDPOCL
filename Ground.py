@@ -40,11 +40,11 @@ def GroundDiscourseOperator(DO, Subplans):
 	for sp in Subplans:
 		GDO = copy.deepcopy(DO)
 		for elm in sp.elements:
-			for ex_elm in GDO.elements:
-				if elm.arg_name == ex_elm.arg_name:
-					ex_elm = elm
-					#ex_elm.ID = elm.ID
-					#ex_elm.replaced_ID = elm.replaced_ID
+			ex_elms = iter(DO.elements)
+			for ex_elm in ex_elms:
+				if elm.arg_name == ex_elm.arg_name and elm.arg_name is not None:
+					EG = eval(elm.typ).subgraph(sp,elm)
+					GDO.assign(ex_elm, EG)
 		GDO.ground_subplan = sp
 		Ground_Discourse_Operators.append(GDO)
 	return Ground_Discourse_Operators

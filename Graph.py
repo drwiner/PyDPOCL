@@ -30,7 +30,11 @@ class Edge:
 		return (not self.__eq__(other))
 		
 	def __hash__(self):
-		return hash((self.source.ID, self.sink.ID, self.label))
+		return hash(self.source.ID) ^ hash(self.sink.ID) ^ hash(self.label)
+
+	def assign(self, endpoint, new_val):
+		new_val.ID = self.endpoint.ID
+		self.endpoint = new_val
 		
 	def merge(self, other):
 		"""Merges source and sink"""
@@ -103,6 +107,24 @@ class Graph(Element):
 						r.elements.add(newsnk)
 					r.replaceWith(r_edge.sink, newsnk)
 		return self
+
+	def assign(self, old_elm_in_edge, new_elm, remove_old=True):
+		if new_elm not in self.elements:
+			self.elements.add(new_elm)
+		if remove_old:
+			self.elements.remove(old_elm_in_edge)
+		edges = iter(self.edges)
+		for edge in edges:
+			if edge.source == old_elm_in_edge:
+				self.edges.add(Edge(new_elm, edge.sink, edge.label))
+				self.edges.remove(edge)
+			if edge.sink == old_elm_in_edge:
+				self.edges.add(Edge(edge.source, new_elm, edge.label))
+				self.edges.remove(edge)
+		for r in self.subgraphs:
+			if r.name == 'Restriction':
+				r.assign(old_elm_in_edge, new_elm)
+
 
 	def getEdgesByLabel(self, label):
 		return {edge for edge in self.edges if edge.label == label}

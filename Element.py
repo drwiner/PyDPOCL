@@ -282,7 +282,7 @@ class Literal(InternalElement):
 		
 		
 class Argument(Element):
-	object_types = None
+	object_types = {}
 	def __init__(self, ID, typ, name= None, arg_name = None):
 		super(Argument,self).__init__(ID,typ,name, arg_name)		
 	
@@ -305,8 +305,11 @@ class Argument(Element):
 
 	def isConsistentType(self, other):
 		if not self.typ == other.typ:
-			if not self.typ in self.object_types[other.typ] and not other.typ in self.object_types[self.typ]:
-				return False
+			try:
+				if not self.typ in self.object_types[other.typ] and not other.typ in self.object_types[self.typ]:
+					return False
+			except:
+				raise TypeError('what self {} / other {} typs are these?'.format(self.typ, other.typ))
 		return True
 
 	def isConsistent(self, other):

@@ -6,6 +6,12 @@ import random
 import itertools
 from clockdeco import clock
 
+class DiscArg(ElementGraph):
+	def __init__(self, ID, type_graph, name=None, Elements=None, root_element=None, Edges=None):
+		super(DiscArg, self).__init__(ID, type_graph, name, Elements, root_element, Edges)
+		self.typ = root_element.typ
+
+
 class Action(ElementGraph):
 	#stepnumber = 2
 	def __init__(self,ID,type_graph,name=None,Elements = None, root_element = None, Edges = None):
@@ -313,11 +319,13 @@ class PlanElementGraph(ElementGraph):
 
 		@return:
 		"""
-
-		from GlobalContainer import GC
-		if self.name == 'story':
-			return self.calculateHeuristic(GC.SGL)
-		return self.calculateHeuristic(GC.DGL)
+		try:
+			from GlobalContainer import GC
+			if self.name == 'story':
+				return self.calculateHeuristic(GC.SGL)
+			return self.calculateHeuristic(GC.DGL)
+		except:
+			return 0
 
 		#return len(self.flaws) + k
 
