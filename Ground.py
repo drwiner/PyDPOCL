@@ -4,6 +4,8 @@ import copy
 from collections import namedtuple, defaultdict
 from PlanElementGraph import Condition, Action
 from clockdeco import clock
+from ElementGraph import ElementGraph
+from Element import Argument
 from Element import Operator
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
@@ -73,17 +75,8 @@ def reload(name):
 	afile.close()
 	return GL
 
-def discotize(literal):
-	cndts = [[obj for obj in objects if arg.typ == obj.typ or arg.typ in obtypes[obj.typ]] for arg in literal.Args]
-	for arg in literal.Args:
-		pass
-		#this arg is an elementgraph or an arg
-		#if its actually an arg, just pick some object
-		#if its a Condition, pick some predicate from initial state, if no truth status, then create for both true
-	# and false
-		#if its an Action, pick some action from storyGL
-		#Idea: for each argument, create a library of possible alternatives, then take itertools.prodcut for each
-	# goal world.
+def isStoryElement(elm):
+	return isinstance(elm, ElementGraph) or isinstance(elm, Argument)
 
 class GLib:
 
@@ -179,17 +172,11 @@ class GLib:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
 
 	def makeGoal(self, objects, goal_action):
-		from ElementGraph import ElementGraph
-		from Element import Argument
+		from Plannify import DiscLib
 
-		story_elements = {elm for dgl in self for elm in dgl.elements if isinstance(elm, ElementGraph) or isinstance(
-			elm, Argument)}
-		# [se for se in story_elements if elm.isConsistent() for elm in goal_action.elements if elm ]
-		# for elm in goal_action.elements:
-		# 	for se in story_elements:
-		# 		if se
-
-		#for each arg, make a library of possible candidates. this should all be done in some sort of DiscLib
+		#story_elements = {elm for dgl in self for elm in dgl.elements if isStoryElement(elm)}
+		DiscLibs = [DiscLib(elm, self) for elm in goal_action.elements if isStoryElement(elm)]
+		DiscWorlds = itertools.product(DiscLibs)
 
 	def getPotentialLinkConditions(self, src, snk):
 		from Graph import Edge
