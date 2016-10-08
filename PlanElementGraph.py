@@ -165,9 +165,9 @@ class PlanElementGraph(ElementGraph):
 		self.final_dummy_step = None
 
 		if planElement is None:
-			planElement = PlanElement(ID =ID, typ=type_graph,name=name)
+			plan_elm = PlanElement(uid=ID, typ=type_graph, name=name)
 									
-		super(PlanElementGraph,self).__init__(ID,type_graph,name,Elements,planElement,Edges,Restrictions)
+		super(PlanElementGraph,self).__init__(ID, type_graph, name, Elements, plan_elm, Edges, Restrictions)
 
 
 	@classmethod

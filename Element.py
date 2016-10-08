@@ -265,15 +265,13 @@ class Literal(InternalElement):
 		
 		
 class Argument(Element):
-	#object_types = {}
-	def __init__(self, ID, typ, name= None, arg_name = None):
-		super(Argument,self).__init__(ID,typ,name, arg_name)		
+
+	def __init__(self, ID, typ, name=None, arg_name=None):
+		super(Argument,self).__init__(ID, typ, name, arg_name)
 	
 	def isEquivalent(self, other):
-		""" 
-			'equivalent' arguments are consistent and have been assigned the same name
-			
-		"""
+		""" 'equivalent' arguments are consistent and have been assigned the same name """
+
 		if not super(Argument,self).isEquivalent(other):
 			if not self.typ in GC.object_types[other.typ] and not other.typ in GC.object_types[self.typ]:
 				return False
@@ -322,8 +320,7 @@ class Argument(Element):
 	
 
 class Actor(Argument):
-	""" An actor is an argument
-	"""
+	""" An actor is an argument """
 
 	def __init__(self, ID, typ, name=None, arg_name=None):
 		super(Actor,self).__init__(ID,typ,name,arg_name)
@@ -348,8 +345,8 @@ class Actor(Argument):
 
 class PlanElement(Element):
 
-	def __init__(self,ID,typ=None, name=None, arg_name = None):
-		if typ == None:
+	def __init__(self, uid, typ=None, name=None, arg_name=None):
+		if typ is None:
 			typ = 'PlanElementGraph'
 			
-		super(PlanElement,self).__init__(ID,typ,name, arg_name)
+		super(PlanElement,self).__init__(uid, typ, name, arg_name)
