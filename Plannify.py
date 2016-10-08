@@ -267,8 +267,8 @@ from uuid import uuid1 as uid
 from Element import Argument, Actor, Operator, Literal
 
 class DiscLib:
-	def __init__(self, i, story_element, DGL):
-		self.element, self.typ = arg_to_elm(i, story_element)
+	def __init__(self, i, disc_arg, DGL):
+		self.element, self.typ = arg_to_elm(i, disc_arg)
 		self._cndts = self.findCandidates(i, DGL)
 
 	def __len__(self):
@@ -278,16 +278,15 @@ class DiscLib:
 		return self._cndts[position]
 
 
-
 	def findCandidates(self, i, DGL):
-		cndts = []
+		cndts = set()
 		for dgl in DGL:
 			for elm in dgl.elements:
+				if not isStoryElement(elm):
+					continue
 				if elm.isConsistent(self.element):
-					new_elm = copy.deepcopy(elm)
-					new_elm.position = i
-					cndts.append(new_elm)
-		return cndts
+					cndts.add((i, elm))
+		return list(cndts)
 
 
 def arg_to_elm(i, arg):
@@ -302,3 +301,7 @@ def arg_to_elm(i, arg):
 	else:
 		raise ValueError('whose typ is this anyway? {}'.format(arg.typ))
 	return elm, elm.typ
+
+from ElementGraph import ElementGraph
+def isStoryElement(elm):
+	return isinstance(elm, ElementGraph) or isinstance(elm, Argument)

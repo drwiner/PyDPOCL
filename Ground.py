@@ -2,11 +2,9 @@
 import itertools
 import copy
 from collections import namedtuple, defaultdict
-from PlanElementGraph import Condition, Action
+from PlanElementGraph import Condition
 from clockdeco import clock
-from ElementGraph import ElementGraph
 from Element import Argument
-from Element import Operator
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
 Antestep = namedtuple('Antestep', 'action eff_link')
@@ -83,9 +81,6 @@ def reload(name):
 	afile.close()
 	return GL
 
-def isStoryElement(elm):
-	return isinstance(elm, ElementGraph) or isinstance(elm, Argument)
-
 class GLib:
 
 	def __init__(self, operators, objects, obtypes, init_action, goal_action, storyGL=None):
@@ -93,22 +88,19 @@ class GLib:
 
 		if storyGL is not None:
 			self._gsteps = groundDiscList(operators, storyGL)
-			goal_conditions = self.groundDiscGoal(goal_action)
-			#init_actions = discotize(init_action)
-			#goal_actions = discotize(goal_action)
+			self._gsteps.extend(self.groundDiscGoal(goal_action))
 		else:
 			self._gsteps = groundStoryList(operators, objects, obtypes)
-
-		#init at [-2]
-		init_action.root.stepnumber =len(self._gsteps)
-		init_action._replaceInternals()
-		init_action.replaceInternals()
-		self._gsteps.append(init_action)
-		#goal at [-1]
-		goal_action.root.stepnumber= len(self._gsteps)
-		goal_action._replaceInternals()
-		goal_action.replaceInternals()
-		self._gsteps.append(goal_action)
+			# init at [-2]
+			init_action.root.stepnumber = len(self._gsteps)
+			init_action._replaceInternals()
+			init_action.replaceInternals()
+			self._gsteps.append(init_action)
+			# goal at [-1]
+			goal_action.root.stepnumber = len(self._gsteps)
+			goal_action._replaceInternals()
+			goal_action.replaceInternals()
+			self._gsteps.append(goal_action)
 
 		#dictionaries
 		self.initDicts()
@@ -182,31 +174,19 @@ class GLib:
 
 	def groundDiscGoal(self, goal_action):
 		from Plannify import DiscLib
-		Disc_Worlds = itertools.product([DiscLib(elm, self) for elm in goal_action.elements if isStoryElement(elm)])
-		#A Disc_World is a world where each each position in the iter is a goal condition
-		#Each DiscLib is a set of cndts for replacing the discourse arguments with story elements
+		discs = [elm for elm in goal_action.elements if isinstance(elm, Argument)]
+		if len(discs) == 0:
+			raise ValueError('no args in goal_actions?')
+		Disc_Worlds = itertools.product([DiscLib(i, elm, self) for i, elm in enumerate(discs)])
 		goals = []
 		for DW in Disc_Worlds:
-			for cndt_choice in DW:
-				cndt_choice.element
+			GA = copy.deepcopy(goal_action)
+			for i, cndt_elm in DW:
+				disc_arg = discs[i]
+				GA.assign(disc_arg, cndt_elm)
+			goals.append(GA)
 
 
-	def assignStoryToDisc(GDO, SP, elm, ex_elms):
-		for ex_elm in ex_elms:
-			if elm.arg_name is None:
-				continue
-			if elm.arg_name != ex_elm.arg_name:
-				continue
-
-			EG = elm
-			if elm.typ in {'Action', 'Condition'}:
-				EG = eval(elm.typ).subgraph(SP, elm)
-
-			GDO.assign(ex_elm, EG)
-
-		#then, for each discworld, create a new goal action by swapping the former arguments with the new ground
-	# story elemetns
-		#then return those.
 		return Disc_Worlds
 
 	def getPotentialLinkConditions(self, src, snk):
