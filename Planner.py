@@ -41,18 +41,17 @@ class PlanSpacePlanner:
 		self.story_objs = story_objs
 
 		self.story_GL = story_GL
-		s_plan = self.setup(self.story_GL, 'story')
+		SP = self.setup(self.story_GL, 'story')
 		self.Open = Frontier()
 		if not disc_ops is None:
 			self.disc_GL = disc_GL
 			self.disc_ops = disc_ops
 			self.disc_objects = disc_objects
-			d_plan = self.setup(self.disc_ops, 'disc')
-			self.Open.insert((s_plan, d_plan))
+			Discourse_Plans = self.multiGoalSetup(self.disc_GL)
+			for DP in Discourse_Plans:
+				self.Open.insert((SP,DP))
 		else:
-			self.Open.insert((s_plan))
-
-
+			self.Open.insert(SP)
 
 	def __len__(self):
 		return len(self._frontier)
@@ -75,8 +74,8 @@ class PlanSpacePlanner:
 		s_goal = copy.deepcopy([-1])
 		s_goal.replaceInternals()
 
-		s_init_plan = PlanElementGraph(uid(0), name=plan_name, Elements=objects | s_init.elements | s_goal.elements,
-									   Edges=s_init.edges | s_goal.edges)
+		s_init_plan = PlanElementGraph(uid(0), name=plan_name, Elements=self.story_objs|s_init.elements|s_goal.elements,
+									   Edges=s_init.edges|s_goal.edges)
 
 		s_init_plan.initial_dummy_step = s_init.root
 		s_init_plan.final_dummy_step = s_goal.root
@@ -84,10 +83,31 @@ class PlanSpacePlanner:
 		s_init_plan.OrderingGraph.addOrdering(s_init.root, s_goal.root)
 
 		#Add initial Open precondition flaws for dummy step
-		init_flaws = (Flaw((dummy_final, prec), 'opf') for prec in s_init_plan.getNeighborsByLabel(dummy_final, 'precond-of'))
+		init_flaws = (Flaw((s_goal.root, prec), 'opf') for prec in s_goal.preconditions)
 		for flaw in init_flaws:
 			s_init_plan.flaws.insert(GL, s_init_plan, flaw)
 		return s_init_plan
+
+	def multiGoalSetup(self, GL):
+		#s_init is in the back for a multi-goal setup
+		init = copy.deepcopy([-1])
+		init.replaceInternals()
+		DPlans = []
+		for GA in GL.Goal_Actions:
+			s_goal = copy.deepcopy(GA)
+			s_init = copy.deepcopy(init)
+			DPlan = PlanElementGraph(uid(0), name='disc',
+									 Elements=s_init.elements|s_goal.elements,
+									 Edges=s_init.edges|s_goal.edges)
+
+			DPlan.initial_dummy_step = s_init.root
+			DPlan.final_dummy_step = s_goal.root
+			DPlan.OrderingGraph.addOrdering(s_init.root, s_goal.root)
+			init_flaws = (Flaw((s_goal.root, prec), 'opf') for prec in s_goal.preconditions)
+			for flaw in init_flaws:
+				DPlan.flaws.insert(GL, DPlan, flaw)
+			DPlans.append(DPlan)
+		return DPlans
 
 
 	#@clock
@@ -176,8 +196,9 @@ class PlanSpacePlanner:
 	def RetargetPrecondition(self, plan,  S_Old, precondition):
 		effect_token = self.story_GL.getConsistentEffect(S_Old, precondition)
 		pre_link = plan.RemoveSubgraph(precondition)
-		pre_link.sink = effect_token
-		self.edges.add(pre_link)
+		plan.assign(pre_link.sink, effect_token) #new
+		#pre_link.sink = effect_token
+		#self.edges.add(pre_link)
 		return pre_link.sink
 
 	def addStep(self, plan, s_add, s_need, condition, new=None):

@@ -88,7 +88,13 @@ class GLib:
 
 		if storyGL is not None:
 			self._gsteps = groundDiscList(operators, storyGL)
-			self._gsteps.extend(self.groundDiscGoal(goal_action))
+			self.Goal_Actions = self.groundDiscGoal(goal_action)
+			self._gsteps.extend(self.GoalActions)
+			init_action.root.stepnumber = len(self._gsteps)
+			init_action._replaceInternals()
+			init_action.replaceInternals()
+			self._gsteps.append(init_action)
+
 		else:
 			self._gsteps = groundStoryList(operators, objects, obtypes)
 			# init at [-2]
