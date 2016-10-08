@@ -186,14 +186,13 @@ class GLib:
 				GA.assign(disc_arg, cndt_elm)
 			goals.append(GA)
 
-
-		return Disc_Worlds
+		return goals
 
 	def getPotentialLinkConditions(self, src, snk):
 		from Graph import Edge
 		cndts = []
 		for pre in self[snk.stepnumber].preconditions:
-			if not src.stepnumber in self.id_dict[pre.replaced_ID]:
+			if src.stepnumber not in self.id_dict[pre.replaced_ID]:
 				continue
 
 			cndts.add(Edge(src,snk,copy.deepcopy(pre)))
@@ -204,7 +203,7 @@ class GLib:
 		cndts = []
 		for eff in self[src.stepnumber].effects:
 			for pre in self[snk.stepnumber].preconditions:
-				if not eff.replaced_ID in self.id_dict[pre.replaced_ID]:
+				if eff.replaced_ID not in self.id_dict[pre.replaced_ID]:
 					continue
 				cndts.add(Edge(src, snk, copy.deepcopy(eff)))
 

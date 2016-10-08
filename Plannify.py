@@ -1,7 +1,10 @@
 import itertools
-from PlanElementGraph import Action, PlanElementGraph, Condition
+from PlanElementGraph import Action, PlanElementGraph
 from Graph import Edge
 from clockdeco import clock
+from uuid import uuid1 as uid
+from Element import Argument, Actor, Operator, Literal
+from ElementGraph import ElementGraph
 
 @clock
 def Plannify(RQ, GL):
@@ -226,8 +229,7 @@ class LinkLib:
 		@param position: in list of links of Planet
 		@param link: ground steps
 		@param Plan: Plan containing link
-		@param GL: ground step library
-		"""
+		@param GL: ground step library """
 
 		self.position = position
 		self.source = link.source
@@ -262,9 +264,6 @@ class ReuseLib:
 		self._cndts = [ustep for ustep in U.Steps if ustep.stepnumber == vstep.stepnumber]
 		self._cndts.append(vstep)
 
-
-from uuid import uuid1 as uid
-from Element import Argument, Actor, Operator, Literal
 
 class DiscLib:
 	def __init__(self, i, disc_arg, DGL):
@@ -302,6 +301,6 @@ def arg_to_elm(i, arg):
 		raise ValueError('whose typ is this anyway? {}'.format(arg.typ))
 	return elm, elm.typ
 
-from ElementGraph import ElementGraph
+
 def isStoryElement(elm):
 	return isinstance(elm, ElementGraph) or isinstance(elm, Argument)
