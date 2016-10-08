@@ -119,10 +119,11 @@ class PlanSpacePlanner:
 			new_plan = plan.deepcopy()
 
 			#step 4 - set sink before replace internals
-			preserve_original_id = eff_link.sink.replaced_ID
-			eff_link.sink = new_plan.getElementById(precondition.ID)
-			eff_link.sink.replaced_ID = preserve_original_id
-			new_plan.edges.add(eff_link)
+			preserve_original_id = eff_link.sink.replaced_ID #original
+			anteaction.assign(eff_link.sink, new_plan.getElementById(precondition.ID)) #new
+			eff_link.sink.replaced_ID = preserve_original_id #original
+			#eff_link.sink = new_plan.getElementById(precondition.ID)
+			#new_plan.edges.add(eff_link)
 			# check: eff_link.sink should till be precondition of s_need
 
 			#step 5 - add new stuff to new plan
