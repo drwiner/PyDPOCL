@@ -14,7 +14,7 @@ class DiscArg(ElementGraph):
 
 class Action(ElementGraph):
 	#stepnumber = 2
-	def __init__(self,ID,type_graph,name=None,Elements = None, root_element = None, Edges = None):
+	def __init__(self, ID, type_graph, name=None, Elements=None, root_element=None, Edges=None):
 		
 		if Edges == None:
 			Edges = set()
@@ -27,8 +27,11 @@ class Action(ElementGraph):
 
 		self.nonequals = set()
 			
-		super(Action,self).__init__(ID,type_graph,name,Elements,root_element,Edges)
+		super(Action,self).__init__(ID, type_graph, name, Elements, root_element, Edges)
 
+	@property
+	def executed(self):
+		return self.root.executed
 
 	def RemoveSubgraph(self, elm):
 		elm = self.getElementById(elm.ID)
@@ -119,6 +122,10 @@ class Condition(ElementGraph):
 		
 		super(Condition,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Restrictions)
 		self.labels = ['first-arg','sec-arg','third-arg','fourth-arg']
+
+	@property
+	def truth(self):
+		return self.root.truth
 
 	def isConsistent(self, other):
 		return self.isConsistentSubgraph(other)

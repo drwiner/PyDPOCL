@@ -171,6 +171,7 @@ class GLib:
 			if count > 0:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
 
+
 	def groundDiscGoal(self, goal_action):
 		from Plannify import DiscLib
 		Disc_Worlds = itertools.product([DiscLib(elm, self) for elm in goal_action.elements if isStoryElement(elm)])

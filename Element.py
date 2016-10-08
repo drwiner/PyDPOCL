@@ -103,43 +103,25 @@ class InternalElement(Element):
 	"""Internal Element is an Element with a possibly unimportant name, and a number of arguments
 	"""
 
-	def __init__(self, ID, typ, name = None, arg_name = None, num_args = None):
+	def __init__(self, ID, typ, name = None, arg_name = None, num_args=None):
 		super(InternalElement,self).__init__(ID,typ,name, arg_name)
 		if num_args == None:
 			num_args = 0
 		self.num_args = num_args
 	
 	def isEquivalent(self, other):
-		"""Another element is equivalent with self iff 
-				for each non-None parameter in self, 
-					other's parameter == 
-					and cannot be None 
-				and if for each None parameter in self,
-						other's parameter must be None
-		"""
 		if not super(InternalElement,self).isEquivalent(other):
 			return False
-		
 
-		if not self.name is None:
+		if self.name is not None:
 			if self.name != other.name:
 				return False
 		else:
-			if not other.name is None:
+			if other.name is not None:
 				return False
 				
 		if self.num_args != other.num_args:
 			return False
-		
-		
-		# if not other.name is None:
-			# if other.num_args > 0:
-				# if self.num_args != other.num_args:
-					# return False
-			# if self.num_args == 0:
-				# if self.num_args != other.num_args:
-					# return False
-
 				
 		return True
 			
@@ -178,7 +160,7 @@ class InternalElement(Element):
 class Operator(InternalElement):
 	stepnumber = 0
 	""" An operator element is an internal element with an executed status and orphan status"""
-	def __init__(self, ID, typ, name = None, stepnumber = None, num_args = None, executed = None, arg_name = None):
+	def __init__(self, ID, typ, name=None, stepnumber=None, num_args=None, executed=None, arg_name=None):
 
 		if num_args == None:
 			num_args = 0

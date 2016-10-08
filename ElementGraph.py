@@ -22,7 +22,21 @@ class ElementGraph(Graph):
 		return new_self
 
 
+	@property
+	def typ(self):
+		return self.root.typ
+
+	@property
+	def name(self):
+		return self.root.name
+
+	@property
+	def num_args(self):
+		return self.root.num_args
+
+
 	def isConsistent(self, other):
+
 		if isinstance(other) is not ElementGraph:
 			return False
 		#may have issue with inital and goal dummy steps - check here
@@ -40,7 +54,7 @@ class ElementGraph(Graph):
 	@classmethod
 	def subgraph(cls, EG, elm):
 		"""
-			INPLACE subgraph - still references same parent
+		INPLACE subgraph - still references same parent
 		"""
 		elm = EG.getElementById(elm.ID)
 		edges = EG.rGetDescendantEdges(elm)
