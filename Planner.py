@@ -34,22 +34,20 @@ class Frontier:
 
 class PlanSpacePlanner:
 
-	def __init__(self, story_ops, story_objs, story_GL, disc_ops=None, disc_objects=None, disc_GL=None):
+	def __init__(self, story_objs, story_GL, disc_objects=None, disc_GL=None):
 		#Assumes these parameters are already read from file
 
-		self.story_ops = story_ops
 		self.story_objs = story_objs
-
 		self.story_GL = story_GL
+
 		SP = self.setup(self.story_GL, 'story')
 		self.Open = Frontier()
-		if not disc_ops is None:
+		if disc_objects is not None:
 			self.disc_GL = disc_GL
-			self.disc_ops = disc_ops
 			self.disc_objects = disc_objects
-			Discourse_Plans = self.multiGoalSetup(self.disc_GL)
+			Discourse_Plans = self.multiGoalSetup(self.disc_GL, disc_objects)
 			for DP in Discourse_Plans:
-				self.Open.insert((SP,DP))
+				self.Open.insert((SP, DP))
 		else:
 			self.Open.insert(SP)
 
@@ -88,7 +86,7 @@ class PlanSpacePlanner:
 			s_init_plan.flaws.insert(GL, s_init_plan, flaw)
 		return s_init_plan
 
-	def multiGoalSetup(self, GL):
+	def multiGoalSetup(self, GL, disc_objects):
 		#s_init is in the back for a multi-goal setup
 		init = copy.deepcopy([-1])
 		init.replaceInternals()
@@ -97,8 +95,8 @@ class PlanSpacePlanner:
 			s_goal = copy.deepcopy(GA)
 			s_init = copy.deepcopy(init)
 			DPlan = PlanElementGraph(uid(0), name='disc',
-									 Elements=s_init.elements|s_goal.elements,
-									 Edges=s_init.edges|s_goal.edges)
+									 Elements=s_init.elements | s_goal.elements | self.story_objs | disc_objects,
+									 Edges=s_init.edges | s_goal.edges)
 
 			DPlan.initial_dummy_step = s_init.root
 			DPlan.final_dummy_step = s_goal.root
@@ -376,9 +374,11 @@ class TestPlanner(unittest.TestCase):
 	def testDecomp(self):
 		#operators, objects, object_types, initAction, goalAction = \
 		from GlobalContainer import GC
+
+		print('Reading ark-domain and ark-problem')
 		story = parseDomAndProb('domains/ark-domain.pddl', 'domains/ark-problem.pddl')
 
-
+		#(op_graphs, objects, GC.object_types, init, goal)
 		try:
 			SGL = reload('SGL')
 			GC.SGL = SGL
@@ -386,6 +386,7 @@ class TestPlanner(unittest.TestCase):
 			SGL = GLib(*story)
 			GC.SGL = SGL
 
+		print('Reading ark-requirements-domain and ark-requirements-problem')
 		disc = parseDomAndProb('domains/ark-requirements-domain.pddl', 'domains/ark-requirements-problem.pddl')
 
 		try:
@@ -395,9 +396,15 @@ class TestPlanner(unittest.TestCase):
 			DGL = GLib(*disc, storyGL=SGL)
 			GC.DGL = DGL
 
+		bi = PlanSpacePlanner(story[1], SGL, disc[1], DGL)
+		results = bi.POCL(1)
+		for result in results:
+			print('\n')
+			for step in topoSort(result):
+				print(Action.subgraph(result, step))
+		print('\n\n')
 
 
-		print('Reading story requirements from ark-requirements-domain and ark-requirements-problem')
 		#empty_plan = story_planner.Open.pop()
 
 

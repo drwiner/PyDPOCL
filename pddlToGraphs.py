@@ -531,6 +531,7 @@ def parseDomAndProb(domain_file, problem_file):
 
 	return (op_graphs, objects, GC.object_types, init, goal)
 
+
 def obTypesDict(object_types):
 	obtypes = defaultdict(set)
 	for t in object_types:
