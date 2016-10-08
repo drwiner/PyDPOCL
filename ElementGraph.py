@@ -38,7 +38,8 @@ class ElementGraph(Graph):
 	def isConsistent(self, other):
 
 		if isinstance(other) is not ElementGraph:
-			return False
+			return self.root.isConsistent(other)
+
 		#may have issue with inital and goal dummy steps - check here
 		if self.name == 'dummy_init' or self.name == 'dummy_goal':
 			if other.name == 'dummy_init' or other.name =='dummy_goal':

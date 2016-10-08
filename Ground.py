@@ -46,19 +46,27 @@ def groundDiscList(operators, SGL):
 			GDO = copy.deepcopy(op)
 			for elm in sp.elements:
 				ex_elms = iter(op.elements)
-				for ex_elm in ex_elms:
-					if elm.arg_name == ex_elm.arg_name and elm.arg_name is not None:
-						if elm.typ in {'Action','Condition'}:
-							EG = eval(elm.typ).subgraph(sp,elm)
-						else:
-							EG = elm
-						GDO.assign(ex_elm, EG)
+				assignStoryToDisc(GDO, sp, elm, ex_elms)
 			GDO.ground_subplan = sp
 			GDO.root.stepnumber = stepnum
 			stepnum+=1
 			gsteps.append(GDO)
 
 	return gsteps
+
+def assignStoryToDisc(GDO, SP, elm, ex_elms):
+	for ex_elm in ex_elms:
+		if elm.arg_name is None:
+			continue
+		if elm.arg_name != ex_elm.arg_name:
+			continue
+
+		EG = elm
+		if elm.typ in {'Action', 'Condition'}:
+			EG = eval(elm.typ).subgraph(SP, elm)
+
+		GDO.assign(ex_elm, EG)
+
 
 import pickle
 
@@ -175,6 +183,27 @@ class GLib:
 	def groundDiscGoal(self, goal_action):
 		from Plannify import DiscLib
 		Disc_Worlds = itertools.product([DiscLib(elm, self) for elm in goal_action.elements if isStoryElement(elm)])
+		#A Disc_World is a world where each each position in the iter is a goal condition
+		#Each DiscLib is a set of cndts for replacing the discourse arguments with story elements
+		goals = []
+		for DW in Disc_Worlds:
+			for cndt_choice in DW:
+				cndt_choice.element
+
+
+	def assignStoryToDisc(GDO, SP, elm, ex_elms):
+		for ex_elm in ex_elms:
+			if elm.arg_name is None:
+				continue
+			if elm.arg_name != ex_elm.arg_name:
+				continue
+
+			EG = elm
+			if elm.typ in {'Action', 'Condition'}:
+				EG = eval(elm.typ).subgraph(SP, elm)
+
+			GDO.assign(ex_elm, EG)
+
 		#then, for each discworld, create a new goal action by swapping the former arguments with the new ground
 	# story elemetns
 		#then return those.

@@ -145,8 +145,7 @@ class PlanElementGraph(ElementGraph):
 
 	GL = None
 
-	def __init__(self,ID,type_graph =None,name=None,Elements = None, planElement = None, Edges = None,
-				 Restrictions = None):
+	def __init__(self, ID, type_graph=None, name=None, Elements=None, plan_elm=None, Edges=None, Restrictions=None):
 				
 		if type_graph == None:
 			type_graph = 'PlanElementGraph'
@@ -164,7 +163,7 @@ class PlanElementGraph(ElementGraph):
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
 
-		if planElement is None:
+		if plan_elm is None:
 			plan_elm = PlanElement(uid=ID, typ=type_graph, name=name)
 									
 		super(PlanElementGraph,self).__init__(ID, type_graph, name, Elements, plan_elm, Edges, Restrictions)
