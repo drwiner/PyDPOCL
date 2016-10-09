@@ -2,7 +2,7 @@
 import itertools
 import copy
 from collections import namedtuple, defaultdict
-from PlanElementGraph import Condition
+from PlanElementGraph import Condition, Action
 from clockdeco import clock
 from uuid import uuid1 as uid
 from Element import Argument, Actor, Operator, Literal
@@ -91,10 +91,11 @@ class GLib:
 		if storyGL is not None:
 			self._gsteps = groundDiscList(operators, storyGL)
 			self.Goal_Actions = self.groundDiscGoal(goal_action)
-			self._gsteps.extend(self.GoalActions)
+			self._gsteps.extend(self.Goal_Actions)
 			init_action.root.stepnumber = len(self._gsteps)
-			init_action._replaceInternals()
-			init_action.replaceInternals()
+			init_action.edges = set()
+			init_action.elements = {init_action.root}
+			#for edge in init_action.edges:
 			self._gsteps.append(init_action)
 
 		else:

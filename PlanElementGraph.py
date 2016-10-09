@@ -417,6 +417,7 @@ class PlanElementGraph(ElementGraph):
 
 class BiPlan:
 	""" A container class for story and discourse plans, so they behave as a single plan. A tuple with functionality """
+	weight = 2
 	def __init__(self, Story, Disc):
 		self.S = Story
 		self.D = Disc
@@ -429,3 +430,14 @@ class BiPlan:
 		new_self.S.ID = uid(21)
 		new_self.D.ID = uid(22)
 		return new_self
+
+	@property
+	def heuristic(self):
+		return self.S.heuristic + self.weight*self.D.heuristic
+
+	@property
+	def cost(self):
+		return self.S.cost + self.weight*self.D.cost
+
+	def __lt__(self, other):
+		return (self.cost + self.heuristic) < (other.cost + other.heuristic)

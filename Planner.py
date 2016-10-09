@@ -47,7 +47,7 @@ class PlanSpacePlanner:
 			self.disc_objects = disc_objects
 			Discourse_Plans = self.multiGoalSetup(self.disc_GL, disc_objects)
 			for DP in Discourse_Plans:
-				self.Open.insert((SP, DP))
+				self.Open.insert(BiPlan(SP, DP))
 		else:
 			self.Open.insert(SP)
 
@@ -67,9 +67,9 @@ class PlanSpacePlanner:
 			Add ordering from DI to DG
 		"""
 
-		s_init = copy.deepcopy([-2])
+		s_init = copy.deepcopy(GL[-2])
 		s_init.replaceInternals()
-		s_goal = copy.deepcopy([-1])
+		s_goal = copy.deepcopy(GL[-1])
 		s_goal.replaceInternals()
 
 		s_init_plan = PlanElementGraph(uid(0), name=plan_name, Elements=self.story_objs|s_init.elements|s_goal.elements,
@@ -88,7 +88,7 @@ class PlanSpacePlanner:
 
 	def multiGoalSetup(self, GL, disc_objects):
 		#s_init is in the back for a multi-goal setup
-		init = copy.deepcopy([-1])
+		init = copy.deepcopy(GL[-1])
 		init.replaceInternals()
 		DPlans = []
 		for GA in GL.Goal_Actions:
@@ -414,7 +414,9 @@ class TestPlanner(unittest.TestCase):
 			DGL = GLib(*disc, storyGL=SGL)
 			GC.DGL = DGL
 
-		DGL.groundDiscGoal(disc[4])
+		#DGL.groundDiscGoal(disc[4])
+
+		#undo this:
 		bi = PlanSpacePlanner(story[1], SGL, disc[1], DGL)
 		results = bi.POCL(1)
 		for result in results:
