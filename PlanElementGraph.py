@@ -461,3 +461,6 @@ class BiPlan:
 			self.S = kplan
 		else:
 			self.D = kplan
+
+	def __repr__(self):
+		return self.S, self.D

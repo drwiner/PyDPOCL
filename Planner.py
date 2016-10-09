@@ -138,10 +138,10 @@ class PlanSpacePlanner:
 
 			#step 4 - set sink before replace internals
 			preserve_original_id = eff_link.sink.replaced_ID #original
-			anteaction.assign(eff_link.sink, new_plan.getElementById(precondition.ID)) #new
+			#anteaction.assign(eff_link.sink, new_plan.getElementById(precondition.ID)) #new
 			eff_link.sink.replaced_ID = preserve_original_id #original
-			#eff_link.sink = new_plan.getElementById(precondition.ID)
-			#new_plan.edges.add(eff_link)
+			eff_link.sink = new_plan.getElementById(precondition.ID)
+			new_plan.edges.add(eff_link)
 			# check: eff_link.sink should till be precondition of s_need
 
 			#step 5 - add new stuff to new plan
@@ -181,7 +181,7 @@ class PlanSpacePlanner:
 			S_Need = Action.subgraph(new_plan, s_need)
 
 			#step 3-4 retarget precondition to be s_old effect
-			pre_link_sink = self.RetargetPrecondition(new_plan, S_Old, precondition)
+			pre_link_sink = self.RetargetPrecondition(GL, new_plan, S_Old, precondition)
 
 			#step 5 - add orderings, causal links, and create flaws
 			self.addStep(new_plan, S_Old.root, S_Need.root, pre_link_sink, GL, new=False)
@@ -191,12 +191,13 @@ class PlanSpacePlanner:
 
 		return results
 
-	def RetargetPrecondition(self, GL, plan,  S_Old, precondition):
+	def RetargetPrecondition(self, GL, plan, S_Old, precondition):
 		effect_token = GL.getConsistentEffect(S_Old, precondition)
 		pre_link = plan.RemoveSubgraph(precondition)
-		plan.assign(pre_link.sink, effect_token) #new
-		#pre_link.sink = effect_token
-		#self.edges.add(pre_link)
+		#plan.assign(pre_link.sink, effect_token) #new
+		plan.edges.remove(pre_link)
+		pre_link.sink = effect_token
+		plan.edges.add(pre_link)
 		return pre_link.sink
 
 	def addStep(self, plan, s_add, s_need, condition, GL, new=None):
@@ -254,19 +255,19 @@ class PlanSpacePlanner:
 	def generateChildren(self, plan, k, flaw):
 		#results = set()
 		if k == 0:
-			plan = plan.S
+			kplan = plan.S
 			other = plan.D
 			GL = self.story_GL
 		else:
-			plan = plan.D
+			kplan = plan.D
 			other = plan.S
 			GL = self.disc_GL
 
 		if flaw.name == 'opf':
-			results = self.reuse(plan, flaw, GL)
-			results.update(self.newStep(plan, flaw, GL))
+			results = self.reuse(kplan, flaw, GL)
+			results.update(self.newStep(kplan, flaw, GL))
 		elif flaw.name == 'tclf':
-			results = self.resolveThreatenedCausalLinkFlaw(plan, flaw)
+			results = self.resolveThreatenedCausalLinkFlaw(kplan, flaw)
 		else:
 			raise ValueError('whose flaw is it anyway {}?'.format(flaw))
 
@@ -375,8 +376,12 @@ class TestPlanner(unittest.TestCase):
 		assert len(results) == n
 		for result in results:
 			print('\n')
-			for step in topoSort(result):
-				print(Action.subgraph(result, step))
+			print('Story')
+			for step in topoSort(S):
+				print(Action.subgraph(S, step))
+			print('Discourse')
+			for step in topoSort(D):
+				print(Action.subgraph(D, step))
 		print('\n\n')
 		pass
 
@@ -412,10 +417,17 @@ class TestPlanner(unittest.TestCase):
 		#undo this:
 		bi = PlanSpacePlanner(story[1], SGL, disc[1], DGL)
 		results = bi.POCL(1)
-		for result in results:
+		for R in results:
+			S = R.S
+			D = R.D
 			print('\n')
-			for step in topoSort(result):
-				print(Action.subgraph(result, step))
+			print('Story')
+			for step in topoSort(S):
+				print(Action.subgraph(S, step))
+			print('Discourse')
+			for step in topoSort(D):
+				print(Action.subgraph(D, step))
+
 		print('\n\n')
 
 
