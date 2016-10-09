@@ -2,32 +2,29 @@ import itertools
 from PlanElementGraph import Action, PlanElementGraph
 from Graph import Edge
 from clockdeco import clock
-from uuid import uuid1 as uid
-from Element import Argument, Actor, Operator, Literal
-from ElementGraph import ElementGraph
 
 @clock
 def Plannify(RQ, GL):
 	#An ActionLib for steps in RQ - ActionLib is a container w/ all of its possible instances as ground steps
-	print('ActionLibs')
+	print('...ActionLibs')
 	Libs = [ActionLib(i, RS, GL) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
 
 	#A World is a combination of one ground-instance from each step
 	Worlds = productByPosition(Libs)
 
-	print('Planets')
+	print('...Planets')
 	#A Planet is a plan s.t. all steps are "arg_name consistent", but a step may not be equiv to some ground step
 	Planets = [PlanElementGraph.Actions_2_Plan(W) for W in Worlds if isArgNameConsistent(W)]
 
-	print('Linkify')
+	print('...Linkify')
 	#Linkify installs orderings and causal links from RQ/decomp to Planets, rmvs Planets which cannot support links
 	has_links = Linkify(Planets, RQ, GL)
 
-	print('Groundify')
+	print('...Groundify')
 	#Groundify is the process of replacing partial steps with its ground step, and removing inconsistent planets
 	Plans = Groundify(Planets, GL, has_links)
 
-	print('returning consistent')
+	print('...returning consistent plans')
 	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
 
 @clock
@@ -263,44 +260,3 @@ class ReuseLib:
 		self.step = vstep
 		self._cndts = [ustep for ustep in U.Steps if ustep.stepnumber == vstep.stepnumber]
 		self._cndts.append(vstep)
-
-
-class DiscLib:
-	def __init__(self, i, disc_arg, DGL):
-		self.element, self.typ = arg_to_elm(i, disc_arg)
-		self._cndts = self.findCandidates(i, DGL)
-
-	def __len__(self):
-		return len(self._cndts)
-
-	def __getitem__(self, position):
-		return self._cndts[position]
-
-
-	def findCandidates(self, i, DGL):
-		cndts = set()
-		for dgl in DGL:
-			for elm in dgl.elements:
-				if not isStoryElement(elm):
-					continue
-				if elm.isConsistent(self.element):
-					cndts.add((i, elm))
-		return list(cndts)
-
-
-def arg_to_elm(i, arg):
-	if arg.typ == 'character' or arg.typ == 'actor':
-		elm = Actor(ID=uid(i), name=arg.name, typ='character', arg_name=arg.arg_name)
-	elif arg.typ == 'arg' or arg.typ == 'item' or arg.typ == 'place':
-		elm = Argument(ID=uid(i), name=arg.name, typ=arg.typ, arg_name=arg.arg_name)
-	elif arg.typ == 'step':
-		elm = Operator(ID=uid(i), name=arg.name, typ='Action', arg_name=arg.arg_name)
-	elif arg.typ == 'literal' or arg.typ == 'lit':
-		elm = Literal(ID=uid(i), name=arg.name, typ='Condition', arg_name=arg.arg_name)
-	else:
-		raise ValueError('whose typ is this anyway? {}'.format(arg.typ))
-	return elm, elm.typ
-
-
-def isStoryElement(elm):
-	return isinstance(elm, ElementGraph) or isinstance(elm, Argument)

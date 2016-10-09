@@ -56,7 +56,7 @@ class Edge:
 
 class Graph(Element):
 	"""A graph is an element with elements, edges, and restrictions"""
-	def __init__(self, ID, typ, name = None, Elements = None, Edges = None, Restrictions = None):
+	def __init__(self, ID, typ, name=None, Elements=None, Edges=None, Restrictions=None):
 		if Elements == None:
 			Elements = set()
 		if Edges == None:
@@ -64,7 +64,7 @@ class Graph(Element):
 		if Restrictions == None:
 			Restrictions = set()
 		
-		super(Graph,self).__init__(ID,typ,name)
+		super(Graph, self).__init__(ID, typ, name)
 		self.elements = Elements
 		self.edges = Edges
 		self.subgraphs = Restrictions

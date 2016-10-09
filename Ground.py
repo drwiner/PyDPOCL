@@ -4,7 +4,9 @@ import copy
 from collections import namedtuple, defaultdict
 from PlanElementGraph import Condition
 from clockdeco import clock
-from Element import Argument
+from uuid import uuid1 as uid
+from Element import Argument, Actor, Operator, Literal
+from ElementGraph import ElementGraph
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
 Antestep = namedtuple('Antestep', 'action eff_link')
@@ -179,20 +181,29 @@ class GLib:
 
 
 	def groundDiscGoal(self, goal_action):
-		from Plannify import DiscLib
 		discs = [elm for elm in goal_action.elements if isinstance(elm, Argument)]
 		if len(discs) == 0:
 			raise ValueError('no args in goal_actions?')
-		Disc_Worlds = itertools.product([DiscLib(i, elm, self) for i, elm in enumerate(discs)])
+
+		story_elms = {elm for dgl in self for elm in dgl.elements if isStoryElement(elm)}
+		Disc_Worlds = itertools.product(*[DiscToElm(i, elm, story_elms) for i, elm in enumerate(discs)])
+
+		stepnum = len(self)
 		goals = []
+		#Each DW is a list of tuples (0 = i, 1 = element)
 		for DW in Disc_Worlds:
 			GA = copy.deepcopy(goal_action)
+			#for each story element in goal action
 			for i, cndt_elm in DW:
 				disc_arg = discs[i]
 				GA.assign(disc_arg, cndt_elm)
+			GA.root.stepnumber = stepnum
+			stepnum+=1
+			GA.replaceInternals()
 			goals.append(GA)
 
 		return goals
+
 
 	def getPotentialLinkConditions(self, src, snk):
 		from Graph import Edge
@@ -254,11 +265,43 @@ class GLib:
 		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
 
 
-		#what if we limit to just those elements which are args in a DGL?
-			#idea: iterate through DGL and identify all story-elements. Then, those story-elements become the problem
-	#  objects. Then, for each problem object in goal state, create world for each possible goal world. Basically,
-	# just take the story element in the goal condition, and see which DGL story elements
+def DiscToElm(i, disc_arg, story_elms):
+	return findCandidates(arg_to_elm(i,disc_arg), i, story_elms)
 
+
+def findCandidates(element, i, story_elms):
+	cndts = []
+	prior = []
+	for elm in story_elms:
+		if elm.isConsistent(element):
+			if isinstance(elm, ElementGraph):
+				k = (elm.root.name, elm.Args)
+				if k not in prior:
+					prior.append(k)
+					cndts.append((i,elm))
+			else:
+				if elm.name not in prior:
+					prior.append(elm.name)
+					cndts.append((i,elm))
+	return cndts
+
+
+def arg_to_elm(i, arg):
+	if arg.typ == 'character' or arg.typ == 'actor':
+		elm = Actor(ID=uid(i), name=arg.name, typ='character', arg_name=arg.arg_name)
+	elif arg.typ == 'arg' or arg.typ == 'item' or arg.typ == 'place':
+		elm = Argument(ID=uid(i), name=arg.name, typ=arg.typ, arg_name=arg.arg_name)
+	elif arg.typ == 'step':
+		elm = Operator(ID=uid(i), name=arg.name, typ='Action', arg_name=arg.arg_name)
+	elif arg.typ == 'literal' or arg.typ == 'lit':
+		elm = Literal(ID=uid(i), name=arg.name, typ='Condition', arg_name=arg.arg_name)
+	else:
+		raise ValueError('whose typ is this anyway? {}'.format(arg.typ))
+	return elm
+
+
+def isStoryElement(elm):
+	return isinstance(elm, ElementGraph) or isinstance(elm, Argument)
 
 from pddlToGraphs import parseDomAndProb
 from Flaws import FlawLib

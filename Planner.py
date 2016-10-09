@@ -414,6 +414,7 @@ class TestPlanner(unittest.TestCase):
 			DGL = GLib(*disc, storyGL=SGL)
 			GC.DGL = DGL
 
+		DGL.groundDiscGoal(disc[4])
 		bi = PlanSpacePlanner(story[1], SGL, disc[1], DGL)
 		results = bi.POCL(1)
 		for result in results:

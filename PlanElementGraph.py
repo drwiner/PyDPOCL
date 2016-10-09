@@ -29,9 +29,9 @@ class Action(ElementGraph):
 			
 		super(Action,self).__init__(ID, type_graph, name, Elements, root_element, Edges)
 
-	@property
-	def executed(self):
-		return self.root.executed
+	# @property
+	# def executed(self):
+	# 	return self.root.executed
 
 	def RemoveSubgraph(self, elm):
 		elm = self.getElementById(elm.ID)
@@ -100,7 +100,10 @@ class Action(ElementGraph):
 
 	def isConsistent(self, other):
 		""" an action is consistent just when one can absolve the other"""
-		return self.isConsistentSubgraph(other)
+		if isinstance(other, ElementGraph):
+			return self.isConsistentSubgraph(other)
+		if isinstance(other, Operator):
+			return self.root.isConsistent(other)
 
 		
 	def __repr__(self):
@@ -123,12 +126,15 @@ class Condition(ElementGraph):
 		super(Condition,self).__init__(ID,type_graph,name,Elements,root_element,Edges,Restrictions)
 		self.labels = ['first-arg','sec-arg','third-arg','fourth-arg']
 
-	@property
-	def truth(self):
-		return self.root.truth
+	# @property
+	# def truth(self):
+	# 	return self.root.truth
 
 	def isConsistent(self, other):
-		return self.isConsistentSubgraph(other)
+		if isinstance(other, ElementGraph):
+			return self.isConsistentSubgraph(other)
+		if isinstance(other, Literal):
+			return self.root.isConsistent(other)
 
 	def numArgs(self):
 		if not hasattr(self, 'Args'):

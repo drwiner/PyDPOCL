@@ -443,7 +443,8 @@ def problemToGraphs(problem):
 							root_element = goal_op)
 	goal_graph.elements.update(goal_elements)
 	goal_graph.edges.update(goal_edges)
-	goal_graph.edges.update({Edge(goal_op, goal_lit, 'precond-of') for goal_lit in goal_elements})
+	goal_graph.edges.update({Edge(goal_op, goal_lit, 'precond-of') for goal_lit in goal_elements if type(goal_lit) is
+							 Literal})
 	
 	return (Args, init_graph, goal_graph)
 

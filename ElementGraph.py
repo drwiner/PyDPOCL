@@ -16,23 +16,24 @@ class ElementGraph(Graph):
 		super(ElementGraph, self).__init__(ID, type_graph, name, Elements, Edges, Restrictions)
 		self.root = root_element
 
+
 	def deepcopy(self):
 		new_self = copy.deepcopy(self)
 		new_self.ID = uuid.uuid1(21)
 		return new_self
 
 
-	@property
-	def typ(self):
-		return self.root.typ
-
-	@property
-	def name(self):
-		return self.root.name
-
-	@property
-	def num_args(self):
-		return self.root.num_args
+	# @property
+	# def typ(self):
+	# 	return self.root.typ
+	#
+	# @property
+	# def name(self):
+	# 	return self.root.name
+	#
+	# @property
+	# def num_args(self):
+	# 	return self.root.num_args
 
 
 	def isConsistent(self, other):
