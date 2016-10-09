@@ -101,7 +101,7 @@ class PlanSpacePlanner:
 			DPlan.initial_dummy_step = s_init.root
 			DPlan.final_dummy_step = s_goal.root
 			DPlan.OrderingGraph.addOrdering(s_init.root, s_goal.root)
-			init_flaws = (Flaw((s_goal.root, prec), 'opf') for prec in s_goal.preconditions)
+			init_flaws = (Flaw((s_goal.root, prec), 'dopf') for prec in s_goal.preconditions)
 			for flaw in init_flaws:
 				DPlan.flaws.insert(GL, DPlan, flaw)
 			DPlans.append(DPlan)
