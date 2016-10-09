@@ -419,8 +419,8 @@ class BiPlan:
 	""" A container class for story and discourse plans, so they behave as a single plan. A tuple with functionality """
 	weight = 2
 	def __init__(self, Story, Disc):
-		self.S = Story
-		self.D = Disc
+		self.insert(Story)
+		self.insert(Disc)
 
 	def isInternallyConsistent(self):
 		return self.S.isInternallyConsistent() and self.D.isInternallyConsistent()
@@ -441,3 +441,23 @@ class BiPlan:
 
 	def __lt__(self, other):
 		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+
+	def num_flaws(self):
+		return len(self.S.flaws) + len(self.D.flaws)
+
+	def next_flaw(self):
+		try:
+			if len(self.S.flaws.statics) > 0:
+				return 0, self.S.flaws.next()
+			elif len(self.D.flaws) > 0:
+				return 1, self.D.flaws.next()
+			else:
+				return 0, self.S.flaws.next()
+		except:
+			raise ValueError("shouldn't get here if no more flaws")
+
+	def insert(self, kplan):
+		if kplan.name == 'story':
+			self.S = kplan
+		else:
+			self.D = kplan

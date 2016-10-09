@@ -101,7 +101,7 @@ class PlanSpacePlanner:
 			DPlan.initial_dummy_step = s_init.root
 			DPlan.final_dummy_step = s_goal.root
 			DPlan.OrderingGraph.addOrdering(s_init.root, s_goal.root)
-			init_flaws = (Flaw((s_goal.root, prec), 'dopf') for prec in s_goal.preconditions)
+			init_flaws = (Flaw((s_goal.root, prec), 'opf') for prec in s_goal.preconditions)
 			for flaw in init_flaws:
 				DPlan.flaws.insert(GL, DPlan, flaw)
 			DPlans.append(DPlan)
@@ -109,7 +109,7 @@ class PlanSpacePlanner:
 
 
 	#@clock
-	def newStep(self, plan, flaw):
+	def newStep(self, plan, flaw, GL):
 		"""
 		@param plan:
 		@param flaw:
@@ -120,7 +120,7 @@ class PlanSpacePlanner:
 		s_need, precondition = flaw.flaw
 
 		#antecedent is of the form (antecedent_action_with_missing_eff_link, eff_link)
-		antecedents = self.story_GL.pre_dict[precondition.replaced_ID]
+		antecedents = GL.pre_dict[precondition.replaced_ID]
 		#print('flaw precondition.replaced_ID: {}'.format(precondition.replaced_ID))
 		for ante in antecedents:
 			if ante.action.name == 'dummy_init':
@@ -149,8 +149,8 @@ class PlanSpacePlanner:
 			new_plan.edges.update(anteaction.edges)
 
 			#step 6 - update orderings and causal links, add flaws
-			self.addStep(new_plan, anteaction.root, new_plan.getElementById(s_need.ID), eff_link.sink, new=True)
-			new_plan.flaws.addCndtsAndRisks(self.story_GL, anteaction.root)
+			self.addStep(new_plan, anteaction.root, new_plan.getElementById(s_need.ID), eff_link.sink, GL, new=True)
+			new_plan.flaws.addCndtsAndRisks(GL, anteaction.root)
 
 			#step 7 - add new_plan to open list
 			results.add(new_plan)
@@ -158,12 +158,12 @@ class PlanSpacePlanner:
 		return results
 
 	#@clock
-	def reuse(self, plan, flaw):
+	def reuse(self, plan, flaw, GL):
 		results = set()
 		s_need, precondition = flaw.flaw
 
 		#antecedents - a set of stepnumbers
-		antecedents = self.story_GL.id_dict[precondition.replaced_ID]
+		antecedents = GL.id_dict[precondition.replaced_ID]
 		if len(antecedents) == 0:
 			return set()
 
@@ -184,22 +184,22 @@ class PlanSpacePlanner:
 			pre_link_sink = self.RetargetPrecondition(new_plan, S_Old, precondition)
 
 			#step 5 - add orderings, causal links, and create flaws
-			self.addStep(new_plan, S_Old.root, S_Need.root, pre_link_sink,  new=False)
+			self.addStep(new_plan, S_Old.root, S_Need.root, pre_link_sink, GL, new=False)
 
 			#step 6 - add new plan to open list
 			results.add(new_plan)
 
 		return results
 
-	def RetargetPrecondition(self, plan,  S_Old, precondition):
-		effect_token = self.story_GL.getConsistentEffect(S_Old, precondition)
+	def RetargetPrecondition(self, GL, plan,  S_Old, precondition):
+		effect_token = GL.getConsistentEffect(S_Old, precondition)
 		pre_link = plan.RemoveSubgraph(precondition)
 		plan.assign(pre_link.sink, effect_token) #new
 		#pre_link.sink = effect_token
 		#self.edges.add(pre_link)
 		return pre_link.sink
 
-	def addStep(self, plan, s_add, s_need, condition, new=None):
+	def addStep(self, plan, s_add, s_need, condition, GL, new=None):
 		"""
 			when a step is added/reused, 
 			add causal link and ordering edges (including to dummy steps)
@@ -207,13 +207,6 @@ class PlanSpacePlanner:
 		"""
 		if new is None:
 			new = False
-		else:
-			if plan.name == 'disc':
-				link_type = 'dopf'
-				GL = self.disc_GL
-			else:
-				link_type = 'opf'
-				GL = self.story_GL
 
 		if s_add != plan.initial_dummy_step:
 			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_add)
@@ -229,7 +222,7 @@ class PlanSpacePlanner:
 
 		if new:
 			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
-				plan.flaws.insert(GL, plan, Flaw((s_add, prec.sink), link_type))
+				plan.flaws.insert(GL, plan, Flaw((s_add, prec.sink), 'opf'))
 
 		#Good time as ever to updatePlan
 		#plan.updatePlan()
@@ -258,32 +251,32 @@ class PlanSpacePlanner:
 		return results
 
 
-	def generateChildren(self, plan, flaw):
+	def generateChildren(self, plan, k, flaw):
 		#results = set()
-		s = False
-		if flaw.name == 'opf':
-			results = self.reuse(plan.S, flaw)
-			results.update(self.newStep(plan.S, flaw))
-			s = True
-		elif flaw.name == 'tclf':
-			results = self.resolveThreatenedCausalLinkFlaw(plan.S, flaw)
-			s = True
-		elif flaw.name =='dopf':
-			results = self.reuse(plan.D, flaw)
-			results.update(self.newStep(plan.D, flaw))
-		elif flaw.name == 'dtclf':
-			results = self.resolveThreatenedCausalLinkFlaw(plan.D, flaw)
+		if k == 0:
+			plan = plan.S
+			other = plan.D
+			GL = self.story_GL
 		else:
-			raise ValueError('whose flaw is this anyway {}?'.format(flaw))
+			plan = plan.D
+			other = plan.S
+			GL = self.disc_GL
 
+		if flaw.name == 'opf':
+			results = self.reuse(plan, flaw, GL)
+			results.update(self.newStep(plan, flaw, GL))
+		elif flaw.name == 'tclf':
+			results = self.resolveThreatenedCausalLinkFlaw(plan, flaw)
+		else:
+			raise ValueError('whose flaw is it anyway {}?'.format(flaw))
+
+		nBiPlans = set()
 		for result in results:
-			if s:
-				new_flaws = result.detectThreatenedCausalLinks(self.story_GL)
-			else:
-				new_flaws = result.detectThreatenedCausalLinks(self.disc_GL)
+			new_flaws = result.detectThreatenedCausalLinks(GL)
 			result.flaws.threats.update(new_flaws)
+			nBiPlans.add(BiPlan(result, other.deepcopy()))
 
-		return results
+		return nBiPlans
 
 
 	@clock
@@ -306,7 +299,7 @@ class PlanSpacePlanner:
 			#for step in topoSort(plan):
 				#print(Action.subgraph(plan, step))
 
-			if len(plan.flaws) == 0:
+			if plan.num_flaws() == 0:
 				print('solution found at {} nodes visited and {} nodes expanded'.format(visited, len(self.Open)))
 				Completed.append(plan)
 				if len(Completed) == num_plans:
@@ -317,11 +310,11 @@ class PlanSpacePlanner:
 			#print(plan.flaws)
 
 			#Select Flaw
-			flaw = plan.flaws.next()
+			k, flaw = plan.next_flaw()
 			#print('selected : {}\n'.format(flaw))
 
 			#Add children to Open List
-			children = self.generateChildren(plan, flaw)
+			children = self.generateChildren(plan, k, flaw)
 
 			#print('generated children: {}'.format(len(children)))
 			for child in children:
