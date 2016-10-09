@@ -192,10 +192,7 @@ class PlanSpacePlanner:
 		return results
 
 	def RetargetPrecondition(self, GL, plan, S_Old, precondition):
-		try:
-			effect_token = GL.getConsistentEffect(S_Old, precondition)
-		except:
-			print('why')
+		effect_token = GL.getConsistentEffect(S_Old, precondition)
 		pre_link = plan.RemoveSubgraph(precondition)
 		#plan.assign(pre_link.sink, effect_token) #new
 		plan.edges.remove(pre_link)
@@ -227,6 +224,9 @@ class PlanSpacePlanner:
 		if new:
 			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
 				plan.flaws.insert(GL, plan, Flaw((s_add, prec.sink), 'opf'))
+
+		if plan.name == 'disc':
+			plan.flaws.insert(GL, plan, Flaw(s_add.stepnumber, 'dcf'))
 
 		#Good time as ever to updatePlan
 		#plan.updatePlan()
@@ -271,6 +271,10 @@ class PlanSpacePlanner:
 			results.update(self.newStep(kplan, flaw, GL))
 		elif flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(kplan, flaw)
+		elif flaw.name == 'dcf':
+			results = other.Unify(GL[flaw.flaw].ground_subplan.deepcopy())
+			GL = self.story_GL
+			other = plan.D
 		else:
 			raise ValueError('whose flaw is it anyway {}?'.format(flaw))
 
@@ -304,11 +308,16 @@ class PlanSpacePlanner:
 				#print(Action.subgraph(plan, step))
 
 			if plan.num_flaws() == 0:
-				print('solution found at {} nodes visited and {} nodes expanded'.format(visited, len(self.Open)))
+				print('story + disc solution found at {} nodes visited and {} nodes expanded'.format(visited,
+																								len(self.Open)))
 				Completed.append(plan)
 				if len(Completed) == num_plans:
 					return Completed
 				continue
+			elif len(plan.S.flaws) == 0:
+				print('story solution found at {} nodes visited and {} nodes expanded'.format(visited, len(self.Open)))
+			elif len(plan.D.flaws) == 0:
+				print('disc solution found at {} nodes visited and {} nodes expanded'.format(visited, len(self.Open)))
 
 			#print(plan)
 			#print(plan.flaws)
@@ -391,13 +400,12 @@ class TestPlanner(unittest.TestCase):
 
 
 	def testDecomp(self):
-		#operators, objects, object_types, initAction, goalAction = \
 		from GlobalContainer import GC
 
 		print('Reading ark-domain and ark-problem')
 		story = parseDomAndProb('domains/ark-domain.pddl', 'domains/ark-problem.pddl')
+		# (op_graphs, objects, GC.object_types, init, goal)
 
-		#(op_graphs, objects, GC.object_types, init, goal)
 		try:
 			SGL = reload('SGL')
 			GC.SGL = SGL
@@ -407,6 +415,7 @@ class TestPlanner(unittest.TestCase):
 
 		print('Reading ark-requirements-domain and ark-requirements-problem')
 		disc = parseDomAndProb('domains/ark-requirements-domain.pddl', 'domains/ark-requirements-problem.pddl')
+		# (op_graphs, objects, GC.object_types, init, goal)
 
 		try:
 			DGL = reload('DGL')
@@ -415,11 +424,8 @@ class TestPlanner(unittest.TestCase):
 			DGL = GLib(*disc, storyGL=SGL)
 			GC.DGL = DGL
 
-		#DGL.groundDiscGoal(disc[4])
-
-		#undo this:
 		bi = PlanSpacePlanner(story[1], SGL, disc[1], DGL)
-		results = bi.POCL(1)
+		results = bi.POCL(5)
 		for R in results:
 			S = R.S
 			D = R.D
@@ -432,25 +438,6 @@ class TestPlanner(unittest.TestCase):
 				print(Action.subgraph(D, step))
 
 		print('\n\n')
-
-
-		#empty_plan = story_planner.Open.pop()
-
-
-		# Ground_Discourse_Operators = []
-		# for op in doperators:
-		# 	decomp = next(iter(op.subgraphs))
-		# 	print('\ndiscourse /decomp name {}\n'.format(decomp.name))
-		# 	plans = Plannify(decomp, story_planner.story_GL)
-		# 	print('\n')
-		# 	for plan in plans:
-		# 		#gdo = copy.deepcopy(op)
-		# 		for step in plan.Steps:
-		# 			print(Action.subgraph(plan,step))
-		# 		#print(plan.isInternallyConsistent())
-		# 		print('\n')
-		# 	#print('check')
-		# print('ok')
 
 if __name__ ==  '__main__':
 	tp = TestPlanner()

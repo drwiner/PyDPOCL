@@ -113,6 +113,8 @@ class FlawLib():
 		#init = established by initial state
 		self.inits = simpleQueueWrapper()
 
+		self.decomps = simpleQueueWrapper()
+
 		#threat = causal link dependency undone
 		self.threats = simpleQueueWrapper()
 
@@ -125,7 +127,7 @@ class FlawLib():
 		#nonreusable = open conditions inconsistent with existing effect sorted by number of cndts
 		self.nonreusable = Flawque()
 
-		self.typs = [self.statics, self.inits, self.threats, self.unsafe, self.reusable, self.nonreusable]
+		self.typs = [self.statics, self.inits, self.decomps, self.threats, self.unsafe, self.reusable, self.nonreusable]
 
 	@property
 	def heuristic(self):
@@ -189,6 +191,9 @@ class FlawLib():
 
 		if flaw.name == 'tclf':
 			self.threats.add(flaw)
+			return
+		if flaw.name == 'dcf':
+			self.decomps.add(flaw)
 			return
 
 		#unpack flaw
