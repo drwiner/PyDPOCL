@@ -205,14 +205,21 @@ class PlanSpacePlanner:
 			add causal link and ordering edges (including to dummy steps)
 			If step is new, add open precondition flaws for each precondition
 		"""
-		if new == None:
+		if new is None:
 			new = False
+		else:
+			if plan.name == 'disc':
+				link_type = 'dopf'
+				GL = self.disc_GL
+			else:
+				link_type = 'opf'
+				GL = self.story_GL
 
-		if not s_add == plan.initial_dummy_step:
+		if s_add != plan.initial_dummy_step:
 			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_add)
 			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_need)
 
-		if not s_need == plan.final_dummy_step:
+		if s_need != plan.final_dummy_step:
 			plan.OrderingGraph.addEdge(s_add, plan.final_dummy_step)
 			plan.OrderingGraph.addEdge(s_need, plan.final_dummy_step)
 
@@ -222,7 +229,7 @@ class PlanSpacePlanner:
 
 		if new:
 			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
-				plan.flaws.insert(self.story_GL, plan, Flaw((s_add, prec.sink), 'opf'))
+				plan.flaws.insert(GL, plan, Flaw((s_add, prec.sink), link_type))
 
 		#Good time as ever to updatePlan
 		#plan.updatePlan()
@@ -252,17 +259,28 @@ class PlanSpacePlanner:
 
 
 	def generateChildren(self, plan, flaw):
-		results = set()
+		#results = set()
+		s = False
 		if flaw.name == 'opf':
-			results = self.reuse(plan, flaw)
-			results.update(self.newStep(plan, flaw))
+			results = self.reuse(plan.S, flaw)
+			results.update(self.newStep(plan.S, flaw))
+			s = True
+		elif flaw.name == 'tclf':
+			results = self.resolveThreatenedCausalLinkFlaw(plan.S, flaw)
+			s = True
+		elif flaw.name =='dopf':
+			results = self.reuse(plan.D, flaw)
+			results.update(self.newStep(plan.D, flaw))
+		elif flaw.name == 'dtclf':
+			results = self.resolveThreatenedCausalLinkFlaw(plan.D, flaw)
+		else:
+			raise ValueError('whose flaw is this anyway {}?'.format(flaw))
 
-		if flaw.name == 'tclf':
-			results = self.resolveThreatenedCausalLinkFlaw(plan, flaw)
-
-		#for result, res in results:
 		for result in results:
-			new_flaws = result.detectThreatenedCausalLinks(self.story_GL)
+			if s:
+				new_flaws = result.detectThreatenedCausalLinks(self.story_GL)
+			else:
+				new_flaws = result.detectThreatenedCausalLinks(self.disc_GL)
 			result.flaws.threats.update(new_flaws)
 
 		return results

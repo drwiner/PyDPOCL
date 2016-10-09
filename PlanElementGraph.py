@@ -171,6 +171,8 @@ class PlanElementGraph(ElementGraph):
 
 	@classmethod
 	def Actions_2_Plan(cls, Actions):
+		# Used by Plannify
+
 		elements = set().union(*[A.elements for A in Actions])
 		edges = set().union(*[A.edges for A in Actions])
 		Plan = cls(uid(2), name='Action_2_Plan', Elements=elements, Edges=edges)
@@ -185,9 +187,9 @@ class PlanElementGraph(ElementGraph):
 		return Plan
 
 	def UnifyActions(self, P, G):
+		#Used by Plannify
 
 		NG = G.deepcopy(replace_internals=True)
-
 		for edge in NG.edges:
 
 			if edge.sink.replaced_ID == -1:
@@ -352,19 +354,6 @@ class PlanElementGraph(ElementGraph):
 	@property
 	def Steps(self):
 		return [element for element in self.elements if type(element) is Operator]
-		# if not hasattr(self, 'Steps'):
-		# 	self.Steps = [element for element in self.elements if type(element) is Operator]
-		#return self.Steps
-
-
-
-	def updatePlan(self, Elements = None):
-		""" Updating plans to have accurate top-level Sets"""
-		if Elements is None:
-			Elements = self.elements
-		self.Steps = [element for element in Elements if type(element) is Operator]
-		#self.IntentionFrames = {element for element in Elements if type(element) is IntentionFrameElement}
-		return self
 
 	'''for debugging'''
 	def getActions(self):
@@ -406,7 +395,10 @@ class PlanElementGraph(ElementGraph):
 					nonThreats[causal_link].add(step)
 					continue
 
-				detectedThreatenedCausalLinks.add(Flaw((step, causal_link), 'tclf'))
+				if self.name == 'disc':
+					detectedThreatenedCausalLinks.add(Flaw((step, causal_link), 'dtclf'))
+				else:
+					detectedThreatenedCausalLinks.add(Flaw((step, causal_link), 'tclf'))
 
 		return detectedThreatenedCausalLinks
 
@@ -415,5 +407,19 @@ class PlanElementGraph(ElementGraph):
 		steps =  str([Action.subgraph(self, step) for step in self.Steps])
 		orderings = self.OrderingGraph.__repr__()
 		links = self.CausalLinkGraph.__repr__()
-		return 'PLAN: ' + str(self.ID) + c + '\n*Steps: \n{' + steps + '}\n *Orderings:\n {' + orderings + '}\n ' \
-																								   '*CausalLinks:\n {' + links + '}'
+		return 'PLAN: ' + str(self.ID) + c + '\n*Steps: \n{' + steps + '}\n *Orderings:\n {' + orderings + '}\n ' '*CausalLinks:\n {' + links + '}'
+
+class BiPlan:
+	""" A container class for story and discourse plans, so they behave as a single plan. A tuple with functionality """
+	def __init__(self, Story, Disc):
+		self.S = Story
+		self.D = Disc
+
+	def isInternallyConsistent(self):
+		return self.S.isInternallyConsistent() and self.D.isInternallyConsistent()
+
+	def deepcopy(self):
+		new_self = copy.deepcopy(self)
+		new_self.S.ID = uid(21)
+		new_self.D.ID = uid(22)
+		return new_self

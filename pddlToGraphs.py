@@ -516,20 +516,16 @@ def parseDomAndProb(domain_file, problem_file):
 
 	addNegativeInitStates(domain.predicates.predicates, init, objects)
 
-	#parse Domain after parsing problem - so that for-all/exists statements can create edges for each legal typed object
-	# treats axioms as actions, TODO: consider if this affects heuristics drastically enough to change.
 	domainAxiomsToGraphs(domain)
+	Operators = domainToOperatorGraphs(domain)
 
-	op_graphs = domainToOperatorGraphs(domain)
-
-	#FlawLib.non_static_preds
-	for op in op_graphs:
+	for op in Operators:
 		FlawLib.non_static_preds.union(op.effects)
 
 	from GlobalContainer import GC
 	GC.object_types.update(obTypesDict(domain.types))
 
-	return (op_graphs, objects, GC.object_types, init, goal)
+	return Operators, objects, GC.object_types, init, goal
 
 
 def obTypesDict(object_types):
