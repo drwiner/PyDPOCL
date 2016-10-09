@@ -47,7 +47,7 @@ class PlanSpacePlanner:
 			self.disc_objects = disc_objects
 			Discourse_Plans = self.multiGoalSetup(self.disc_GL, disc_objects)
 			for DP in Discourse_Plans:
-				self.Open.insert(BiPlan(SP, DP))
+				self.Open.insert(BiPlan(SP.deepcopy(), DP))
 		else:
 			self.Open.insert(SP)
 
@@ -192,7 +192,10 @@ class PlanSpacePlanner:
 		return results
 
 	def RetargetPrecondition(self, GL, plan, S_Old, precondition):
-		effect_token = GL.getConsistentEffect(S_Old, precondition)
+		try:
+			effect_token = GL.getConsistentEffect(S_Old, precondition)
+		except:
+			print('why')
 		pre_link = plan.RemoveSubgraph(precondition)
 		#plan.assign(pre_link.sink, effect_token) #new
 		plan.edges.remove(pre_link)

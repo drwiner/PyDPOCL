@@ -233,8 +233,13 @@ class GLib:
 			if eff.replaced_ID in self.eff_dict[precondition.replaced_ID]:
 				effect_token = eff
 				break
-		if effect_token == None:
-			raise AttributeError('story_GL.eff_dict empty but id_dict has antecedent')
+		if effect_token is None:
+			for eff in S_Old.effects:
+				if self.eff_dict[eff.replaced_ID] == self.eff_dict[precondition.replaced_ID]:
+					effect_token = eff
+					break
+			if effect_token is None:
+				raise AttributeError('story_GL.eff_dict empty but id_dict has antecedent')
 		return effect_token
 
 	def hasConsistentPrecondition(self, Sink, effect):

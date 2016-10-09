@@ -401,10 +401,7 @@ class PlanElementGraph(ElementGraph):
 					nonThreats[causal_link].add(step)
 					continue
 
-				if self.name == 'disc':
-					detectedThreatenedCausalLinks.add(Flaw((step, causal_link), 'dtclf'))
-				else:
-					detectedThreatenedCausalLinks.add(Flaw((step, causal_link), 'tclf'))
+				detectedThreatenedCausalLinks.add(Flaw((step, causal_link), 'tclf'))
 
 		return detectedThreatenedCausalLinks
 
@@ -463,4 +460,4 @@ class BiPlan:
 			self.D = kplan
 
 	def __repr__(self):
-		return self.S, self.D
+		return self.S.__repr__() + self.D.__repr__()
