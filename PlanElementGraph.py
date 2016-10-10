@@ -215,57 +215,53 @@ class PlanElementGraph(ElementGraph):
 
 			self.edges.add(Edge(source, sink, edge.label))
 
-	def Unify(self, other, bindings = None):
-		#Unify two ground subplans
-		#Combine elements,
-		#Combine
-		pass
 
-	#def Integrate(U, W, V, B):
-	def Integrate(self, other):
-		#W is [1,..., k] where  1--> k are the indices of V.Steps
-		# _map = defaultdict(set)
-		# for i, s in enumerate(other.Steps):
-		# 	for i, t in enumerate(self.Steps):
-		# 		if s.stepnumber == t.stepnumber:
-		# 			_map[s].add(t)
+	def Unify(self, other, GL):
+		from Plannify import ReuseLib
+		OSteps = other.Steps
+		SSteps = self.Steps
 
-		Uni_Libs = [[(i, t) for t in self.Steps if t.stepnumber == s.stepnumber] + [(i, s)]
-		 			for i, s in enumerate(other.Steps)]
+		Uni_Libs = [ReuseLib(i, s_add, SSteps) for i, s_add in enumerate(OSteps)]
 		Uni_Worlds = itertools.product(*Uni_Libs)
 
-		#for each ordering,
-			#find
-		for uw in Uni_Worlds:
-			if uw
+		New_Plans = set()
+		for UW in Uni_Worlds:
+			new_plan = self.deepcopy()
+			for step in UW:
+				if step not in SSteps:
+					S_new = Action.subgraph(other, step).deepcopy()
+					S_new.root.arg_name = step.stepnumber
+					#move pieces
+					new_plan.elements.update(S_new.elements)
+					new_plan.edges.update(S_new.edges)
+					#place in order
+					new_plan.OrderingGraph.addEdge(new_plan.initial_dummy_step, S_new.root)
+					new_plan.OrderingGraph.addEdge(S_new.root, new_plan.final_dummy_step)
 
+			for ord in other.OrderingGraph.edges:
+				new_plan.OrderingGraph.addEdge(UW[ord.source.position], UW[ord.sink.position])
 
-		for i, step in enumerate(W):
-			if step in V.Steps:
-				#don't add B if
-				if (u.ID, v.ID, 1) in B:
-					continue
-				# then, add this step,
-				U.AddSubgraph(Action.subgraph(V,step))
-				_map[step] = step
-			else:
+			for link in other.CausalLinkGraph.edges:
+				new_d = UW[link.source.position].getElmByRID(link.label.replaced_ID)
+				new_plan.CausalLinkGraph.addEdge(UW[link.source.position], UW[link.sink.position], new_d)
 
-				# if u and v must be distinct
-				if (u.ID, v.ID, 0) in B:
-					continue
-				if (_, v.ID, 1) in B:
-					if not _ == u.ID:
-						continue
-				# else, this v-step is to be reused by u-step
-				_map[step] = U.Steps[i]
+			for step in UW:
+				Step = Action.subgraph(new_plan, step)
+				for pre in Step.preconditions:
+					cndts = {edge for edge in new_plan.edges if isinstance(edge.source, Operator)
+							 and edge.label == 'precond-of' and edge.sink == pre}
+					if len(cndts) == 0:
+						raise ValueError('wait, no edge for this preconditon? impossible!')
+					if len(cndts) < 2:
+						new_plan.flaws.insert(GL, new_plan, Flaw((step, pre), 'opf'))
 
-		for ordering in V.OrderingGraph.edges:
-			U.OrderingGraph.addEdge(_map[ordering.source], _map[ordering.sink])
-		for link in V.CausalLinkGraph.edges:
-			#get the effect of the mapped u-step (possibly former vstep)
-			condition = Action.subgraph(U,_map[link.source]).getElmByRID(link.label.replaced_ID)
-			U.CausalLinkGraph.addEdge(_map[link.source],_map[link.sink],condition)
-		return U
+			for step in UW:
+				if step in OSteps:
+					new_plan.flaws.addCndtsAndRisks(GL, UW[step.position])
+
+			New_Plans.add(new_plan)
+
+		return New_Plans
 
 	def __lt__(self, other):
 		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
@@ -413,7 +409,7 @@ class PlanElementGraph(ElementGraph):
 					nonThreats[causal_link].add(step)
 					continue
 
-				if not step.stepnumber in GL.threat_dict[causal_link.sink.stepnumber]:
+				if step.stepnumber not in GL.threat_dict[causal_link.sink.stepnumber]:
 					nonThreats[causal_link].add(step)
 					continue
 

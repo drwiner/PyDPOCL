@@ -113,7 +113,7 @@ def Linkify(Planets, RQ, GL):
 			snk = Planet.getElementById(link.sink.ID)
 			cond = Planet.getElementById(link.label.ID)
 
-			if not src.stepnumber in GL.ante_dict[snk.stepnumber]:
+			if src.stepnumber not in GL.ante_dict[snk.stepnumber]:
 				removable.add(i)
 				continue
 
@@ -124,8 +124,7 @@ def Linkify(Planets, RQ, GL):
 			Planet.CausalLinkGraph.addEdge(src, snk, cond)
 			Planet.OrderingGraph.addEdge(src,snk)
 
-
-		Planets[:] = [Planet for i, Planet in enumerate(Planets) if not i in removable]
+		Planets[:] = [Planet for i, Planet in enumerate(Planets) if i not in removable]
 		removable = set()
 		if len(Planets) == 0:
 			raise ValueError('no Planet could support links in {}'.format(RQ.name))
@@ -255,8 +254,16 @@ class LinkLib:
 
 
 class ReuseLib:
-	def __init__(self, i, vstep, U):
-		self.position = i
-		self.step = vstep
-		self._cndts = [ustep for ustep in U.Steps if ustep.stepnumber == vstep.stepnumber]
-		self._cndts.append(vstep)
+	def __init__(self, i, s_add, Old_Steps):
+		self.step = s_add
+		self._cndts = [(i,old_step) for old_step in Old_Steps if old_step.stepnumber == s_add.stepnumber]
+		self._cndts.append(s_add)
+
+	def __len__(self):
+		return len(self._cndts)
+
+	def __getitem__(self, position):
+		return self._cndts[position]
+
+	def __repr__(self):
+		return str(self.step)

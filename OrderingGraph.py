@@ -106,7 +106,7 @@ class CausalLinkGraph(OrderingGraph):
 		return str(['{}-{} --{}-{}-{}--> {}-{}'.format(edge.source.name,
 													   edge.source.arg_name,
 													   		edge.label.truth,
-													   		edge.label.replaced_ID,
+													   		str(edge.label.replaced_ID)[19:23],
 													  		edge.label.name,
 													   			edge.sink.name,
 													   			edge.sink.arg_name)

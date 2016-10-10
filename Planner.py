@@ -275,7 +275,7 @@ class PlanSpacePlanner:
 		elif flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(kplan, flaw)
 		elif flaw.name == 'dcf':
-			results = other.Integrate(GL[flaw.flaw].ground_subplan.deepcopy())
+			results = other.Unify(GL[flaw.flaw].ground_subplan.deepcopy(), self.story_GL)
 			GL = self.story_GL
 			other = plan.D
 		else:
