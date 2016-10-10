@@ -521,7 +521,9 @@ def parseDomAndProb(domain_file, problem_file):
 	Operators = domainToOperatorGraphs(domain)
 
 	for op in Operators:
-		FlawLib.non_static_preds.union(op.effects)
+		for eff in op.effects:
+			FlawLib.non_static_preds.add(eff.name)
+				#update(op.effects)
 
 	from GlobalContainer import GC
 	GC.object_types.update(obTypesDict(domain.types))

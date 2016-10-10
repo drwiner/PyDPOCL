@@ -215,7 +215,7 @@ class PlanElementGraph(ElementGraph):
 
 			self.edges.add(Edge(source, sink, edge.label))
 
-
+	@clock
 	def Unify(self, other, GL):
 		from Plannify import ReuseLib
 		OSteps = other.Steps
@@ -414,6 +414,7 @@ class PlanElementGraph(ElementGraph):
 					continue
 
 				detectedThreatenedCausalLinks.add(Flaw((step, causal_link), 'tclf'))
+				#nonThreats[causal_link].add(step)
 
 		return detectedThreatenedCausalLinks
 

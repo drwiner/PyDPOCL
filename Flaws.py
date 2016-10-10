@@ -200,7 +200,7 @@ class FlawLib():
 		s_need, pre = flaw.flaw
 
 		#if pre.predicate is static
-		if not pre.name in FlawLib.non_static_preds:
+		if pre.name not in FlawLib.non_static_preds:
 			self.statics.add(flaw)
 			return
 
@@ -241,12 +241,15 @@ class FlawLib():
 
 		statics = str([flaw for flaw in self.statics])
 		inits = str([flaw for flaw in self.inits])
+		decomps = str([flaw for flaw in self.decomps])
 		threats = str([flaw for flaw in self.threats])
 		unsafe = str([flaw for flaw in self.unsafe])
 		reusable = str([flaw for flaw in self.reusable])
 		nonreusable = str([flaw for flaw in self.nonreusable])
 	#	return '\nFLAW LIBRARY: \n' + [flaw_set for flaw_set in flaw_str_list] + '\n'
-		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\ninits: \n' + inits + '\nthreats: \n' + threats + '\nunsafe: \n' +  unsafe + '\nreusable: \n' + reusable + '\nnonreusable: \n' + nonreusable + '\n'
+		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\ninits: \n' + inits + '\ndecomps: \n' + \
+			   decomps + '\nthreats: \n' + threats + \
+			   '\nunsafe: \n' +  unsafe + '\nreusable: \n' + reusable + '\nnonreusable: \n' + nonreusable + '\n'
 
 
 import unittest

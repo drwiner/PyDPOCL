@@ -307,8 +307,8 @@ class PlanSpacePlanner:
 				#print('branch terminated')
 				continue
 
-			#for step in topoSort(plan):
-				#print(Action.subgraph(plan, step))
+			#for step in topoSort(plan.S):
+			#	print(Action.subgraph(plan.S, step))
 
 			if plan.num_flaws() == 0:
 				print('story + disc solution found at {} nodes visited and {} nodes expanded'.format(visited,
@@ -322,8 +322,8 @@ class PlanSpacePlanner:
 			elif len(plan.D.flaws) == 0:
 				print('disc solution found at {} nodes visited and {} nodes expanded'.format(visited, len(self.Open)))
 
-			#print(plan)
-			#print(plan.flaws)
+			#print(plan.S)
+			#print(plan.S.flaws)
 
 			#Select Flaw
 			k, flaw = plan.next_flaw()
@@ -337,7 +337,7 @@ class PlanSpacePlanner:
 				self.Open.insert(child)
 
 			#print('open list number: {}'.format(len(self.Open)))
-			#print('\n')
+		#	print('\n')
 
 
 def topoSort(graph):
@@ -428,7 +428,7 @@ class TestPlanner(unittest.TestCase):
 			GC.DGL = DGL
 
 		bi = PlanSpacePlanner(story[1], SGL, disc[1], DGL)
-		results = bi.POCL(5)
+		results = bi.POCL(1)
 		for R in results:
 			S = R.S
 			D = R.D
