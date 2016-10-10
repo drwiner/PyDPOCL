@@ -57,7 +57,7 @@
     (:action link-excavate-steal
      :parameters (?excavate - step ?steal - step ?stolen - item)
      :precondition (not (= ?excavate ?steal))
-     :effect (bel-linked ?excavate ?steal)
+     :effect (and (bel-linked ?excavate ?steal) (bel-occurs ?excavate) (bel-occurs ?steal))
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
                   (nth-step-arg 1 ?excavate ?stolen)
@@ -67,7 +67,7 @@
    (:action linked-by-has-indy-ark
      :parameters (?excavate - step ?steal - step ?indy - actor ?ark - item)
      :precondition (not (= ?excavate ?steal))
-     :effect (bel-linked ?excavate ?steal)
+     :effect (and (bel-linked ?excavate ?steal) (bel-occurs ?excavate) (bel-occurs ?steal))
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
                   (name ?ark ark)
@@ -78,7 +78,7 @@
   ;  (:action steal-before-excavate
    ;  :parameters (?excavate - step ?steal - step)
     ; :precondition (not (= ?excavate ?steal))
-     ;:effect (bel-precedes ?steal ?excavate)
+     ;:effect (and (bel-precedes ?steal ?excavate) (bel-occurs ?excavate) (bel-occurs ?steal))
      ;:decomp (and (name ?excavate excavate)
       ;            (name ?steal steal)
        ;           (< ?steal ?excavate)))
@@ -86,7 +86,7 @@
     (:action impossible-sequence
      :parameters (?excavate - step ?steal - step)
      :precondition (not (= ?excavate ?steal))
-     :effect (and (bel-linked ?excavate ?steal) (bel-precedes ?steal ?excavate))
+     :effect (and (bel-linked ?excavate ?steal) (bel-precedes ?steal ?excavate) (bel-occurs ?excavate) (bel-occurs ?steal))
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
                   (linked ?excavate ?steal)
@@ -95,7 +95,7 @@
     (:action multi-sink
      :parameters (?excavate - step ?steal - step ?travel - step)
      :precondition (and (not (= ?excavate ?steal)) (not (= ?excavate ?travel)) (not (= ?steal ?travel)))
-     :effect (and (bel-linked ?excavate ?steal) (bel-linked ?travel ?steal))
+     :effect (and (bel-linked ?excavate ?steal) (bel-linked ?travel ?steal) (bel-occurs ?excavate) (bel-occurs ?travel) (bel-occurs ?steal))
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
                   (name ?travel travel)
@@ -105,7 +105,7 @@
     (:action multi-source
      :parameters (?excavate - step ?steal - step ?open-ark - step)
      :precondition (and (not (= ?excavate ?steal)) (not (= ?excavate ?open-ark)) (not (= ?steal ?open-ark)))
-     :effect (and (bel-linked ?excavate ?open-ark) (bel-linked ?excavate ?steal))
+     :effect (and (bel-linked ?excavate ?open-ark) (bel-linked ?excavate ?steal) (bel-occurs ?excavate) (bel-occurs ?steal) (bel-occurs ?open-ark))
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
                   (name ?open-ark open-ark)

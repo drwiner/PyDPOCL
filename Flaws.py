@@ -200,7 +200,7 @@ class FlawLib():
 		s_need, pre = flaw.flaw
 
 		#if pre.predicate is static
-		if pre.name not in FlawLib.non_static_preds:
+		if (pre.name, pre.truth) not in FlawLib.non_static_preds:
 			self.statics.add(flaw)
 			return
 

@@ -166,6 +166,7 @@ class PlanElementGraph(ElementGraph):
 		self.CausalLinkGraph = CausalLinkGraph(ID=uid(6))
 
 		self.flaws = FlawLib()
+		self.solved = False
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
 
@@ -242,7 +243,13 @@ class PlanElementGraph(ElementGraph):
 				new_plan.OrderingGraph.addEdge(UW[ord.source.position], UW[ord.sink.position])
 
 			for link in other.CausalLinkGraph.edges:
-				new_d = UW[link.source.position].getElmByRID(link.label.replaced_ID)
+				Source = Action.subgraph(new_plan, UW[link.source.position])
+				new_d = Source.getElmByRID(link.label.replaced_ID)
+				if new_d is None:
+					Sink = Action.subgraph(new_plan, UW[link.sink.position])
+					new_d = Sink.getElmByRID(link.label.replaced_ID)
+					if new_d is None:
+						raise ValueError('here')
 				new_plan.CausalLinkGraph.addEdge(UW[link.source.position], UW[link.sink.position], new_d)
 
 			for step in UW:
@@ -258,8 +265,8 @@ class PlanElementGraph(ElementGraph):
 			for step in UW:
 				if step in OSteps:
 					new_plan.flaws.addCndtsAndRisks(GL, UW[step.position])
-
-			New_Plans.add(new_plan)
+			if new_plan.isInternallyConsistent():
+				New_Plans.add(new_plan)
 
 		return New_Plans
 
@@ -373,9 +380,10 @@ class PlanElementGraph(ElementGraph):
 	def Steps(self):
 		return [element for element in self.elements if type(element) is Operator]
 
-	'''for debugging'''
-	def getActions(self):
-		return list(Action.subgraph(self,step) for step in self.Steps)
+	@property
+	def Step_Graphs(self):
+		return [Action.subgraph(self, step) for step in self.Steps]
+
 
 	#@clock
 	def detectThreatenedCausalLinks(self, GL):
@@ -427,7 +435,7 @@ class PlanElementGraph(ElementGraph):
 
 class BiPlan:
 	""" A container class for story and discourse plans, so they behave as a single plan. A tuple with functionality """
-	weight = 2
+	weight = 1
 	def __init__(self, Story, Disc):
 		self.insert(Story)
 		self.insert(Disc)

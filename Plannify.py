@@ -256,8 +256,16 @@ class LinkLib:
 class ReuseLib:
 	def __init__(self, i, s_add, Old_Steps):
 		self.step = s_add
-		self._cndts = [(i,old_step) for old_step in Old_Steps if old_step.stepnumber == s_add.stepnumber]
+		#self.step.position = i
+		self._cndts = []
+		for old_step in Old_Steps:
+			if old_step.stepnumber == s_add.stepnumber:
+				old_step.position = i
+				self._cndts.append(old_step)
+		s_add.position = i
 		self._cndts.append(s_add)
+		#self._cndts = [(i,old_step) for old_step in Old_Steps if old_step.stepnumber == s_add.stepnumber]
+		#elf._cndts.append((i, s_add))
 
 	def __len__(self):
 		return len(self._cndts)

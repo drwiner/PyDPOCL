@@ -522,7 +522,7 @@ def parseDomAndProb(domain_file, problem_file):
 
 	for op in Operators:
 		for eff in op.effects:
-			FlawLib.non_static_preds.add(eff.name)
+			FlawLib.non_static_preds.add((eff.name,eff.truth))
 				#update(op.effects)
 
 	from GlobalContainer import GC

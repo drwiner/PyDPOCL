@@ -275,7 +275,9 @@ class PlanSpacePlanner:
 		elif flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(kplan, flaw)
 		elif flaw.name == 'dcf':
+			print(GL[flaw.flaw].name)
 			results = other.Unify(GL[flaw.flaw].ground_subplan.deepcopy(), self.story_GL)
+			print(len(results))
 			GL = self.story_GL
 			other = plan.D
 		else:
@@ -283,6 +285,7 @@ class PlanSpacePlanner:
 
 		nBiPlans = set()
 		for result in results:
+			#print(len(result.Steps))
 			new_flaws = result.detectThreatenedCausalLinks(GL)
 			result.flaws.threats.update(new_flaws)
 			nBiPlans.add(BiPlan(result, other.deepcopy()))
@@ -306,28 +309,40 @@ class PlanSpacePlanner:
 			if not plan.isInternallyConsistent():
 				#print('branch terminated')
 				continue
-
+			#print(plan)
+			# for step in topoSort(plan.D):
+			# 	print(Action.subgraph(plan.D, step))
 			#for step in topoSort(plan.S):
 			#	print(Action.subgraph(plan.S, step))
 
 			if plan.num_flaws() == 0:
-				print('story + disc solution found at {} nodes visited and {} nodes expanded'.format(visited,
-																								len(self.Open)))
+				print('story + disc solution found at {} nodes expanded and {} nodes visited'.format(visited,
+																								len(self.Open)+visited))
 				Completed.append(plan)
 				if len(Completed) == num_plans:
 					return Completed
 				continue
 			elif len(plan.S.flaws) == 0:
-				print('story solution found at {} nodes visited and {} nodes expanded'.format(visited, len(self.Open)))
-			elif len(plan.D.flaws) == 0:
-				print('disc solution found at {} nodes visited and {} nodes expanded'.format(visited, len(self.Open)))
+				print('story solution found at {} nodes expanded and {} nodes visited'.format(visited, len(self.Open)+visited))
+			elif len(plan.D.flaws) == 0 and not plan.D.solved:
+				plan.D.solved = True
+				print('disc solution found at {} nodes expanded and {} nodes visited'.format(visited, len(self.Open)+visited))
+
+				for step in topoSort(plan.D):
+					print(Action.subgraph(plan.D, step))
+				print('\n')
+
+			for step in plan.D.Steps:
+				if step.name != 'dummy_init' and step.name != 'dummy_goal':
+					print(step.name)
 
 			#print(plan.S)
 			#print(plan.S.flaws)
 
 			#Select Flaw
 			k, flaw = plan.next_flaw()
-			#print('selected : {}\n'.format(flaw))
+			if k == 1:
+				print('{} selected : {}\n'.format(flaw.name, flaw))
 
 			#Add children to Open List
 			children = self.generateChildren(plan, k, flaw)

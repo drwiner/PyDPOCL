@@ -86,6 +86,11 @@ class Graph(Element):
 		for element in self.elements:
 			if element.replaced_ID == ID:
 				return element
+		for edge in self.edges:
+			if edge.source.replaced_ID == ID:
+				return edge.source
+			if edge.sink.replaced_ID == ID:
+				return edge.sink
 		return None
 
 
