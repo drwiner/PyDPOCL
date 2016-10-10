@@ -221,9 +221,25 @@ class PlanElementGraph(ElementGraph):
 		#Combine
 		pass
 
-	def Integrate(U, W, V, B):
+	#def Integrate(U, W, V, B):
+	def Integrate(self, other):
 		#W is [1,..., k] where  1--> k are the indices of V.Steps
-		_map = {}
+		# _map = defaultdict(set)
+		# for i, s in enumerate(other.Steps):
+		# 	for i, t in enumerate(self.Steps):
+		# 		if s.stepnumber == t.stepnumber:
+		# 			_map[s].add(t)
+
+		Uni_Libs = [[(i, t) for t in self.Steps if t.stepnumber == s.stepnumber] + [(i, s)]
+		 			for i, s in enumerate(other.Steps)]
+		Uni_Worlds = itertools.product(*Uni_Libs)
+
+		#for each ordering,
+			#find
+		for uw in Uni_Worlds:
+			if uw
+
+
 		for i, step in enumerate(W):
 			if step in V.Steps:
 				#don't add B if

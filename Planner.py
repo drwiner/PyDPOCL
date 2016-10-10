@@ -150,7 +150,10 @@ class PlanSpacePlanner:
 
 			#step 6 - update orderings and causal links, add flaws
 			self.addStep(new_plan, anteaction.root, new_plan.getElementById(s_need.ID), eff_link.sink, GL, new=True)
-			new_plan.flaws.addCndtsAndRisks(GL, anteaction.root)
+			try:
+				new_plan.flaws.addCndtsAndRisks(GL, anteaction.root)
+			except:
+				print('ok')
 
 			#step 7 - add new_plan to open list
 			results.add(new_plan)
@@ -272,7 +275,7 @@ class PlanSpacePlanner:
 		elif flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(kplan, flaw)
 		elif flaw.name == 'dcf':
-			results = other.Unify(GL[flaw.flaw].ground_subplan.deepcopy())
+			results = other.Integrate(GL[flaw.flaw].ground_subplan.deepcopy())
 			GL = self.story_GL
 			other = plan.D
 		else:

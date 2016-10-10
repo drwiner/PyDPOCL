@@ -133,7 +133,7 @@ class FlawLib():
 	def heuristic(self):
 		value = 0
 		for i,flaw_set in enumerate(self.typs):
-			if i == 2:
+			if i ==2 or i == 3:
 				continue
 			value+=i*len(flaw_set)
 		return value
@@ -159,7 +159,7 @@ class FlawLib():
 		for i, flaw_set in enumerate(self.typs):
 			if len(flaw_set) == 0:
 				continue
-			if i == 2:
+			if i == 2 or i ==3:
 				continue
 			g = (flaw for flaw in flaw_set)
 			yield(next(g))
