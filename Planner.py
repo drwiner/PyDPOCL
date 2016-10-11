@@ -335,9 +335,9 @@ class PlanSpacePlanner:
 					print(Action.subgraph(plan.D, step))
 				print('\n')
 
-			for step in plan.D.Steps:
-				if step.name != 'dummy_init' and step.name != 'dummy_goal':
-					print(step.name)
+			#for step in plan.D.Steps:
+			#	if step.name != 'dummy_init' and step.name != 'dummy_goal':
+			#		print(step.name)
 
 			#print(plan.S)
 			#print(plan.S.flaws)
@@ -446,7 +446,7 @@ class TestPlanner(unittest.TestCase):
 			GC.DGL = DGL
 
 		bi = PlanSpacePlanner(story[1], SGL, disc[1], DGL)
-		results = bi.POCL(1)
+		results = bi.POCL(3)
 		for R in results:
 			S = R.S
 			D = R.D

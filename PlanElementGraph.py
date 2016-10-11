@@ -448,7 +448,7 @@ class PlanElementGraph(ElementGraph):
 
 class BiPlan:
 	""" A container class for story and discourse plans, so they behave as a single plan. A tuple with functionality """
-	weight = 2
+	weight = 1
 	def __init__(self, Story, Disc):
 		self.insert(Story)
 		self.insert(Disc)
@@ -478,7 +478,9 @@ class BiPlan:
 
 	def next_flaw(self):
 		try:
-			if len(self.S.flaws.statics) > 0:
+			if len(self.D.flaws.statics) > 0:
+				return 1, self.D.flaws.next()
+			elif len(self.S.flaws.statics) > 0:
 				return 0, self.S.flaws.next()
 			elif len(self.S.flaws.inits) > 0:
 				return 0, self.S.flaws.next()
