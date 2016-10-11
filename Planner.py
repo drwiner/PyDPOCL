@@ -435,7 +435,8 @@ class TestPlanner(unittest.TestCase):
 			GC.SGL = SGL
 
 		print('Reading ark-requirements-domain and ark-requirements-problem')
-		disc = parseDomAndProb('domains/ark-requirements-domain.pddl', 'domains/ark-requirements-problem.pddl')
+		#disc = parseDomAndProb('domains/ark-requirements-domain.pddl', 'domains/ark-requirements-problem.pddl')
+		disc = parseDomAndProb('domains/ark-discourse-tests.pddl', 'domains/ark-discourse-tests-problem.pddl')
 		# (op_graphs, objects, GC.object_types, init, goal)
 
 		try:
