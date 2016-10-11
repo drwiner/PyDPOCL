@@ -49,6 +49,7 @@ def groundDiscList(operators, SGL):
 				assignStoryToDisc(GDO, sp, elm, ex_elms)
 			GDO.ground_subplan = sp
 			GDO.root.stepnumber = stepnum
+			GDO._replaceInternals()
 			stepnum+=1
 			gsteps.append(GDO)
 
@@ -95,6 +96,7 @@ class GLib:
 			init_action.root.stepnumber = len(self._gsteps)
 			init_action.edges = set()
 			init_action.elements = {init_action.root}
+			#init_action._replaceInternals()
 			#for edge in init_action.edges:
 			self._gsteps.append(init_action)
 
@@ -143,6 +145,7 @@ class GLib:
 
 	def loadAnteSteps(self, _step, _pre):
 		Precondition = Condition.subgraph(_step, _pre)
+		#if _step.stepnumber
 		for gstep in self._gsteps:
 			# Defense pattern
 			count = 0
@@ -201,6 +204,7 @@ class GLib:
 			GA.root.stepnumber = stepnum
 			stepnum+=1
 			GA.replaceInternals()
+			GA._replaceInternals()
 			goals.append(GA)
 
 		return goals

@@ -29,6 +29,17 @@ class Action(ElementGraph):
 			
 		super(Action,self).__init__(ID, type_graph, name, Elements, root_element, Edges)
 
+	def __hash__(self):
+		return hash(arg for arg in self.Args) ^ hash(self.name)
+
+	def __eq__(self, other):
+		if isinstance(other, Argument):
+			return False
+		if self.name == other.name:
+			if self.Args == other.Args:
+				return True
+		return False
+
 	# @property
 	# def executed(self):
 	# 	return self.root.executed
@@ -57,6 +68,9 @@ class Action(ElementGraph):
 		elif name == 'effects':
 			self.effects = self.getPreconditionsOrEffects('effect-of')
 			return self.effects
+		elif name == 'Args':
+			self.updateArgs()
+			return self.Args
 		else:
 			raise AttributeError('no attribute {}'.format(name))
 
@@ -465,6 +479,8 @@ class BiPlan:
 	def next_flaw(self):
 		try:
 			if len(self.S.flaws.statics) > 0:
+				return 0, self.S.flaws.next()
+			elif len(self.S.flaws.inits) > 0:
 				return 0, self.S.flaws.next()
 			elif len(self.D.flaws) > 0:
 				return 1, self.D.flaws.next()
