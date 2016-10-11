@@ -227,9 +227,8 @@ class PlanSpacePlanner:
 		if new:
 			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
 				plan.flaws.insert(GL, plan, Flaw((s_add, prec.sink), 'opf'))
-
-		if plan.name == 'disc':
-			plan.flaws.insert(GL, plan, Flaw(s_add.stepnumber, 'dcf'))
+			if plan.name == 'disc':
+				plan.flaws.insert(GL, plan, Flaw(s_add.stepnumber, 'dcf'))
 
 		#Good time as ever to updatePlan
 		#plan.updatePlan()

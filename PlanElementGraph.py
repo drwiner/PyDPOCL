@@ -255,8 +255,7 @@ class PlanElementGraph(ElementGraph):
 			for step in UW:
 				Step = Action.subgraph(new_plan, step)
 				for pre in Step.preconditions:
-					cndts = {edge for edge in new_plan.edges if isinstance(edge.source, Operator)
-							 and edge.label == 'precond-of' and edge.sink == pre}
+					cndts = {edge for edge in new_plan.edges if isinstance(edge.source, Operator) and edge.sink == pre}
 					if len(cndts) == 0:
 						raise ValueError('wait, no edge for this preconditon? impossible!')
 					if len(cndts) < 2:
@@ -435,7 +434,7 @@ class PlanElementGraph(ElementGraph):
 
 class BiPlan:
 	""" A container class for story and discourse plans, so they behave as a single plan. A tuple with functionality """
-	weight = 1
+	weight = 2
 	def __init__(self, Story, Disc):
 		self.insert(Story)
 		self.insert(Disc)
