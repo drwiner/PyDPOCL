@@ -275,7 +275,8 @@ class PlanSpacePlanner:
 			results = self.resolveThreatenedCausalLinkFlaw(kplan, flaw)
 		elif flaw.name == 'dcf':
 			print(GL[flaw.flaw].name)
-			results = other.Unify(GL[flaw.flaw].ground_subplan.deepcopy(), self.story_GL)
+			story = other.deepcopy()
+			results = story.Unify(GL[flaw.flaw].ground_subplan.deepcopy(), self.story_GL)
 			print(len(results))
 			GL = self.story_GL
 			other = plan.D
