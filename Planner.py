@@ -276,6 +276,8 @@ class PlanSpacePlanner:
 		elif flaw.name == 'dcf':
 			print(GL[flaw.flaw].name)
 			story = other.deepcopy()
+			if 115 in {s.stepnumber for s in plan.D.Steps}:
+				print('stop here for tests')
 			results = story.Unify(GL[flaw.flaw].ground_subplan.deepcopy(), self.story_GL)
 			print(len(results))
 			GL = self.story_GL
