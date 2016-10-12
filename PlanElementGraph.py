@@ -480,14 +480,14 @@ class BiPlan:
 		try:
 			if len(self.D.flaws.statics) > 0:
 				return 1, self.D.flaws.next()
-			elif len(self.S.flaws.statics) > 0:
-				return 0, self.S.flaws.next()
-			elif len(self.S.flaws.inits) > 0:
-				return 0, self.S.flaws.next()
+			#elif len(self.S.flaws.statics) > 0:
+			#	return 0, self.S.flaws.next()
+			#elif len(self.S.flaws.inits) > 0:
+			#	return 0, self.S.flaws.next()
 			elif len(self.D.flaws) > 0:
 				return 1, self.D.flaws.next()
-			else:
-				return 0, self.S.flaws.next()
+			#else:
+			#	return 0, self.S.flaws.next()
 		except:
 			raise ValueError("shouldn't get here if no more flaws")
 

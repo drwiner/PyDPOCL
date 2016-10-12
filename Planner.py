@@ -228,8 +228,8 @@ class PlanSpacePlanner:
 		if new:
 			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
 				plan.flaws.insert(GL, plan, Flaw((s_add, prec.sink), 'opf'))
-			if plan.name == 'disc':
-				plan.flaws.insert(GL, plan, Flaw(s_add.stepnumber, 'dcf'))
+			#if plan.name == 'disc':
+			#	plan.flaws.insert(GL, plan, Flaw(s_add.stepnumber, 'dcf'))
 
 		#Good time as ever to updatePlan
 		#plan.updatePlan()
@@ -326,7 +326,9 @@ class PlanSpacePlanner:
 					return Completed
 				continue
 			elif len(plan.S.flaws) == 0:
-				print('story solution found at {} nodes expanded and {} nodes visited'.format(visited, len(self.Open)+visited))
+				pass
+				#print('story solution found at {} nodes expanded and {} nodes visited'.format(visited,
+			# len(self.Open)+visited))
 			elif len(plan.D.flaws) == 0 and not plan.D.solved:
 				plan.D.solved = True
 				print('disc solution found at {} nodes expanded and {} nodes visited'.format(visited, len(self.Open)+visited))
@@ -447,7 +449,7 @@ class TestPlanner(unittest.TestCase):
 			GC.DGL = DGL
 
 		bi = PlanSpacePlanner(story[1], SGL, disc[1], DGL)
-		results = bi.POCL(3)
+		results = bi.POCL(1)
 		for R in results:
 			S = R.S
 			D = R.D
