@@ -318,8 +318,8 @@ class TestPlanner(unittest.TestCase):
 		GC.SGL = GL
 		planner = PlanSpacePlanner(objects, GL)
 
-		n = 1
-		print('\nRunning Story Planner on ark-domain and problem to find {} solutions'.format(n))
+		n = 3
+		print('\nRunning Story Planner on {} and {} to find {} solutions'.format(domain_file, problem_file, n))
 
 		results = planner.POCL(n)
 		assert len(results) == n
