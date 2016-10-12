@@ -113,8 +113,6 @@ class FlawLib():
 		#init = established by initial state
 		self.inits = simpleQueueWrapper()
 
-		self.decomps = simpleQueueWrapper()
-
 		#threat = causal link dependency undone
 		self.threats = simpleQueueWrapper()
 
@@ -127,13 +125,13 @@ class FlawLib():
 		#nonreusable = open conditions inconsistent with existing effect sorted by number of cndts
 		self.nonreusable = Flawque()
 
-		self.typs = [self.statics, self.inits, self.decomps, self.threats, self.unsafe, self.reusable, self.nonreusable]
+		self.typs = [self.statics, self.inits, self.threats, self.unsafe, self.reusable, self.nonreusable]
 
 	@property
 	def heuristic(self):
 		value = 0
 		for i,flaw_set in enumerate(self.typs):
-			if i ==2 or i == 3:
+			if i ==2:
 				continue
 			value+=i*len(flaw_set)
 		return value
@@ -159,7 +157,7 @@ class FlawLib():
 		for i, flaw_set in enumerate(self.typs):
 			if len(flaw_set) == 0:
 				continue
-			if i == 2 or i ==3:
+			if i == 2:
 				continue
 			g = (flaw for flaw in flaw_set)
 			yield(next(g))
@@ -191,9 +189,6 @@ class FlawLib():
 
 		if flaw.name == 'tclf':
 			self.threats.add(flaw)
-			return
-		if flaw.name == 'dcf':
-			self.decomps.add(flaw)
 			return
 
 		#unpack flaw
@@ -241,14 +236,12 @@ class FlawLib():
 
 		statics = str([flaw for flaw in self.statics])
 		inits = str([flaw for flaw in self.inits])
-		decomps = str([flaw for flaw in self.decomps])
 		threats = str([flaw for flaw in self.threats])
 		unsafe = str([flaw for flaw in self.unsafe])
 		reusable = str([flaw for flaw in self.reusable])
 		nonreusable = str([flaw for flaw in self.nonreusable])
 	#	return '\nFLAW LIBRARY: \n' + [flaw_set for flaw_set in flaw_str_list] + '\n'
-		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\ninits: \n' + inits + '\ndecomps: \n' + \
-			   decomps + '\nthreats: \n' + threats + \
+		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\ninits: \n' + inits + '\nthreats: \n' + threats + \
 			   '\nunsafe: \n' +  unsafe + '\nreusable: \n' + reusable + '\nnonreusable: \n' + nonreusable + '\n'
 
 

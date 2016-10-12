@@ -34,22 +34,15 @@ class Frontier:
 
 class PlanSpacePlanner:
 
-	def __init__(self, story_objs, story_GL, disc_objects=None, disc_GL=None):
+	def __init__(self, story_objs, story_GL):
 		#Assumes these parameters are already read from file
 
 		self.story_objs = story_objs
-		self.story_GL = story_GL
+		self.GL = story_GL
 
-		SP = self.setup(self.story_GL, 'story')
+		SP = self.setup()
 		self.Open = Frontier()
-		if disc_objects is not None:
-			self.disc_GL = disc_GL
-			self.disc_objects = disc_objects
-			Discourse_Plans = self.multiGoalSetup(self.disc_GL, disc_objects)
-			for DP in Discourse_Plans:
-				self.Open.insert(BiPlan(SP.deepcopy(), DP))
-		else:
-			self.Open.insert(SP)
+		self.Open.insert(SP)
 
 	def __len__(self):
 		return len(self._frontier)
@@ -60,19 +53,19 @@ class PlanSpacePlanner:
 	def __setitem__(self, plan, position):
 		self._frontier[position] = plan
 
-	def setup(self, GL, plan_name):
+	def setup(self):
 		"""
 			Create step typed element DI, with effect edges to each condition of start_set
 			Create step typed element DG, with precondition edges to each condition of end_set
 			Add ordering from DI to DG
 		"""
 
-		s_init = copy.deepcopy(GL[-2])
+		s_init = copy.deepcopy(self.GL[-2])
 		s_init.replaceInternals()
-		s_goal = copy.deepcopy(GL[-1])
+		s_goal = copy.deepcopy(self.GL[-1])
 		s_goal.replaceInternals()
 
-		s_init_plan = PlanElementGraph(uid(0), name=plan_name, Elements=self.story_objs|s_init.elements|s_goal.elements,
+		s_init_plan = PlanElementGraph(uid(0), name='story', Elements=self.story_objs|s_init.elements|s_goal.elements,
 									   Edges=s_init.edges|s_goal.edges)
 
 		s_init_plan.initial_dummy_step = s_init.root
@@ -80,37 +73,14 @@ class PlanSpacePlanner:
 
 		s_init_plan.OrderingGraph.addOrdering(s_init.root, s_goal.root)
 
-		#Add initial Open precondition flaws for dummy step
 		init_flaws = (Flaw((s_goal.root, prec), 'opf') for prec in s_goal.preconditions)
 		for flaw in init_flaws:
-			s_init_plan.flaws.insert(GL, s_init_plan, flaw)
+			s_init_plan.flaws.insert(self.GL, s_init_plan, flaw)
 		return s_init_plan
 
-	def multiGoalSetup(self, GL, disc_objects):
-		#s_init is in the back for a multi-goal setup
-		init = copy.deepcopy(GL[-1])
-		init.replaceInternals()
-		DPlans = []
-		for GA in GL.Goal_Actions:
-			s_goal = copy.deepcopy(GA)
-			s_init = copy.deepcopy(init)
-			DPlan = PlanElementGraph(uid(0), name='disc',
-									 Elements=s_init.elements | s_goal.elements | self.story_objs | disc_objects,
-									 Edges=s_init.edges | s_goal.edges)
 
-			DPlan.initial_dummy_step = s_init.root
-			DPlan.final_dummy_step = s_goal.root
-			DPlan.OrderingGraph.addOrdering(s_init.root, s_goal.root)
-			init_flaws = (Flaw((s_goal.root, prec), 'opf') for prec in s_goal.preconditions)
-			for flaw in init_flaws:
-				DPlan.flaws.insert(GL, DPlan, flaw)
-			#if s_goal.stepnumber == 116:
-			DPlans.append(DPlan)
-		return DPlans
-
-
-	#@clock
-	def newStep(self, plan, flaw, GL):
+	@clock
+	def newStep(self, plan, flaw):
 		"""
 		@param plan:
 		@param flaw:
@@ -120,9 +90,9 @@ class PlanSpacePlanner:
 		results = set()
 		s_need, precondition = flaw.flaw
 
-		#antecedent is of the form (antecedent_action_with_missing_eff_link, eff_link)
-		antecedents = GL.pre_dict[precondition.replaced_ID]
-		#print('flaw precondition.replaced_ID: {}'.format(precondition.replaced_ID))
+
+		antecedents = self.GL.pre_dict[precondition.replaced_ID]
+
 		for ante in antecedents:
 			if ante.action.name == 'dummy_init':
 				continue
@@ -138,23 +108,18 @@ class PlanSpacePlanner:
 			new_plan = plan.deepcopy()
 
 			#step 4 - set sink before replace internals
-			preserve_original_id = eff_link.sink.replaced_ID #original
-			#anteaction.assign(eff_link.sink, new_plan.getElementById(precondition.ID)) #new
-			eff_link.sink.replaced_ID = preserve_original_id #original
+			preserve_original_id = eff_link.sink.replaced_ID
+			eff_link.sink.replaced_ID = preserve_original_id
 			eff_link.sink = new_plan.getElementById(precondition.ID)
 			new_plan.edges.add(eff_link)
-			# check: eff_link.sink should till be precondition of s_need
 
 			#step 5 - add new stuff to new plan
 			new_plan.elements.update(anteaction.elements)
 			new_plan.edges.update(anteaction.edges)
 
 			#step 6 - update orderings and causal links, add flaws
-			self.addStep(new_plan, anteaction.root, new_plan.getElementById(s_need.ID), eff_link.sink, GL, new=True)
-			try:
-				new_plan.flaws.addCndtsAndRisks(GL, anteaction.root)
-			except:
-				print('ok')
+			self.addStep(new_plan, anteaction.root, new_plan.getElementById(s_need.ID), eff_link.sink, new=True)
+			new_plan.flaws.addCndtsAndRisks(self.GL, anteaction.root)
 
 			#step 7 - add new_plan to open list
 			results.add(new_plan)
@@ -162,12 +127,12 @@ class PlanSpacePlanner:
 		return results
 
 	#@clock
-	def reuse(self, plan, flaw, GL):
+	def reuse(self, plan, flaw):
 		results = set()
 		s_need, precondition = flaw.flaw
 
 		#antecedents - a set of stepnumbers
-		antecedents = GL.id_dict[precondition.replaced_ID]
+		antecedents = self.GL.id_dict[precondition.replaced_ID]
 		if len(antecedents) == 0:
 			return set()
 
@@ -185,26 +150,27 @@ class PlanSpacePlanner:
 			S_Need = Action.subgraph(new_plan, s_need)
 
 			#step 3-4 retarget precondition to be s_old effect
-			pre_link_sink = self.RetargetPrecondition(GL, new_plan, S_Old, precondition)
+			pre_link_sink = self.RetargetPrecondition(new_plan, S_Old, precondition)
 
 			#step 5 - add orderings, causal links, and create flaws
-			self.addStep(new_plan, S_Old.root, S_Need.root, pre_link_sink, GL, new=False)
+			self.addStep(new_plan, S_Old.root, S_Need.root, pre_link_sink, new=False)
 
 			#step 6 - add new plan to open list
 			results.add(new_plan)
 
 		return results
 
-	def RetargetPrecondition(self, GL, plan, S_Old, precondition):
-		effect_token = GL.getConsistentEffect(S_Old, precondition)
+	#@clock
+	def RetargetPrecondition(self, plan, S_Old, precondition):
+		effect_token = self.GL.getConsistentEffect(S_Old, precondition)
 		pre_link = plan.RemoveSubgraph(precondition)
-		#plan.assign(pre_link.sink, effect_token) #new
 		plan.edges.remove(pre_link)
 		pre_link.sink = effect_token
 		plan.edges.add(pre_link)
 		return pre_link.sink
 
-	def addStep(self, plan, s_add, s_need, condition, GL, new=None):
+	#@clock
+	def addStep(self, plan, s_add, s_need, condition, new=None):
 		"""
 			when a step is added/reused, 
 			add causal link and ordering edges (including to dummy steps)
@@ -227,12 +193,8 @@ class PlanSpacePlanner:
 
 		if new:
 			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
-				plan.flaws.insert(GL, plan, Flaw((s_add, prec.sink), 'opf'))
-			#if plan.name == 'disc':
-			#	plan.flaws.insert(GL, plan, Flaw(s_add.stepnumber, 'dcf'))
+				plan.flaws.insert(self.GL, plan, Flaw((s_add, prec.sink), 'opf'))
 
-		#Good time as ever to updatePlan
-		#plan.updatePlan()
 		return plan
 
 	#@clock
@@ -257,47 +219,25 @@ class PlanSpacePlanner:
 
 		return results
 
-
-	def generateChildren(self, plan, k, flaw):
-		#results = set()
-		if k == 0:
-			kplan = plan.S
-			other = plan.D
-			GL = self.story_GL
-		else:
-			kplan = plan.D
-			other = plan.S
-			GL = self.disc_GL
-
+	#@clock
+	def generateChildren(self, plan, flaw):
 		if flaw.name == 'opf':
-			results = self.reuse(kplan, flaw, GL)
-			results.update(self.newStep(kplan, flaw, GL))
+			results = self.reuse(plan, flaw)
+			results.update(self.newStep(plan, flaw))
 		elif flaw.name == 'tclf':
-			results = self.resolveThreatenedCausalLinkFlaw(kplan, flaw)
-		elif flaw.name == 'dcf':
-			print(GL[flaw.flaw].name)
-			story = other.deepcopy()
-			#if 116 in {s.stepnumber for s in plan.D.Steps}:
-			#	print('stop here for tests')
-			results = story.Unify(GL[flaw.flaw].ground_subplan.deepcopy(), self.story_GL)
-			print(len(results))
-			GL = self.story_GL
-			other = plan.D
+			results = self.resolveThreatenedCausalLinkFlaw(plan, flaw)
 		else:
 			raise ValueError('whose flaw is it anyway {}?'.format(flaw))
 
-		nBiPlans = set()
 		for result in results:
-			#print(len(result.Steps))
-			new_flaws = result.detectThreatenedCausalLinks(GL)
+			new_flaws = result.detectThreatenedCausalLinks(self.GL)
 			result.flaws.threats.update(new_flaws)
-			nBiPlans.add(BiPlan(result, other.deepcopy()))
 
-		return nBiPlans
+		return results
 
 
 	@clock
-	def POCL(self, num_plans = 5):
+	def POCL(self, num_plans=5):
 		Completed = []
 		visited = 0
 		#Visited = []
@@ -310,54 +250,29 @@ class PlanSpacePlanner:
 			visited+=1
 
 			if not plan.isInternallyConsistent():
-				#print('branch terminated')
 				continue
-			#print(plan)
-			# for step in topoSort(plan.D):
-			# 	print(Action.subgraph(plan.D, step))
-			#for step in topoSort(plan.S):
-			#	print(Action.subgraph(plan.S, step))
 
-			if plan.num_flaws() == 0:
-				print('story + disc solution found at {} nodes expanded and {} nodes visited'.format(visited,
-																								len(self.Open)+visited))
+
+			if len(plan.flaws) == 0:
+				print('solution found at {} nodes expanded and {} nodes visited'.format(visited,
+																						len(self.Open)+visited))
 				Completed.append(plan)
 				if len(Completed) == num_plans:
 					return Completed
 				continue
-			elif len(plan.S.flaws) == 0:
-				pass
-				#print('story solution found at {} nodes expanded and {} nodes visited'.format(visited,
-			# len(self.Open)+visited))
-			elif len(plan.D.flaws) == 0 and not plan.D.solved:
-				plan.D.solved = True
-				print('disc solution found at {} nodes expanded and {} nodes visited'.format(visited, len(self.Open)+visited))
-
-				for step in topoSort(plan.D):
-					print(Action.subgraph(plan.D, step))
-				print('\n')
-
-			#for step in plan.D.Steps:
-			#	if step.name != 'dummy_init' and step.name != 'dummy_goal':
-			#		print(step.name)
-
-			#print(plan.S)
-			#print(plan.S.flaws)
 
 			#Select Flaw
-			k, flaw = plan.next_flaw()
-			if k == 1:
-				print('{} selected : {}\n'.format(flaw.name, flaw))
+			#print(plan.flaws)
+			flaw = plan.flaws.next()
+			#print('{} selected : {}\n'.format(flaw.name, flaw))
 
 			#Add children to Open List
-			children = self.generateChildren(plan, k, flaw)
+			children = self.generateChildren(plan, flaw)
 
 			#print('generated children: {}'.format(len(children)))
 			for child in children:
 				self.Open.insert(child)
-
-			#print('open list number: {}'.format(len(self.Open)))
-		#	print('\n')
+			#print('open:', len(self.Open))
 
 
 def topoSort(graph):
@@ -384,14 +299,12 @@ class TestPlanner(unittest.TestCase):
 	def testArk(self):
 		domain_file = 'domains/ark-domain.pddl'
 		problem_file = 'domains/ark-problem.pddl'
-		operators, objects, initAction, goalAction = parseDomAndProb(domain_file, problem_file)
-		obtypes = Argument.object_types
-
+		operators, objects, obtypes, initAction, goalAction = parseDomAndProb(domain_file, problem_file)
 
 		print('preprocessing...')
 		preprocess=False
 		if preprocess:
-			GL = GLib(op_graphs, objects, obtypes, initAction, goalAction)
+			GL = GLib(operators, objects, obtypes, initAction, goalAction)
 			print(len(GL))
 		else:
 			try:
@@ -400,73 +313,21 @@ class TestPlanner(unittest.TestCase):
 				print(len(GL))
 			except:
 				print('could not reload')
-				GL = GLib(op_graphs, objects,obtypes, initAction, goalAction)
+				GL = GLib(operators, objects, obtypes, initAction, goalAction)
 
-		planner = PlanSpacePlanner(operators, objects, GL)
+		planner = PlanSpacePlanner(objects, GL)
 
-		n = 6
+		n = 1
 		print('\nRunning Story Planner on ark-domain and problem to find {} solutions'.format(n))
 
 		results = planner.POCL(n)
 		assert len(results) == n
 		for result in results:
 			print('\n')
-			print('Story')
-			for step in topoSort(S):
-				print(Action.subgraph(S, step))
-			print('Discourse')
-			for step in topoSort(D):
-				print(Action.subgraph(D, step))
+			for step in topoSort(result):
+				print(Action.subgraph(result, step))
 		print('\n\n')
 		pass
 
-
-
-	def testDecomp(self):
-		from GlobalContainer import GC
-
-		print('Reading ark-domain and ark-problem')
-		story = parseDomAndProb('domains/ark-domain.pddl', 'domains/ark-problem.pddl')
-		# (op_graphs, objects, GC.object_types, init, goal)
-
-		try:
-			SGL = reload('SGL')
-			GC.SGL = SGL
-		except:
-			SGL = GLib(*story)
-			GC.SGL = SGL
-
-		disc_domain = 'domains/ark-discourse-tests.pddl'
-		disc_problem = 'domains/ark-discourse-tests-problem.pddl'
-		print('Reading {} and {}'.format(disc_domain, disc_problem))
-		#disc = parseDomAndProb('domains/ark-requirements-domain.pddl', 'domains/ark-requirements-problem.pddl')
-		disc = parseDomAndProb(disc_domain, disc_problem)
-		# (op_graphs, objects, GC.object_types, init, goal)
-
-		try:
-			DGL = reload('DGL')
-			GC.DGL = DGL
-		except:
-			DGL = GLib(*disc, storyGL=SGL)
-			GC.DGL = DGL
-
-		bi = PlanSpacePlanner(story[1], SGL, disc[1], DGL)
-		results = bi.POCL(1)
-		for R in results:
-			S = R.S
-			D = R.D
-			print('\n')
-			print('Story')
-			for step in topoSort(S):
-				print(Action.subgraph(S, step))
-			print('Discourse')
-			for step in topoSort(D):
-				print(Action.subgraph(D, step))
-
-		print('\n\n')
-
 if __name__ ==  '__main__':
-	tp = TestPlanner()
-	tp.testDecomp()
-	#unittest.testDecomp()
-	#unittest.main()
+	unittest.main()

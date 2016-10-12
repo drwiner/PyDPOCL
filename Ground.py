@@ -35,40 +35,6 @@ def groundStoryList(operators, objects, obtypes):
 			gsteps.append(gstep)
 	return gsteps
 
-def groundDiscList(operators, SGL):
-	from Plannify import Plannify
-	#For each ground subplan in Subplans, make a copy of DO s.t. each
-	gsteps = []
-	stepnum = 0
-	for op in operators:
-		Subplans = Plannify(next(iter(op.subgraphs)), SGL)
-		for sp in Subplans:
-			GDO = copy.deepcopy(op)
-			for elm in sp.elements:
-				ex_elms = iter(op.elements)
-				assignStoryToDisc(GDO, sp, elm, ex_elms)
-			GDO.ground_subplan = sp
-			GDO.root.stepnumber = stepnum
-			GDO._replaceInternals()
-			stepnum+=1
-			gsteps.append(GDO)
-
-	return gsteps
-
-def assignStoryToDisc(GDO, SP, elm, ex_elms):
-	for ex_elm in ex_elms:
-		if elm.arg_name is None:
-			continue
-		if elm.arg_name != ex_elm.arg_name:
-			continue
-
-		EG = elm
-		if elm.typ in {'Action', 'Condition'}:
-			EG = eval(elm.typ).subgraph(SP, elm)
-
-		GDO.assign(ex_elm, EG)
-
-
 import pickle
 
 @clock
@@ -86,32 +52,20 @@ def reload(name):
 
 class GLib:
 
-	def __init__(self, operators, objects, obtypes, init_action, goal_action, storyGL=None):
+	def __init__(self, operators, objects, obtypes, init_action, goal_action):
 
+		self._gsteps = groundStoryList(operators, objects, obtypes)
 
-		if storyGL is not None:
-			self._gsteps = groundDiscList(operators, storyGL)
-			self.Goal_Actions = self.groundDiscGoal(goal_action)
-			self._gsteps.extend(self.Goal_Actions)
-			init_action.root.stepnumber = len(self._gsteps)
-			init_action.edges = set()
-			init_action.elements = {init_action.root}
-			#init_action._replaceInternals()
-			#for edge in init_action.edges:
-			self._gsteps.append(init_action)
-
-		else:
-			self._gsteps = groundStoryList(operators, objects, obtypes)
-			# init at [-2]
-			init_action.root.stepnumber = len(self._gsteps)
-			init_action._replaceInternals()
-			init_action.replaceInternals()
-			self._gsteps.append(init_action)
-			# goal at [-1]
-			goal_action.root.stepnumber = len(self._gsteps)
-			goal_action._replaceInternals()
-			goal_action.replaceInternals()
-			self._gsteps.append(goal_action)
+		# init at [-2]
+		init_action.root.stepnumber = len(self._gsteps)
+		init_action._replaceInternals()
+		init_action.replaceInternals()
+		self._gsteps.append(init_action)
+		# goal at [-1]
+		goal_action.root.stepnumber = len(self._gsteps)
+		goal_action._replaceInternals()
+		goal_action.replaceInternals()
+		self._gsteps.append(goal_action)
 
 		#dictionaries
 		self.initDicts()
@@ -121,10 +75,7 @@ class GLib:
 		print('{} ground steps created'.format(len(self)))
 
 		print('uploading')
-		if storyGL is not None:
-			upload(self, 'DGL')
-		else:
-			upload(self, 'SGL')
+		upload(self, 'SGL')
 
 
 	def initDicts(self):
@@ -182,32 +133,6 @@ class GLib:
 
 			if count > 0:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
-
-
-	def groundDiscGoal(self, goal_action):
-		discs = [elm for elm in goal_action.elements if isinstance(elm, Argument)]
-		if len(discs) == 0:
-			raise ValueError('no args in goal_actions?')
-
-		story_elms = {elm for elm in (dgl.elements for dgl in self) if isStoryElement(elm)}
-		Disc_Worlds = itertools.product(*[DiscToElm(i, elm, story_elms) for i, elm in enumerate(discs)])
-
-		stepnum = len(self)
-		goals = []
-		#Each DW is a list of tuples (0 = i, 1 = element)
-		for DW in Disc_Worlds:
-			GA = copy.deepcopy(goal_action)
-			#for each story element in goal action
-			for i, cndt_elm in DW:
-				disc_arg = discs[i]
-				GA.assign(disc_arg, cndt_elm)
-			GA.root.stepnumber = stepnum
-			stepnum+=1
-			GA.replaceInternals()
-			GA._replaceInternals()
-			goals.append(GA)
-
-		return goals
 
 
 	def getPotentialLinkConditions(self, src, snk):
@@ -270,44 +195,6 @@ class GLib:
 	def __repr__(self):
 		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
 
-
-def DiscToElm(i, disc_arg, story_elms):
-	return findCandidates(arg_to_elm(i,disc_arg), i, story_elms)
-
-
-def findCandidates(element, i, story_elms):
-	cndts = []
-	prior = []
-	for elm in story_elms:
-		if elm.isConsistent(element):
-			if isinstance(elm, ElementGraph):
-				k = (elm.root.name, elm.Args)
-				if k not in prior:
-					prior.append(k)
-					cndts.append((i,elm))
-			else:
-				if elm.name not in prior:
-					prior.append(elm.name)
-					cndts.append((i,elm))
-	return cndts
-
-
-def arg_to_elm(i, arg):
-	if arg.typ == 'character' or arg.typ == 'actor':
-		elm = Actor(ID=uid(i), name=arg.name, typ='character', arg_name=arg.arg_name)
-	elif arg.typ == 'arg' or arg.typ == 'item' or arg.typ == 'place':
-		elm = Argument(ID=uid(i), name=arg.name, typ=arg.typ, arg_name=arg.arg_name)
-	elif arg.typ == 'step':
-		elm = Operator(ID=uid(i), name=arg.name, typ='Action', arg_name=arg.arg_name)
-	elif arg.typ == 'literal' or arg.typ == 'lit':
-		elm = Literal(ID=uid(i), name=arg.name, typ='Condition', arg_name=arg.arg_name)
-	else:
-		raise ValueError('whose typ is this anyway? {}'.format(arg.typ))
-	return elm
-
-
-def isStoryElement(elm):
-	return isinstance(elm, ElementGraph) or isinstance(elm, Argument)
 
 from pddlToGraphs import parseDomAndProb
 from Flaws import FlawLib

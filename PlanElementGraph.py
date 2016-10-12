@@ -97,21 +97,6 @@ class Action(ElementGraph):
 			new_self.replaceInternals()
 		return new_self
 
-				#elm.ID = elm.replaced_ID
-				#elm.ID = uid(self.root.stepnumber)
-
-		
-	# '''for debugging'''
-	# def getConditions(self):
-		# pres = {edge for edge in self.edges if edge.label == 'precond-of'}
-		# effs = {edge for edge in self.edges if edge.label == 'effect-of'}
-		# print('Preconditions:\n')
-		# for pre in pres:
-			# pre.sink
-		# print('Effects:\n')
-		# for eff in effs:
-			# eff.sink
-
 	def isConsistent(self, other):
 		""" an action is consistent just when one can absolve the other"""
 		if isinstance(other, ElementGraph):
@@ -337,7 +322,7 @@ class PlanElementGraph(ElementGraph):
 					v = visited[ante]
 				else:
 					visited[ante] = 1000
-					v = self.relaxedStep(GL, GL[ante],visited)
+					v = self.relaxedStep(GL, GL[ante], visited)
 					visited[ante] = v
 				if v < least:
 					least = v
@@ -368,9 +353,7 @@ class PlanElementGraph(ElementGraph):
 		"""
 		try:
 			from GlobalContainer import GC
-			if self.name == 'story':
-				return self.calculateHeuristic(GC.SGL)
-			return self.calculateHeuristic(GC.DGL)
+			return self.calculateHeuristic(GC.SGL)
 		except:
 			return 0
 
@@ -381,10 +364,10 @@ class PlanElementGraph(ElementGraph):
 
 	@property
 	def cost(self):
-		#if not hasattr(self, 'Steps'):
-			#self.updatePlan()
+
 		return len(self.Steps) - 2
 
+	#@clock
 	def isInternallyConsistent(self):
 		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent() and \
 			   super(PlanElementGraph, self).isInternallyConsistent()
@@ -393,10 +376,9 @@ class PlanElementGraph(ElementGraph):
 	def Steps(self):
 		return [element for element in self.elements if type(element) is Operator]
 
-	@property
-	def Step_Graphs(self):
-		return [Action.subgraph(self, step) for step in self.Steps]
-
+	#@property
+	#def Step_Graphs(self):
+#		return [Action.subgraph(self, step) for step in self.Steps]
 
 	#@clock
 	def detectThreatenedCausalLinks(self, GL):
