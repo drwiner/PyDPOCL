@@ -415,6 +415,11 @@ def problemToGraphs(problem):
 		Keys: 'arg', 'init', 'goal'
 		Values: arg dictionary, (elements, edges), (elements, edges)
 	"""
+
+	if len(problem.elements) > 0:
+		for elm in problem.elements:
+			pass
+
 	Args = {object.name: Argument(ID=uid(1),name=object.name, typ=object.typeName) for object in problem.objects if
 			not object.typeName.lower() in {'character', 'actor'}}
 	Args.update({object.name: Actor(ID = uid(1), name=object.name, typ='character') for object in problem.objects if

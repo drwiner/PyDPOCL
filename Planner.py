@@ -436,9 +436,11 @@ class TestPlanner(unittest.TestCase):
 			SGL = GLib(*story)
 			GC.SGL = SGL
 
-		print('Reading ark-requirements-domain and ark-requirements-problem')
+		disc_domain = 'domains/ark-discourse-tests.pddl'
+		disc_problem = 'domains/ark-discourse-tests-problem.pddl'
+		print('Reading {} and {}'.format(disc_domain, disc_problem))
 		#disc = parseDomAndProb('domains/ark-requirements-domain.pddl', 'domains/ark-requirements-problem.pddl')
-		disc = parseDomAndProb('domains/ark-discourse-tests.pddl', 'domains/ark-discourse-tests-problem.pddl')
+		disc = parseDomAndProb(disc_domain, disc_problem)
 		# (op_graphs, objects, GC.object_types, init, goal)
 
 		try:
