@@ -148,7 +148,7 @@ class Condition(ElementGraph):
 		
 class PlanElementGraph(ElementGraph):
 
-	GL = None
+	#GL = None
 
 	def __init__(self, ID, type_graph=None, name=None, Elements=None, plan_elm=None, Edges=None, Restrictions=None):
 				
@@ -173,100 +173,6 @@ class PlanElementGraph(ElementGraph):
 			plan_elm = PlanElement(uid=ID, typ=type_graph, name=name)
 									
 		super(PlanElementGraph,self).__init__(ID, type_graph, name, Elements, plan_elm, Edges, Restrictions)
-
-
-	@classmethod
-	def Actions_2_Plan(cls, Actions):
-		# Used by Plannify
-
-		elements = set().union(*[A.elements for A in Actions])
-		edges = set().union(*[A.edges for A in Actions])
-		Plan = cls(uid(2), name='Action_2_Plan', Elements=elements, Edges=edges)
-		for edge in Plan.edges:
-			if edge.label == 'effect-of':
-				elm = Plan.getElementById(edge.sink.ID)
-				elm.replaced_ID = edge.sink.replaced_ID
-
-		Plan.OrderingGraph = OrderingGraph(ID=uid(5))
-		Plan.CausalLinkGraph = CausalLinkGraph(ID=uid(6))
-		#Plan.Steps = [A.root for A in Actions]
-		return Plan
-
-	def UnifyActions(self, P, G):
-		#Used by Plannify
-
-		NG = G.deepcopy(replace_internals=True)
-		for edge in NG.edges:
-
-			if edge.sink.replaced_ID == -1:
-				sink = copy.deepcopy(edge.sink)
-				sink.replaced_ID = edge.sink.ID
-				self.elements.add(sink)
-			else:
-				sink = P.getElmByRID(edge.sink.replaced_ID)
-				if sink is None:
-					sink = copy.deepcopy(edge.sink)
-					self.elements.add(sink)
-
-			source = P.getElmByRID(edge.source.replaced_ID)
-			if source is None:
-				source = copy.deepcopy(edge.source)
-				self.elements.add(source)
-
-			self.edges.add(Edge(source, sink, edge.label))
-
-	@clock
-	def Unify(self, other, GL):
-		from Plannify import ReuseLib
-		OSteps = other.Steps
-		SSteps = self.Steps
-
-		Uni_Libs = [ReuseLib(i, s_add, SSteps) for i, s_add in enumerate(OSteps)]
-		Uni_Worlds = itertools.product(*Uni_Libs)
-
-		New_Plans = set()
-		for UW in Uni_Worlds:
-			new_plan = self.deepcopy()
-			for step in UW:
-				if step not in SSteps:
-					S_new = Action.subgraph(other, step).deepcopy()
-					S_new.root.arg_name = step.stepnumber
-					#move pieces
-					new_plan.elements.update(S_new.elements)
-					new_plan.edges.update(S_new.edges)
-					#place in order
-					new_plan.OrderingGraph.addEdge(new_plan.initial_dummy_step, S_new.root)
-					new_plan.OrderingGraph.addEdge(S_new.root, new_plan.final_dummy_step)
-
-			for ord in other.OrderingGraph.edges:
-				new_plan.OrderingGraph.addEdge(UW[ord.source.position], UW[ord.sink.position])
-
-			for link in other.CausalLinkGraph.edges:
-				Source = Action.subgraph(new_plan, UW[link.source.position])
-				new_d = Source.getElmByRID(link.label.replaced_ID)
-				if new_d is None:
-					Sink = Action.subgraph(new_plan, UW[link.sink.position])
-					new_d = Sink.getElmByRID(link.label.replaced_ID)
-					if new_d is None:
-						raise ValueError('here')
-				new_plan.CausalLinkGraph.addEdge(UW[link.source.position], UW[link.sink.position], new_d)
-
-			for step in UW:
-				Step = Action.subgraph(new_plan, step)
-				for pre in Step.preconditions:
-					cndts = {edge for edge in new_plan.edges if isinstance(edge.source, Operator) and edge.sink == pre}
-					if len(cndts) == 0:
-						raise ValueError('wait, no edge for this preconditon? impossible!')
-					if len(cndts) < 2:
-						new_plan.flaws.insert(GL, new_plan, Flaw((step, pre), 'opf'))
-
-			for step in UW:
-				if step in OSteps:
-					new_plan.flaws.addCndtsAndRisks(GL, UW[step.position])
-			if new_plan.isInternallyConsistent():
-				New_Plans.add(new_plan)
-
-		return New_Plans
 
 	def __lt__(self, other):
 		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
@@ -376,9 +282,9 @@ class PlanElementGraph(ElementGraph):
 	def Steps(self):
 		return [element for element in self.elements if type(element) is Operator]
 
-	#@property
-	#def Step_Graphs(self):
-#		return [Action.subgraph(self, step) for step in self.Steps]
+	@property
+	def Step_Graphs(self):
+		return [Action.subgraph(self, step) for step in self.Steps]
 
 	#@clock
 	def detectThreatenedCausalLinks(self, GL):
@@ -423,61 +329,7 @@ class PlanElementGraph(ElementGraph):
 
 	def __repr__(self):
 		c = '\ncost {} + heuristic {}'.format(self.cost, self.heuristic)
-		steps =  str([Action.subgraph(self, step) for step in self.Steps])
+		steps =  str(self.Step_Graphs)
 		orderings = self.OrderingGraph.__repr__()
 		links = self.CausalLinkGraph.__repr__()
 		return 'PLAN: ' + str(self.ID) + c + '\n*Steps: \n{' + steps + '}\n *Orderings:\n {' + orderings + '}\n ' '*CausalLinks:\n {' + links + '}'
-
-class BiPlan:
-	""" A container class for story and discourse plans, so they behave as a single plan. A tuple with functionality """
-	weight = 1
-	def __init__(self, Story, Disc):
-		self.insert(Story)
-		self.insert(Disc)
-
-	def isInternallyConsistent(self):
-		return self.S.isInternallyConsistent() and self.D.isInternallyConsistent()
-
-	def deepcopy(self):
-		new_self = copy.deepcopy(self)
-		new_self.S.ID = uid(21)
-		new_self.D.ID = uid(22)
-		return new_self
-
-	@property
-	def heuristic(self):
-		return self.S.heuristic + self.weight*self.D.heuristic
-
-	@property
-	def cost(self):
-		return self.S.cost + self.weight*self.D.cost
-
-	def __lt__(self, other):
-		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
-
-	def num_flaws(self):
-		return len(self.S.flaws) + len(self.D.flaws)
-
-	def next_flaw(self):
-		try:
-			if len(self.D.flaws.statics) > 0:
-				return 1, self.D.flaws.next()
-			#elif len(self.S.flaws.statics) > 0:
-			#	return 0, self.S.flaws.next()
-			#elif len(self.S.flaws.inits) > 0:
-			#	return 0, self.S.flaws.next()
-			elif len(self.D.flaws) > 0:
-				return 1, self.D.flaws.next()
-			#else:
-			#	return 0, self.S.flaws.next()
-		except:
-			raise ValueError("shouldn't get here if no more flaws")
-
-	def insert(self, kplan):
-		if kplan.name == 'story':
-			self.S = kplan
-		else:
-			self.D = kplan
-
-	def __repr__(self):
-		return self.S.__repr__() + self.D.__repr__()

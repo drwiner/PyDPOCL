@@ -79,7 +79,7 @@ class PlanSpacePlanner:
 		return s_init_plan
 
 
-	@clock
+	#@clock
 	def newStep(self, plan, flaw):
 		"""
 		@param plan:
@@ -314,7 +314,8 @@ class TestPlanner(unittest.TestCase):
 			except:
 				print('could not reload')
 				GL = GLib(operators, objects, obtypes, initAction, goalAction)
-
+		from GlobalContainer import GC
+		GC.SGL = GL
 		planner = PlanSpacePlanner(objects, GL)
 
 		n = 1
