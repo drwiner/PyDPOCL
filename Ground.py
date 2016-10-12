@@ -189,7 +189,7 @@ class GLib:
 		if len(discs) == 0:
 			raise ValueError('no args in goal_actions?')
 
-		story_elms = {elm for dgl in self for elm in dgl.elements if isStoryElement(elm)}
+		story_elms = {elm for elm in (dgl.elements for dgl in self) if isStoryElement(elm)}
 		Disc_Worlds = itertools.product(*[DiscToElm(i, elm, story_elms) for i, elm in enumerate(discs)])
 
 		stepnum = len(self)
