@@ -313,7 +313,7 @@ class DomainDef(Visitable):
 class ProblemDef(Visitable):
 	"""This class represents the AST node for a pddl domain."""
 
-	def __init__(self, name, domainName, objects=None, init=None, goal=None):
+	def __init__(self, name, domainName, objects=None, elements=None, init=None, goal=None):
 		""" Construct a new Problem AST node.
 
 			Keyword arguments:
@@ -327,6 +327,10 @@ class ProblemDef(Visitable):
 		self.name = name
 		self.domainName = domainName
 		self.objects = objects
+		self.elements = elements
+		if elements is None:
+			self.elements = []
+
 		self.init = init
 		self.goal = goal
 
@@ -370,6 +374,11 @@ class GoalStmt(Visitable):
 		predicates -- a list of predicates denoting the goal codition
 		"""
 		self._visitorName = 'visit_goal_stmt'
+		self.formula = formula
+
+class ElmStmt(Visitable):
+	def __init__(self, formula):
+		self._visitorName = 'visit_elm_stmt'
 		self.formula = formula
 
 ###
@@ -827,16 +836,27 @@ def parse_problem_def(iter):
 	# parse problem name and corresponding domain name
 	probname = parse_problem_name(next(iter))
 	dom = parse_problem_domain_stmt(next(iter))
+	problem = ProblemDef(probname, dom.name)
+
 	# parse all object definitions
 	objects = dict()
 	if iter.peek_tag() == ':objects':
 		objects = parse_objects_stmt(next(iter))
+		problem.objects = objects
+
+	while iter.peek_tag() == ':element':
+		elm = parse_element_stmt(next(iter))
+		problem.elements.append(elm)
+
 	init = parse_init_stmt(next(iter))
+	problem.init = init
+
 	goal = parse_goal_stmt(next(iter))
+	problem.goal = goal
 	# assert end is reached
 	iter.match_end()
 	# create new ProblemDef instance
-	return ProblemDef(probname, dom.name, objects, init, goal)
+	return problem
 
 
 def parse_init_stmt(iter):
@@ -865,6 +885,12 @@ def parse_goal_stmt(iter):
 		raise ValueError('Error found invalid keyword when parsing GoalStmt')
 	f = parse_formula(next(iter))
 	return GoalStmt(f)
+
+def parse_element_stmt(iter):
+	if not iter.try_match(':element'):
+		raise ValueError('Error found invalid keyword when parsing Element Stmt')
+	f = parse_formula(next(iter))
+	return ElmStmt(f)
 
 
 class Parser(object):
