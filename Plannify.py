@@ -264,8 +264,6 @@ class ReuseLib:
 				self._cndts.append(old_step)
 		s_add.position = i
 		self._cndts.append(s_add)
-		#self._cndts = [(i,old_step) for old_step in Old_Steps if old_step.stepnumber == s_add.stepnumber]
-		#elf._cndts.append((i, s_add))
 
 	def __len__(self):
 		return len(self._cndts)

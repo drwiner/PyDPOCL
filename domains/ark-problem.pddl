@@ -14,9 +14,6 @@
          (at nazis tanis)
          (has nazis gun))
   (:goal (and
-              (at army usa)
-             ; (has army ark)
-             ; (not (alive usa))
-              ;(not (alive indiana))
               (not (alive nazis))
+              (has army ark)
               )))
