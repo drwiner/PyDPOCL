@@ -1,8 +1,6 @@
 from OrderingGraph import OrderingGraph, CausalLinkGraph
 from Flaws import Flaw, FlawLib
 from uuid import uuid4
-import itertools
-from clockdeco import clock
 from Element import Argument, Element, Operator, Literal
 from Graph import Edge
 from ElementGraph import ElementGraph
@@ -165,10 +163,7 @@ class Condition(ElementGraph):
 		return len({arg for arg in self.Args if not arg.name is None})
 
 	def __repr__(self):
-		# self.updateArgs()
 		args = str([arg.__repr__() for arg in self.Args])
-		# args = str([' {}-{} '.format(arg.name, arg.typ) for arg in self.Args
-		#			if type(arg) is Argument else arg.__repr__()
 		return '{}-{}{}'.format(self.root.truth, self.root.name, self.typ) + args
 
 

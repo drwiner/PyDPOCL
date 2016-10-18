@@ -243,6 +243,9 @@ class PlanSpacePlanner:
 		else:
 			raise ValueError('whose flaw is it anyway {}?'.format(flaw))
 
+		if len(results) == 0:
+			print(flaw)
+
 		for result in results:
 			new_flaws = result.detectThreatenedCausalLinks(self.GL)
 			result.flaws.threats.update(new_flaws)
