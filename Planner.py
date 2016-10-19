@@ -289,7 +289,10 @@ class PlanSpacePlanner:
 
 			#Select Flaw
 			flaw = plan.flaws.next()
-			print('{} selected : {}\n'.format(flaw.name, flaw))
+			#print('{} selected : {}\n'.format(flaw.name, flaw))
+			#if flaw.name == 'tclf':
+			#	print('{} selected : {}\n'.format(flaw.name, flaw))
+				#print(plan.flaws)
 
 			#Add children to Open List
 			children = self.generateChildren(plan, flaw)

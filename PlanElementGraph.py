@@ -1,5 +1,5 @@
 from OrderingGraph import OrderingGraph, CausalLinkGraph
-from Flaws import Flaw, FlawLib
+from Flaws import Flaw, FlawLib, TCLF
 from uuid import uuid4
 from Element import Argument, Element, Operator, Literal
 from Graph import Edge
@@ -410,7 +410,7 @@ class PlanElementGraph(ElementGraph):
 					nonThreats[causal_link].add(step)
 					continue
 
-				detectedThreatenedCausalLinks.add(Flaw((step, causal_link), 'tclf'))
+				detectedThreatenedCausalLinks.add(TCLF((step, causal_link), 'tclf'))
 			# nonThreats[causal_link].add(step)
 
 		return detectedThreatenedCausalLinks

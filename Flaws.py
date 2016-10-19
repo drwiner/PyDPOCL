@@ -47,6 +47,19 @@ class Flaw:
 	def __repr__(self):
 		return 'Flaw({}, h={}, criteria={}, tb={})'.format(self.flaw, self.heuristic, self.criteria, self.tiebreaker)
 
+class TCLF(Flaw):
+	def __init__(self, f, name):
+		super(TCLF, self).__init__(f, name)
+		self.threat = self.flaw[0]
+		self.link = self.flaw[1]
+		self.criteria = self.threat.stepnumber
+		self.tiebreaker = hash(self.link.label.replaced_ID) + self.link.sink.stepnumber
+
+	def __hash__(self):
+		return hash(self.threat.stepnumber) ^ hash(self.link.source.stepnumber) ^ hash(self.link.sink.stepnumber) ^ \
+			   hash(self.link.label.replaced_ID)
+
+
 class Flawque:
 	""" A deque which pretends to be a set, and keeps everything sorted"""
 
