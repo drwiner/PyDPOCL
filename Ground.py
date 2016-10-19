@@ -1,12 +1,13 @@
 
 import itertools
 import copy
+import pickle
 from collections import namedtuple, defaultdict
 from PlanElementGraph import Condition, Action
 from clockdeco import clock
-from uuid import uuid1 as uid
+from Plannify import Plannify
 from Element import Argument, Actor, Operator, Literal
-from ElementGraph import ElementGraph
+from pddlToGraphs import parseDomAndProb
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
 Antestep = namedtuple('Antestep', 'action eff_link')
@@ -30,12 +31,46 @@ def groundStoryList(operators, objects, obtypes):
 			gstep._replaceInternals()
 			gstep.root.stepnumber = stepnum
 			gstep.root.arg_name = stepnum
-			stepnum+=1
+			stepnum += 1
 			gstep.replaceArgs(t)
 			gsteps.append(gstep)
 	return gsteps
 
-import pickle
+def groundDecompStepList(operators, GL, stepnum=0):
+
+	#For each ground subplan in Subplans, make a copy of DO s.t. each
+	gsteps = []
+	for op in operators:
+		Subplans = Plannify(next(iter(op.subgraphs)), GL)
+		for sp in Subplans:
+			GDO = copy.deepcopy(op)
+			for elm in sp.elements:
+				ex_elms = list(op.elements)
+				assignElmToContainer(GDO, sp, elm, ex_elms)
+			GDO.ground_subplan = sp
+			GDO.root.stepnumber = stepnum
+			GDO._replaceInternals()
+			stepnum += 1
+			gsteps.append(GDO)
+
+	return gsteps
+
+def assignElmToContainer(GDO, SP, elm, ex_elms):
+	for ex_elm in ex_elms:
+		if ex_elm.arg_name is None:
+			continue
+		if elm.arg_name != ex_elm.arg_name:
+			if isinstance(elm, Argument):
+				if elm.name != ex_elm.name:
+					continue
+			else:
+				continue
+
+		EG = elm
+		if elm.typ in {'Action', 'Condition'}:
+			EG = eval(elm.typ).subgraph(SP, elm)
+
+		GDO.assign(ex_elm, EG)
 
 @clock
 def upload(GL, name):
@@ -52,9 +87,11 @@ def reload(name):
 
 class GLib:
 
-	def __init__(self, operators, objects, obtypes, init_action, goal_action):
+	def __init__(self, domain, problem):
+		operators, dops, objects, obtypes, init_action, goal_action = parseDomAndProb(domain, problem)
 
-		self._gsteps = groundStoryList(operators, objects, obtypes)
+		self.objects = objects
+		self._gsteps = groundStoryList(operators, obtypes)
 
 		# init at [-2]
 		init_action.root.stepnumber = len(self._gsteps)
@@ -69,14 +106,23 @@ class GLib:
 
 		#dictionaries
 		self.initDicts()
-
-		#load dictionaries
 		self.loadAll()
+
+		#The consequence of putting this here is that these decomp operators will not be preconditions to steps at
+		# lower levels of hierarchy... but this is a good thing?
+		D =  groundDecompStepList(dops, self, stepnum=len(self._gsteps))
+		self.loadPartition(D)
+		self._gsteps[-2:] = D
+
+		# init at [-2] second time
+		self._gsteps.append(init_action)
+		# goal at [-1] second time
+		self._gsteps.append(goal_action)
+
 		print('{} ground steps created'.format(len(self)))
-
 		print('uploading')
-		upload(self, 'SGL')
 
+		upload(self, domain + problem)
 
 	def initDicts(self):
 		self.pre_dict = defaultdict(set)
@@ -85,19 +131,22 @@ class GLib:
 		self.eff_dict = defaultdict(set)
 		self.threat_dict = defaultdict(set)
 
+	def loadAll(self, consequents):
+		self.load(consequents, consequents)
 
-	def loadAll(self):
-		for _step in self._gsteps:
-			#print('preprocessing step {}....'.format(_step))
-			pre_tokens = _step.preconditions
-			for _pre in pre_tokens:
-				#print('preprocessing precondition {} of step {}....'.format(_pre, _step))
-				self.loadAnteSteps(_step, _pre)
+	def loadPartition(self, doperators):
+		self.load(doperators, self._gsteps)
+		self.load(self._gsteps, doperators)
 
-	def loadAnteSteps(self, _step, _pre):
+	def load(self, antecedents, consequents):
+		for ante in antecedents:
+			for pre in ante.preconditions:
+				self._loadAntecedentPerConsequent(consequents, ante, pre)
+
+	def _loadAntecedantsPerConsequent(self, antecedents, _step, _pre):
 		Precondition = Condition.subgraph(_step, _pre)
-		#if _step.stepnumber
-		for gstep in self._gsteps:
+		# if _step.stepnumber
+		for gstep in antecedents:
 			# Defense pattern
 			count = 0
 			for _eff in gstep.effects:
@@ -115,9 +164,8 @@ class GLib:
 					self.threat_dict[_step.stepnumber].add(gstep.stepnumber)
 					continue
 
-
 				# Defense 3
-				Effect = Condition.subgraph(gstep,_eff)
+				Effect = Condition.subgraph(gstep, _eff)
 				if Effect.Args != Precondition.Args:
 					continue
 
@@ -133,7 +181,6 @@ class GLib:
 
 			if count > 0:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
-
 
 	def getPotentialLinkConditions(self, src, snk):
 		from Graph import Edge
@@ -196,7 +243,6 @@ class GLib:
 		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
 
 
-from pddlToGraphs import parseDomAndProb
 from Flaws import FlawLib
 
 

@@ -27,22 +27,6 @@ def Plannify(RQ, GL):
 	print('...returning consistent plans')
 	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
 
-@clock
-def Unify(U, V, B = None):
-	if B is None:
-		B = set()
-	#Create library of possible U-steps to reuse steps in V
-	Reuse = [[u for u in U.Steps if u.stepnumber == v.stepnumber].append(v) for v in V.Steps]
-
-	#Create step lists where either "u" is reused to unify with "v" or "v" is added
-	Worlds = itertools.product(*Reuse)
-
-	#Create new U-Plans to Integrate V info (links and orderings) or add v-steps not reused (or both)
-	Plans = [U.Integrate(W, V) for W in Worlds]
-
-	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
-
-
 def partialUnify(PS, _map):
 	if _map is False:
 		return False
@@ -145,7 +129,7 @@ def Groundify(Planets, GL, has_links):
 
 	Discovered_Planets = []
 	for Plan in Planets:
-		Libs = [LinkLib(i,link,GL) for i, link in enumerate(Plan.CausalLinkGraph.edges)]
+		Libs = [LinkLib(i, link, GL) for i, link in enumerate(Plan.CausalLinkGraph.edges)]
 
 		#LW = [plan1 [link1.condition, link2.condition,..., link-n.condition],
 			#  plan2 [link1.condition, link2.condition, ..., link-m.condition],
@@ -212,11 +196,7 @@ class ActionLib:
 		return item in self._cndts
 
 	def __repr__(self):
-
 		return self.RS.__repr__()
-
-
-
 
 class LinkLib:
 
@@ -251,7 +231,6 @@ class LinkLib:
 
 	def __repr__(self):
 		return '{}-- link-pos {} --> {}'.format(self.source, self.position, self.sink)
-
 
 class ReuseLib:
 	def __init__(self, i, s_add, Old_Steps):

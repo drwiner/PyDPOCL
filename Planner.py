@@ -41,11 +41,11 @@ class Frontier:
 
 class PlanSpacePlanner:
 
-	def __init__(self, story_objs, story_GL):
+	def __init__(self, GL):
 		#Assumes these parameters are already read from file
 
-		self.objects = story_objs
-		self.GL = story_GL
+		self.objects = GL.objects
+		self.GL = GL
 
 		SP = self.setup('story')
 		self._frontier = Frontier()
@@ -322,21 +322,21 @@ class TestPlanner(unittest.TestCase):
 	def testPlanner(self):
 		from GlobalContainer import GC
 
-		story_domain = 'domains/ark-domain.pddl'
-		story_problem = 'domains/ark-problem.pddl'
+		domain = 'domains/ark-domain-decomp.pddl'
+		problem = 'domains/ark-problem-decomp.pddl'
 
-		print('Reading {} and {}'.format(story_domain, story_problem))
-		story = parseDomAndProb(story_domain, story_problem)
+		print('Reading {} and {}'.format(domain, problem))
+
 		# (op_graphs, objects, GC.object_types, init, goal)
 
 		try:
-			SGL = reload('SGL')
+			SGL = reload(domain + problem)
 			GC.SGL = SGL
 		except:
-			SGL = GLib(*story)
+			SGL = GLib(domain, problem)
 			GC.SGL = SGL
 
-		pypocl = PlanSpacePlanner(story[1], SGL)
+		pypocl = PlanSpacePlanner(SGL)
 		results = pypocl.POCL(1)
 		for R in results:
 			print(R)

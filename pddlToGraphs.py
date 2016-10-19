@@ -300,6 +300,7 @@ def evalActionParams(params, op_graph):
 @clock
 def domainToOperatorGraphs(domain):
 	opGraphs = set()
+	dopGraphs = set()
 	for action in domain.actions:
 		op = Operator(name=action.name, num_args=len(action.parameters))
 		op_graph = Action(name=action.name, root_element=op)
@@ -322,8 +323,9 @@ def domainToOperatorGraphs(domain):
 						continue
 					if d_elm.arg_name == step_elm.arg_name:
 						op_graph.assign(step_elm, d_elm)
-
-		opGraphs.add(op_graph)
+			dopGraphs.add(op_graph)
+		else:
+			opGraphs.add(op_graph)
 	return opGraphs
 
 
@@ -424,17 +426,20 @@ def parseDomAndProb(domain_file, problem_file):
 	addNegativeInitStates(domain.predicates.predicates, init, objects)
 
 	domainAxiomsToGraphs(domain)
-	Operators = domainToOperatorGraphs(domain)
+	Operators, DOperators = domainToOperatorGraphs(domain)
 
-	for op in Operators:
-		for eff in op.effects:
-			FlawLib.non_static_preds.add((eff.name, eff.truth))
+	addStatics(Operators)
+	addStatics(DOperators)
 
 	from GlobalContainer import GC
 	GC.object_types.update(obTypesDict(domain.types))
 
-	return Operators, objects, GC.object_types, init, goal
+	return Operators, DOperators, objects, GC.object_types, init, goal
 
+def addStatics(operators):
+	for op in operators:
+		for eff in op.effects:
+			FlawLib.non_static_preds.add((eff.name, eff.truth))
 
 def obTypesDict(object_types):
 	obtypes = defaultdict(set)

@@ -27,6 +27,7 @@ class Action(ElementGraph):
 			Elements = {root_element}
 
 		self.nonequals = set()
+		self.is_decomp = False
 
 		super(Action, self).__init__(ID, type_graph, name, Elements, root_element, Edges)
 
