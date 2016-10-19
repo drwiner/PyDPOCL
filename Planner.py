@@ -1,5 +1,5 @@
 from pddlToGraphs import parseDomAndProb
-from PlanElementGraph import PlanElementGraph, Action
+from PlanElementGraph import PlanElementGraph, Action, Condition
 from Flaws import Flaw
 from heapq import heappush, heappop
 from clockdeco import clock
@@ -31,6 +31,13 @@ class Frontier:
 		for item in itera:
 			self.insert(item)
 
+	def __repr__(self):
+		k = str('\nfrontier plans\n')
+		for plan in self._frontier:
+			k += '\n' + str(plan.ID) + ' ' + str(plan.cost) + ' ' + str(plan.heuristic) + ' ' + str(plan.Step_Graphs)
+		#k1 = str('plan ID={}, ')
+		return k
+		#return str([plan.__repr__() for plan in self])
 
 class PlanSpacePlanner:
 
@@ -80,7 +87,7 @@ class PlanSpacePlanner:
 		s_init_plan.OrderingGraph.addOrdering(s_init.root, s_goal.root)
 
 		#Add initial Open precondition flaws for dummy step
-		init_flaws = (Flaw((s_goal.root, prec), 'opf') for prec in s_goal.preconditions)
+		init_flaws = (Flaw((s_goal.root, Condition.subgraph(s_goal, prec)), 'opf') for prec in s_goal.preconditions)
 		for flaw in init_flaws:
 			s_init_plan.flaws.insert(self.GL, s_init_plan, flaw)
 		return s_init_plan
@@ -96,6 +103,7 @@ class PlanSpacePlanner:
 
 		results = set()
 		s_need, precondition = flaw.flaw
+		precondition = precondition.root
 
 		antecedents = self.GL.pre_dict[precondition.replaced_ID]
 
@@ -137,6 +145,7 @@ class PlanSpacePlanner:
 	def reuse(self, plan, flaw):
 		results = set()
 		s_need, precondition = flaw.flaw
+		precondition = precondition.root
 
 		#antecedents - a set of stepnumbers
 		antecedents = self.GL.id_dict[precondition.replaced_ID]
@@ -204,7 +213,7 @@ class PlanSpacePlanner:
 
 		if new:
 			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
-				plan.flaws.insert(self.GL, plan, Flaw((s_add, prec.sink), 'opf'))
+				plan.flaws.insert(self.GL, plan, Flaw((s_add, Condition.subgraph(plan, prec.sink)), 'opf'))
 
 		return plan
 
@@ -232,7 +241,6 @@ class PlanSpacePlanner:
 
 		return results
 
-
 	def generateChildren(self, plan, flaw):
 
 		if flaw.name == 'opf':
@@ -243,8 +251,8 @@ class PlanSpacePlanner:
 		else:
 			raise ValueError('whose flaw is it anyway {}?'.format(flaw))
 
-		if len(results) == 0:
-			print(flaw)
+		#if len(results) == 0:
+		#	print(flaw)
 
 		for result in results:
 			new_flaws = result.detectThreatenedCausalLinks(self.GL)
@@ -261,7 +269,11 @@ class PlanSpacePlanner:
 		while len(self) > 0:
 
 			#Select child
+			#print(self._frontier)
+
 			plan = self.pop()
+			#print('\n selecting plan: {}'.format(plan))
+			#print(plan.flaws)
 
 			visited += 1
 
@@ -277,7 +289,6 @@ class PlanSpacePlanner:
 				for step in topoSort(plan):
 					print(Action.subgraph(plan, step))
 				continue
-
 
 			#Select Flaw
 			flaw = plan.flaws.next()
@@ -326,7 +337,7 @@ class TestPlanner(unittest.TestCase):
 			GC.SGL = SGL
 
 		pypocl = PlanSpacePlanner(story[1], SGL)
-		results = pypocl.POCL(5)
+		results = pypocl.POCL(1)
 		for R in results:
 			print(R)
 			for step in topoSort(R):

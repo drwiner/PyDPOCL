@@ -1,6 +1,7 @@
 #from pddlToGraphs import *
 import collections
 import bisect
+from uuid import uuid1, uuid4
 from Graph import isConsistentEdgeSet
 
 import itertools
@@ -12,9 +13,9 @@ from clockdeco import clock
 """
 
 class Flaw:
-	def __init__(self, tuple, name):
+	def __init__(self, f, name):
 		self.name = name
-		self.flaw = tuple
+		self.flaw = f
 		self.cndts = 0
 		self.risks = 0
 		self.criteria = self.cndts
@@ -39,25 +40,37 @@ class Flaw:
 
 		return self
 
-		
-	def __repr__(self):
-		return 'Flaw({}, h={}'.format(self.flaw, self.heuristic)
+	def setCriteria(self, flaw_type):
+		if self.name == 'tclf':
+			self.criteria = hash(self.flaw[0].stepnumber) ^ hash(self.flaw[1].source.stepnumber) ^ hash(self.flaw[1].sink.stepnumber)
+		elif flaw_type == 'statics' or flaw_type == 'inits':
+			f = self.flaw
+			#args = [arg.name for arg in f[1].Args]
+			self.criteria = hash(f[0].stepnumber) ^ hash(f[1].root.name) ^ \
+							hash(f[1].root.truth) ^ hash(arg.name for arg in f[1].Args)
+		elif flaw_type == 'unsafe':
+			self.criteria = self.risks
+		else:
+			self.criteria = self.cndts
 
+	def __repr__(self):
+		return 'Flaw({}, h={}, criteria={})'.format(self.flaw, self.heuristic, self.criteria)
 
 class Flawque:
 	""" A deque which pretends to be a set, and keeps everything sorted"""
 
-	def __init__(self):
+	def __init__(self, name=None):
 		self._flaws = collections.deque()
-	#	self._name = name
+		self._name = name
 
 	def add(self, flaw):
+		flaw.setCriteria(self._name)
 		self.insert(flaw)
 		#self._flaws.append(item)
 
 	def update(self, iter):
 		for flaw in iter:
-			self.insert(flaw)
+			self.add(flaw)
 
 	def __contains__(self, item):
 		return item in self._flaws
@@ -76,7 +89,6 @@ class Flawque:
 
 	def peek(self):
 		return self._flaws[-1]
-
 
 	def insert(self, flaw):
 		index = bisect.bisect_left(self._flaws, flaw)
@@ -108,16 +120,16 @@ class FlawLib():
 	def __init__(self):
 
 		#static = unchangeable (should do oldest first.)
-		self.statics = simpleQueueWrapper()
+		self.statics = Flawque('statics')
 
 		#init = established by initial state
-		self.inits = simpleQueueWrapper()
+		self.inits = Flawque('inits')
 
 		#threat = causal link dependency undone
-		self.threats = simpleQueueWrapper()
+		self.threats = Flawque()
 
 		#unsafe = existing effect would undo sorted by number of cndts
-		self.unsafe = Flawque()
+		self.unsafe = Flawque('unsafe')
 
 		#reusable = open conditions consistent with at least one existing effect sorted by number of cndts
 		self.reusable = Flawque()
@@ -131,7 +143,7 @@ class FlawLib():
 	def heuristic(self):
 		value = 0
 		for i,flaw_set in enumerate(self.typs):
-			if i ==2:
+			if i == 2:
 				continue
 			value+=i*len(flaw_set)
 		return value
@@ -146,11 +158,9 @@ class FlawLib():
 				return True
 		return False
 
-
 	@property
 	def flaws(self):
 		return [flaw for i, flaw_set in enumerate(self.typs) for flaw in flaw_set if i != 2]
-
 
 	def OCs(self):
 		''' Generator for open conditions'''
@@ -196,7 +206,7 @@ class FlawLib():
 		s_need, pre = flaw.flaw
 
 		#if pre.predicate is static
-		if (pre.name, pre.truth) not in FlawLib.non_static_preds:
+		if (pre.root.name, pre.root.truth) not in FlawLib.non_static_preds:
 			self.statics.add(flaw)
 			return
 
@@ -221,12 +231,12 @@ class FlawLib():
 			return
 
 		if flaw.risks > 0:
-			self.unsafe.insert(flaw.switch())
+			self.unsafe.add(flaw)
 			return
 
 		#if not static but has cndts, then reusable
 		if flaw.cndts > 0:
-			self.reusable.insert(flaw)
+			self.reusable.add(flaw)
 			return
 
 		#last, must be nonreusable

@@ -15,5 +15,6 @@
          (has nazis gun))
   (:goal (and
               (not (alive nazis))
-              (has army ark)
+              (at army usa)
+            ;  (has army ark)
               )))

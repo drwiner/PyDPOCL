@@ -7,6 +7,7 @@ from ElementGraph import ElementGraph
 from GlobalContainer import GC
 import copy
 import collections
+from clockdeco import clock
 
 
 class Action(ElementGraph):
@@ -238,8 +239,14 @@ class PlanElementGraph(ElementGraph):
 
 			self.edges.add(Edge(source, sink, edge.label))
 
+	#@clock
 	def __lt__(self, other):
-		return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+		if self.cost + self.heuristic != other.cost + other.heuristic:
+			return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+		else:
+			steps = sum(step.stepnumber for step in self.Steps)
+			othersteps = sum(step.stepnumber for step in other.Steps)
+			return steps < othersteps
 
 	def deepcopy(self):
 		new_self = copy.deepcopy(self)
@@ -309,6 +316,7 @@ class PlanElementGraph(ElementGraph):
 
 		for oc in self.flaws.flaws:
 			_, pre = oc.flaw
+			pre = pre.root
 			c = self.relaxedPre(GL, pre)
 			oc.heuristic = c
 			# print('flaw: {} , heuristic = {}'.format(oc,c))
