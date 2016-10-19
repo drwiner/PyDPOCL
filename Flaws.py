@@ -21,7 +21,7 @@ class Flaw:
 		self.criteria = self.cndts
 		self.heuristic = 0
 		if name == 'opf':
-			self.tiebreaker = int(f[1].replaced_ID)
+			self.tiebreaker = hash(f[1].replaced_ID)
 
 	def __hash__(self):
 		return hash(self.flaw)
@@ -39,8 +39,8 @@ class Flaw:
 
 	def setCriteria(self, flaw_type):
 		if self.name == 'tclf':
-			self.criteria = hash(self.flaw[0].stepnumber) ^ hash(self.flaw[1].source.stepnumber) ^ hash(self.flaw[1].sink.stepnumber)
-			self.tiebreaker = hash(self.flaw[1].label)
+			self.criteria = self.flaw[0].stepnumber
+			self.tiebreaker = hash(self.flaw[1].label.replaced_ID) + self.flaw[1].sink.stepnumber
 		elif flaw_type == 'unsafe':
 			self.criteria = self.risks
 

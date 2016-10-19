@@ -124,11 +124,13 @@ class Action(ElementGraph):
 		if hasattr(self.root, 'executed'):
 			exe = self.root.executed
 			if exe is None:
-				exe = 'ex'
+				exe = ''
+			else:
+				exe = exe + '-'
 		else:
 			exe = 'ex'
 		id = str(self.root.ID)[19:23]
-		return '{}-{}-{}-{}'.format(exe, self.root.name, self.root.stepnumber, id) + args
+		return '{}{}-{}-{}'.format(exe, self.root.name, self.root.stepnumber, id) + args
 
 
 class Condition(ElementGraph):
@@ -179,7 +181,10 @@ class Condition(ElementGraph):
 	def __repr__(self):
 		self.updateArgs()
 		args = str([arg.name for arg in self.Args])
-		return '{}-{}{}'.format(self.root.truth, self.root.name, self.typ) + args
+		t = ''
+		if not self.root.truth:
+			t = 'not-'
+		return '{}{}'.format(t, self.root.name) + args
 
 
 class PlanElementGraph(ElementGraph):
