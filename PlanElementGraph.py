@@ -120,7 +120,7 @@ class Action(ElementGraph):
 
 	def __repr__(self):
 		self.updateArgs()
-		args = str(self.Args)
+		args = str([arg.name for arg in self.Args])
 		if hasattr(self.root, 'executed'):
 			exe = self.root.executed
 			if exe is None:
@@ -138,11 +138,24 @@ class Condition(ElementGraph):
 				 Restrictions=None):
 		if type_graph is None:
 			type_graph = 'Condition'
+		if ID is None:
+			ID = root_element.ID
+		if root_element is None:
+			root_element = Literal()
+		if Elements is None:
+			Elements = {root_element}
+		if name is None:
+			name = root_element.name
 
 		super(Condition, self).__init__(ID, type_graph, name, Elements, root_element, Edges, Restrictions)
+		self.replaced_ID = root_element.replaced_ID
 
 	def __hash__(self):
-		return hash(arg for arg in self.Args) ^ hash(self.root.name) ^ hash(self.root.truth)
+		return hash(self.ID) ^ hash(self.root.name) ^ hash(self.root.truth) ^ hash(self.root.replaced_ID)
+
+	@property
+	def truth(self):
+		return self.root.truth
 
 	def __eq__(self, other):
 		if not isinstance(other, ElementGraph):
@@ -164,7 +177,8 @@ class Condition(ElementGraph):
 		return len({arg for arg in self.Args if not arg.name is None})
 
 	def __repr__(self):
-		args = str([arg.__repr__() for arg in self.Args])
+		self.updateArgs()
+		args = str([arg.name for arg in self.Args])
 		return '{}-{}{}'.format(self.root.truth, self.root.name, self.typ) + args
 
 
@@ -243,10 +257,22 @@ class PlanElementGraph(ElementGraph):
 	def __lt__(self, other):
 		if self.cost + self.heuristic != other.cost + other.heuristic:
 			return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+		elif self.heuristic != other.heuristic:
+			return self.heuristic < other.heuristic
+		elif self.cost != other.cost:
+			return self.cost < other.cost
+		elif len(self.Steps) != len(other.Steps):
+			return len(self.Steps) < len(other.Steps)
+		elif len(self.flaws) != len(other.flaws):
+			return len(self.flaws) < len(other.flaws)
 		else:
-			steps = sum(step.stepnumber for step in self.Steps)
-			othersteps = sum(step.stepnumber for step in other.Steps)
-			return steps < othersteps
+			S = list(self.Steps)
+			S.sort(key=lambda x: x.stepnumber)
+			O = list(other.Steps)
+			O.sort(key=lambda x: x.stepnumber)
+			for s, o in zip(S, O):
+				if s.stepnumber != o.stepnumber:
+					return s.stepnumber < o.stepnumber
 
 	def deepcopy(self):
 		new_self = copy.deepcopy(self)
@@ -316,7 +342,6 @@ class PlanElementGraph(ElementGraph):
 
 		for oc in self.flaws.flaws:
 			_, pre = oc.flaw
-			pre = pre.root
 			c = self.relaxedPre(GL, pre)
 			oc.heuristic = c
 			# print('flaw: {} , heuristic = {}'.format(oc,c))
@@ -391,4 +416,4 @@ class PlanElementGraph(ElementGraph):
 		orderings = self.OrderingGraph.__repr__()
 		links = self.CausalLinkGraph.__repr__()
 		return 'PLAN: ' + str(
-			self.ID) + c + '\n*Steps: \n{' + steps + '}\n *Orderings:\n {' + orderings + '}\n ' '*CausalLinks:\n {' + links + '}'
+			self.ID) + c + '\n*Steps: \n{' + steps + '}\n*Orderings:\n {' + orderings + '}\n*CausalLinks:\n {' + links + '}'

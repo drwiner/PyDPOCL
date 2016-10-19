@@ -20,6 +20,8 @@ class Flaw:
 		self.risks = 0
 		self.criteria = self.cndts
 		self.heuristic = 0
+		if name == 'opf':
+			self.tiebreaker = int(f[1].replaced_ID)
 
 	def __hash__(self):
 		return hash(self.flaw)
@@ -29,32 +31,21 @@ class Flaw:
 
 	#For comparison via bisect
 	def __lt__(self, other):
-		return self.criteria < other.criteria
-
-	#switch to risks for unsafe flaws
-	def switch(self):
-		if self.criteria == self.cndts:
-			self.criteria = self.risks
+		if self.criteria != other.criteria:
+			return self.criteria < other.criteria
 		else:
-			self.criteria = self.cndts
+			return self.tiebreaker < other.tiebreaker
 
-		return self
 
 	def setCriteria(self, flaw_type):
 		if self.name == 'tclf':
 			self.criteria = hash(self.flaw[0].stepnumber) ^ hash(self.flaw[1].source.stepnumber) ^ hash(self.flaw[1].sink.stepnumber)
-		elif flaw_type == 'statics' or flaw_type == 'inits':
-			f = self.flaw
-			#args = [arg.name for arg in f[1].Args]
-			self.criteria = hash(f[0].stepnumber) ^ hash(f[1].root.name) ^ \
-							hash(f[1].root.truth) ^ hash(arg.name for arg in f[1].Args)
+			self.tiebreaker = hash(self.flaw[1].label)
 		elif flaw_type == 'unsafe':
 			self.criteria = self.risks
-		else:
-			self.criteria = self.cndts
 
 	def __repr__(self):
-		return 'Flaw({}, h={}, criteria={})'.format(self.flaw, self.heuristic, self.criteria)
+		return 'Flaw({}, h={}, criteria={}, tb={})'.format(self.flaw, self.heuristic, self.criteria, self.tiebreaker)
 
 class Flawque:
 	""" A deque which pretends to be a set, and keeps everything sorted"""
@@ -120,10 +111,10 @@ class FlawLib():
 	def __init__(self):
 
 		#static = unchangeable (should do oldest first.)
-		self.statics = Flawque('statics')
+		self.statics = Flawque()
 
 		#init = established by initial state
-		self.inits = Flawque('inits')
+		self.inits = Flawque()
 
 		#threat = causal link dependency undone
 		self.threats = Flawque()
@@ -206,7 +197,7 @@ class FlawLib():
 		s_need, pre = flaw.flaw
 
 		#if pre.predicate is static
-		if (pre.root.name, pre.root.truth) not in FlawLib.non_static_preds:
+		if (pre.name, pre.truth) not in FlawLib.non_static_preds:
 			self.statics.add(flaw)
 			return
 

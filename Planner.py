@@ -34,10 +34,10 @@ class Frontier:
 	def __repr__(self):
 		k = str('\nfrontier plans\n')
 		for plan in self._frontier:
-			k += '\n' + str(plan.ID) + ' ' + str(plan.cost) + ' ' + str(plan.heuristic) + ' ' + str(plan.Step_Graphs)
-		#k1 = str('plan ID={}, ')
+			k += '\n' + str(plan.ID) + ' c=' + str(plan.cost) + ' h=' + str(plan.heuristic) + ' ' + str(
+				plan.Step_Graphs)
 		return k
-		#return str([plan.__repr__() for plan in self])
+
 
 class PlanSpacePlanner:
 
@@ -103,8 +103,6 @@ class PlanSpacePlanner:
 
 		results = set()
 		s_need, precondition = flaw.flaw
-		precondition = precondition.root
-
 		antecedents = self.GL.pre_dict[precondition.replaced_ID]
 
 		for ante in antecedents:
@@ -145,7 +143,6 @@ class PlanSpacePlanner:
 	def reuse(self, plan, flaw):
 		results = set()
 		s_need, precondition = flaw.flaw
-		precondition = precondition.root
 
 		#antecedents - a set of stepnumbers
 		antecedents = self.GL.id_dict[precondition.replaced_ID]
@@ -272,8 +269,8 @@ class PlanSpacePlanner:
 			#print(self._frontier)
 
 			plan = self.pop()
-			#print('\n selecting plan: {}'.format(plan))
-			#print(plan.flaws)
+		#	print('\n selecting plan: {}'.format(plan))
+		#	print(plan.flaws)
 
 			visited += 1
 
@@ -292,7 +289,7 @@ class PlanSpacePlanner:
 
 			#Select Flaw
 			flaw = plan.flaws.next()
-			#print('{} selected : {}\n'.format(flaw.name, flaw))
+			print('{} selected : {}\n'.format(flaw.name, flaw))
 
 			#Add children to Open List
 			children = self.generateChildren(plan, flaw)
