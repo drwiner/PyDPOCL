@@ -4,6 +4,7 @@ from Flaws import Flaw
 from heapq import heappush, heappop
 from clockdeco import clock
 from Ground import reload, GLib
+from Graph import Edge, isIdenticalElmsInArgs, retargetElmsInArgs, retargetArgs
 
 import copy
 
@@ -87,9 +88,10 @@ class PlanSpacePlanner:
 		s_init_plan.OrderingGraph.addOrdering(s_init.root, s_goal.root)
 
 		#Add initial Open precondition flaws for dummy step
-		init_flaws = (Flaw((s_goal.root, Condition.subgraph(s_goal, prec)), 'opf') for prec in s_goal.preconditions)
-		for flaw in init_flaws:
-			s_init_plan.flaws.insert(self.GL, s_init_plan, flaw)
+		#init_flaws = (Flaw((s_goal.root, prec), 'opf') for prec in s_goal.Preconditions)
+		#for flaw in init_flaws:
+		for prec in s_goal.Preconditions:
+			s_init_plan.flaws.insert(self.GL, s_init_plan, Flaw((s_goal.root, prec), 'opf'))
 		return s_init_plan
 
 
@@ -106,35 +108,36 @@ class PlanSpacePlanner:
 		antecedents = self.GL.pre_dict[precondition.replaced_ID]
 
 		for ante in antecedents:
-			if ante.action.name == 'dummy_init':
+			if ante.stepnumber == plan.initial_dummy_step.stepnumber:
 				continue
 
 			#step 1 - make a copy
-			cndt = copy.deepcopy(ante)
+			antestep = ante.deepcopy(replace_internals=True)
+			eff = self.GL.getConsistentEffect(antestep, precondition)
+			eff_link = antestep.RemoveSubgraph(eff)
 
-			#step 2 - replace its internals, to distinguish from other identical antesteps
-			(anteaction, eff_link) = cndt
-			anteaction.replaceInternals()
-
-			# step 3 - make a copy of the plan
+			#step 2 - make a copy of the plan
 			new_plan = plan.deepcopy()
 
-				#step 4 - set sink before replace internals
-			preserve_original_id = eff_link.sink.replaced_ID
+			#step 3 - set sink before replace internals
+			temp = eff.replaced_ID
 			eff_link.sink = new_plan.getElementById(precondition.ID)
-			eff_link.sink.replaced_ID = preserve_original_id
+			eff_link.sink.replaced_ID = temp
 			new_plan.edges.add(eff_link)
 
+			#step 4 - add new stuff to new plan
+			new_plan.elements.update(antestep.elements)
+			new_plan.edges.update(antestep.edges)
 
-			#step 5 - add new stuff to new plan
-			new_plan.elements.update(anteaction.elements)
-			new_plan.edges.update(anteaction.edges)
+			#step 5 - update orderings and causal links, add flaws
+			self.addStep(new_plan,
+						 s_add=antestep,
+						 s_need=new_plan.getElementById(s_need.ID),
+						 condition=Condition.subgraph(new_plan, eff_link.sink),
+						 new=True)
+			new_plan.flaws.addCndtsAndRisks(self.GL, antestep.root)
 
-			#step 6 - update orderings and causal links, add flaws
-			self.addStep(new_plan, anteaction.root, new_plan.getElementById(s_need.ID), eff_link.sink, new=True)
-			new_plan.flaws.addCndtsAndRisks(self.GL, anteaction.root)
-
-			#step 7 - add new_plan to open list
+			#step 6 - add new_plan to open list
 			results.add(new_plan)
 
 		return results
@@ -163,9 +166,12 @@ class PlanSpacePlanner:
 
 			#step 3-4 retarget precondition to be s_old effect
 			pre_link_sink = self.RetargetPrecondition(self.GL, new_plan, s_old, precondition)
+			Old = Action.subgraph(new_plan, new_plan.getElementById(s_old.ID))
 
 			#step 5 - add orderings, causal links, and create flaws
-			self.addStep(new_plan, s_old.root, s_need_new, pre_link_sink, new=False)
+			self.addStep(new_plan, Old, s_need_new,
+						 condition=Condition.subgraph(new_plan, pre_link_sink),
+						 new=False)
 
 			#step 6 - add new plan to open list
 			results.add(new_plan)
@@ -173,11 +179,18 @@ class PlanSpacePlanner:
 		return results
 
 	def RetargetPrecondition(self, GL, plan, S_Old, precondition):
+		effect_token = GL.getConsistentEffect(S_Old, precondition)
 
-		for Eff in S_Old.Effects:
-			if Eff.Args == precondition.Args:
-				effect_token = Eff.root
-				break
+		if S_Old.is_decomp:
+			Eff = list(Condition.subgraph(S_Old, effect_token).Args)
+			Pre = precondition.Args
+			if not isIdenticalElmsInArgs(Pre, Eff):
+				return False
+
+		# for Eff in S_Old.Effects:
+		# 	if Eff.Args == precondition.Args:
+		# 		effect_token = Eff.root
+		# 		break
 		#effect_token = GL.getConsistentEffect(S_Old, precondition)
 
 		pre_link = plan.RemoveSubgraph(precondition.root)
@@ -199,21 +212,23 @@ class PlanSpacePlanner:
 		if new is None:
 			new = False
 
-		if s_add != plan.initial_dummy_step:
-			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_add)
+		if s_add.stepnumber != plan.initial_dummy_step.stepnumber:
+			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_add.root)
 			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_need)
 
-		if s_need != plan.final_dummy_step:
-			plan.OrderingGraph.addEdge(s_add, plan.final_dummy_step)
+		if s_need.stepnumber != plan.final_dummy_step.stepnumber:
+			plan.OrderingGraph.addEdge(s_add.root, plan.final_dummy_step)
 			plan.OrderingGraph.addEdge(s_need, plan.final_dummy_step)
 
 		#Always add this ordering
-		plan.OrderingGraph.addEdge(s_add, s_need)
-		plan.CausalLinkGraph.addEdge(s_add, s_need, condition)
+		plan.OrderingGraph.addEdge(s_add.root, s_need)
+		plan.CausalLinkGraph.addEdge(s_add.root, s_need, condition)
 
 		if new:
-			for prec in plan.getIncidentEdgesByLabel(s_add, 'precond-of'):
-				plan.flaws.insert(self.GL, plan, Flaw((s_add, Condition.subgraph(plan, prec.sink)), 'opf'))
+			for Prec in s_add.Preconditions:
+				plan.flaws.insert(self.GL, plan, Flaw((s_add.root, Prec), 'opf'))
+		plan.lastAdded = s_add
+		s_add.Effects
 
 		return plan
 
@@ -248,6 +263,7 @@ class PlanSpacePlanner:
 			results.update(self.newStep(plan, flaw))
 		elif flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(plan, flaw)
+			return results
 		else:
 			raise ValueError('whose flaw is it anyway {}?'.format(flaw))
 
@@ -256,7 +272,8 @@ class PlanSpacePlanner:
 
 		for result in results:
 			new_flaws = result.detectThreatenedCausalLinks(self.GL)
-			result.flaws.threats.update(new_flaws)
+			for nf in new_flaws:
+				result.flaws.insert(self.GL, result, nf)
 
 		return results
 
@@ -268,12 +285,13 @@ class PlanSpacePlanner:
 
 		while len(self) > 0:
 
+			print(visited, len(self)+visited)
 			#Select child
 			#print(self._frontier)
 
 			plan = self.pop()
-		#	print('\n selecting plan: {}'.format(plan))
-		#	print(plan.flaws)
+			#print('\n selecting plan: {}'.format(plan))
+			#print(plan.flaws)
 
 			visited += 1
 
@@ -292,10 +310,10 @@ class PlanSpacePlanner:
 
 			#Select Flaw
 			flaw = plan.flaws.next()
-			#print('{} selected : {}\n'.format(flaw.name, flaw))
-			#if flaw.name == 'tclf':
-			#	print('{} selected : {}\n'.format(flaw.name, flaw))
-				#print(plan.flaws)
+#			print('{} selected : {}\n'.format(flaw.name, flaw))
+		#	if flaw.name == 'tclf':
+		#		print('{} selected : {}\n'.format(flaw.name, flaw))
+			#	print(plan.flaws)
 
 			#Add children to Open List
 			children = self.generateChildren(plan, flaw)
@@ -325,12 +343,12 @@ class TestPlanner(unittest.TestCase):
 	def testPlanner(self):
 		from GlobalContainer import GC
 
-		domain = 'domains/ark-domain-decomp.pddl'
-		problem = 'domains/ark-problem-decomp.pddl'
+		#domain = 'domains/ark-domain-decomp.pddl'
+		#problem = 'domains/ark-problem-decomp.pddl'
+		domain = 'domains/ark-domain.pddl'
+		problem = 'domains/ark-problem.pddl'
 
 		print('Reading {} and {}'.format(domain, problem))
-
-		# (op_graphs, objects, GC.object_types, init, goal)
 
 		try:
 			SGL = reload(domain + problem)

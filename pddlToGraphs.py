@@ -316,7 +316,7 @@ def domainToOperatorGraphs(domain):
 		if hasattr(action, 'decomp') and action.decomp is not None:
 			decomp_graph = PlanElementGraph(name=action.name, type_graph='decomp')
 			getDecompGraph(action.decomp.formula, decomp_graph, action.parameters)
-			op_graph.subgraphs.add(decomp_graph)
+			op_graph.subplan = decomp_graph
 			for step_elm in op_graph.elements:
 				for d_elm in decomp_graph.elements:
 					if not isinstance(d_elm, Argument):
@@ -326,7 +326,7 @@ def domainToOperatorGraphs(domain):
 			dopGraphs.add(op_graph)
 		else:
 			opGraphs.add(op_graph)
-	return opGraphs
+	return opGraphs, dopGraphs
 
 
 """ Convert pddl problem file to usable structures"""
@@ -411,12 +411,7 @@ def domainAxiomsToGraphs(domain):
 
 
 def parseDomAndProb(domain_file, problem_file):
-	""" Returns tuple
-			1) Operator Graphs
-			2) Object Elements
-			3) Init dummy Action
-			4) Goal dummy Action
-	"""
+
 	parser = Parser(domain_file, problem_file)
 	domain, dom = parser.parse_domain_drw()
 	problem, v = parser.parse_problem_drw(dom)
@@ -474,7 +469,7 @@ if __name__ == '__main__':
 	parser = Parser(domain_file, problem_file)
 	domain, dom = parser.parse_domain_drw()
 	problem, v = parser.parse_problem_drw(dom)
-	op_graphs = domainToOperatorGraphs(domain)
+	op_graphs, dops = domainToOperatorGraphs(domain)
 	for opgraph in op_graphs:
 		opgraph.print_graph_names()
 		print('\n')

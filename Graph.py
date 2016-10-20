@@ -218,7 +218,7 @@ class Graph(Element):
 		return not self.equivalentWithRestrictions()
 
 	def equivalentWithRestrictions(self):
-		if not hasattr(self, 'subplans') or len(self.subplans) == 0:
+		if not hasattr(self, 'subgraphs') or len(self.subgraphs) == 0:
 			return False
 
 		for restriction in self.subgraphs:
@@ -232,6 +232,85 @@ class Graph(Element):
 		edges = str([edge for edge in self.edges])
 		elms = str([elm for elm in self.elements])
 		return '\n' + edges + '\n\n_____\n\n ' + elms + '\n'
+
+def isIdenticalElmsInArgs(C1, C2):
+	arg_map = zip(C1, C2)
+	for u, v in arg_map:
+		if isinstance(u, Argument):
+			if u.ID != v.ID:
+				return False
+			continue
+		for elm in u.elements:
+			try:
+				v.getElementById(elm.ID)
+			except:
+				if isinstance(elm, Literal):
+					for v_elm in v.elements:
+						if v_elm.name == elm.name and v_elm.truth == elm.truth:
+							continue
+				return False
+			# if elm.ID != v.getElmByRID(elm.replaced_ID).ID:
+			#	return False
+	return True
+
+def retargetElmsInArgs(GSP, C1, C2):
+	# C2 is removable, in GSP, while C1 is replacer not in GSP
+	arg_map = dict(zip(C1, C2))
+	#For all args in C1/C2 which are element graphs, create a map by finding equivalent pieces via replaced_IDs. which are assumed to be the same for both. This makes sense since they are "literally" the same ground elements, but with different IDs
+	bigger_map = {}
+	for u, v in arg_map.items():
+		if isinstance(u, Argument):
+			bigger_map[u] = v
+			continue
+		for elm in u.elements:
+			bigger_map[elm] = v.getElmByRID(elm.replaced_ID)
+			if bigger_map[elm] is None and isinstance(elm, Literal):
+				for v_elm in v.elements:
+					if v_elm.name == elm.name and v_elm.truth == elm.truth:
+						bigger_map[elm] = v_elm
+						break
+	#for each elm in GSP, or story, replace
+	retarget(GSP, bigger_map)
+
+	#Links
+	links = list(GSP.CausalLinkGraph.edges)
+	for link in list(GSP.CausalLinkGraph.edges):
+		if link.source in bigger_map and link.sink in bigger_map:
+			links.remove(link)
+			links.append(Edge(bigger_map[link.source], bigger_map[link.sink], bigger_map[link.label]))
+		elif link.source in bigger_map:
+			links.remove(link)
+			links.append(Edge(bigger_map[link.source], link.sink, bigger_map[link.label]))
+		elif link.sink in bigger_map:
+			links.remove(link)
+			links.append(Edge(link.source, bigger_map[link.sink], bigger_map[link.label]))
+	GSP.CausalLinkGraph.edges = set(links)
+
+	#Orderings
+	orderings = list(GSP.OrderingGraph.edges)
+	for o in list(GSP.OrderingGraph.edges):
+		if o.source in bigger_map and o.sink in bigger_map:
+			orderings.remove(o)
+			orderings.append(Edge(bigger_map[o.source], bigger_map[o.sink], '<'))
+		elif o.source in bigger_map:
+			orderings.remove(o)
+			orderings.append(Edge(bigger_map[o.source], o.sink, '<'))
+		elif o.sink in bigger_map:
+			orderings.remove(o)
+			orderings.append(Edge(o.source, bigger_map[o.sink], '<'))
+	GSP.OrderingGraph.edges = set(orderings)
+
+	return C2
+
+def retargetArgs(G, C1, C2):
+	#G contains C1 and means to replace it with C2
+	retarget(G, dict(zip(C1,C2)))
+	return C2
+
+def retarget(G, _map):
+	for elm in list(G.elements):
+		if elm in _map:
+			G.assign(elm, _map[elm])
 
 
 ################################################################
@@ -270,13 +349,7 @@ def isConsistentEdgeSet(Rem, Avail, map_=None, return_map=False):
 		if not _Map is False:
 			if return_map:
 				return _Map
-		#if isConsistentEdgeSet(copy.deepcopy(Rem), Avail-{cndt}, Map_):
-		#	if return_map:
-		#		return Map_
-		#	return True
 	return False
-
-
 
 def findConsistentEdgeMap(Rem, Avail, map_ = None, Super_Maps = None):
 	if map_ is None:
@@ -311,110 +384,10 @@ def findConsistentEdgeMap(Rem, Avail, map_ = None, Super_Maps = None):
 
 	return Super_Maps
 
-#A method - unify - which given two graphs, will merge. currently performed by mergeGraph
-# def UnifyActions(_Map = None, R = None, A = None):
-# 	"""
-#
-# 	@param _Map: dictonary
-# 	@param R: edges to account for
-# 	@param A: edges which account as
-# 	@return: dictionary _Map
-# 	"""
-#
-# 	if _Map ==None:
-# 		_Map = {} 	;#_Map is a 1:1 mapping (r : a) for r in "R" for a in "A" s.t. every edge in "R" has one partner in "A"
-# 					#Mapping is a dictionary.
-# 	if R == None:
-# 		R = []		;#"R" is the set of edges all of whose edges must be accounted for
-# 	if A == None:
-# 		A = []		;#"A" is the set of edges which account for edges in "R".
-#
-# 	if len(R) == 0:
-# 		return _Map
-#
-# 	rem = R.pop()
-# 	cndts = {edge for edge in A if edge.isConsistent(rem)}
-#
-# 	if rem.source in _Map:
-# 		cndts -= {edge for edge in cndts if not edge.source == _Map[rem.source]}
-# 	if rem.sink in _Map:
-# 		cndts -= {edge for edge in cndts if not edge.sink == _Map[rem.sink]}
-#
-# 	if len(cndts) == 0:
-# 		return []
-#
-# 	Mbins = []
-# 	for cndt in cndts:
-# 		Map_ = copy.deepcopy(_Map)
-# 		if not cndt.source in _Map:
-# 			Map_[rem.source] = cndt.source
-# 		if not cndt.sink in _Map:
-# 			Map_[rem.sink] = cndt.sink
-#
-# 		#if this 'cndt' was to account for 'rem', recursively solve for rest of R and append all possible worlds in []
-# 		M_ = isConsistentEdgeSet(Map_ = _Map, R = copy.deepcopy(R), A = A-{cndt})
-# 		Mbins = consistentMaps(prior_maps=Map_,cndt_maps = M_, Mbins = Mbins)
-#
-# 	if len(Mbins) == 0:
-# 		return []
-#
-# 	return _Map.extend(Mbins)
-
-
 import unittest
 
 class TestGraph(unittest.TestCase):
 	pass
-	# def test_consistent_edge_set(self):
-	# 	"""
-	# 			Full Graph
-	# 			1 --> 2 --> 3 --> 5
-	# 				  2 --> 4 --> 5
-	#
-	# 			Requirements
-	# 			[2]  --> [3]
-	# 			[2]  --> [4]
-	#
-	#
-	# 		"""
-	# 	G = 	  ['buffer',
-	# 			   Element(ID=1,name=1, typ='1'),
-	# 			   Element(ID=2,name=2, typ='2'),
-	# 			   Element(ID=3,name=3, typ='3'),
-	# 			   Element(ID=4,name=4, typ='4'),
-	# 			   Element(ID=5,name=5, typ='5')]
-	# 	O =		  [Element(ID=20, typ='2'),
-	# 			   Element(ID=30, typ='3'),
-	# 			   Element(ID=40, typ='4')]
-	#
-	# 	Avail = {Edge(G[1],G[2],'a'),
-	# 		   Edge(G[2],G[3], 'b'),
-	# 		   Edge(G[2],G[4], 'c'),
-	# 		   Edge(G[3],G[5], 'd'),
-	# 		   Edge(G[4],G[5], 'e')}
-	# 	Rem = {
-	# 			Edge(O[0],O[1], 'b'),
-	# 			Edge(O[0],O[2], 'c')}
-	#
-	#
-	# 	isit = isConsistentEdgeSet(Rem, Avail)
-	# 	assert(isit)
-	# 	assert(not isConsistentEdgeSet(Avail, Rem))
-	# 	print(isit)
-	#
-	# 	#With LARGER example to look through
-	# 	G = ['buffer']
-	# 	G+= [Element(ID=i, name=i, typ=str(i)) for i in range(1,900)]
-	# 	Avail = {Edge(G[i],G[i+1],'m') for i in range(1,700)}
-	# 	Avail.update({Edge(G[1],G[2],'a'),
-	# 		   Edge(G[2],G[3], 'b'),
-	# 		   Edge(G[2],G[4], 'c'),
-	# 		   Edge(G[3],G[5], 'd'),
-	# 		   Edge(G[4],G[5], 'e')})
-	#
-	# 	isit = isConsistentEdgeSet(Rem, Avail)
-	# 	assert (isit)
-	# 	print(isit)
 
 if __name__ ==  '__main__':
 	pass

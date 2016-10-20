@@ -8,6 +8,8 @@ from clockdeco import clock
 from Plannify import Plannify
 from Element import Argument, Actor, Operator, Literal
 from pddlToGraphs import parseDomAndProb
+from Graph import Edge
+import hashlib
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
 Antestep = namedtuple('Antestep', 'action eff_link')
@@ -36,22 +38,22 @@ def groundStoryList(operators, objects, obtypes):
 			gsteps.append(gstep)
 	return gsteps
 
-def groundDecompStepList(operators, GL, stepnum=0):
-
-	#For each ground subplan in Subplans, make a copy of DO s.t. each
+def groundDecompStepList(doperators, GL, stepnum=0):
 	gsteps = []
-	for op in operators:
-		Subplans = Plannify(next(iter(op.subgraphs)), GL)
-		for sp in Subplans:
+	for op in doperators:
+		#Subplans = Plannify(op.subplan, GL)
+		for sp in Plannify(op.subplan, GL):
+
 			GDO = copy.deepcopy(op)
+
 			for elm in sp.elements:
-				ex_elms = list(op.elements)
-				assignElmToContainer(GDO, sp, elm, ex_elms)
+				assignElmToContainer(GDO, sp, elm, list(op.elements))
+
 			GDO.ground_subplan = sp
 			GDO.root.stepnumber = stepnum
 			GDO._replaceInternals()
-			stepnum += 1
 			gsteps.append(GDO)
+			stepnum += 1
 
 	return gsteps
 
@@ -72,15 +74,18 @@ def assignElmToContainer(GDO, SP, elm, ex_elms):
 
 		GDO.assign(ex_elm, EG)
 
+import re
 @clock
 def upload(GL, name):
-	afile = open(name,"wb")
+	n = re.sub('[^A-Za-z0-9]+', '', name)
+	afile = open(n, "wb")
 	pickle.dump(GL, afile)
 	afile.close()
 
 @clock
 def reload(name):
-	afile = open(name,"rb")
+	n = re.sub('[^A-Za-z0-9]+', '', name)
+	afile = open(n, "rb")
 	GL = pickle.load(afile)
 	afile.close()
 	return GL
@@ -91,7 +96,7 @@ class GLib:
 		operators, dops, objects, obtypes, init_action, goal_action = parseDomAndProb(domain, problem)
 
 		self.objects = objects
-		self._gsteps = groundStoryList(operators, obtypes)
+		self._gsteps = groundStoryList(operators, self.objects, obtypes)
 
 		# init at [-2]
 		init_action.root.stepnumber = len(self._gsteps)
@@ -105,12 +110,14 @@ class GLib:
 		self._gsteps.append(goal_action)
 
 		#dictionaries
-		self.initDicts()
+		self.pre_dict = defaultdict(set)
+		self.ante_dict = defaultdict(set)
+		self.id_dict = defaultdict(set)
+		self.eff_dict = defaultdict(set)
+		self.threat_dict = defaultdict(set)
 		self.loadAll()
 
-		#The consequence of putting this here is that these decomp operators will not be preconditions to steps at
-		# lower levels of hierarchy... but this is a good thing?
-		D =  groundDecompStepList(dops, self, stepnum=len(self._gsteps))
+		D = groundDecompStepList(dops, self, stepnum=len(self._gsteps))
 		self.loadPartition(D)
 		self._gsteps[-2:] = D
 
@@ -121,23 +128,15 @@ class GLib:
 
 		print('{} ground steps created'.format(len(self)))
 		print('uploading')
-
 		upload(self, domain + problem)
-
-	def initDicts(self):
-		self.pre_dict = defaultdict(set)
-		self.ante_dict = defaultdict(set)
-		self.id_dict = defaultdict(set)
-		self.eff_dict = defaultdict(set)
-		self.threat_dict = defaultdict(set)
 
 	def insert(self, _pre, antestep, eff):
 		self.pre_dict[_pre.replaced_ID].add(antestep)
 		self.id_dict[_pre.replaced_ID].add(antestep.stepnumber)
 		self.eff_dict[_pre.replaced_ID].add(eff.replaced_ID)
 
-	def loadAll(self, consequents):
-		self.load(consequents, consequents)
+	def loadAll(self):
+		self.load(self._gsteps, self._gsteps)
 
 	def loadPartition(self, doperators):
 		self.load(doperators, self._gsteps)
@@ -148,47 +147,38 @@ class GLib:
 			for pre in ante.Preconditions:
 				self._loadAntecedentPerConsequent(consequents, ante, pre)
 
-	def _loadAntecedantsPerConsequent(self, antecedents, _step, _pre):
+	def _loadAntecedentPerConsequent(self, antecedents, _step, _pre):
 		for gstep in antecedents:
 			if self._parseEffects(gstep, _step, _pre) > 0:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
 
 	def _parseEffects(self, gstep, _step, _pre):
 		count = 0
-
 		for Eff in gstep.Effects:
-
 			if Eff.Args != _pre.Args or Eff.name != _pre.name:
 				continue
-
 			if Eff.truth != _pre.truth:
 				self.threat_dict[_step.stepnumber].add(gstep.stepnumber)
-				continue
-
-			self.insert(_pre, gstep.deepcopy(replace_internals=True), Eff)
-
-			count += 1
-
+			else:
+				self.insert(_pre, gstep.deepcopy(replace_internals=True), Eff)
+				count += 1
 		return count
 
 	def getPotentialLinkConditions(self, src, snk):
-		from Graph import Edge
 		cndts = []
 		for pre in self[snk.stepnumber].preconditions:
 			if src.stepnumber not in self.id_dict[pre.replaced_ID]:
 				continue
-
-			cndts.add(Edge(src,snk,copy.deepcopy(pre)))
+			cndts.append(Edge(src,snk, copy.deepcopy(pre)))
 		return cndts
 
 	def getPotentialEffectLinkConditions(self, src, snk):
-		from Graph import Edge
 		cndts = []
 		for eff in self[src.stepnumber].effects:
 			for pre in self[snk.stepnumber].preconditions:
 				if eff.replaced_ID not in self.id_dict[pre.replaced_ID]:
 					continue
-				cndts.add(Edge(src, snk, copy.deepcopy(eff)))
+				cndts.append(Edge(src, snk, copy.deepcopy(eff)))
 
 		return cndts
 
@@ -215,7 +205,7 @@ class GLib:
 			if effect.replaced_ID in self.eff_dict[pre.replaced_ID]:
 				pre_token = pre
 				break
-		if pre_token == None:
+		if pre_token is None:
 			raise AttributeError('effect {} not in story_GL.eff_Dict for Sink {}'.format(effect, Sink))
 		return pre_token
 
@@ -231,9 +221,7 @@ class GLib:
 	def __repr__(self):
 		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
 
-
 from Flaws import FlawLib
-
 
 if __name__ ==  '__main__':
 	domain_file = 'domains/ark-domain.pddl'
@@ -250,14 +238,3 @@ if __name__ ==  '__main__':
 
 	print('\n')
 	print(GL)
-
-	# for gstep in story_GL:
-	# 	print(gstep)
-	# 	pre_tokens = gstep.getPreconditionsOrEffects('precond-of')
-	# 	print('antes:')
-	# 	for pre in pre_tokens:
-	# 		print('pre: {} of step {}....\n'.format(pre, gstep))
-	# 		for ante in gstep.pre_dict[pre]:
-	# 			print(ante.action)
-	# 		print('\n')
-	# 	print('\n')

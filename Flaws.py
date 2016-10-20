@@ -56,8 +56,12 @@ class TCLF(Flaw):
 		self.tiebreaker = hash(self.link.label.replaced_ID) + self.link.sink.stepnumber
 
 	def __hash__(self):
-		return hash(self.threat.stepnumber) ^ hash(self.link.source.stepnumber) ^ hash(self.link.sink.stepnumber) ^ \
-			   hash(self.link.label.replaced_ID)
+		#return self.threat.
+	 	return self.threat.stepnumber*1000 + self.link.source.stepnumber + self.link.sink.stepnumber + hash(
+			self.link.label.replaced_ID)
+	# 	k =  self.threat.stepnumber ^ self.link.source.stepnumber ^ self.link.sink.stepnumber ^ \
+	# 		   hash(self.link.label.replaced_ID)
+	# 	return k
 
 
 class Flawque:
@@ -81,6 +85,9 @@ class Flawque:
 
 	def __len__(self):
 		return len(self._flaws)
+
+	def removeDuplicates(self):
+		self._flaws = collections.deque(set(self._flaws))
 
 	def head(self):
 		return self._flaws.popleft()
@@ -149,7 +156,7 @@ class FlawLib():
 		for i,flaw_set in enumerate(self.typs):
 			if i == 2:
 				continue
-			value+=i*len(flaw_set)
+			value += i*len(flaw_set)
 		return value
 
 	def __len__(self):
@@ -203,6 +210,7 @@ class FlawLib():
 		''' for each effect of an existing step, check and update mapping to consistent effects'''
 
 		if flaw.name == 'tclf':
+			#if flaw not in self.threats:
 			self.threats.add(flaw)
 			return
 

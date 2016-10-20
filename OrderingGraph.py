@@ -2,6 +2,7 @@ import collections
 
 from Graph import Graph, Edge
 from Element import Element
+#from clockdeco import clock
 
 
 class OrderingGraph(Graph):
@@ -77,6 +78,7 @@ class OrderingGraph(Graph):
 				return 2
 		return 0
 
+	#@clock
 	def isPath(self, start, finish):
 		"""Returns True if path from start to Finish, False otherwise"""
 		visited = self.rDetectCycle(start)
@@ -104,11 +106,9 @@ class CausalLinkGraph(OrderingGraph):
 		self.edges.add(Edge(source, sink, condition))
 
 	def __repr__(self):
-		return str(['{}-{} --{}-{}-{}--> {}-{}'.format(edge.source.name,
+		return str(['{}-{} --{}--> {}-{}'.format(edge.source.name,
 													   edge.source.arg_name,
-													   edge.label.truth,
-													   str(edge.label.replaced_ID)[19:23],
-													   edge.label.name,
+													 edge.label,
 													   edge.sink.name,
 													   edge.sink.arg_name)
 					for edge in self.edges])
