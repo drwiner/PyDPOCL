@@ -131,6 +131,11 @@ class GLib:
 		self.eff_dict = defaultdict(set)
 		self.threat_dict = defaultdict(set)
 
+	def insert(self, _pre, antestep, eff):
+		self.pre_dict[_pre.replaced_ID].add(antestep)
+		self.id_dict[_pre.replaced_ID].add(antestep.stepnumber)
+		self.eff_dict[_pre.replaced_ID].add(eff.replaced_ID)
+
 	def loadAll(self, consequents):
 		self.load(consequents, consequents)
 
@@ -140,47 +145,31 @@ class GLib:
 
 	def load(self, antecedents, consequents):
 		for ante in antecedents:
-			for pre in ante.preconditions:
+			for pre in ante.Preconditions:
 				self._loadAntecedentPerConsequent(consequents, ante, pre)
 
 	def _loadAntecedantsPerConsequent(self, antecedents, _step, _pre):
-		Precondition = Condition.subgraph(_step, _pre)
-		# if _step.stepnumber
 		for gstep in antecedents:
-			# Defense pattern
-			count = 0
-			for _eff in gstep.effects:
-				# Defense 2
-				if not _eff.isConsistent(_pre):
-					# Defense 2.1
-
-					if not _eff.isOpposite(_pre):
-						continue
-					# Defense 2.2
-					Effect = Condition.subgraph(gstep, _eff)
-					if Effect.Args != Precondition.Args:
-						continue
-
-					self.threat_dict[_step.stepnumber].add(gstep.stepnumber)
-					continue
-
-				# Defense 3
-				Effect = Condition.subgraph(gstep, _eff)
-				if Effect.Args != Precondition.Args:
-					continue
-
-				# Create antestep
-				antestep = copy.deepcopy(gstep)
-				eff_link = antestep.RemoveSubgraph(_eff)
-				antestep.replaceInternals()
-
-				self.pre_dict[_pre.replaced_ID].add(Antestep(antestep, eff_link))
-				self.id_dict[_pre.replaced_ID].add(antestep.stepnumber)
-				self.eff_dict[_pre.replaced_ID].add(eff_link.sink.replaced_ID)
-				count += 1
-
-			if count > 0:
+			if self._parseEffects(gstep, _step, _pre) > 0:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
+
+	def _parseEffects(self, gstep, _step, _pre):
+		count = 0
+
+		for Eff in gstep.Effects:
+
+			if Eff.Args != _pre.Args or Eff.name != _pre.name:
+				continue
+
+			if Eff.truth != _pre.truth:
+				self.threat_dict[_step.stepnumber].add(gstep.stepnumber)
+				continue
+
+			self.insert(_pre, gstep.deepcopy(replace_internals=True), Eff)
+
+			count += 1
+
+		return count
 
 	def getPotentialLinkConditions(self, src, snk):
 		from Graph import Edge

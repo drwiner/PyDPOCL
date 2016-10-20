@@ -149,24 +149,23 @@ class PlanSpacePlanner:
 		if len(antecedents) == 0:
 			return set()
 
-		for s_old in plan.Steps:
+		for s_old in plan.Step_Graphs:
 			if s_old.stepnumber not in antecedents:
 				continue
-			if s_old == s_need:
+			if s_old.root == s_need:
 				continue
 
 			#step 1 - make a copy of the plan, also replaces the plan number
 			new_plan = plan.deepcopy()
 
 			#step 2 - Actionize the steps from new_plan
-			S_Old = Action.subgraph(new_plan, s_old)
 			s_need_new = new_plan.getElementById(s_need.ID)
 
 			#step 3-4 retarget precondition to be s_old effect
-			pre_link_sink = self.RetargetPrecondition(self.GL, new_plan, S_Old, precondition)
+			pre_link_sink = self.RetargetPrecondition(self.GL, new_plan, s_old, precondition)
 
 			#step 5 - add orderings, causal links, and create flaws
-			self.addStep(new_plan, S_Old.root, s_need_new, pre_link_sink, new=False)
+			self.addStep(new_plan, s_old.root, s_need_new, pre_link_sink, new=False)
 
 			#step 6 - add new plan to open list
 			results.add(new_plan)
@@ -175,9 +174,13 @@ class PlanSpacePlanner:
 
 	def RetargetPrecondition(self, GL, plan, S_Old, precondition):
 
-		effect_token = GL.getConsistentEffect(S_Old, precondition)
+		for Eff in S_Old.Effects:
+			if Eff.Args == precondition.Args:
+				effect_token = Eff.root
+				break
+		#effect_token = GL.getConsistentEffect(S_Old, precondition)
 
-		pre_link = plan.RemoveSubgraph(precondition)
+		pre_link = plan.RemoveSubgraph(precondition.root)
 		#push
 		plan.edges.remove(pre_link)
 		#mutate

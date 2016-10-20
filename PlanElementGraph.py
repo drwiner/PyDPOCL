@@ -63,8 +63,24 @@ class Action(ElementGraph):
 		self.edges = set(edges)
 		return link
 
+	@property
+	def Preconditions(self):
+		self.updatePreconditionsOrEffects('precond-of')
+		return [Condition.subgraph(self, pre) for pre in self.preconditions]
+
+	@property
+	def Effects(self):
+		self.updatePreconditionsOrEffects('effect-of')
+		return [Condition.subgraph(self, eff) for eff in self.effects]
+
+	def updatePreconditionsOrEffects(self, label):
+		if label == 'effect-of':
+			self.effect = self.getPreconditionsOrEffects(label)
+		elif label == 'precond-of':
+			self.preconditions = self.getPreconditionsOrEffects(label)
+
 	def getPreconditionsOrEffects(self, label):
-		return {edge.sink for edge in self.edges if edge.label == label}
+		return [edge.sink for edge in self.edges if edge.label == label]
 
 	def __getattr__(self, name):
 		if name == 'preconditions':
