@@ -1,6 +1,7 @@
 (define (domain indiana-jones-ark)
   (:requirements)
   (:types step arg literal name-str - object
+          n - name-str
           0 1 2 3 4 5 - n
           character place item - arg
           weapon - item

@@ -123,7 +123,7 @@ class Graph(Element):
 			self.elements.add(new_elm)
 		if remove_old:
 			self.elements.remove(old_elm_in_edge)
-		edges = iter(self.edges)
+		edges = list(self.edges)
 		for edge in edges:
 			if edge.source == old_elm_in_edge:
 				self.edges.add(Edge(new_elm, edge.sink, edge.label))

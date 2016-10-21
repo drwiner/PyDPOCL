@@ -238,17 +238,8 @@ class PlanSpacePlanner:
 			results.update(self.newStep(plan, flaw))
 		elif flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(plan, flaw)
-			return results
 		else:
 			raise ValueError('whose flaw is it anyway {}?'.format(flaw))
-
-		#if len(results) == 0:
-		#	print(flaw)
-
-		# for result in results:
-		# 	new_flaws = result.detectThreatenedCausalLinks(self.GL)
-		# 	for nf in new_flaws:
-		# 		result.flaws.insert(self.GL, result, nf)
 
 		return results
 
@@ -325,8 +316,8 @@ class TestPlanner(unittest.TestCase):
 
 		#domain = 'domains/ark-domain-decomp.pddl'
 		#problem = 'domains/ark-problem-decomp.pddl'
-		domain = 'domains/ark-domain.pddl'
-		problem = 'domains/ark-problem.pddl'
+		domain = 'domains/ark-domain-decomp.pddl'
+		problem = 'domains/ark-problem-decomp.pddl'
 
 		print('Reading {} and {}'.format(domain, problem))
 

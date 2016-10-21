@@ -8,7 +8,7 @@ import copy
 from uuid import uuid4
 from Flaws import FlawLib
 
-ARGLABELS = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
+ARGLABELS = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg', '6', '7', '8', '9', '10']
 
 
 def makeGoal(formula):
@@ -317,8 +317,10 @@ def domainToOperatorGraphs(domain):
 			decomp_graph = PlanElementGraph(name=action.name, type_graph='decomp')
 			getDecompGraph(action.decomp.formula, decomp_graph, action.parameters)
 			op_graph.subplan = decomp_graph
-			for step_elm in op_graph.elements:
-				for d_elm in decomp_graph.elements:
+			opelms = list(op_graph.elements)
+			dpelms = list(decomp_graph.elements)
+			for step_elm in opelms:
+				for d_elm in dpelms:
 					if not isinstance(d_elm, Argument):
 						continue
 					if d_elm.arg_name == step_elm.arg_name:

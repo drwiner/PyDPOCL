@@ -67,7 +67,6 @@ class Visitable:
 		# and finally call the callback
 		m(self)
 
-
 class PDDLVisitor:
 	"""
 	The standard tree traversal PDDL Visitor from which other Visitors derive.

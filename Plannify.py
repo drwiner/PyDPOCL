@@ -1,5 +1,5 @@
 import itertools
-from PlanElementGraph import Action, PlanElementGraph
+from PlanElementGraph import Action, PlanElementGraph, Condition
 from Graph import Edge
 from clockdeco import clock
 
@@ -117,17 +117,23 @@ def Linkify(Planets, RQ, GL):
 
 
 def Groundify(Planets, GL, has_links):
-
+	print('...Groundify - Unifying Actions with GL')
+	i = 0
 	for Planet in Planets:
+		print("... Planet {}".format(i))
+		i += 1
 		for Step in Planet.Step_Graphs:
+			print('... Unifying {} with {}'.format(Step, GL[Step.stepnumber]))
 			Planet.UnifyActions(Step, GL[Step.stepnumber])
 
 	if not has_links:
 		#we're done
 		return Planets
 
+	print('...Groundify - Creating Causal Links')
 	Discovered_Planets = []
 	for Plan in Planets:
+		print(Plan)
 		Libs = [LinkLib(i, link, GL) for i, link in enumerate(Plan.CausalLinkGraph.edges)]
 
 		#LW = [plan1 [link1.condition, link2.condition,..., link-n.condition],
@@ -139,7 +145,8 @@ def Groundify(Planets, GL, has_links):
 			NP = Plan.deepcopy()
 			for _link in lw:
 				pre_token = GL.getConsistentPrecondition(Action.subgraph(NP, _link.sink), _link.label)
-				NP.ReplaceSubgraphs(pre_token, _link.label.root)
+				NP.ReplaceSubgraphs(pre_token, _link.label)
+				_link.label = Condition.subgraph(NP, _link.label)
 
 			Discovered_Planets.append(NP)
 
