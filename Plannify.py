@@ -119,9 +119,8 @@ def Linkify(Planets, RQ, GL):
 def Groundify(Planets, GL, has_links):
 
 	for Planet in Planets:
-		for step in Planet.Steps:
-			Step = Action.subgraph(Planet, step)
-			Planet.UnifyActions(Step, GL[step.stepnumber])
+		for Step in Planet.Step_Graphs:
+			Planet.UnifyActions(Step, GL[Step.stepnumber])
 
 	if not has_links:
 		#we're done
@@ -140,8 +139,7 @@ def Groundify(Planets, GL, has_links):
 			NP = Plan.deepcopy()
 			for _link in lw:
 				pre_token = GL.getConsistentPrecondition(Action.subgraph(NP, _link.sink), _link.label)
-				pre_link = NP.RemoveSubgraph(pre_token)
-				pre_link.sink = _link.label
+				NP.ReplaceSubgraphs(pre_token, _link.label.root)
 
 			Discovered_Planets.append(NP)
 

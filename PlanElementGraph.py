@@ -61,6 +61,7 @@ class Action(ElementGraph):
 			if link is None:
 				if edge.sink == elm:
 					link = edge
+		edges.remove(link)
 		self.edges = set(edges)
 		return link
 
@@ -76,7 +77,7 @@ class Action(ElementGraph):
 
 	def updatePreconditionsOrEffects(self, label):
 		if label == 'effect-of':
-			self.effect = self.getPreconditionsOrEffects(label)
+			self.effects = self.getPreconditionsOrEffects(label)
 		elif label == 'precond-of':
 			self.preconditions = self.getPreconditionsOrEffects(label)
 
@@ -319,7 +320,26 @@ class PlanElementGraph(ElementGraph):
 			if link is None:
 				if edge.sink == elm:
 					link = edge
+		edges.remove(link)
 		self.edges = set(edges)
+		return link
+
+	def ReplaceSubgraphs(self, literal_old, literal_new):
+		edges = list(self.edges)
+		elm = self.getElementById(literal_old.ID)
+		link = None
+		self.elements.remove(elm)
+
+		for edge in list(self.edges):
+			if edge.source == elm:
+				edges.remove(edge)
+			if link is None:
+				if edge.sink == elm:
+					link = edge
+		edges.remove(link)
+		link.sink = literal_new
+		self.edges = set(edges)
+		self.edges.add(link)
 		return link
 
 	def AddSubgraph(self, subgraph):
@@ -397,7 +417,7 @@ class PlanElementGraph(ElementGraph):
 	def Step_Graphs(self):
 		return [Action.subgraph(self, step) for step in self.Steps]
 
-	@clock
+	#@clock
 	def detectThreatenedCausalLinks(self, GL):
 		"""
 		A threatened causal link flaw is a tuple <causal link edge, threatening step element>
@@ -411,13 +431,15 @@ class PlanElementGraph(ElementGraph):
 		detectedThreatenedCausalLinks = set()
 		nonThreats = self.CausalLinkGraph.nonThreats
 		step = self.lastAdded
-		step
+		#for eff in step.Effects:
+		#	print(eff)
+		#step
 		#if step is None:
 
 		for causal_link in self.CausalLinkGraph.edges:
 
 			#for step in self.Step_Graphs:
-			print('checking step {} for cl {}'.format(step, causal_link))
+			#print('checking step {} for cl {}'.format(step, causal_link))
 			# defense 1
 			if step.root in nonThreats[causal_link]:
 				continue
@@ -438,7 +460,7 @@ class PlanElementGraph(ElementGraph):
 				nonThreats[causal_link].add(step.root)
 				continue
 
-			print('still checking')
+		#	print('still checking')
 
 			if test(step, causal_link):
 				detectedThreatenedCausalLinks.add(TCLF((step.root, causal_link), 'tclf'))

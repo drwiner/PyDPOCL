@@ -97,12 +97,6 @@ class PlanSpacePlanner:
 
 	#@clock
 	def newStep(self, plan, flaw):
-		"""
-		@param plan:
-		@param flaw:
-		@return:
-		"""
-
 		results = set()
 		s_need, precondition = flaw.flaw
 		antecedents = self.GL.pre_dict[precondition.replaced_ID]
@@ -111,36 +105,31 @@ class PlanSpacePlanner:
 			if ante.stepnumber == plan.initial_dummy_step.stepnumber:
 				continue
 
-			#step 1 - make a copy
-			antestep = ante.deepcopy(replace_internals=True)
-			eff = self.GL.getConsistentEffect(antestep, precondition)
-			eff_link = antestep.RemoveSubgraph(eff)
-
-			#step 2 - make a copy of the plan
 			new_plan = plan.deepcopy()
+			antestep = ante.deepcopy(replace_internals=True)
+			eff = self.IntegrateNewStep(new_plan, antestep, precondition)
 
-			#step 3 - set sink before replace internals
-			temp = eff.replaced_ID
-			eff_link.sink = new_plan.getElementById(precondition.ID)
-			eff_link.sink.replaced_ID = temp
-			new_plan.edges.add(eff_link)
-
-			#step 4 - add new stuff to new plan
-			new_plan.elements.update(antestep.elements)
-			new_plan.edges.update(antestep.edges)
-
-			#step 5 - update orderings and causal links, add flaws
+			#add step, orderings and causal links, add flaws
 			self.addStep(new_plan,
 						 s_add=antestep,
 						 s_need=new_plan.getElementById(s_need.ID),
-						 condition=Condition.subgraph(new_plan, eff_link.sink),
+						 condition=Condition.subgraph(new_plan, eff),
 						 new=True)
 			new_plan.flaws.addCndtsAndRisks(self.GL, antestep.root)
 
-			#step 6 - add new_plan to open list
 			results.add(new_plan)
 
 		return results
+
+	def IntegrateNewStep(self, new_plan, antestep, precondition):
+		eff = self.GL.getConsistentEffect(antestep, precondition)
+		eff_link = antestep.RemoveSubgraph(eff)
+		eff_link.sink = new_plan.getElementById(precondition.root.ID)
+		eff_link.sink.replaced_ID = eff.replaced_ID
+		new_plan.edges.add(eff_link)
+		new_plan.elements.update(antestep.elements)
+		new_plan.edges.update(antestep.edges)
+		return eff_link.sink
 
 	#@clock
 	def reuse(self, plan, flaw):
@@ -152,28 +141,22 @@ class PlanSpacePlanner:
 		if len(antecedents) == 0:
 			return set()
 
-		for s_old in plan.Step_Graphs:
+		for s_old in plan.Steps:
 			if s_old.stepnumber not in antecedents:
 				continue
-			if s_old.root == s_need:
+			if s_old == s_need:
 				continue
 
-			#step 1 - make a copy of the plan, also replaces the plan number
 			new_plan = plan.deepcopy()
+			Old = Action.subgraph(new_plan, s_old)
+			joint_literal = self.RetargetPrecondition(self.GL, new_plan, Old, precondition)
 
-			#step 2 - Actionize the steps from new_plan
-			s_need_new = new_plan.getElementById(s_need.ID)
-
-			#step 3-4 retarget precondition to be s_old effect
-			pre_link_sink = self.RetargetPrecondition(self.GL, new_plan, s_old, precondition)
-			Old = Action.subgraph(new_plan, new_plan.getElementById(s_old.ID))
-
-			#step 5 - add orderings, causal links, and create flaws
-			self.addStep(new_plan, Old, s_need_new,
-						 condition=Condition.subgraph(new_plan, pre_link_sink),
+			#add step, orderings, causal links, and create flaws
+			self.addStep(new_plan, Old,
+						 s_need=new_plan.getElementById(s_need.ID),
+						 condition=Condition.subgraph(new_plan, joint_literal),
 						 new=False)
 
-			#step 6 - add new plan to open list
 			results.add(new_plan)
 
 		return results
@@ -182,26 +165,15 @@ class PlanSpacePlanner:
 		effect_token = GL.getConsistentEffect(S_Old, precondition)
 
 		if S_Old.is_decomp:
-			Eff = list(Condition.subgraph(S_Old, effect_token).Args)
+			Eff = Condition.subgraph(S_Old, effect_token).Args
 			Pre = precondition.Args
 			if not isIdenticalElmsInArgs(Pre, Eff):
 				return False
+			pass
 
-		# for Eff in S_Old.Effects:
-		# 	if Eff.Args == precondition.Args:
-		# 		effect_token = Eff.root
-		# 		break
-		#effect_token = GL.getConsistentEffect(S_Old, precondition)
+		plan.ReplaceSubgraphs(precondition.root, effect_token)
 
-		pre_link = plan.RemoveSubgraph(precondition.root)
-		#push
-		plan.edges.remove(pre_link)
-		#mutate
-		pre_link.sink = effect_token
-		#pop
-		plan.edges.add(pre_link)
-
-		return pre_link.sink
+		return effect_token
 
 	def addStep(self, plan, s_add, s_need, condition, new=None):
 		"""
@@ -228,7 +200,6 @@ class PlanSpacePlanner:
 			for Prec in s_add.Preconditions:
 				plan.flaws.insert(self.GL, plan, Flaw((s_add.root, Prec), 'opf'))
 		plan.lastAdded = s_add
-		s_add.Effects
 
 		return plan
 
@@ -290,6 +261,7 @@ class PlanSpacePlanner:
 			#print(self._frontier)
 
 			plan = self.pop()
+			print(plan.flaws)
 			#print('\n selecting plan: {}'.format(plan))
 			#print(plan.flaws)
 
@@ -310,7 +282,8 @@ class PlanSpacePlanner:
 
 			#Select Flaw
 			flaw = plan.flaws.next()
-#			print('{} selected : {}\n'.format(flaw.name, flaw))
+			print('{} selected : {}\n'.format(flaw.name, flaw))
+
 		#	if flaw.name == 'tclf':
 		#		print('{} selected : {}\n'.format(flaw.name, flaw))
 			#	print(plan.flaws)
