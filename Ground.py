@@ -144,6 +144,7 @@ class GLib:
 		self.load(self._gsteps, self._gsteps)
 
 	def loadPartition(self, doperators):
+		#print('... for each decompositional operator ')
 		self.load(doperators, self._gsteps)
 		self.load(self._gsteps, doperators)
 
