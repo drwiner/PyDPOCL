@@ -194,12 +194,16 @@ class PlanSpacePlanner:
 
 		#Always add this ordering
 		plan.OrderingGraph.addEdge(s_add.root, s_need)
-		plan.CausalLinkGraph.addEdge(s_add.root, s_need, condition)
+		new_link = plan.CausalLinkGraph.addEdge(s_add.root, s_need, condition)
+		new_tclfs = plan.detectTCLFperCL(self.GL, new_link)
 
 		if new:
 			for Prec in s_add.Preconditions:
 				plan.flaws.insert(self.GL, plan, Flaw((s_add.root, Prec), 'opf'))
-		plan.lastAdded = s_add
+				new_tclfs.update(plan.detectTCLFperStep(self.GL, s_add.root))
+
+		for tclf in new_tclfs:
+			plan.flaws.insert(self.GL, plan, tclf)
 
 		return plan
 
@@ -241,10 +245,10 @@ class PlanSpacePlanner:
 		#if len(results) == 0:
 		#	print(flaw)
 
-		for result in results:
-			new_flaws = result.detectThreatenedCausalLinks(self.GL)
-			for nf in new_flaws:
-				result.flaws.insert(self.GL, result, nf)
+		# for result in results:
+		# 	new_flaws = result.detectThreatenedCausalLinks(self.GL)
+		# 	for nf in new_flaws:
+		# 		result.flaws.insert(self.GL, result, nf)
 
 		return results
 
@@ -261,13 +265,16 @@ class PlanSpacePlanner:
 			#print(self._frontier)
 
 			plan = self.pop()
-			print(plan.flaws)
+			#print(plan.flaws)
 			#print('\n selecting plan: {}'.format(plan))
 			#print(plan.flaws)
 
 			visited += 1
 
 			if not plan.isInternallyConsistent():
+				print('pruned')
+				print(plan)
+				print(plan.flaws)
 				continue
 
 			if len(plan.flaws) == 0:

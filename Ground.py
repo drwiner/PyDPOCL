@@ -9,6 +9,8 @@ from Plannify import Plannify
 from Element import Argument, Actor, Operator, Literal
 from pddlToGraphs import parseDomAndProb
 from Graph import Edge
+from Flaws import FlawLib
+from GlobalContainer import GC
 import hashlib
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
@@ -87,6 +89,8 @@ def reload(name):
 	n = re.sub('[^A-Za-z0-9]+', '', name)
 	afile = open(n, "rb")
 	GL = pickle.load(afile)
+	FlawLib.non_static_preds = GL.non_static_preds
+	GC.object_types = GL.object_types
 	afile.close()
 	return GL
 
@@ -94,7 +98,8 @@ class GLib:
 
 	def __init__(self, domain, problem):
 		operators, dops, objects, obtypes, init_action, goal_action = parseDomAndProb(domain, problem)
-
+		self.non_static_preds = FlawLib.non_static_preds
+		self.object_types = GC.object_types
 		self.objects = objects
 		self._gsteps = groundStoryList(operators, self.objects, obtypes)
 
@@ -220,8 +225,6 @@ class GLib:
 
 	def __repr__(self):
 		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
-
-from Flaws import FlawLib
 
 if __name__ ==  '__main__':
 	domain_file = 'domains/ark-domain.pddl'

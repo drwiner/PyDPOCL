@@ -87,6 +87,27 @@ class OrderingGraph(Graph):
 				return True
 		return False
 
+	def __lt__(self, other):
+		#only compared when already has same number of elements
+		if len(self.edges) != len(other.edges):
+			return len(self.edges) < len(other.edges)
+
+		S = list(self.elements)
+		S.sort(key=lambda x: x.stepnumber)
+		O = list(other.elements)
+		O.sort(key=lambda x: x.stepnumber)
+		for s, o in zip(S, O):
+			if s.stepnumber != o.stepnumber:
+				return s.stepnumber < o.stepnumber
+			sumo = self.numOutgoing(s)
+			oumo = other.numOutgoing(o)
+			if sumo != oumo:
+				return sumo < oumo
+
+
+	def numOutgoing(self, step):
+		return len({ordering for ordering in self.edges if ordering.source == step})
+
 	def __repr__(self):
 		return str(
 			['{}-{} < {}-{}'.format(edge.source.name, edge.source.arg_name, edge.sink.name, edge.sink.arg_name) for edge
@@ -103,7 +124,9 @@ class CausalLinkGraph(OrderingGraph):
 	def addEdge(self, source, sink, condition):
 		self.elements.add(source)
 		self.elements.add(sink)
-		self.edges.add(Edge(source, sink, condition))
+		new_link = Edge(source, sink, condition)
+		self.edges.add(new_link)
+		return new_link
 
 	def __repr__(self):
 		return str(['{}-{} --{}--> {}-{}'.format(edge.source.name,

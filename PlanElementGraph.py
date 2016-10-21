@@ -290,18 +290,11 @@ class PlanElementGraph(ElementGraph):
 			return self.heuristic < other.heuristic
 		elif self.cost != other.cost:
 			return self.cost < other.cost
-		elif len(self.Steps) != len(other.Steps):
-			return len(self.Steps) < len(other.Steps)
 		elif len(self.flaws) != len(other.flaws):
 			return len(self.flaws) < len(other.flaws)
 		else:
-			S = list(self.Steps)
-			S.sort(key=lambda x: x.stepnumber)
-			O = list(other.Steps)
-			O.sort(key=lambda x: x.stepnumber)
-			for s, o in zip(S, O):
-				if s.stepnumber != o.stepnumber:
-					return s.stepnumber < o.stepnumber
+			return self.OrderingGraph < other.OrderingGraph
+
 
 	def deepcopy(self):
 		new_self = copy.deepcopy(self)
@@ -417,6 +410,40 @@ class PlanElementGraph(ElementGraph):
 	def Step_Graphs(self):
 		return [Action.subgraph(self, step) for step in self.Steps]
 
+
+	def detectTCLFperCL(self, GL, causal_link):
+		detectedThreatenedCausalLinks = set()
+		nonThreats = self.CausalLinkGraph.nonThreats
+		for step in self.Steps:
+			self.testThreat(GL, nonThreats, causal_link, step, detectedThreatenedCausalLinks)
+		return detectedThreatenedCausalLinks
+
+	def detectTCLFperStep(self, GL, step):
+		detectedThreatenedCausalLinks = set()
+		nonThreats = self.CausalLinkGraph.nonThreats
+		for causal_link in self.CausalLinkGraph.edges:
+			self.testThreat(GL, nonThreats, causal_link, step, detectedThreatenedCausalLinks)
+		return detectedThreatenedCausalLinks
+
+	def testThreat(self, GL, nonThreats, causal_link, step, dTCLFs):
+		if step in nonThreats[causal_link]:
+			return
+		if step == causal_link.source or step == causal_link.sink:
+			nonThreats[causal_link].add(step)
+			return
+		if self.OrderingGraph.isPath(causal_link.sink, step):
+			nonThreats[causal_link].add(step)
+			return
+		if self.OrderingGraph.isPath(step, causal_link.source):
+			nonThreats[causal_link].add(step)
+			return
+		if step.stepnumber not in GL.threat_dict[causal_link.sink.stepnumber]:
+			nonThreats[causal_link].add(step)
+			return
+		if test(Action.subgraph(self, step), causal_link):
+			dTCLFs.add(TCLF((step, causal_link), 'tclf'))
+		nonThreats[causal_link].add(step)
+
 	#@clock
 	def detectThreatenedCausalLinks(self, GL):
 		"""
@@ -430,7 +457,7 @@ class PlanElementGraph(ElementGraph):
 
 		detectedThreatenedCausalLinks = set()
 		nonThreats = self.CausalLinkGraph.nonThreats
-		step = self.lastAdded
+		#step = self.lastAdded
 		#for eff in step.Effects:
 		#	print(eff)
 		#step
@@ -438,38 +465,38 @@ class PlanElementGraph(ElementGraph):
 
 		for causal_link in self.CausalLinkGraph.edges:
 
-			#for step in self.Step_Graphs:
+			for step in self.Steps:
 			#print('checking step {} for cl {}'.format(step, causal_link))
 			# defense 1
-			if step.root in nonThreats[causal_link]:
-				continue
+				if step in nonThreats[causal_link]:
+					continue
 
-			# defense 2-4 - First, ignore steps which either are the source and sink of causal link, or which cannot
-			#  be ordered between them
-			if step.root == causal_link.source or step.root == causal_link.sink:
-				nonThreats[causal_link].add(step.root)
-				continue
-			if self.OrderingGraph.isPath(causal_link.sink, step.root):
-				nonThreats[causal_link].add(step.root)
-				continue
-			if self.OrderingGraph.isPath(step.root, causal_link.source):
-				nonThreats[causal_link].add(step.root)
-				continue
+				# defense 2-4 - First, ignore steps which either are the source and sink of causal link, or which cannot
+				#  be ordered between them
+				if step == causal_link.source or step == causal_link.sink:
+					nonThreats[causal_link].add(step)
+					continue
+				if self.OrderingGraph.isPath(causal_link.sink, step):
+					nonThreats[causal_link].add(step)
+					continue
+				if self.OrderingGraph.isPath(step, causal_link.source):
+					nonThreats[causal_link].add(step)
+					continue
 
-			if step.stepnumber not in GL.threat_dict[causal_link.sink.stepnumber]:
-				nonThreats[causal_link].add(step.root)
-				continue
+				if step.stepnumber not in GL.threat_dict[causal_link.sink.stepnumber]:
+					nonThreats[causal_link].add(step)
+					continue
 
-		#	print('still checking')
+			#	print('still checking')
 
-			if test(step, causal_link):
-				detectedThreatenedCausalLinks.add(TCLF((step.root, causal_link), 'tclf'))
+				if test(Action.subgraph(self, step), causal_link):
+					detectedThreatenedCausalLinks.add(TCLF((step, causal_link), 'tclf'))
 			# for eff in step.Effects:
 			# 	if eff.isOpposite(causal_link.label):
 			# 		detectedThreatenedCausalLinks.add(TCLF((step.root, causal_link), 'tclf'))
 			# 		break
 
-			nonThreats[causal_link].add(step.root)
+			nonThreats[causal_link].add(step)
 
 		return detectedThreatenedCausalLinks
 
