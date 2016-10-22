@@ -332,6 +332,7 @@ class PlanElementGraph(ElementGraph):
 					link = edge
 		edges.remove(link)
 		link.sink = literal_new
+		self.elements.add(literal_new)
 		self.edges = set(edges)
 		self.edges.add(link)
 		return link

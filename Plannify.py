@@ -109,7 +109,7 @@ def Linkify(Planets, RQ, GL):
 				continue
 
 			Planet.CausalLinkGraph.addEdge(src, snk, cond)
-			Planet.OrderingGraph.addEdge(src,snk)
+			Planet.OrderingGraph.addEdge(src, snk)
 
 		Planets[:] = [Planet for i, Planet in enumerate(Planets) if i not in removable]
 		removable = set()
@@ -148,9 +148,14 @@ def Groundify(Planets, GL, has_links):
 			NP = Plan.deepcopy()
 			for _link in list(lw):
 				pre_token = GL.getConsistentPrecondition(Action.subgraph(NP, _link.sink), _link.label)
+				#label = NP.getElementByID(_link.label.ID)
 				NP.ReplaceSubgraphs(pre_token, _link.label)
 				NP.CausalLinkGraph.edges.remove(_link)
-				NP.CausalLinkGraph.edges.add(Edge(_link.source, _link.sink, Condition.subgraph(NP, _link.label)))
+				try:
+					NP.CausalLinkGraph.edges.add(Edge(_link.source, _link.sink, Condition.subgraph(NP, _link.label)))
+				except:
+					print('no?')
+
 			#	_link.label = Condition.subgraph(NP, _link.label)
 
 			Discovered_Planets.append(NP)
