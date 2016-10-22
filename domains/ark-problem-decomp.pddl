@@ -15,6 +15,6 @@
          (has nazis gun))
   (:goal (and
               (not (alive nazis))
-              (chases nazis indiana)
+              (decomposer indiana)
               ;(has army ark)
               )))

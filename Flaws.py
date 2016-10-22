@@ -153,12 +153,13 @@ class FlawLib():
 		self.nonreusable = Flawque()
 
 		self.typs = [self.statics, self.inits, self.threats, self.decomps, self.unsafe, self.reusable, self.nonreusable]
+		self.restricted_names = ['threats', 'decomps']
 
 	@property
 	def heuristic(self):
 		value = 0
 		for i, flawques in enumerate(self.typs):
-			if flawques.name == 'threats' or flawques.name == 'decomps':
+			if flawques.name in self.restricted_names:
 				continue
 			value += i*len(flawques)
 		return value
@@ -175,15 +176,15 @@ class FlawLib():
 
 	@property
 	def flaws(self):
-		return [flaw for i, flaw_set in enumerate(self.typs) for flaw in flaw_set if flaw_set.name != 'threats' and
-				flaw_set.name != 'threats']
+		return [flaw for i, flaw_set in enumerate(self.typs) for flaw in flaw_set if flaw_set.name not in
+				self.restricted_names]
 
 	def OCs(self):
 		''' Generator for open conditions'''
 		for i, flaw_set in enumerate(self.typs):
 			if len(flaw_set) == 0:
 				continue
-			if flaw_set.name == 'threats' or flaw_set.name == 'decomps':
+			if flaw_set.name in self.restricted_names:
 				continue
 			g = (flaw for flaw in flaw_set)
 			yield(next(g))

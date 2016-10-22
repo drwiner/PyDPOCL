@@ -21,7 +21,8 @@
                (name ?obj - object ?name - name-str)
                (nth-step-arg ?n - n ?step - step ?arg - arg)
                (effect ?step - step ?lit - literal)
-               (chases ?char - character ?char2 - character))
+               (chases ?char - character ?char2 - character)
+               (decomposer ?char - character))
 
 
   (:action travel
@@ -128,18 +129,18 @@
      :precondition (not (has ?character ?w))
      :effect (not (armed ?character)))
 
-    (:action chase-scene
-        :parameters (?c1 - character ?c2 - character
-                    ?t1 - step ?t2 - step ?t3 - step
-                    ?t4 - step ?t5 - step ?t6 - step
-                    ?place1 - place ?place2 - place)
-        :precondition (and (at ?c1 ?place1) (at ?c2 ?place1) (not (= ?c1 ?c2)))
-        :effect (and (chases ?c2 ?c1) (at ?c1 ?place2) (at ?c2 ?place2))
-        :decomp (and (name ?t1 travel) (name ?t2 travel) (name ?t3 travel)
-                (name ?t4 travel) (name ?t5 travel) (name ?t6 travel)
-                (< ?t1 ?t2) (< ?t2 ?t3) (< ?t3 ?t4) (< ?t4 ?t5) (< ?t5 ?t6)
-                (nth-step-arg 0 ?t1 ?c1) (nth-step-arg 0 ?t3 ?c1) (nth-step-arg 0 ?t5 ?c1)
-                (nth-step-arg 0 ?t2 ?c2) (nth-step-arg 0 ?t4 ?c2) (nth-step-arg 0 ?t6 ?c2)
-                ))
+
+   (:action indy-gets-ark
+     :parameters (?indy - character ?ark - item ?excavate - step ?state - literal)
+     :precondition ()
+     :effect (and (has ?indy ?ark) (decomposer ?indy))
+     :decomp (and
+                  (name ?indy indiana)
+                  (name ?ark ark)
+                  (name ?state has)
+                  (truth ?state True)
+                  (nth-lit-arg 0 ?state ?indy)
+                  (nth-lit-arg 1 ?state ?ark)
+                  (effect ?excavate ?state)))
 
 )
