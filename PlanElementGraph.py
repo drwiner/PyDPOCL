@@ -141,7 +141,8 @@ class Action(ElementGraph):
 
 	def __repr__(self):
 		self.updateArgs()
-		args = str([arg.name for arg in self.Args])
+		args = str([arg.name if not isinstance(arg, ElementGraph) else arg for arg in
+				   self.Args])
 		if hasattr(self.root, 'executed'):
 			exe = self.root.executed
 			if exe is None:
@@ -204,7 +205,7 @@ class Condition(ElementGraph):
 
 	def __repr__(self):
 		self.updateArgs()
-		args = str([arg.name for arg in self.Args])
+		args = str([arg.name if not isinstance(arg, Action) else arg for arg in self.Args])
 		t = ''
 		if not self.root.truth:
 			t = 'not-'

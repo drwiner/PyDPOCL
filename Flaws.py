@@ -132,10 +132,10 @@ class FlawLib():
 	def __init__(self):
 
 		#static = unchangeable (should do oldest first.)
-		self.statics = Flawque()
+		self.statics = Flawque('statics')
 
 		#init = established by initial state
-		self.inits = Flawque()
+		self.inits = Flawque('inits')
 
 		#decomps - decompositional ground subplans to add
 		self.decomps = Flawque('decomps')
@@ -147,10 +147,10 @@ class FlawLib():
 		self.unsafe = Flawque('unsafe')
 
 		#reusable = open conditions consistent with at least one existing effect sorted by number of cndts
-		self.reusable = Flawque()
+		self.reusable = Flawque('reusable')
 
 		#nonreusable = open conditions inconsistent with existing effect sorted by number of cndts
-		self.nonreusable = Flawque()
+		self.nonreusable = Flawque('nonreusable')
 
 		self.typs = [self.statics, self.inits, self.threats, self.decomps, self.unsafe, self.reusable, self.nonreusable]
 		self.restricted_names = ['threats', 'decomps']
@@ -266,17 +266,10 @@ class FlawLib():
 
 	def __repr__(self):
 		#flaw_str_list = [str([flaw for flaw in flaw_set]) for flaw_set in self.typs]
-
-		statics = str([flaw for flaw in self.statics])
-		inits = str([flaw for flaw in self.inits])
-		decomps = str([flaw for flaw in self.decomps])
-		threats = str([flaw for flaw in self.threats])
-		unsafe = str([flaw for flaw in self.unsafe])
-		reusable = str([flaw for flaw in self.reusable])
-		nonreusable = str([flaw for flaw in self.nonreusable])
-		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\ninits: \n' + inits + '\ndecomps: \n' + decomps +\
-		'\nthreats: \n' + threats + '\nunsafe: \n' +  unsafe + '\nreusable: \n' + reusable + '\nnonreusable: \n' + nonreusable + '\n'
-
+		F = [('|' + ''.join([str(flaw) + '\n|' for flaw in T]) , T.name) for T in self.typs if len(T) > 0]
+		#flaw_lib_string = str(['\n {}: \n {} '.format(flaws, name) + '\n' for flaws, name in F])
+		return '______________________\n|FLAWLIBRARY: \n|' + ''.join(['\n|{}: \n{}'.format(name, flaws) for
+																		  flaws, name in F]) + '______________________'
 
 import unittest
 class TestOrderingGraphMethods(unittest.TestCase):

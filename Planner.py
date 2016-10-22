@@ -266,7 +266,7 @@ class PlanSpacePlanner:
 			#print(self._frontier)
 
 			plan = self.pop()
-			#print(plan.flaws)
+			print(plan.flaws)
 			#print('\n selecting plan: {}'.format(plan))
 			#print(plan.flaws)
 

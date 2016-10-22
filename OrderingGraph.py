@@ -109,9 +109,7 @@ class OrderingGraph(Graph):
 		return len({ordering for ordering in self.edges if ordering.source == step})
 
 	def __repr__(self):
-		return str(
-			['{}-{} < {}-{}'.format(edge.source.name, edge.source.arg_name, edge.sink.name, edge.sink.arg_name) for edge
-			 in self.edges])
+		return str(['{} < {}'.format(edge.source, edge.sink, edge.sink) for edge in self.edges])
 
 
 class CausalLinkGraph(OrderingGraph):
@@ -129,16 +127,9 @@ class CausalLinkGraph(OrderingGraph):
 		return new_link
 
 	def __repr__(self):
-		return str(['{}-{} --{}--> {}-{}'.format(edge.source.name,
-													   edge.source.arg_name,
-													 edge.label,
-													   edge.sink.name,
-													   edge.sink.arg_name)
-					for edge in self.edges])
-
+		return str(['{} --{}--> {}'.format(edge.source, edge.label, edge.sink) for edge in self.edges])
 
 import unittest
-
 
 class TestOrderingGraphMethods(unittest.TestCase):
 	def test_detect_cycle(self):

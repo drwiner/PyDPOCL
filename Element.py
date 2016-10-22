@@ -201,9 +201,9 @@ class Operator(InternalElement):
 		if self.executed is None:
 			exe = ''
 		else:
-			exe = '-' + self.executed
+			exe = self.executed
 		uid = str(self.ID)[19:23]
-		return 'operator{}-{}-{}-{}'.format(exe, self.name, self.stepnumber, uid)
+		return '{}{}-{}-{}'.format(exe, self.name, self.stepnumber, uid)
 
 
 class Literal(InternalElement):
