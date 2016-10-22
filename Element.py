@@ -161,6 +161,7 @@ class Operator(InternalElement):
 		super(Operator, self).__init__(ID, typ, name, arg_name, num_args=num_args)
 		self.stepnumber = stepnumber
 		self.executed = executed
+		self.is_decomp = False
 
 	def __hash__(self):
 		return hash(self.ID)

@@ -133,7 +133,7 @@
                     ?t1 - step ?t2 - step ?t3 - step
                     ?t4 - step ?t5 - step ?t6 - step
                     ?place1 - place ?place2 - place)
-        :precondition (and (at ?c1 ?place1) (at ?c2 ?place1))
+        :precondition (and (at ?c1 ?place1) (at ?c2 ?place1) (not (= ?c1 ?c2)))
         :effect (and (chases ?c2 ?c1) (at ?c1 ?place2) (at ?c2 ?place2))
         :decomp (and (name ?t1 travel) (name ?t2 travel) (name ?t3 travel)
                 (name ?t4 travel) (name ?t5 travel) (name ?t6 travel)

@@ -47,10 +47,12 @@ def groundDecompStepList(doperators, GL, stepnum=0):
 		for sp in Plannify(op.subplan, GL):
 
 			GDO = copy.deepcopy(op)
+			GDO.is_decomp = True
 
 			for elm in sp.elements:
 				assignElmToContainer(GDO, sp, elm, list(op.elements))
 
+			GDO.root.is_decomp = True
 			GDO.ground_subplan = sp
 			GDO.root.stepnumber = stepnum
 			GDO._replaceInternals()

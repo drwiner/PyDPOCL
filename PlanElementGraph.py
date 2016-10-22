@@ -413,16 +413,14 @@ class PlanElementGraph(ElementGraph):
 
 	def detectTCLFperCL(self, GL, causal_link):
 		detectedThreatenedCausalLinks = set()
-		nonThreats = self.CausalLinkGraph.nonThreats
 		for step in self.Steps:
-			self.testThreat(GL, nonThreats, causal_link, step, detectedThreatenedCausalLinks)
+			self.testThreat(GL, self.CausalLinkGraph.nonThreats, causal_link, step, detectedThreatenedCausalLinks)
 		return detectedThreatenedCausalLinks
 
 	def detectTCLFperStep(self, GL, step):
 		detectedThreatenedCausalLinks = set()
-		nonThreats = self.CausalLinkGraph.nonThreats
 		for causal_link in self.CausalLinkGraph.edges:
-			self.testThreat(GL, nonThreats, causal_link, step, detectedThreatenedCausalLinks)
+			self.testThreat(GL, self.CausalLinkGraph.nonThreats, causal_link, step, detectedThreatenedCausalLinks)
 		return detectedThreatenedCausalLinks
 
 	def testThreat(self, GL, nonThreats, causal_link, step, dTCLFs):
@@ -446,58 +444,10 @@ class PlanElementGraph(ElementGraph):
 
 	#@clock
 	def detectThreatenedCausalLinks(self, GL):
-		"""
-		A threatened causal link flaw is a tuple <causal link edge, threatening step element>
-			where if s --p--> t is a causal link edge and s_threat is the threatening step element,
-				then there is no ordering path from t to s_threat,
-				no ordering path from s_threat to s,
-				there is an effect edge from s_threat to a literal false-p',
-				and p' is consistent with p after flipping the truth attribute
-		"""
-
 		detectedThreatenedCausalLinks = set()
-		nonThreats = self.CausalLinkGraph.nonThreats
-		#step = self.lastAdded
-		#for eff in step.Effects:
-		#	print(eff)
-		#step
-		#if step is None:
-
 		for causal_link in self.CausalLinkGraph.edges:
-
 			for step in self.Steps:
-			#print('checking step {} for cl {}'.format(step, causal_link))
-			# defense 1
-				if step in nonThreats[causal_link]:
-					continue
-
-				# defense 2-4 - First, ignore steps which either are the source and sink of causal link, or which cannot
-				#  be ordered between them
-				if step == causal_link.source or step == causal_link.sink:
-					nonThreats[causal_link].add(step)
-					continue
-				if self.OrderingGraph.isPath(causal_link.sink, step):
-					nonThreats[causal_link].add(step)
-					continue
-				if self.OrderingGraph.isPath(step, causal_link.source):
-					nonThreats[causal_link].add(step)
-					continue
-
-				if step.stepnumber not in GL.threat_dict[causal_link.sink.stepnumber]:
-					nonThreats[causal_link].add(step)
-					continue
-
-			#	print('still checking')
-
-				if test(Action.subgraph(self, step), causal_link):
-					detectedThreatenedCausalLinks.add(TCLF((step, causal_link), 'tclf'))
-			# for eff in step.Effects:
-			# 	if eff.isOpposite(causal_link.label):
-			# 		detectedThreatenedCausalLinks.add(TCLF((step.root, causal_link), 'tclf'))
-			# 		break
-
-			nonThreats[causal_link].add(step)
-
+				self.testThreat(GL, self.CausalLinkGraph.nonThreats, causal_link, step, detectedThreatenedCausalLinks)
 		return detectedThreatenedCausalLinks
 
 	def __repr__(self):

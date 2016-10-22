@@ -56,23 +56,24 @@ class TCLF(Flaw):
 		self.tiebreaker = hash(self.link.label.replaced_ID) + self.link.sink.stepnumber
 
 	def __hash__(self):
-		#return self.threat.
 	 	return self.threat.stepnumber*1000 + self.link.source.stepnumber + self.link.sink.stepnumber + hash(
 			self.link.label.replaced_ID)
-	# 	k =  self.threat.stepnumber ^ self.link.source.stepnumber ^ self.link.sink.stepnumber ^ \
-	# 		   hash(self.link.label.replaced_ID)
-	# 	return k
 
+class DCF(Flaw):
+	def __init__(self, f, name):
+		super(DCF, self).__init__(f, name)
+		self.criteria = len(f.Steps)
+		self.tiebreaker = f.heuristic
 
 class Flawque:
 	""" A deque which pretends to be a set, and keeps everything sorted"""
 
 	def __init__(self, name=None):
 		self._flaws = collections.deque()
-		self._name = name
+		self.name = name
 
 	def add(self, flaw):
-		flaw.setCriteria(self._name)
+		flaw.setCriteria(self.name)
 		self.insert(flaw)
 		#self._flaws.append(item)
 
@@ -116,7 +117,7 @@ class Flawque:
 class simpleQueueWrapper(collections.deque):
 	#def __init__(self, name):
 		#super(simpleQueueWrapper, self).__init__()
-		#self._name = name
+		#self.name = name
 	def add(self, item):
 		self.append(item)
 	def pop(self):
@@ -136,8 +137,11 @@ class FlawLib():
 		#init = established by initial state
 		self.inits = Flawque()
 
+		#decomps - decompositional ground subplans to add
+		self.decomps = Flawque('decomps')
+
 		#threat = causal link dependency undone
-		self.threats = Flawque()
+		self.threats = Flawque('threats')
 
 		#unsafe = existing effect would undo sorted by number of cndts
 		self.unsafe = Flawque('unsafe')
@@ -148,15 +152,15 @@ class FlawLib():
 		#nonreusable = open conditions inconsistent with existing effect sorted by number of cndts
 		self.nonreusable = Flawque()
 
-		self.typs = [self.statics, self.inits, self.threats, self.unsafe, self.reusable, self.nonreusable]
+		self.typs = [self.statics, self.inits, self.threats, self.decomps, self.unsafe, self.reusable, self.nonreusable]
 
 	@property
 	def heuristic(self):
 		value = 0
-		for i,flaw_set in enumerate(self.typs):
-			if i == 2:
+		for i, flawques in enumerate(self.typs):
+			if flawques.name == 'threats' or flawques.name == 'decomps':
 				continue
-			value += i*len(flaw_set)
+			value += i*len(flawques)
 		return value
 
 	def __len__(self):
@@ -171,14 +175,15 @@ class FlawLib():
 
 	@property
 	def flaws(self):
-		return [flaw for i, flaw_set in enumerate(self.typs) for flaw in flaw_set if i != 2]
+		return [flaw for i, flaw_set in enumerate(self.typs) for flaw in flaw_set if flaw_set.name != 'threats' and
+				flaw_set.name != 'threats']
 
 	def OCs(self):
 		''' Generator for open conditions'''
 		for i, flaw_set in enumerate(self.typs):
 			if len(flaw_set) == 0:
 				continue
-			if i == 2:
+			if flaw_set.name == 'threats' or flaw_set.name == 'decomps':
 				continue
 			g = (flaw for flaw in flaw_set)
 			yield(next(g))
@@ -212,6 +217,10 @@ class FlawLib():
 		if flaw.name == 'tclf':
 			#if flaw not in self.threats:
 			self.threats.add(flaw)
+			return
+
+		if flaw.name == 'dcf':
+			self.decomps.add(flaw)
 			return
 
 		#unpack flaw
@@ -259,13 +268,13 @@ class FlawLib():
 
 		statics = str([flaw for flaw in self.statics])
 		inits = str([flaw for flaw in self.inits])
+		decomps = str([flaw for flaw in self.decomps])
 		threats = str([flaw for flaw in self.threats])
 		unsafe = str([flaw for flaw in self.unsafe])
 		reusable = str([flaw for flaw in self.reusable])
 		nonreusable = str([flaw for flaw in self.nonreusable])
-	#	return '\nFLAW LIBRARY: \n' + [flaw_set for flaw_set in flaw_str_list] + '\n'
-		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\ninits: \n' + inits + '\nthreats: \n' + threats + \
-			   '\nunsafe: \n' +  unsafe + '\nreusable: \n' + reusable + '\nnonreusable: \n' + nonreusable + '\n'
+		return '\nFLAW LIBRARY: \nstatics:  \n' + statics + '\ninits: \n' + inits + '\ndecomps: \n' + decomps +\
+		'\nthreats: \n' + threats + '\nunsafe: \n' +  unsafe + '\nreusable: \n' + reusable + '\nnonreusable: \n' + nonreusable + '\n'
 
 
 import unittest

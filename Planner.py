@@ -1,11 +1,11 @@
 from pddlToGraphs import parseDomAndProb
 from PlanElementGraph import PlanElementGraph, Action, Condition
-from Flaws import Flaw
+from Flaws import Flaw, DCF
 from heapq import heappush, heappop
 from clockdeco import clock
 from Ground import reload, GLib
 from Graph import Edge, isIdenticalElmsInArgs, retargetElmsInArgs, retargetArgs
-
+from Plannify import Unify
 import copy
 
 """
@@ -123,6 +123,14 @@ class PlanSpacePlanner:
 
 	def IntegrateNewStep(self, new_plan, antestep, precondition):
 		eff = self.GL.getConsistentEffect(antestep, precondition)
+
+		if antestep.is_decomp:
+			PArgs = list(precondition.Args)
+			EArgs = list(Condition.subgraph(antestep, eff).Args)
+			retargetArgs(antestep, EArgs, PArgs)
+			retargetElmsInArgs(antestep.ground_subplan, EArgs, PArgs)
+			new_plan.flaws.insert(self.GL, new_plan, DCF(antestep.ground_subplan, 'dcf'))
+
 		eff_link = antestep.RemoveSubgraph(eff)
 		eff_link.sink = new_plan.getElementById(precondition.root.ID)
 		eff_link.sink.replaced_ID = eff.replaced_ID
@@ -151,6 +159,10 @@ class PlanSpacePlanner:
 			Old = Action.subgraph(new_plan, s_old)
 			joint_literal = self.RetargetPrecondition(self.GL, new_plan, Old, precondition)
 
+			if Old.is_decomp and s_need.is_decomp:
+				if not isIdenticalElmsInArgs(precondition.Args, Condition.subgraph(Old, joint_literal).Args):
+					continue
+
 			#add step, orderings, causal links, and create flaws
 			self.addStep(new_plan, Old,
 						 s_need=new_plan.getElementById(s_need.ID),
@@ -163,14 +175,6 @@ class PlanSpacePlanner:
 
 	def RetargetPrecondition(self, GL, plan, S_Old, precondition):
 		effect_token = GL.getConsistentEffect(S_Old, precondition)
-
-		if S_Old.is_decomp:
-			Eff = Condition.subgraph(S_Old, effect_token).Args
-			Pre = precondition.Args
-			if not isIdenticalElmsInArgs(Pre, Eff):
-				return False
-			pass
-
 		plan.ReplaceSubgraphs(precondition.root, effect_token)
 
 		return effect_token
@@ -238,6 +242,12 @@ class PlanSpacePlanner:
 			results.update(self.newStep(plan, flaw))
 		elif flaw.name == 'tclf':
 			results = self.resolveThreatenedCausalLinkFlaw(plan, flaw)
+		elif flaw.name == 'dcf':
+			results = Unify(plan, flaw.flaw, self.GL)
+			for r in results:
+				new_flaws = r.detectThreatenedCausalLinks(self.GL)
+				for nf in new_flaws:
+					r.flaws.insert(self.GL, r, nf)
 		else:
 			raise ValueError('whose flaw is it anyway {}?'.format(flaw))
 
@@ -314,8 +324,8 @@ class TestPlanner(unittest.TestCase):
 	def testPlanner(self):
 		from GlobalContainer import GC
 
-		#domain = 'domains/ark-domain-decomp.pddl'
-		#problem = 'domains/ark-problem-decomp.pddl'
+		# domain = 'domains/ark-domain.pddl'
+		# problem = 'domains/ark-problem.pddl'
 		domain = 'domains/ark-domain-decomp.pddl'
 		problem = 'domains/ark-problem-decomp.pddl'
 
