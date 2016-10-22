@@ -38,6 +38,7 @@ def groundStoryList(operators, objects, obtypes):
 			stepnum += 1
 			gstep.replaceArgs(t)
 			gsteps.append(gstep)
+			gstep.replaceInternals()
 	return gsteps
 
 def groundDecompStepList(doperators, GL, stepnum=0):

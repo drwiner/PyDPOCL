@@ -310,7 +310,8 @@ def retargetArgs(G, C1, C2):
 def retarget(G, _map):
 	for elm in list(G.elements):
 		if elm in _map:
-			G.assign(elm, _map[elm])
+			if elm.ID != _map[elm].ID:
+				G.assign(elm, _map[elm])
 
 
 ################################################################

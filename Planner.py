@@ -159,7 +159,7 @@ class PlanSpacePlanner:
 			Old = Action.subgraph(new_plan, s_old)
 			joint_literal = self.RetargetPrecondition(self.GL, new_plan, Old, precondition)
 
-			if Old.is_decomp and s_need.is_decomp:
+			if Old.is_decomp or s_need.is_decomp:
 				if not isIdenticalElmsInArgs(precondition.Args, Condition.subgraph(Old, joint_literal).Args):
 					continue
 
@@ -324,8 +324,8 @@ class TestPlanner(unittest.TestCase):
 	def testPlanner(self):
 		from GlobalContainer import GC
 
-		# domain = 'domains/ark-domain.pddl'
-		# problem = 'domains/ark-problem.pddl'
+		#domain = 'domains/ark-domain.pddl'
+		#problem = 'domains/ark-problem.pddl'
 		domain = 'domains/ark-domain-decomp.pddl'
 		problem = 'domains/ark-problem-decomp.pddl'
 
