@@ -57,6 +57,7 @@ def groundDecompStepList(doperators, GL, stepnum=0):
 			GDO.ground_subplan = sp
 			GDO.root.stepnumber = stepnum
 			GDO._replaceInternals()
+			GDO.replaceInternals()
 			gsteps.append(GDO)
 			stepnum += 1
 

@@ -326,8 +326,10 @@ class TestPlanner(unittest.TestCase):
 
 		#domain = 'domains/ark-domain.pddl'
 		#problem = 'domains/ark-problem.pddl'
-		domain = 'domains/ark-domain-decomp.pddl'
-		problem = 'domains/ark-problem-decomp.pddl'
+		#domain = 'domains/ark-domain-decomp.pddl'
+		#problem = 'domains/ark-problem-decomp.pddl'
+		domain = 'domains/ark-domain-decomp-two.pddl'
+		problem = 'domains/ark-problem-decomp-two.pddl'
 
 		print('Reading {} and {}'.format(domain, problem))
 

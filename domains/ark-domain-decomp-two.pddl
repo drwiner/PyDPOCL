@@ -20,10 +20,11 @@
                (< ?source - step ?sink - step)
                (name ?obj - object ?name - name-str)
                (nth-step-arg ?n - n ?step - step ?arg - arg)
+               (nth-lit-arg ?n - n ?lit - literal ?arg - arg)
                (effect ?step - step ?lit - literal)
                (chases ?char - character ?char2 - character)
                (linked-by ?source - step ?sink - step ?dependency - literal)
-               (bel-linked ?source - step ?sink - step)
+               (stolen ?k - arg)
                (decomposer ?char - character))
 
 
@@ -148,11 +149,9 @@
     (:action link-excavate-steal
      :parameters (?excavate - step ?steal - step ?state - literal ?stolen - item)
      :precondition (and (not (= ?excavate ?steal)))
-     :effect (and (bel-linked ?excavate ?steal))
+     :effect (and (stolen ?stolen))
      :decomp (and (name ?excavate excavate)
                   (name ?steal steal)
-                  (effect ?excavate ?state)
-                  (precond ?steal ?state)
+                  (nth-lit-arg 1 ?state ?stolen)
                   (linked-by ?excavate ?steal ?state)))
-
 )

@@ -136,7 +136,7 @@ def Groundify(Planets, GL, has_links):
 	print('...Groundify - Creating Causal Links')
 	Discovered_Planets = []
 	for Plan in Planets:
-		print(Plan)
+		#print(Plan)
 		Libs = [LinkLib(i, link, GL) for i, link in enumerate(Plan.CausalLinkGraph.edges)]
 
 		#LW = [plan1 [link1.condition, link2.condition,..., link-n.condition],
@@ -146,10 +146,12 @@ def Groundify(Planets, GL, has_links):
 
 		for lw in LW:
 			NP = Plan.deepcopy()
-			for _link in lw:
+			for _link in list(lw):
 				pre_token = GL.getConsistentPrecondition(Action.subgraph(NP, _link.sink), _link.label)
 				NP.ReplaceSubgraphs(pre_token, _link.label)
-				_link.label = Condition.subgraph(NP, _link.label)
+				NP.CausalLinkGraph.edges.remove(_link)
+				NP.CausalLinkGraph.edges.add(Edge(_link.source, _link.sink, Condition.subgraph(NP, _link.label)))
+			#	_link.label = Condition.subgraph(NP, _link.label)
 
 			Discovered_Planets.append(NP)
 
@@ -340,14 +342,11 @@ def AddLink(link, new_plan, UW, remove_flaw=True):
 	if new_d is None:
 		Sink = Action.subgraph(new_plan, UW[link.sink.position])
 		new_d = Sink.getElmByRID(link.label.replaced_ID)
-		# if new_d is None:
-		# 	raise ValueError('here')
-	new_plan.CausalLinkGraph.addEdge(UW[link.source.position],
-									 UW[link.sink.position],
-									 Condition.subgraph(new_plan, new_d))
+	D = Condition.subgraph(new_plan, new_d)
+	new_plan.CausalLinkGraph.addEdge(UW[link.source.position], UW[link.sink.position],D)
 
 	if remove_flaw:
 		flaws = new_plan.flaws.flaws
-		f = Flaw((UW[link.sink.position], new_d), 'opf')
+		f = Flaw((UW[link.sink.position], D), 'opf')
 		if f in flaws:
 			new_plan.flaws.remove(f)

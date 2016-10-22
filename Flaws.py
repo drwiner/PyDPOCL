@@ -64,6 +64,10 @@ class DCF(Flaw):
 		super(DCF, self).__init__(f, name)
 		self.criteria = len(f.Steps)
 		self.tiebreaker = f.heuristic
+	def __repr__(self):
+		steps = [''.join(str(step) + ', ' for step in self.flaw.Step_Graphs)]
+		return 'DCF(' + ''.join(['{}'.format(step) for step in steps]) + 'h={}, criteria ={}, tb={})'.format(
+			self.heuristic, self.criteria, self.tiebreaker)
 
 class Flawque:
 	""" A deque which pretends to be a set, and keeps everything sorted"""
