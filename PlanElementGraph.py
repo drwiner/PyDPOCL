@@ -411,6 +411,9 @@ class PlanElementGraph(ElementGraph):
 	def Step_Graphs(self):
 		return [Action.subgraph(self, step) for step in self.Steps]
 
+	@property
+	def Steps_Sorted(self):
+		pass
 
 	def detectTCLFperCL(self, GL, causal_link):
 		detectedThreatenedCausalLinks = set()
@@ -452,12 +455,24 @@ class PlanElementGraph(ElementGraph):
 		return detectedThreatenedCausalLinks
 
 	def __repr__(self):
+	#	F = [('|' + ''.join([str(flaw) + '\n|' for flaw in T]), T.name) for T in self.typs if len(T) > 0]
+		# flaw_lib_string = str(['\n {}: \n {} '.format(flaws, name) + '\n' for flaws, name in F])
+	#	return '______________________\n|FLAWLIBRARY: \n|' + ''.join(['\n|{}: \n{}'.format(name, flaws) for
+#																	  flaws, name in F]) + '______________________'
+#
 		c = '\ncost {} + heuristic {}'.format(self.cost, self.heuristic)
-		steps = str([Action.subgraph(self, step) for step in self.Steps])
+		steps = [''.join('\t' + str(step) + '\n' for step in self.Step_Graphs)]
+		order = [''.join('\t' + str(ordering.source) + ' < ' + str(ordering.sink) + '\n' for ordering in \
+			self.OrderingGraph.edges if
+						 ordering.source.stepnumber != self.initial_dummy_step.stepnumber and
+						 ordering.sink.stepnumber != self.final_dummy_step.stepnumber)]
+		#steps = str([''.join(str(Action.subgraph(self, step))) + '\n' for step in self.Steps]))
+		links = [''.join('\t' + str(cl) + '\n' for cl in self.CausalLinkGraph.edges)]
 		orderings = self.OrderingGraph.__repr__()
-		links = self.CausalLinkGraph.__repr__()
-		return 'PLAN: ' + str(
-			self.ID) + c + '\n*Steps: \n{' + steps + '}\n*Orderings:\n {' + orderings + '}\n*CausalLinks:\n {' + links + '}'
+		#links = self.CausalLinkGraph.__repr__()
+		return 'PLAN: ' + str(self.ID) + c + '\n*Steps: \n' + ''.join(['{}'.format(step) for step in steps]) + \
+			   '*Orderings:\n' + \
+			   ''.join(['{}'.format(o) for o in order]) + '*CausalLinks:\n' + ''.join(['{}'.format(link) for link in links]) + '}'
 
 #@clock
 def test(step, causal_link):
@@ -465,3 +480,16 @@ def test(step, causal_link):
 		if eff.isOpposite(causal_link.label):
 			return True
 	return False
+
+def topoSort(plan):
+	OG = copy.deepcopy(plan.OrderingGraph)
+	L =[]
+	S = {plan.initial_dummy_step}
+	while len(S) > 0:
+		n = S.pop()
+		L.append(n)
+		for m_edge in OG.getIncidentEdges(n):
+			OG.edges.remove(m_edge)
+			if len({edge for edge in OG.getParents(m_edge.sink)}) == 0:
+				S.add(m_edge.sink)
+	return L
