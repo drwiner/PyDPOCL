@@ -200,7 +200,7 @@ class FlawLib():
 				return flaw_set.pop()
 		return None
 
-	@clock
+	#@clock
 	def addCndtsAndRisks(self, GL, action):
 		""" For each effect of Action, add to open-condition mapping if consistent"""
 
@@ -215,7 +215,7 @@ class FlawLib():
 			elif action.stepnumber in GL.threat_dict[s_need.stepnumber]:
 				oc.risks += 1
 
-	@clock
+	#@clock
 	def insert(self, GL, plan, flaw):
 		''' for each effect of an existing step, check and update mapping to consistent effects'''
 
