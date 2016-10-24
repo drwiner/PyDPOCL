@@ -149,14 +149,10 @@ def Groundify(Planets, GL, has_links):
 			for _link in list(lw):
 				pre_token = GL.getConsistentPrecondition(Action.subgraph(NP, _link.sink), _link.label)
 				#label = NP.getElementByID(_link.label.ID)
-				NP.ReplaceSubgraphs(pre_token, _link.label)
+				if pre_token != _link.label:
+					NP.ReplaceSubgraphs(pre_token, _link.label)
 				NP.CausalLinkGraph.edges.remove(_link)
-				try:
-					NP.CausalLinkGraph.edges.add(Edge(_link.source, _link.sink, Condition.subgraph(NP, _link.label)))
-				except:
-					print('no?')
-
-			#	_link.label = Condition.subgraph(NP, _link.label)
+				NP.CausalLinkGraph.edges.add(Edge(_link.source, _link.sink, Condition.subgraph(NP, _link.label)))
 
 			Discovered_Planets.append(NP)
 
@@ -245,7 +241,7 @@ class LinkLib:
 		return self._links[position]
 
 	def __repr__(self):
-		return '{}-- link-pos {} --> {}'.format(self.source, self.position, self.sink)
+		return 'pos={}: {}--{}-> {}'.format(self.position, self.source, self.condition, self.sink)
 
 class ReuseLib:
 	def __init__(self, i, s_add, story_steps):
@@ -337,6 +333,9 @@ def AddNewFlaws(GL, step, new_plan):
 			raise ValueError('wait, no edge for this preconditon? impossible!')
 		if len(cndts) < 2:
 			new_plan.flaws.insert(GL, new_plan, Flaw((step, pre), 'opf'))
+
+	if step.is_decomp:
+		new_plan.flaws.insert(GL, new_plan, Flaw(GL[step.stepnumber].ground_subplan, 'dcf'))
 
 	new_plan.flaws.addCndtsAndRisks(GL, step)
 

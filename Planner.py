@@ -99,9 +99,11 @@ class PlanSpacePlanner:
 	def newStep(self, plan, flaw):
 		results = set()
 		s_need, precondition = flaw.flaw
-		antecedents = self.GL.pre_dict[precondition.replaced_ID]
+		#antecedents = self.GL.pre_dict[precondition.replaced_ID]
+		antecedents = self.GL.id_dict[precondition.replaced_ID]
 
-		for ante in antecedents:
+		for antenum in antecedents:
+			ante = self.GL[antenum]
 			if ante.stepnumber == plan.initial_dummy_step.stepnumber:
 				continue
 
@@ -129,6 +131,10 @@ class PlanSpacePlanner:
 			EArgs = list(Condition.subgraph(antestep, eff).Args)
 			retargetArgs(antestep, EArgs, PArgs)
 			retargetElmsInArgs(antestep.ground_subplan, EArgs, PArgs)
+			to_add = set()
+			for link in list(antestep.ground_subplan.CausalLinkGraph.edges):
+				to_add.add(Edge(link.source, link.sink, Condition.subgraph(antestep.ground_subplan, link.label)))
+			antestep.ground_subplan.CausalLinkGraph.edges = to_add
 			new_plan.flaws.insert(self.GL, new_plan, DCF(antestep.ground_subplan, 'dcf'))
 
 		eff_link = antestep.RemoveSubgraph(eff)
@@ -157,27 +163,28 @@ class PlanSpacePlanner:
 
 			new_plan = plan.deepcopy()
 			Old = Action.subgraph(new_plan, s_old)
-			joint_literal = self.RetargetPrecondition(self.GL, new_plan, Old, precondition)
+			effect_token = self.GL.getConsistentEffect(Old, precondition)
+			#joint_literal = self.RetargetPrecondition(self.GL, new_plan, Old, precondition)
 
+			print('reuse: {}'.format(Old))
+			print('is_decomp={}'.format(Old.is_decomp))
 			if Old.is_decomp or s_need.is_decomp:
-				if not isIdenticalElmsInArgs(precondition.Args, Condition.subgraph(Old, joint_literal).Args):
+				if not isIdenticalElmsInArgs(precondition.Args, Condition.subgraph(Old, effect_token).Args):
 					continue
+				else:
+					print("not identical")
+
+			effect_edge = new_plan.ReplaceSubgraphs(precondition.root, effect_token)
 
 			#add step, orderings, causal links, and create flaws
 			self.addStep(new_plan, Old,
 						 s_need=new_plan.getElementById(s_need.ID),
-						 condition=Condition.subgraph(new_plan, joint_literal),
+						 condition=Condition.subgraph(new_plan, effect_edge.sink),
 						 new=False)
 
 			results.add(new_plan)
 
 		return results
-
-	def RetargetPrecondition(self, GL, plan, S_Old, precondition):
-		effect_token = GL.getConsistentEffect(S_Old, precondition)
-		plan.ReplaceSubgraphs(precondition.root, effect_token)
-
-		return effect_token
 
 	def addStep(self, plan, s_add, s_need, condition, new=None):
 		"""
@@ -302,7 +309,7 @@ class PlanSpacePlanner:
 			#print('generated children: {}'.format(len(children)))
 			for child in children:
 				self.insert(child)
-
+		raise ValueError('Frontier is empty... no plan found')
 
 def topoSort(graph):
 	OG = copy.deepcopy(graph.OrderingGraph)
@@ -328,9 +335,9 @@ class TestPlanner(unittest.TestCase):
 		#problem = 'domains/ark-problem.pddl'
 		#domain = 'domains/ark-domain-decomp.pddl'
 		#problem = 'domains/ark-problem-decomp.pddl'
-		domain = 'domains/ark-domain-decomp-two.pddl'
+	#	domain = 'domains/ark-domain-decomp-two.pddl'
 		problem = 'domains/ark-problem-decomp-two.pddl'
-		#domain = 'domains/ark-domain-decomp-three.pddl'
+		domain = 'domains/ark-domain-decomp-three.pddl'
 
 		print('Reading {} and {}'.format(domain, problem))
 

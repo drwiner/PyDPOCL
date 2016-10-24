@@ -93,9 +93,10 @@ def reload(name):
 	n = re.sub('[^A-Za-z0-9]+', '', name)
 	afile = open(n, "rb")
 	GL = pickle.load(afile)
+	afile.close()
 	FlawLib.non_static_preds = GL.non_static_preds
 	GC.object_types = GL.object_types
-	afile.close()
+
 	return GL
 
 class GLib:
@@ -107,17 +108,6 @@ class GLib:
 		self.objects = objects
 		self._gsteps = groundStoryList(operators, self.objects, obtypes)
 
-		# init at [-2]
-		init_action.root.stepnumber = len(self._gsteps)
-		init_action._replaceInternals()
-		init_action.replaceInternals()
-		self._gsteps.append(init_action)
-		# goal at [-1]
-		goal_action.root.stepnumber = len(self._gsteps)
-		goal_action._replaceInternals()
-		goal_action.replaceInternals()
-		self._gsteps.append(goal_action)
-
 		#dictionaries
 		self.pre_dict = defaultdict(set)
 		self.ante_dict = defaultdict(set)
@@ -128,16 +118,29 @@ class GLib:
 
 		D = groundDecompStepList(dops, self, stepnum=len(self._gsteps))
 		self.loadPartition(D)
-		self._gsteps[-2:] = D
+		#self._gsteps.extend(D)
 
-		# init at [-2] second time
-		self._gsteps.append(init_action)
-		# goal at [-1] second time
-		self._gsteps.append(goal_action)
+		# init at [-2]
+		init_action.root.stepnumber = len(self._gsteps)
+		init_action._replaceInternals()
+		init_action.replaceInternals()
+		#self._gsteps.append(init_action)
+		# goal at [-1]
+		goal_action.root.stepnumber = len(self._gsteps) + 1
+		goal_action._replaceInternals()
+		goal_action.replaceInternals()
+	#	self._gsteps.append(goal_action)
+
+		self.loadPartition([init_action, goal_action])
+		#self._gsteps.append(init_action)
+		#self._gsteps.append(goal_action)
 
 		print('{} ground steps created'.format(len(self)))
 		print('uploading')
 		upload(self, domain + problem)
+		for Pre in self[-1].preconditions:
+			print(self.id_dict[Pre.replaced_ID])
+			print(self.pre_dict[Pre.replaced_ID])
 
 	def insert(self, _pre, antestep, eff):
 		self.pre_dict[_pre.replaced_ID].add(antestep)
@@ -147,10 +150,12 @@ class GLib:
 	def loadAll(self):
 		self.load(self._gsteps, self._gsteps)
 
-	def loadPartition(self, doperators):
+	def loadPartition(self, particals):
 		#print('... for each decompositional operator ')
-		self.load(doperators, self._gsteps)
-		self.load(self._gsteps, doperators)
+		self.load(particals, self._gsteps)
+		self.load(self._gsteps, particals)
+		self.load(particals, particals)
+		self._gsteps.extend(particals)
 
 	def load(self, antecedents, consequents):
 		for ante in antecedents:

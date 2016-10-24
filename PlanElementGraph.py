@@ -464,8 +464,8 @@ class PlanElementGraph(ElementGraph):
 		c = '\ncost {} + heuristic {}'.format(self.cost, self.heuristic)
 		steps = [''.join('\t' + str(step) + '\n' for step in self.Step_Graphs)]
 		order = [''.join('\t' + str(ordering.source) + ' < ' + str(ordering.sink) + '\n' for ordering in
-			self.OrderingGraph.edges if ordering.source.stepnumber != self.initial_dummy_step.stepnumber and
-			ordering.sink.stepnumber != self.final_dummy_step.stepnumber)]
+			self.OrderingGraph.edges)] #if ordering.source.stepnumber != self.initial_dummy_step.stepnumber and
+			#ordering.sink.stepnumber != self.final_dummy_step.stepnumber)]
 		#steps = str([''.join(str(Action.subgraph(self, step))) + '\n' for step in self.Steps]))
 		links = [''.join('\t' + str(cl) + '\n' for cl in self.CausalLinkGraph.edges)]
 		#orderings = self.OrderingGraph.__repr__()

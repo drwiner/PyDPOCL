@@ -1,4 +1,5 @@
-from Element import *
+from Element import Element, Argument, Literal
+#from PlanElementGraph import Condition
 import copy
 from clockdeco import clock
 class Edge:
@@ -31,10 +32,6 @@ class Edge:
 		
 	def __hash__(self):
 		return hash(self.source.ID) ^ hash(self.sink.ID) ^ hash(self.label)
-
-	def assign(self, endpoint, new_val):
-		new_val.ID = self.endpoint.ID
-		self.endpoint = new_val
 		
 	def merge(self, other):
 		"""Merges source and sink"""
@@ -45,10 +42,6 @@ class Edge:
 		self.source.merge(other.source)
 		self.sink.merge(other.sink)
 		
-		return self
-	
-	def swapSink(self,sink):
-		self.sink = sink
 		return self
 		
 	def __repr__(self):
@@ -93,44 +86,46 @@ class Graph(Element):
 				return edge.sink
 		return None
 
-
 	def replaceWith(self, oldsnk, newsnk):
 		''' removes oldsnk from self.elements, replaces all edges with snk = oldsnk with newsnk'''
 
 		if oldsnk == newsnk:
 			return
+
+		self.assign(oldsnk, newsnk)
+
 		if self.getElementById(newsnk.ID) is None:
 			raise NameError('newsnk replacer is not found in self')
-		if oldsnk in self.elements:
-			self.elements.remove(oldsnk)
-		for incoming in (edge for edge in self.edges if edge.sink == oldsnk):
-			incoming.sink = newsnk
-		#update constraint edges which might reference specific elements being replaced
+
+		# update constraint edges which might reference specific elements being replaced
 		for r in self.subgraphs:
-			for r_edge in r.edges:
-				if r_edge.source == oldsnk:
-					if r_edge.source in r.elements:
-						r.elements.add(newsnk)
-					r.replaceWith(r_edge.source, newsnk)
-				if r_edge.sink == oldsnk:
-					if r_edge.sink in r.elements:
-						r.elements.add(newsnk)
-					r.replaceWith(r_edge.sink, newsnk)
+			r.assign(oldsnk, newsnk)
+
+		if hasattr(self, 'ground_subplan'):
+			self.ground_subplan.assign(oldsnk, newsnk)
+
 		return self
 
 	def assign(self, old_elm_in_edge, new_elm, remove_old=True):
-		if new_elm not in self.elements:
-			self.elements.add(new_elm)
+		if old_elm_in_edge.ID == new_elm.ID:
+			return
+		new_elements = list(self.elements)
+		new_edges = list(self.edges)
 		if remove_old:
-			self.elements.remove(old_elm_in_edge)
-		edges = list(self.edges)
-		for edge in edges:
+			# if old_elm_in_edge in self.elements:
+			new_elements.remove(old_elm_in_edge)
+		if new_elm not in self.elements:
+			new_elements.append(new_elm)
+		for edge in list(self.edges):
 			if edge.source == old_elm_in_edge:
-				self.edges.add(Edge(new_elm, edge.sink, edge.label))
-				self.edges.remove(edge)
+				# if edge in self.edges:
+				new_edges.remove(edge)
+				new_edges.append(Edge(new_elm, edge.sink, edge.label))
 			if edge.sink == old_elm_in_edge:
-				self.edges.add(Edge(edge.source, new_elm, edge.label))
-				self.edges.remove(edge)
+				new_edges.remove(edge)
+				new_edges.append(Edge(edge.source, new_elm, edge.label))
+		self.elements = set(new_elements)
+		self.edges = set(new_edges)
 		for r in self.subgraphs:
 			if r.name == 'Restriction':
 				r.assign(old_elm_in_edge, new_elm)
@@ -212,7 +207,7 @@ class Graph(Element):
 		return False
 
 	def findConsistentSubgraph(self, cndt_subgraph):
-		return findConsistentEdgeMap(Rem = copy.deepcopy(cndt_subgraph.edges), Avail = copy.deepcopy(self.edges))
+		return findConsistentEdgeMap(Rem=copy.deepcopy(cndt_subgraph.edges), Avail=copy.deepcopy(self.edges))
 		
 	def isInternallyConsistent(self):
 		return not self.equivalentWithRestrictions()
@@ -277,13 +272,16 @@ def retargetElmsInArgs(GSP, C1, C2):
 	for link in list(GSP.CausalLinkGraph.edges):
 		if link.source in bigger_map and link.sink in bigger_map:
 			links.remove(link)
-			links.append(Edge(bigger_map[link.source], bigger_map[link.sink], bigger_map[link.label]))
+			links.append(
+				Edge(bigger_map[link.source], bigger_map[link.sink], bigger_map[link.label]))
 		elif link.source in bigger_map:
 			links.remove(link)
-			links.append(Edge(bigger_map[link.source], link.sink, bigger_map[link.label]))
+			links.append(
+				Edge(bigger_map[link.source], link.sink, bigger_map[link.label]))
 		elif link.sink in bigger_map:
 			links.remove(link)
-			links.append(Edge(link.source, bigger_map[link.sink], bigger_map[link.label]))
+			links.append(
+				Edge(link.source, bigger_map[link.sink], bigger_map[link.label]))
 	GSP.CausalLinkGraph.edges = set(links)
 
 	#Orderings

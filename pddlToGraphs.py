@@ -124,7 +124,7 @@ def getSubFormulaNoParent(formula, objects):
 		arg = next(ob_element for ob_name, ob_element in objects.items() if child.key == ob_name)
 		edges.add(Edge(lit, arg, ARGLABELS[i]))
 		elements.add(arg)
-	return (elements, edges)
+	return elements, edges
 
 
 def getGoalSet(goal_formula, objects):
@@ -141,7 +141,7 @@ def getGoalSet(goal_formula, objects):
 		goal_elements.update(elements)
 		goal_edges.update(edges)
 
-	return (goal_elements, goal_edges)
+	return goal_elements, goal_edges
 
 
 def decorateElm(child, DG):
@@ -363,7 +363,7 @@ def problemToGraphs(problem):
 		for i, p in enumerate(condition.parameters):
 			init_graph.edges.add(Edge(lit, Args[p], ARGLABELS[i]))
 
-	return (Args, init_graph, goal_graph)
+	return Args, init_graph, goal_graph
 
 
 import itertools
