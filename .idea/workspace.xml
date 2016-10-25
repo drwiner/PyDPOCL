@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="" />
+    <list default="true" id="ace53a0e-3087-4bcd-bd2d-5167343685dd" name="Default" comment="Modified flaw restricted_names">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/story-elements.iml" afterPath="$PROJECT_DIR$/.idea/story-elements.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    </list>
     <ignored path="story-elements.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,21 +24,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Planner.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Planner.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Planner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="439" column="42" selection-start-line="439" selection-start-column="42" selection-end-line="439" selection-end-column="42" />
-              <folding />
+            <state relative-caret-position="694">
+              <caret line="130" column="58" selection-start-line="130" selection-start-column="58" selection-end-line="130" selection-end-column="58" />
+              <folding>
+                <element signature="e#0#40#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ark-discourse-tests.pddl" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/domains/ark-discourse-tests.pddl">
+      <file leaf-file-name="Flaws.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Flaws.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="35" selection-start-line="0" selection-start-column="35" selection-end-line="0" selection-end-column="35" />
+            <state relative-caret-position="456">
+              <caret line="217" column="5" selection-start-line="217" selection-start-column="5" selection-end-line="217" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -43,22 +49,10 @@
       <file leaf-file-name="PlanElementGraph.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="486" column="39" selection-start-line="486" selection-start-column="39" selection-end-line="486" selection-end-column="39" />
+            <state relative-caret-position="4804">
+              <caret line="320" column="24" selection-start-line="320" selection-start-column="8" selection-end-line="320" selection-end-column="24" />
               <folding>
-                <element signature="e#0#27#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pddlToGraphs.py" pinned="true" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2850">
-              <caret line="362" column="0" selection-start-line="362" selection-start-column="0" selection-end-line="362" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#30#0" expanded="true" />
+                <element signature="e#0#56#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -67,8 +61,42 @@
       <file leaf-file-name="Plannify.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Plannify.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="268">
-              <caret line="276" column="29" selection-start-line="276" selection-start-column="29" selection-end-line="276" selection-end-column="29" />
+            <state relative-caret-position="405">
+              <caret line="337" column="89" selection-start-line="337" selection-start-column="86" selection-end-line="337" selection-end-column="89" />
+              <folding>
+                <element signature="e#0#16#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pddlToGraphs.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="303">
+              <caret line="430" column="31" selection-start-line="430" selection-start-column="25" selection-end-line="430" selection-end-column="31" />
+              <folding>
+                <element signature="e#0#30#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GlobalContainer.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GlobalContainer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="51">
+              <caret line="3" column="106" selection-start-line="3" selection-start-column="106" selection-end-line="3" selection-end-column="106" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Element.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Element.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="201">
+              <caret line="279" column="46" selection-start-line="279" selection-start-column="31" selection-end-line="279" selection-end-column="46" />
               <folding />
             </state>
           </provider>
@@ -77,8 +105,20 @@
       <file leaf-file-name="Ground.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Ground.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2184">
-              <caret line="192" column="51" selection-start-line="192" selection-start-column="42" selection-end-line="192" selection-end-column="51" />
+            <state relative-caret-position="401">
+              <caret line="95" column="0" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
+              <folding>
+                <element signature="e#1#17#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="clockdeco.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/clockdeco.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -87,10 +127,10 @@
       <file leaf-file-name="Graph.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Graph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+            <state relative-caret-position="78">
+              <caret line="250" column="22" selection-start-line="250" selection-start-column="4" selection-end-line="250" selection-end-column="22" />
               <folding>
-                <element signature="e#0#21#0" expanded="true" />
+                <element signature="e#0#46#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -119,41 +159,48 @@
         <option value="$PROJECT_DIR$/rGetInt.py" />
         <option value="$PROJECT_DIR$/shelftopack.py" />
         <option value="$PROJECT_DIR$/domains/mini-indy-domain.pddl" />
-        <option value="$PROJECT_DIR$/pddl/tree_visitor.py" />
-        <option value="$PROJECT_DIR$/domains/ark-problem.pddl" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/nlk.py" />
         <option value="$PROJECT_DIR$/CompileReq.py" />
         <option value="$PROJECT_DIR$/Restrictions.py" />
         <option value="$PROJECT_DIR$/pddl/pddl.py" />
         <option value="$PROJECT_DIR$/Relax.py" />
-        <option value="$PROJECT_DIR$/domains/ark-domain.pddl" />
-        <option value="$PROJECT_DIR$/Flaws.py" />
         <option value="$PROJECT_DIR$/Assignments.py" />
-        <option value="$PROJECT_DIR$/OrderingGraph.py" />
         <option value="$PROJECT_DIR$/pddl/parser.py" />
         <option value="$PROJECT_DIR$/domains/ark-requirements-domain.pddl" />
-        <option value="$PROJECT_DIR$/GlobalContainer.py" />
-        <option value="$PROJECT_DIR$/Element.py" />
-        <option value="$PROJECT_DIR$/ElementGraph.py" />
         <option value="$PROJECT_DIR$/clockdeco.py" />
+        <option value="$PROJECT_DIR$/df.py" />
+        <option value="$PROJECT_DIR$/domains/ark-requirements-problem.pddl" />
+        <option value="$PROJECT_DIR$/domains/ark-discourse-tests.pddl" />
+        <option value="$PROJECT_DIR$/domains/ark-domain.pddl" />
+        <option value="$PROJECT_DIR$/domains/ark-problem.pddl" />
+        <option value="$PROJECT_DIR$/pddl/tree_visitor.py" />
+        <option value="$PROJECT_DIR$/OrderingGraph.py" />
+        <option value="$PROJECT_DIR$/Element.py" />
+        <option value="$PROJECT_DIR$/domains/ark-domain-decomp.pddl" />
+        <option value="$PROJECT_DIR$/domains/ark-problem-decomp.pddl" />
+        <option value="$PROJECT_DIR$/domains/ark-problem-decomp-2.pddl" />
+        <option value="$PROJECT_DIR$/domains/ark-domain-decomp-2.pddl" />
+        <option value="$PROJECT_DIR$/domains/ark-problem-decomp-two.pddl" />
+        <option value="$PROJECT_DIR$/domains/ark-domain-decomp-two.pddl" />
+        <option value="$PROJECT_DIR$/domains/ark-domain-decomp-three.pddl" />
+        <option value="$PROJECT_DIR$/PlanElementGraph.py" />
+        <option value="$PROJECT_DIR$/GlobalContainer.py" />
         <option value="$PROJECT_DIR$/pddlToGraphs.py" />
         <option value="$PROJECT_DIR$/Graph.py" />
-        <option value="$PROJECT_DIR$/Plannify.py" />
+        <option value="$PROJECT_DIR$/ElementGraph.py" />
         <option value="$PROJECT_DIR$/Ground.py" />
-        <option value="$PROJECT_DIR$/df.py" />
-        <option value="$PROJECT_DIR$/PlanElementGraph.py" />
-        <option value="$PROJECT_DIR$/domains/ark-requirements-problem.pddl" />
         <option value="$PROJECT_DIR$/Planner.py" />
-        <option value="$PROJECT_DIR$/domains/ark-discourse-tests.pddl" />
+        <option value="$PROJECT_DIR$/Plannify.py" />
+        <option value="$PROJECT_DIR$/Flaws.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-9" />
-    <option name="y" value="-9" />
-    <option name="width" value="1938" />
-    <option name="height" value="1048" />
+    <option name="x" value="2552" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1096" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -201,41 +248,27 @@
         <subPane>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="story-elements" />
+              <option name="myItemId" value="pydpocl" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="story-elements" />
+              <option name="myItemId" value="pydpocl" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="story-elements" />
+              <option name="myItemId" value="pydpocl" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="story-elements" />
+              <option name="myItemId" value="pydpocl" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="story-elements" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="pddl" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="story-elements" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="story-elements" />
+              <option name="myItemId" value="pydpocl" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -256,6 +289,8 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Documents\Python\pydpocl\domains" />
+      <recent name="D:\Documents\Python\pydpocl" />
       <recent name="C:\Users\David\Documents\python\story-elements\domains" />
     </key>
   </component>
@@ -525,125 +560,6 @@
       <option name="presentableId" value="Default" />
       <updated>1470242801490</updated>
     </task>
-    <task id="LOCAL-00090" summary="mergeUnifiedEffect method and usage">
-      <created>1474473902027</created>
-      <option name="number" value="00090" />
-      <option name="presentableId" value="LOCAL-00090" />
-      <option name="project" value="LOCAL" />
-      <updated>1474473902027</updated>
-    </task>
-    <task id="LOCAL-00091" summary="notes on compiling requirements">
-      <created>1474477750366</created>
-      <option name="number" value="00091" />
-      <option name="presentableId" value="LOCAL-00091" />
-      <option name="project" value="LOCAL" />
-      <updated>1474477750366</updated>
-    </task>
-    <task id="LOCAL-00092" summary="notes on compiling requirements">
-      <created>1474480401140</created>
-      <option name="number" value="00092" />
-      <option name="presentableId" value="LOCAL-00092" />
-      <option name="project" value="LOCAL" />
-      <updated>1474480401140</updated>
-    </task>
-    <task id="LOCAL-00093" summary="notes on compiling requirements">
-      <created>1474485828976</created>
-      <option name="number" value="00093" />
-      <option name="presentableId" value="LOCAL-00093" />
-      <option name="project" value="LOCAL" />
-      <updated>1474485828976</updated>
-    </task>
-    <task id="LOCAL-00094" summary="compile requirements with step-assignment strategy">
-      <created>1474488064944</created>
-      <option name="number" value="00094" />
-      <option name="presentableId" value="LOCAL-00094" />
-      <option name="project" value="LOCAL" />
-      <updated>1474488064944</updated>
-    </task>
-    <task id="LOCAL-00095" summary="gsteps">
-      <created>1474554315191</created>
-      <option name="number" value="00095" />
-      <option name="presentableId" value="LOCAL-00095" />
-      <option name="project" value="LOCAL" />
-      <updated>1474554315191</updated>
-    </task>
-    <task id="LOCAL-00096" summary="debugged - newstep and reuse step are once again operational">
-      <created>1474640760256</created>
-      <option name="number" value="00096" />
-      <option name="presentableId" value="LOCAL-00096" />
-      <option name="project" value="LOCAL" />
-      <updated>1474640760256</updated>
-    </task>
-    <task id="LOCAL-00097" summary="clocking speed">
-      <created>1474643692045</created>
-      <option name="number" value="00097" />
-      <option name="presentableId" value="LOCAL-00097" />
-      <option name="project" value="LOCAL" />
-      <updated>1474643692045</updated>
-    </task>
-    <task id="LOCAL-00098" summary="clocking speed">
-      <created>1474645498498</created>
-      <option name="number" value="00098" />
-      <option name="presentableId" value="LOCAL-00098" />
-      <option name="project" value="LOCAL" />
-      <updated>1474645498498</updated>
-    </task>
-    <task id="LOCAL-00099" summary="bug fixed for new step/reuse">
-      <created>1474653946605</created>
-      <option name="number" value="00099" />
-      <option name="presentableId" value="LOCAL-00099" />
-      <option name="project" value="LOCAL" />
-      <updated>1474653946605</updated>
-    </task>
-    <task id="LOCAL-00100" summary="Gsteps, glibs">
-      <created>1474666463393</created>
-      <option name="number" value="00100" />
-      <option name="presentableId" value="LOCAL-00100" />
-      <option name="project" value="LOCAL" />
-      <updated>1474666463393</updated>
-    </task>
-    <task id="LOCAL-00101" summary="Gsteps, glibs">
-      <created>1474671521955</created>
-      <option name="number" value="00101" />
-      <option name="presentableId" value="LOCAL-00101" />
-      <option name="project" value="LOCAL" />
-      <updated>1474671521955</updated>
-    </task>
-    <task id="LOCAL-00102" summary="nonequal tuples for actions">
-      <created>1474730694370</created>
-      <option name="number" value="00102" />
-      <option name="presentableId" value="LOCAL-00102" />
-      <option name="project" value="LOCAL" />
-      <updated>1474730694370</updated>
-    </task>
-    <task id="LOCAL-00103" summary="nonequal tuples for actions">
-      <created>1474732221777</created>
-      <option name="number" value="00103" />
-      <option name="presentableId" value="LOCAL-00103" />
-      <option name="project" value="LOCAL" />
-      <updated>1474732221777</updated>
-    </task>
-    <task id="LOCAL-00104" summary="renew and resused with gsteps">
-      <created>1474737605955</created>
-      <option name="number" value="00104" />
-      <option name="presentableId" value="LOCAL-00104" />
-      <option name="project" value="LOCAL" />
-      <updated>1474737605955</updated>
-    </task>
-    <task id="LOCAL-00105" summary="eff_dict for gsteps">
-      <created>1474738473696</created>
-      <option name="number" value="00105" />
-      <option name="presentableId" value="LOCAL-00105" />
-      <option name="project" value="LOCAL" />
-      <updated>1474738473696</updated>
-    </task>
-    <task id="LOCAL-00106" summary="new step and reuse , created not tested">
-      <created>1474813179808</created>
-      <option name="number" value="00106" />
-      <option name="presentableId" value="LOCAL-00106" />
-      <option name="project" value="LOCAL" />
-      <updated>1474813179809</updated>
-    </task>
     <task id="LOCAL-00107" summary="detect threatened causal links revised">
       <created>1474814978296</created>
       <option name="number" value="00107" />
@@ -868,7 +784,126 @@
       <option name="project" value="LOCAL" />
       <updated>1476204724073</updated>
     </task>
-    <option name="localTasksCounter" value="139" />
+    <task id="LOCAL-00139" summary="determinism tests">
+      <created>1476904256424</created>
+      <option name="number" value="00139" />
+      <option name="presentableId" value="LOCAL-00139" />
+      <option name="project" value="LOCAL" />
+      <updated>1476904256424</updated>
+    </task>
+    <task id="LOCAL-00140" summary="upgrading Ground Step Library load methods">
+      <created>1476916635840</created>
+      <option name="number" value="00140" />
+      <option name="presentableId" value="LOCAL-00140" />
+      <option name="project" value="LOCAL" />
+      <updated>1476916635840</updated>
+    </task>
+    <task id="LOCAL-00141" summary="upgrading ground step library">
+      <created>1476923844046</created>
+      <option name="number" value="00141" />
+      <option name="presentableId" value="LOCAL-00141" />
+      <option name="project" value="LOCAL" />
+      <updated>1476923844046</updated>
+    </task>
+    <task id="LOCAL-00142" summary="Updating">
+      <created>1476992011483</created>
+      <option name="number" value="00142" />
+      <option name="presentableId" value="LOCAL-00142" />
+      <option name="project" value="LOCAL" />
+      <updated>1476992011483</updated>
+    </task>
+    <task id="LOCAL-00143" summary="speed acquired">
+      <created>1477063751903</created>
+      <option name="number" value="00143" />
+      <option name="presentableId" value="LOCAL-00143" />
+      <option name="project" value="LOCAL" />
+      <updated>1477063751903</updated>
+    </task>
+    <task id="LOCAL-00144" summary="Fully Deterministic by library load. Ordering graph __lt__ comparison.">
+      <created>1477070404618</created>
+      <option name="number" value="00144" />
+      <option name="presentableId" value="LOCAL-00144" />
+      <option name="project" value="LOCAL" />
+      <updated>1477070404618</updated>
+    </task>
+    <task id="LOCAL-00145" summary="Fully Deterministic by library load. Ordering graph __lt__ comparison.">
+      <created>1477083062788</created>
+      <option name="number" value="00145" />
+      <option name="presentableId" value="LOCAL-00145" />
+      <option name="project" value="LOCAL" />
+      <updated>1477083062788</updated>
+    </task>
+    <task id="LOCAL-00146" summary="Unify actions no longer overrides arg_name for args">
+      <created>1477084035627</created>
+      <option name="number" value="00146" />
+      <option name="presentableId" value="LOCAL-00146" />
+      <option name="project" value="LOCAL" />
+      <updated>1477084035627</updated>
+    </task>
+    <task id="LOCAL-00147" summary="Testing decomp">
+      <created>1477097921611</created>
+      <option name="number" value="00147" />
+      <option name="presentableId" value="LOCAL-00147" />
+      <option name="project" value="LOCAL" />
+      <updated>1477097921611</updated>
+    </task>
+    <task id="LOCAL-00148" summary="Modified flaw restricted_names">
+      <created>1477099728317</created>
+      <option name="number" value="00148" />
+      <option name="presentableId" value="LOCAL-00148" />
+      <option name="project" value="LOCAL" />
+      <updated>1477099728317</updated>
+    </task>
+    <task id="LOCAL-00149" summary="a proper display for flaw library">
+      <created>1477114792015</created>
+      <option name="number" value="00149" />
+      <option name="presentableId" value="LOCAL-00149" />
+      <option name="project" value="LOCAL" />
+      <updated>1477114792015</updated>
+    </task>
+    <task id="LOCAL-00150" summary="cleanup display">
+      <created>1477118820721</created>
+      <option name="number" value="00150" />
+      <option name="presentableId" value="LOCAL-00150" />
+      <option name="project" value="LOCAL" />
+      <updated>1477118820721</updated>
+    </task>
+    <task id="LOCAL-00151" summary="dpocl with one decompositional action - test success">
+      <created>1477146208265</created>
+      <option name="number" value="00151" />
+      <option name="presentableId" value="LOCAL-00151" />
+      <option name="project" value="LOCAL" />
+      <updated>1477146208265</updated>
+    </task>
+    <task id="LOCAL-00152" summary="Testing linked-by decomposition, arg_name_consistent issue">
+      <created>1477152356005</created>
+      <option name="number" value="00152" />
+      <option name="presentableId" value="LOCAL-00152" />
+      <option name="project" value="LOCAL" />
+      <updated>1477152356005</updated>
+    </task>
+    <task id="LOCAL-00153" summary="decomp tests continue">
+      <created>1477171803210</created>
+      <option name="number" value="00153" />
+      <option name="presentableId" value="LOCAL-00153" />
+      <option name="project" value="LOCAL" />
+      <updated>1477171803210</updated>
+    </task>
+    <task id="LOCAL-00154" summary="DPOCL success">
+      <created>1477326323279</created>
+      <option name="number" value="00154" />
+      <option name="presentableId" value="LOCAL-00154" />
+      <option name="project" value="LOCAL" />
+      <updated>1477326323279</updated>
+    </task>
+    <task id="LOCAL-00155" summary="remove clocks">
+      <created>1477326341663</created>
+      <option name="number" value="00155" />
+      <option name="presentableId" value="LOCAL-00155" />
+      <option name="project" value="LOCAL" />
+      <updated>1477326341663</updated>
+    </task>
+    <option name="localTasksCounter" value="156" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -913,20 +948,20 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
+    <frame x="2552" y="-8" width="1936" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.110416666" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23125" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32943013" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.51108515" sideWeight="0.146875" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3259346" sideWeight="0.49790135" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44120708" sideWeight="0.5140625" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44120708" sideWeight="0.4859375" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2740047" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36331776" sideWeight="0.48373556" order="8" side_tool="false" content_ui="tabs" x="-570" y="534" width="2560" height="400" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4597433" sideWeight="0.48854166" order="2" side_tool="false" content_ui="combo" x="2774" y="228" width="1505" height="1027" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31217483" sideWeight="0.67552084" order="2" side_tool="false" content_ui="combo" x="2774" y="228" width="1505" height="1027" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24959743" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3297619" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.51108515" sideWeight="0.853125" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37773153" sideWeight="0.7369792" order="3" side_tool="false" content_ui="tabs" x="2685" y="29" width="684" height="1143" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -970,22 +1005,6 @@
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="step assignments - late night brainstorm" />
-    <MESSAGE value="assignments reorganized" />
-    <MESSAGE value="constructWorld from possible world" />
-    <MESSAGE value="limbo" />
-    <MESSAGE value="Plannify" />
-    <MESSAGE value="Tests work, plannify method complete!" />
-    <MESSAGE value="remove steal before excavate" />
-    <MESSAGE value="plannify cleanup" />
-    <MESSAGE value="clocking speeds" />
-    <MESSAGE value="Multi sink and multi source bug fix" />
-    <MESSAGE value="Reuse method created" />
-    <MESSAGE value="Integrate in progress" />
-    <MESSAGE value="Integrate Plan V into Plan U given Reuse-Mapping &quot;W&quot;; Integrate(U,V,W)" />
-    <MESSAGE value="setting up for bipocl" />
-    <MESSAGE value="setting up disc GLib" />
-    <MESSAGE value="working on disc GL, problems for debugging include posting heuristic, which requires a GL." />
     <MESSAGE value="limbo, discGL" />
     <MESSAGE value="DGL -= init and goal - need to identify/extract storyelement problems" />
     <MESSAGE value="DiscLib for discotizing init and goal action conditions" />
@@ -995,50 +1014,76 @@
     <MESSAGE value="DiscWorlds and a plan" />
     <MESSAGE value="Works, just takes a while..." />
     <MESSAGE value="Works 3 solution took over 4 minutes though" />
-    <option name="LAST_COMMIT_MESSAGE" value="Works 3 solution took over 4 minutes though" />
+    <MESSAGE value="determinism tests" />
+    <MESSAGE value="upgrading Ground Step Library load methods" />
+    <MESSAGE value="upgrading ground step library" />
+    <MESSAGE value="Updating" />
+    <MESSAGE value="speed acquired" />
+    <MESSAGE value="Fully Deterministic by library load. Ordering graph __lt__ comparison." />
+    <MESSAGE value="Unify actions no longer overrides arg_name for args" />
+    <MESSAGE value="Testing decomp" />
+    <MESSAGE value="Modified flaw restricted_names" />
+    <MESSAGE value="a proper display for flaw library" />
+    <MESSAGE value="cleanup display" />
+    <MESSAGE value="dpocl with one decompositional action - test success" />
+    <MESSAGE value="Testing linked-by decomposition, arg_name_consistent issue" />
+    <MESSAGE value="decomp tests continue" />
+    <MESSAGE value="DPOCL success" />
+    <MESSAGE value="remove clocks" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove clocks" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/pddl/parser.py</url>
-          <line>850</line>
-          <option name="timeStamp" value="614" />
+          <url>file://$PROJECT_DIR$/Planner.py</url>
+          <line>171</line>
+          <option name="timeStamp" value="716" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Plannify.py</url>
-          <line>188</line>
-          <option name="timeStamp" value="622" />
+          <line>136</line>
+          <option name="timeStamp" value="744" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Planner.py</url>
-          <line>378</line>
-          <option name="timeStamp" value="645" />
+          <line>311</line>
+          <option name="timeStamp" value="750" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Planner.py</url>
-          <line>354</line>
-          <option name="timeStamp" value="649" />
+          <line>110</line>
+          <option name="timeStamp" value="751" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Planner.py</url>
-          <line>123</line>
-          <option name="timeStamp" value="650" />
+          <line>270</line>
+          <option name="timeStamp" value="752" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Planner.py</url>
-          <line>281</line>
-          <option name="timeStamp" value="651" />
+          <line>104</line>
+          <option name="timeStamp" value="753" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Planner.py</url>
-          <line>448</line>
-          <option name="timeStamp" value="655" />
+          <line>154</line>
+          <option name="timeStamp" value="755" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Planner.py</url>
-          <line>441</line>
-          <option name="timeStamp" value="660" />
+          <line>350</line>
+          <option name="timeStamp" value="758" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/Graph.py</url>
+          <line>284</line>
+          <option name="timeStamp" value="760" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/Ground.py</url>
+          <line>95</line>
+          <option name="timeStamp" value="763" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -1048,64 +1093,12 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="661" />
+      <option name="time" value="764" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/pddl/lisp_parser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
-          <caret line="33" column="7" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pddl/lisp_iterators.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="59" column="20" selection-start-line="59" selection-start-column="20" selection-end-line="59" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pddl/parser_common.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="27" column="46" selection-start-line="27" selection-start-column="46" selection-end-line="27" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rGetInt.py" />
-    <entry file="file://$PROJECT_DIR$/shelftopack.py" />
-    <entry file="file://$PROJECT_DIR$/domains/ark-domain_syntactic_sugar.pddl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="427">
-          <caret line="110" column="0" selection-start-line="110" selection-start-column="0" selection-end-line="124" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/domains/mini-indy-problem.pddl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="25" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/domains/mini-indy-domain.pddl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="47" selection-start-line="7" selection-start-column="47" selection-end-line="7" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pddl/tree_visitor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="389">
-          <caret line="280" column="56" selection-start-line="280" selection-start-column="56" selection-end-line="280" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/nlk.py" />
-    <entry file="file://D:/Python/Lib/unittest/case.py" />
     <entry file="file://D:/Python/Lib/unittest/suite.py" />
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pycharm/tcunittest.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -1136,21 +1129,8 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/console.txt" />
-    <entry file="file://$PROJECT_DIR$/CompileReq.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="96" column="0" selection-start-line="96" selection-start-column="0" selection-end-line="123" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/CompileReq.py" />
     <entry file="file://D:/Python/Lib/codecs.py" />
-    <entry file="file://$PROJECT_DIR$/pddl/pddl.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="318">
-          <caret line="97" column="38" selection-start-line="97" selection-start-column="38" selection-end-line="97" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pddl/test_parser_drw.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
@@ -1185,173 +1165,227 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
+    <entry file="file://$PROJECT_DIR$/build/lib/pddl/test_parser_pddl_complex.py" />
+    <entry file="file://$PROJECT_DIR$/df.py" />
+    <entry file="file://$PROJECT_DIR$/domains/ark-requirements-domain.pddl" />
+    <entry file="file://$PROJECT_DIR$/domains/ark-discourse-tests-problem.pddl" />
+    <entry file="file://$PROJECT_DIR$/domains/ark-requirements-problem.pddl" />
+    <entry file="file://$PROJECT_DIR$/domains/ark-discourse-tests.pddl" />
+    <entry file="file://$PROJECT_DIR$/domains/ark-domain.pddl">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+        <state relative-caret-position="740">
+          <caret line="109" column="20" selection-start-line="109" selection-start-column="20" selection-end-line="109" selection-end-column="20" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/build/lib/pddl/test_parser_pddl_complex.py" />
+    <entry file="file://$PROJECT_DIR$/domains/ark-problem.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" column="13" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Python/Lib/unittest/case.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="383" column="0" selection-start-line="383" selection-start-column="0" selection-end-line="383" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pddl/pddl.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pddl/tree_visitor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="371">
+          <caret line="213" column="0" selection-start-line="213" selection-start-column="0" selection-end-line="213" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pddl/parser.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="656" column="0" selection-start-line="656" selection-start-column="0" selection-end-line="656" selection-end-column="0" />
+        <state relative-caret-position="439">
+          <caret line="958" column="0" selection-start-line="958" selection-start-column="0" selection-end-line="958" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pddl/lisp_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="57" column="0" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/OrderingGraph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="108" column="84" selection-start-line="108" selection-start-column="15" selection-end-line="108" selection-end-column="84" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/ark-domain-decomp.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="235">
+          <caret line="124" column="56" selection-start-line="124" selection-start-column="56" selection-end-line="124" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/ark-problem-decomp.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" column="34" selection-start-line="17" selection-start-column="34" selection-end-line="17" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/ark-domain-decomp-2.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="167">
+          <caret line="15" column="57" selection-start-line="15" selection-start-column="57" selection-end-line="15" selection-end-column="57" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/ark-problem-decomp-2.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="18" column="14" selection-start-line="18" selection-start-column="14" selection-end-line="18" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/ark-domain-decomp-three.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="371">
+          <caret line="150" column="68" selection-start-line="150" selection-start-column="68" selection-end-line="150" selection-end-column="68" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/ark-problem-decomp-two.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domains/ark-domain-decomp-two.pddl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="335">
+          <caret line="67" column="64" selection-start-line="67" selection-start-column="64" selection-end-line="67" selection-end-column="64" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ElementGraph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="62" column="15" selection-start-line="62" selection-start-column="15" selection-end-line="62" selection-end-column="15" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GlobalContainer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="21" selection-start-line="4" selection-start-column="21" selection-end-line="4" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/clockdeco.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1050">
-          <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
-          <folding>
-            <marker date="1475981680201" expanded="true" signature="0:28" ph="import ..." />
-            <marker date="1475981680201" expanded="true" signature="46:588" ph="..." />
-            <marker date="1475981680201" expanded="true" signature="101:572" ph="..." />
-            <marker date="1475981680201" expanded="true" signature="207:442" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ElementGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="49" column="21" selection-start-line="49" selection-start-column="21" selection-end-line="49" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Element.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="394">
-          <caret line="313" column="0" selection-start-line="313" selection-start-column="0" selection-end-line="313" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/domains/ark-problem.pddl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="355">
-          <caret line="21" column="17" selection-start-line="21" selection-start-column="17" selection-end-line="21" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Flaws.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="455">
-          <caret line="253" column="0" selection-start-line="253" selection-start-column="0" selection-end-line="253" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/domains/ark-domain.pddl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="46" column="29" selection-start-line="46" selection-start-column="29" selection-end-line="46" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Plannify.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="268">
-          <caret line="276" column="29" selection-start-line="276" selection-start-column="29" selection-end-line="276" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/df.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="4" column="30" selection-start-line="4" selection-start-column="30" selection-end-line="4" selection-end-column="30" />
+        <state relative-caret-position="51">
+          <caret line="3" column="106" selection-start-line="3" selection-start-column="106" selection-end-line="3" selection-end-column="106" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="486" column="39" selection-start-line="486" selection-start-column="39" selection-end-line="486" selection-end-column="39" />
+        <state relative-caret-position="4804">
+          <caret line="320" column="24" selection-start-line="320" selection-start-column="8" selection-end-line="320" selection-end-column="24" />
           <folding>
-            <element signature="e#0#27#0" expanded="true" />
+            <element signature="e#0#56#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/domains/ark-requirements-domain.pddl">
+    <entry file="file://$PROJECT_DIR$/Element.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="71" column="37" selection-start-line="71" selection-start-column="37" selection-end-line="71" selection-end-column="37" />
+        <state relative-caret-position="201">
+          <caret line="279" column="46" selection-start-line="279" selection-start-column="31" selection-end-line="279" selection-end-column="46" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/domains/ark-discourse-tests-problem.pddl">
+    <entry file="file://$PROJECT_DIR$/clockdeco.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="6" column="31" selection-start-line="6" selection-start-column="31" selection-end-line="6" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/domains/ark-requirements-problem.pddl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="50">
-          <caret line="2" column="28" selection-start-line="2" selection-start-column="28" selection-end-line="2" selection-end-column="28" />
+        <state relative-caret-position="119">
+          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Graph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+        <state relative-caret-position="78">
+          <caret line="250" column="22" selection-start-line="250" selection-start-column="4" selection-end-line="250" selection-end-column="22" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2850">
-          <caret line="362" column="0" selection-start-line="362" selection-start-column="0" selection-end-line="362" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
+            <element signature="e#0#46#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Ground.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2184">
-          <caret line="192" column="51" selection-start-line="192" selection-start-column="42" selection-end-line="192" selection-end-column="51" />
-          <folding />
+        <state relative-caret-position="401">
+          <caret line="95" column="0" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
+          <folding>
+            <element signature="e#1#17#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/domains/ark-discourse-tests.pddl">
+    <entry file="file://$PROJECT_DIR$/pddlToGraphs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="35" selection-start-line="0" selection-start-column="35" selection-end-line="0" selection-end-column="35" />
-          <folding />
+        <state relative-caret-position="303">
+          <caret line="430" column="31" selection-start-line="430" selection-start-column="25" selection-end-line="430" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Plannify.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="337" column="89" selection-start-line="337" selection-start-column="86" selection-end-line="337" selection-end-column="89" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Planner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="439" column="42" selection-start-line="439" selection-start-column="42" selection-end-line="439" selection-end-column="42" />
+        <state relative-caret-position="694">
+          <caret line="130" column="58" selection-start-line="130" selection-start-column="58" selection-end-line="130" selection-end-column="58" />
+          <folding>
+            <element signature="e#0#40#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Flaws.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="217" column="5" selection-start-line="217" selection-start-column="5" selection-end-line="217" selection-end-column="5" />
           <folding />
         </state>
       </provider>
