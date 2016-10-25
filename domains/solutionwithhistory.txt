@@ -1,0 +1,730 @@
+D:\Python\python.exe D:/Documents/Python/pydpocl/Planner.py
+Reading domains/ark-domain-decomp-three.pddl and domains/ark-problem-decomp-two.pddl
+[1.13706493s] reload
+0 1
+______________________
+|FLAWLIBRARY: 
+|
+|nonreusable: 
+|Flaw((dummy_goal-175-8336, stolen['ark']), h=0, criteria=0, tb=389547949402229877)
+|______________________
+opf selected : Flaw((dummy_goal-175-8336, stolen['ark']), h=0, criteria=0, tb=389547949402229877)
+
+1 25
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], excavate-68-83d0['indiana', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|______________________
+dcf selected : DCF(steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], excavate-68-83d0['indiana', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.03000212s] Unify
+2 26
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-55-b5a7['nazis', 'ark', 'indiana', 'usa'], excavate-68-83d0['indiana', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-121-a4fa, wanted['ark']), h=1, criteria=0, tb=1305872998880005049)
+|______________________
+dcf selected : DCF(steal-55-b5a7['nazis', 'ark', 'indiana', 'usa'], excavate-68-83d0['indiana', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.02900219s] Unify
+3 27
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-62-b5a7['army', 'ark', 'indiana', 'tanis'], excavate-68-83d0['indiana', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-122-9d5b, wanted['ark']), h=1, criteria=0, tb=624614350114591942)
+|______________________
+dcf selected : DCF(steal-62-b5a7['army', 'ark', 'indiana', 'tanis'], excavate-68-83d0['indiana', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.02900219s] Unify
+4 28
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-63-b5a7['army', 'ark', 'indiana', 'usa'], excavate-68-83d0['indiana', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-123-83b4, wanted['ark']), h=1, criteria=0, tb=935561435762886631)
+|______________________
+dcf selected : DCF(steal-63-b5a7['army', 'ark', 'indiana', 'usa'], excavate-68-83d0['indiana', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.02900100s] Unify
+5 29
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], excavate-69-83d0['indiana', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-124-b575, wanted['ark']), h=1, criteria=0, tb=1326528935719247314)
+|______________________
+dcf selected : DCF(steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], excavate-69-83d0['indiana', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.02900195s] Unify
+6 30
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-55-b5a7['nazis', 'ark', 'indiana', 'usa'], excavate-69-83d0['indiana', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-125-a564, wanted['ark']), h=1, criteria=0, tb=1690034487463553605)
+|______________________
+dcf selected : DCF(steal-55-b5a7['nazis', 'ark', 'indiana', 'usa'], excavate-69-83d0['indiana', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.03000188s] Unify
+7 31
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-62-b5a7['army', 'ark', 'indiana', 'tanis'], excavate-69-83d0['indiana', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-126-8a30, wanted['ark']), h=1, criteria=0, tb=1384826322842562629)
+|______________________
+dcf selected : DCF(steal-62-b5a7['army', 'ark', 'indiana', 'tanis'], excavate-69-83d0['indiana', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.03100109s] Unify
+8 32
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-63-b5a7['army', 'ark', 'indiana', 'usa'], excavate-69-83d0['indiana', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-127-bf2a, wanted['ark']), h=1, criteria=0, tb=157446443040300840)
+|______________________
+dcf selected : DCF(steal-63-b5a7['army', 'ark', 'indiana', 'usa'], excavate-69-83d0['indiana', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.03000212s] Unify
+9 33
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-46-b5a7['indiana', 'ark', 'nazis', 'tanis'], excavate-72-83d0['nazis', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-136-aaa1, wanted['ark']), h=1, criteria=0, tb=1103021127217329800)
+|______________________
+dcf selected : DCF(steal-46-b5a7['indiana', 'ark', 'nazis', 'tanis'], excavate-72-83d0['nazis', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.03000212s] Unify
+10 34
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-47-b5a7['indiana', 'ark', 'nazis', 'usa'], excavate-72-83d0['nazis', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-137-83e5, wanted['ark']), h=1, criteria=0, tb=2086048125867849672)
+|______________________
+dcf selected : DCF(steal-47-b5a7['indiana', 'ark', 'nazis', 'usa'], excavate-72-83d0['nazis', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.03000212s] Unify
+11 35
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-64-b5a7['army', 'ark', 'nazis', 'tanis'], excavate-72-83d0['nazis', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-138-b2a4, wanted['ark']), h=1, criteria=0, tb=426812577554499941)
+|______________________
+dcf selected : DCF(steal-64-b5a7['army', 'ark', 'nazis', 'tanis'], excavate-72-83d0['nazis', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.03000188s] Unify
+12 36
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-65-b5a7['army', 'ark', 'nazis', 'usa'], excavate-72-83d0['nazis', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-139-8d6b, wanted['ark']), h=1, criteria=0, tb=1175040683253178702)
+|______________________
+dcf selected : DCF(steal-65-b5a7['army', 'ark', 'nazis', 'usa'], excavate-72-83d0['nazis', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.03200197s] Unify
+13 37
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-46-b5a7['indiana', 'ark', 'nazis', 'tanis'], excavate-73-83d0['nazis', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-140-a3fa, wanted['ark']), h=1, criteria=0, tb=584700895301248529)
+|______________________
+dcf selected : DCF(steal-46-b5a7['indiana', 'ark', 'nazis', 'tanis'], excavate-73-83d0['nazis', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.03000116s] Unify
+14 38
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-47-b5a7['indiana', 'ark', 'nazis', 'usa'], excavate-73-83d0['nazis', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-141-933a, wanted['ark']), h=1, criteria=0, tb=834985178505943636)
+|______________________
+dcf selected : DCF(steal-47-b5a7['indiana', 'ark', 'nazis', 'usa'], excavate-73-83d0['nazis', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.02900195s] Unify
+15 39
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-64-b5a7['army', 'ark', 'nazis', 'tanis'], excavate-73-83d0['nazis', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-142-aa5f, wanted['ark']), h=1, criteria=0, tb=950756637449439629)
+|______________________
+dcf selected : DCF(steal-64-b5a7['army', 'ark', 'nazis', 'tanis'], excavate-73-83d0['nazis', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.02800202s] Unify
+16 40
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-65-b5a7['army', 'ark', 'nazis', 'usa'], excavate-73-83d0['nazis', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-143-a8f4, wanted['ark']), h=1, criteria=0, tb=2095551103666966530)
+|______________________
+dcf selected : DCF(steal-65-b5a7['army', 'ark', 'nazis', 'usa'], excavate-73-83d0['nazis', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.03000093s] Unify
+17 41
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-48-b5a7['indiana', 'ark', 'army', 'tanis'], excavate-76-83d0['army', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-152-b50c, wanted['ark']), h=1, criteria=0, tb=678988556221638961)
+|______________________
+dcf selected : DCF(steal-48-b5a7['indiana', 'ark', 'army', 'tanis'], excavate-76-83d0['army', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.02900100s] Unify
+18 42
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-49-b5a7['indiana', 'ark', 'army', 'usa'], excavate-76-83d0['army', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-153-87a8, wanted['ark']), h=1, criteria=0, tb=436326633695319540)
+|______________________
+dcf selected : DCF(steal-49-b5a7['indiana', 'ark', 'army', 'usa'], excavate-76-83d0['army', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.03000093s] Unify
+19 43
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-56-b5a7['nazis', 'ark', 'army', 'tanis'], excavate-76-83d0['army', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-154-8bf0, wanted['ark']), h=1, criteria=0, tb=128430623366015192)
+|______________________
+dcf selected : DCF(steal-56-b5a7['nazis', 'ark', 'army', 'tanis'], excavate-76-83d0['army', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.02900195s] Unify
+20 44
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-57-b5a7['nazis', 'ark', 'army', 'usa'], excavate-76-83d0['army', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-155-9c8f, wanted['ark']), h=1, criteria=0, tb=983879743205600779)
+|______________________
+dcf selected : DCF(steal-57-b5a7['nazis', 'ark', 'army', 'usa'], excavate-76-83d0['army', 'ark', 'tanis'], h=0, criteria =2, tb=0)
+
+[0.03000188s] Unify
+21 45
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-48-b5a7['indiana', 'ark', 'army', 'tanis'], excavate-77-83d0['army', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-156-a1c1, wanted['ark']), h=1, criteria=0, tb=317903228835245721)
+|______________________
+dcf selected : DCF(steal-48-b5a7['indiana', 'ark', 'army', 'tanis'], excavate-77-83d0['army', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.03000212s] Unify
+22 46
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-49-b5a7['indiana', 'ark', 'army', 'usa'], excavate-77-83d0['army', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-157-a11c, wanted['ark']), h=1, criteria=0, tb=1172207893704231830)
+|______________________
+dcf selected : DCF(steal-49-b5a7['indiana', 'ark', 'army', 'usa'], excavate-77-83d0['army', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.03000188s] Unify
+23 47
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-56-b5a7['nazis', 'ark', 'army', 'tanis'], excavate-77-83d0['army', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-158-b73d, wanted['ark']), h=1, criteria=0, tb=1867995762822804357)
+|______________________
+dcf selected : DCF(steal-56-b5a7['nazis', 'ark', 'army', 'tanis'], excavate-77-83d0['army', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.03000212s] Unify
+24 48
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-57-b5a7['nazis', 'ark', 'army', 'usa'], excavate-77-83d0['army', 'ark', 'usa'], h=0, criteria =2, tb=0)
+|
+|nonreusable: 
+|Flaw((link-excavate-steal-159-b87a, wanted['ark']), h=1, criteria=0, tb=616382165330288515)
+|______________________
+dcf selected : DCF(steal-57-b5a7['nazis', 'ark', 'army', 'usa'], excavate-77-83d0['army', 'ark', 'usa'], h=0, criteria =2, tb=0)
+
+[0.03200102s] Unify
+25 49
+______________________
+|FLAWLIBRARY: 
+|
+|statics: 
+|Flaw((excavate-68-83d0, knows-location['indiana', 'ark', 'tanis']), h=1, criteria=0, tb=356735333203019190)
+|Flaw((excavate-68-83d0, alive['indiana']), h=1, criteria=0, tb=738551627013633394)
+|Flaw((steal-54-b5a7, alive['nazis']), h=1, criteria=0, tb=1369551960073791400)
+|Flaw((excavate-68-83d0, burried['ark', 'tanis']), h=1, criteria=0, tb=1948266846212750278)
+|
+|inits: 
+|Flaw((steal-54-b5a7, not-armed['indiana']), h=1, criteria=0, tb=953848528257544142)
+|Flaw((steal-54-b5a7, at['nazis', 'tanis']), h=1, criteria=0, tb=2091659154092936857)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+|Flaw((excavate-68-83d0, at['indiana', 'tanis']), h=3, criteria=0, tb=2274975136280104835)
+|______________________
+opf selected : Flaw((excavate-68-83d0, burried['ark', 'tanis']), h=1, criteria=0, tb=1948266846212750278)
+
+reuse: dummy_init-174-9099[]
+is_decomp=False
+26 50
+______________________
+|FLAWLIBRARY: 
+|
+|statics: 
+|Flaw((excavate-68-83d0, knows-location['indiana', 'ark', 'tanis']), h=1, criteria=0, tb=356735333203019190)
+|Flaw((excavate-68-83d0, alive['indiana']), h=1, criteria=0, tb=738551627013633394)
+|Flaw((steal-54-b5a7, alive['nazis']), h=1, criteria=0, tb=1369551960073791400)
+|
+|inits: 
+|Flaw((steal-54-b5a7, not-armed['indiana']), h=1, criteria=0, tb=953848528257544142)
+|Flaw((steal-54-b5a7, at['nazis', 'tanis']), h=1, criteria=0, tb=2091659154092936857)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+|Flaw((excavate-68-83d0, at['indiana', 'tanis']), h=3, criteria=0, tb=2274975136280104835)
+|______________________
+opf selected : Flaw((steal-54-b5a7, alive['nazis']), h=1, criteria=0, tb=1369551960073791400)
+
+reuse: dummy_init-174-9099[]
+is_decomp=False
+27 51
+______________________
+|FLAWLIBRARY: 
+|
+|statics: 
+|Flaw((excavate-68-83d0, knows-location['indiana', 'ark', 'tanis']), h=1, criteria=0, tb=356735333203019190)
+|Flaw((excavate-68-83d0, alive['indiana']), h=1, criteria=0, tb=738551627013633394)
+|
+|inits: 
+|Flaw((steal-54-b5a7, not-armed['indiana']), h=1, criteria=0, tb=953848528257544142)
+|Flaw((steal-54-b5a7, at['nazis', 'tanis']), h=1, criteria=0, tb=2091659154092936857)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+|Flaw((excavate-68-83d0, at['indiana', 'tanis']), h=3, criteria=0, tb=2274975136280104835)
+|______________________
+opf selected : Flaw((excavate-68-83d0, alive['indiana']), h=1, criteria=0, tb=738551627013633394)
+
+reuse: dummy_init-174-9099[]
+is_decomp=False
+28 52
+______________________
+|FLAWLIBRARY: 
+|
+|statics: 
+|Flaw((excavate-68-83d0, knows-location['indiana', 'ark', 'tanis']), h=1, criteria=0, tb=356735333203019190)
+|
+|inits: 
+|Flaw((steal-54-b5a7, not-armed['indiana']), h=1, criteria=0, tb=953848528257544142)
+|Flaw((steal-54-b5a7, at['nazis', 'tanis']), h=1, criteria=0, tb=2091659154092936857)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+|Flaw((excavate-68-83d0, at['indiana', 'tanis']), h=3, criteria=0, tb=2274975136280104835)
+|______________________
+opf selected : Flaw((excavate-68-83d0, knows-location['indiana', 'ark', 'tanis']), h=1, criteria=0, tb=356735333203019190)
+
+reuse: dummy_init-174-9099[]
+is_decomp=False
+29 53
+______________________
+|FLAWLIBRARY: 
+|
+|inits: 
+|Flaw((steal-54-b5a7, not-armed['indiana']), h=1, criteria=0, tb=953848528257544142)
+|Flaw((steal-54-b5a7, at['nazis', 'tanis']), h=1, criteria=0, tb=2091659154092936857)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+|Flaw((excavate-68-83d0, at['indiana', 'tanis']), h=3, criteria=0, tb=2274975136280104835)
+|______________________
+opf selected : Flaw((steal-54-b5a7, at['nazis', 'tanis']), h=1, criteria=0, tb=2091659154092936857)
+
+reuse: dummy_init-174-9099[]
+is_decomp=False
+30 55
+______________________
+|FLAWLIBRARY: 
+|
+|inits: 
+|Flaw((steal-54-b5a7, not-armed['indiana']), h=1, criteria=0, tb=953848528257544142)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+|Flaw((excavate-68-83d0, at['indiana', 'tanis']), h=3, criteria=0, tb=2274975136280104835)
+|______________________
+opf selected : Flaw((steal-54-b5a7, not-armed['indiana']), h=1, criteria=0, tb=953848528257544142)
+
+reuse: dummy_init-174-9099[]
+is_decomp=False
+31 57
+______________________
+|FLAWLIBRARY: 
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+|Flaw((excavate-68-83d0, at['indiana', 'tanis']), h=3, criteria=0, tb=2274975136280104835)
+|______________________
+opf selected : Flaw((excavate-68-83d0, at['indiana', 'tanis']), h=3, criteria=0, tb=2274975136280104835)
+
+32 58
+______________________
+|FLAWLIBRARY: 
+|
+|statics: 
+|Flaw((travel-83-9a96, alive['indiana']), h=1, criteria=0, tb=135036349031871282)
+|
+|inits: 
+|Flaw((travel-83-9a96, at['indiana', 'usa']), h=1, criteria=0, tb=1923507725511635395)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+|______________________
+opf selected : Flaw((travel-83-9a96, alive['indiana']), h=1, criteria=0, tb=135036349031871282)
+
+reuse: dummy_init-174-9099[]
+is_decomp=False
+33 59
+______________________
+|FLAWLIBRARY: 
+|
+|inits: 
+|Flaw((travel-83-9a96, at['indiana', 'usa']), h=1, criteria=0, tb=1923507725511635395)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+|______________________
+opf selected : Flaw((travel-83-9a96, at['indiana', 'usa']), h=1, criteria=0, tb=1923507725511635395)
+
+reuse: dummy_init-174-9099[]
+is_decomp=False
+34 61
+______________________
+|FLAWLIBRARY: 
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+|______________________
+opf selected : Flaw((steal-54-b5a7, at['indiana', 'tanis']), h=3, criteria=0, tb=1339667760528378406)
+
+reuse: travel-83-9a96['indiana', 'usa', 'tanis']
+is_decomp=False
+35 63
+______________________
+|FLAWLIBRARY: 
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+|______________________
+opf selected : Flaw((link-excavate-steal-120-8230, wanted['ark']), h=1, criteria=0, tb=1101022028847525196)
+
+36 77
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(take-from-corpse-22-93fa['indiana', 'ark', 'nazis', 'tanis'], h=0, criteria =1, tb=0)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|______________________
+dcf selected : DCF(take-from-corpse-22-93fa['indiana', 'ark', 'nazis', 'tanis'], h=0, criteria =1, tb=0)
+
+[0.03000093s] Unify
+37 78
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(take-from-corpse-23-93fa['indiana', 'ark', 'nazis', 'usa'], h=0, criteria =1, tb=0)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|______________________
+dcf selected : DCF(take-from-corpse-23-93fa['indiana', 'ark', 'nazis', 'usa'], h=0, criteria =1, tb=0)
+
+[0.02900100s] Unify
+38 79
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(take-from-corpse-24-93fa['indiana', 'ark', 'army', 'tanis'], h=0, criteria =1, tb=0)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|______________________
+dcf selected : DCF(take-from-corpse-24-93fa['indiana', 'ark', 'army', 'tanis'], h=0, criteria =1, tb=0)
+
+[0.02900219s] Unify
+39 80
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(take-from-corpse-25-93fa['indiana', 'ark', 'army', 'usa'], h=0, criteria =1, tb=0)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|______________________
+dcf selected : DCF(take-from-corpse-25-93fa['indiana', 'ark', 'army', 'usa'], h=0, criteria =1, tb=0)
+
+[0.03000188s] Unify
+40 81
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-46-93fa['indiana', 'ark', 'nazis', 'tanis'], h=0, criteria =1, tb=0)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|______________________
+dcf selected : DCF(steal-46-93fa['indiana', 'ark', 'nazis', 'tanis'], h=0, criteria =1, tb=0)
+
+[0.03100181s] Unify
+41 82
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-47-93fa['indiana', 'ark', 'nazis', 'usa'], h=0, criteria =1, tb=0)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|______________________
+dcf selected : DCF(steal-47-93fa['indiana', 'ark', 'nazis', 'usa'], h=0, criteria =1, tb=0)
+
+[0.03100204s] Unify
+42 83
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-48-93fa['indiana', 'ark', 'army', 'tanis'], h=0, criteria =1, tb=0)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|______________________
+dcf selected : DCF(steal-48-93fa['indiana', 'ark', 'army', 'tanis'], h=0, criteria =1, tb=0)
+
+[0.03100085s] Unify
+43 84
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(steal-49-93fa['indiana', 'ark', 'army', 'usa'], h=0, criteria =1, tb=0)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|______________________
+dcf selected : DCF(steal-49-93fa['indiana', 'ark', 'army', 'usa'], h=0, criteria =1, tb=0)
+
+[0.03000188s] Unify
+44 85
+______________________
+|FLAWLIBRARY: 
+|
+|decomps: 
+|DCF(excavate-68-93fa['indiana', 'ark', 'tanis'], h=0, criteria =1, tb=0)
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|______________________
+dcf selected : DCF(excavate-68-93fa['indiana', 'ark', 'tanis'], h=0, criteria =1, tb=0)
+
+[0.05000281s] Unify
+45 87
+______________________
+|FLAWLIBRARY: 
+|
+|nonreusable: 
+|Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+|______________________
+opf selected : Flaw((steal-54-b5a7, armed['nazis']), h=2, criteria=0, tb=720358802163468034)
+
+46 88
+______________________
+|FLAWLIBRARY: 
+|
+|inits: 
+|Flaw((armed-axiom-16-8dbf, has['nazis', 'gun']), h=1, criteria=0, tb=969087275493944511)
+|______________________
+opf selected : Flaw((armed-axiom-16-8dbf, has['nazis', 'gun']), h=1, criteria=0, tb=969087275493944511)
+
+reuse: dummy_init-174-9099[]
+is_decomp=False
+47 103
+______________________
+|FLAWLIBRARY: 
+|______________________
+
+solution found at 48 nodes expanded and 103 nodes visited
+
+
+[3.69521189s] POCL
+PLAN: 1140ac21-b34b-4910-acb6-475aa8b3274b
+cost 6 + heuristic 0
+*Steps: 
+	dummy_init-174-9099[]
+	indy-gets-ark-168-a319['indiana', 'ark', excavate-68-93fa['indiana', 'ark', 'tanis'], has['indiana', 'ark']]
+	link-excavate-steal-120-8230[excavate-68-83d0['indiana', 'ark', 'tanis'], steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], has['indiana', 'ark'], 'ark']
+	armed-axiom-16-8dbf['nazis', 'gun']
+	travel-83-9a96['indiana', 'usa', 'tanis']
+	dummy_goal-175-8336[]
+	steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis']
+	excavate-68-83d0['indiana', 'ark', 'tanis']
+*Orderings:
+	dummy_init-174-9099 < dummy_goal-175-8336
+	dummy_init-174-9099 < link-excavate-steal-120-8230
+	dummy_init-174-9099 < steal-54-b5a7
+	steal-54-b5a7 < dummy_goal-175-8336
+	dummy_init-174-9099 < indy-gets-ark-168-a319
+	link-excavate-steal-120-8230 < dummy_goal-175-8336
+	armed-axiom-16-8dbf < steal-54-b5a7
+	armed-axiom-16-8dbf < dummy_goal-175-8336
+	travel-83-9a96 < excavate-68-83d0
+	dummy_init-174-9099 < armed-axiom-16-8dbf
+	indy-gets-ark-168-a319 < link-excavate-steal-120-8230
+	excavate-68-83d0 < dummy_goal-175-8336
+	travel-83-9a96 < dummy_goal-175-8336
+	excavate-68-83d0 < steal-54-b5a7
+	travel-83-9a96 < steal-54-b5a7
+	dummy_init-174-9099 < excavate-68-83d0
+	dummy_init-174-9099 < travel-83-9a96
+	indy-gets-ark-168-a319 < dummy_goal-175-8336
+*CausalLinks:
+	Edge dummy_init-174-9099 --knows-location['indiana', 'ark', 'tanis']--> excavate-68-83d0
+	Edge dummy_init-174-9099 --at['indiana', 'usa']--> travel-83-9a96
+	Edge link-excavate-steal-120-8230 --stolen['ark']--> dummy_goal-175-8336
+	Edge dummy_init-174-9099 --alive['indiana']--> travel-83-9a96
+	Edge dummy_init-174-9099 --has['nazis', 'gun']--> armed-axiom-16-8dbf
+	Edge dummy_init-174-9099 --burried['ark', 'tanis']--> excavate-68-83d0
+	Edge travel-83-9a96 --at['indiana', 'tanis']--> steal-54-b5a7
+	Edge dummy_init-174-9099 --alive['indiana']--> excavate-68-83d0
+	Edge dummy_init-174-9099 --not-armed['indiana']--> steal-54-b5a7
+	Edge indy-gets-ark-168-a319 --wanted['ark']--> link-excavate-steal-120-8230
+	Edge steal-54-b5a7 --has['indiana', 'ark']--> excavate-68-83d0
+	Edge dummy_init-174-9099 --alive['nazis']--> steal-54-b5a7
+	Edge travel-83-9a96 --at['indiana', 'tanis']--> excavate-68-83d0
+	Edge dummy_init-174-9099 --at['nazis', 'tanis']--> steal-54-b5a7
+	Edge armed-axiom-16-8dbf --armed['nazis']--> steal-54-b5a7
+}
+dummy_init-174-9099[]
+armed-axiom-16-8dbf['nazis', 'gun']
+travel-83-9a96['indiana', 'usa', 'tanis']
+excavate-68-83d0['indiana', 'ark', 'tanis']
+indy-gets-ark-168-a319['indiana', 'ark', excavate-68-93fa['indiana', 'ark', 'tanis'], has['indiana', 'ark']]
+link-excavate-steal-120-8230[excavate-68-83d0['indiana', 'ark', 'tanis'], steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], has['indiana', 'ark'], 'ark']
+steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis']
+dummy_goal-175-8336[]
+
+
+
+.
+----------------------------------------------------------------------
+Ran 1 test in 4.890s
+
+OK
+
+Process finished with exit code 0

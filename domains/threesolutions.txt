@@ -1,0 +1,229 @@
+solution found at 48 nodes expanded and 103 nodes visited
+solution found at 75 nodes expanded and 160 nodes visited
+solution found at 110 nodes expanded and 223 nodes visited
+
+[11.79367518s] POCL
+PLAN: d50e26f6-df8e-4b52-88fb-01665e3924af
+cost 6 + heuristic 0
+*Steps: 
+	dummy_init-174-85eb[]
+	travel-83-8718['indiana', 'usa', 'tanis']
+	armed-axiom-16-8e5e['nazis', 'gun']
+	link-excavate-steal-120-a2e1[excavate-68-83d0['indiana', 'ark', 'tanis'], steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], has['indiana', 'ark'], 'ark']
+	indy-gets-ark-168-8b3b['indiana', 'ark', excavate-68-93fa['indiana', 'ark', 'tanis'], has['indiana', 'ark']]
+	steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis']
+	dummy_goal-175-9f4b[]
+	excavate-68-83d0['indiana', 'ark', 'tanis']
+*Orderings:
+	excavate-68-83d0 < steal-54-b5a7
+	travel-83-8718 < dummy_goal-175-9f4b
+	dummy_init-174-85eb < indy-gets-ark-168-8b3b
+	indy-gets-ark-168-8b3b < dummy_goal-175-9f4b
+	dummy_init-174-85eb < steal-54-b5a7
+	dummy_init-174-85eb < travel-83-8718
+	armed-axiom-16-8e5e < dummy_goal-175-9f4b
+	excavate-68-83d0 < dummy_goal-175-9f4b
+	link-excavate-steal-120-a2e1 < dummy_goal-175-9f4b
+	dummy_init-174-85eb < dummy_goal-175-9f4b
+	dummy_init-174-85eb < excavate-68-83d0
+	dummy_init-174-85eb < link-excavate-steal-120-a2e1
+	travel-83-8718 < steal-54-b5a7
+	dummy_init-174-85eb < armed-axiom-16-8e5e
+	indy-gets-ark-168-8b3b < link-excavate-steal-120-a2e1
+	steal-54-b5a7 < dummy_goal-175-9f4b
+	travel-83-8718 < excavate-68-83d0
+	armed-axiom-16-8e5e < steal-54-b5a7
+*CausalLinks:
+	Edge dummy_init-174-85eb --at['nazis', 'tanis']--> steal-54-b5a7
+	Edge dummy_init-174-85eb --has['nazis', 'gun']--> armed-axiom-16-8e5e
+	Edge armed-axiom-16-8e5e --armed['nazis']--> steal-54-b5a7
+	Edge dummy_init-174-85eb --alive['indiana']--> excavate-68-83d0
+	Edge dummy_init-174-85eb --alive['nazis']--> steal-54-b5a7
+	Edge travel-83-8718 --at['indiana', 'tanis']--> excavate-68-83d0
+	Edge indy-gets-ark-168-8b3b --wanted['ark']--> link-excavate-steal-120-a2e1
+	Edge link-excavate-steal-120-a2e1 --stolen['ark']--> dummy_goal-175-9f4b
+	Edge dummy_init-174-85eb --alive['indiana']--> travel-83-8718
+	Edge dummy_init-174-85eb --burried['ark', 'tanis']--> excavate-68-83d0
+	Edge dummy_init-174-85eb --knows-location['indiana', 'ark', 'tanis']--> excavate-68-83d0
+	Edge steal-54-b5a7 --has['indiana', 'ark']--> excavate-68-83d0
+	Edge dummy_init-174-85eb --not-armed['indiana']--> steal-54-b5a7
+	Edge dummy_init-174-85eb --at['indiana', 'usa']--> travel-83-8718
+	Edge travel-83-8718 --at['indiana', 'tanis']--> steal-54-b5a7
+}
+dummy_init-174-85eb[]
+indy-gets-ark-168-8b3b['indiana', 'ark', excavate-68-93fa['indiana', 'ark', 'tanis'], has['indiana', 'ark']]
+travel-83-8718['indiana', 'usa', 'tanis']
+excavate-68-83d0['indiana', 'ark', 'tanis']
+armed-axiom-16-8e5e['nazis', 'gun']
+link-excavate-steal-120-a2e1[excavate-68-83d0['indiana', 'ark', 'tanis'], steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], has['indiana', 'ark'], 'ark']
+steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis']
+dummy_goal-175-9f4b[]
+PLAN: e2bf1616-cf3e-4e73-83c4-649d63ddf78d
+cost 8 + heuristic 0
+*Steps: 
+	dummy_init-174-85eb[]
+	travel-83-8718['indiana', 'usa', 'tanis']
+	indy-gets-ark-168-9613['indiana', 'ark', excavate-68-93fa['indiana', 'ark', 'tanis'], has['indiana', 'ark']]
+	travel-82-b0a0['indiana', 'tanis', 'usa']
+	link-excavate-steal-120-a2e1[excavate-68-83d0['indiana', 'ark', 'tanis'], steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], has['indiana', 'ark'], 'ark']
+	armed-axiom-16-b7c1['nazis', 'gun']
+	steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis']
+	dummy_goal-175-9f4b[]
+	travel-83-b68c['indiana', 'usa', 'tanis']
+	excavate-68-83d0['indiana', 'ark', 'tanis']
+*Orderings:
+	excavate-68-83d0 < steal-54-b5a7
+	travel-83-b68c < steal-54-b5a7
+	excavate-68-83d0 < dummy_goal-175-9f4b
+	travel-83-b68c < dummy_goal-175-9f4b
+	armed-axiom-16-b7c1 < steal-54-b5a7
+	dummy_init-174-85eb < travel-83-8718
+	steal-54-b5a7 < dummy_goal-175-9f4b
+	armed-axiom-16-b7c1 < dummy_goal-175-9f4b
+	travel-82-b0a0 < dummy_goal-175-9f4b
+	link-excavate-steal-120-a2e1 < dummy_goal-175-9f4b
+	travel-82-b0a0 < travel-83-b68c
+	dummy_init-174-85eb < indy-gets-ark-168-9613
+	excavate-68-83d0 < travel-82-b0a0
+	dummy_init-174-85eb < travel-82-b0a0
+	dummy_init-174-85eb < link-excavate-steal-120-a2e1
+	indy-gets-ark-168-9613 < link-excavate-steal-120-a2e1
+	travel-83-8718 < travel-82-b0a0
+	travel-83-8718 < dummy_goal-175-9f4b
+	dummy_init-174-85eb < steal-54-b5a7
+	indy-gets-ark-168-9613 < dummy_goal-175-9f4b
+	dummy_init-174-85eb < armed-axiom-16-b7c1
+	dummy_init-174-85eb < dummy_goal-175-9f4b
+	dummy_init-174-85eb < excavate-68-83d0
+	dummy_init-174-85eb < travel-83-b68c
+	travel-83-8718 < excavate-68-83d0
+	travel-83-8718 < travel-83-b68c
+*CausalLinks:
+	Edge dummy_init-174-85eb --at['nazis', 'tanis']--> steal-54-b5a7
+	Edge dummy_init-174-85eb --alive['indiana']--> travel-83-b68c
+	Edge dummy_init-174-85eb --alive['indiana']--> excavate-68-83d0
+	Edge travel-83-8718 --at['indiana', 'tanis']--> travel-82-b0a0
+	Edge dummy_init-174-85eb --alive['nazis']--> steal-54-b5a7
+	Edge travel-83-8718 --at['indiana', 'tanis']--> excavate-68-83d0
+	Edge link-excavate-steal-120-a2e1 --stolen['ark']--> dummy_goal-175-9f4b
+	Edge dummy_init-174-85eb --alive['indiana']--> travel-83-8718
+	Edge dummy_init-174-85eb --at['indiana', 'usa']--> travel-83-8718
+	Edge dummy_init-174-85eb --burried['ark', 'tanis']--> excavate-68-83d0
+	Edge travel-82-b0a0 --at['indiana', 'usa']--> travel-83-b68c
+	Edge dummy_init-174-85eb --knows-location['indiana', 'ark', 'tanis']--> excavate-68-83d0
+	Edge steal-54-b5a7 --has['indiana', 'ark']--> excavate-68-83d0
+	Edge dummy_init-174-85eb --alive['indiana']--> travel-82-b0a0
+	Edge dummy_init-174-85eb --not-armed['indiana']--> steal-54-b5a7
+	Edge armed-axiom-16-b7c1 --armed['nazis']--> steal-54-b5a7
+	Edge dummy_init-174-85eb --has['nazis', 'gun']--> armed-axiom-16-b7c1
+	Edge travel-83-b68c --at['indiana', 'tanis']--> steal-54-b5a7
+	Edge indy-gets-ark-168-9613 --wanted['ark']--> link-excavate-steal-120-a2e1
+}
+dummy_init-174-85eb[]
+travel-83-8718['indiana', 'usa', 'tanis']
+excavate-68-83d0['indiana', 'ark', 'tanis']
+armed-axiom-16-b7c1['nazis', 'gun']
+indy-gets-ark-168-9613['indiana', 'ark', excavate-68-93fa['indiana', 'ark', 'tanis'], has['indiana', 'ark']]
+travel-82-b0a0['indiana', 'tanis', 'usa']
+link-excavate-steal-120-a2e1[excavate-68-83d0['indiana', 'ark', 'tanis'], steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], has['indiana', 'ark'], 'ark']
+travel-83-b68c['indiana', 'usa', 'tanis']
+steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis']
+dummy_goal-175-9f4b[]
+PLAN: bba6942d-2723-400a-b833-1c19b785bbb5
+cost 10 + heuristic 0
+*Steps: 
+	travel-83-abab['indiana', 'usa', 'tanis']
+	dummy_init-174-85eb[]
+	travel-83-8718['indiana', 'usa', 'tanis']
+	indy-gets-ark-168-9758['indiana', 'ark', excavate-68-93fa['indiana', 'ark', 'tanis'], has['indiana', 'ark']]
+	travel-82-a5b9['indiana', 'tanis', 'usa']
+	travel-83-b68c['indiana', 'usa', 'tanis']
+	travel-82-b0a0['indiana', 'tanis', 'usa']
+	link-excavate-steal-120-a2e1[excavate-68-83d0['indiana', 'ark', 'tanis'], steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], has['indiana', 'ark'], 'ark']
+	steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis']
+	dummy_goal-175-9f4b[]
+	excavate-68-83d0['indiana', 'ark', 'tanis']
+	armed-axiom-16-8bde['nazis', 'gun']
+*Orderings:
+	excavate-68-83d0 < steal-54-b5a7
+	dummy_init-174-85eb < travel-83-abab
+	travel-83-b68c < steal-54-b5a7
+	armed-axiom-16-8bde < dummy_goal-175-9f4b
+	excavate-68-83d0 < dummy_goal-175-9f4b
+	travel-83-b68c < dummy_goal-175-9f4b
+	travel-83-8718 < travel-83-abab
+	dummy_init-174-85eb < travel-83-8718
+	steal-54-b5a7 < dummy_goal-175-9f4b
+	dummy_init-174-85eb < indy-gets-ark-168-9758
+	travel-82-b0a0 < dummy_goal-175-9f4b
+	link-excavate-steal-120-a2e1 < dummy_goal-175-9f4b
+	travel-82-a5b9 < travel-83-abab
+	travel-82-b0a0 < travel-83-b68c
+	excavate-68-83d0 < travel-82-b0a0
+	travel-83-8718 < travel-82-a5b9
+	dummy_init-174-85eb < travel-82-a5b9
+	travel-82-a5b9 < dummy_goal-175-9f4b
+	travel-83-abab < travel-82-b0a0
+	armed-axiom-16-8bde < steal-54-b5a7
+	dummy_init-174-85eb < travel-82-b0a0
+	dummy_init-174-85eb < link-excavate-steal-120-a2e1
+	indy-gets-ark-168-9758 < link-excavate-steal-120-a2e1
+	excavate-68-83d0 < travel-82-a5b9
+	travel-83-8718 < travel-82-b0a0
+	travel-83-8718 < dummy_goal-175-9f4b
+	dummy_init-174-85eb < steal-54-b5a7
+	indy-gets-ark-168-9758 < dummy_goal-175-9f4b
+	dummy_init-174-85eb < dummy_goal-175-9f4b
+	travel-83-8718 < excavate-68-83d0
+	dummy_init-174-85eb < excavate-68-83d0
+	dummy_init-174-85eb < travel-83-b68c
+	travel-83-abab < dummy_goal-175-9f4b
+	dummy_init-174-85eb < armed-axiom-16-8bde
+	travel-83-8718 < travel-83-b68c
+*CausalLinks:
+	Edge armed-axiom-16-8bde --armed['nazis']--> steal-54-b5a7
+	Edge travel-83-8718 --at['indiana', 'tanis']--> travel-82-a5b9
+	Edge travel-82-a5b9 --at['indiana', 'usa']--> travel-83-abab
+	Edge dummy_init-174-85eb --alive['nazis']--> steal-54-b5a7
+	Edge dummy_init-174-85eb --alive['indiana']--> travel-82-a5b9
+	Edge travel-83-abab --at['indiana', 'tanis']--> travel-82-b0a0
+	Edge dummy_init-174-85eb --has['nazis', 'gun']--> armed-axiom-16-8bde
+	Edge indy-gets-ark-168-9758 --wanted['ark']--> link-excavate-steal-120-a2e1
+	Edge link-excavate-steal-120-a2e1 --stolen['ark']--> dummy_goal-175-9f4b
+	Edge dummy_init-174-85eb --alive['indiana']--> travel-83-8718
+	Edge dummy_init-174-85eb --burried['ark', 'tanis']--> excavate-68-83d0
+	Edge dummy_init-174-85eb --alive['indiana']--> travel-83-abab
+	Edge dummy_init-174-85eb --not-armed['indiana']--> steal-54-b5a7
+	Edge dummy_init-174-85eb --at['nazis', 'tanis']--> steal-54-b5a7
+	Edge dummy_init-174-85eb --alive['indiana']--> travel-83-b68c
+	Edge dummy_init-174-85eb --alive['indiana']--> excavate-68-83d0
+	Edge travel-83-8718 --at['indiana', 'tanis']--> excavate-68-83d0
+	Edge travel-82-b0a0 --at['indiana', 'usa']--> travel-83-b68c
+	Edge dummy_init-174-85eb --knows-location['indiana', 'ark', 'tanis']--> excavate-68-83d0
+	Edge steal-54-b5a7 --has['indiana', 'ark']--> excavate-68-83d0
+	Edge dummy_init-174-85eb --alive['indiana']--> travel-82-b0a0
+	Edge travel-83-b68c --at['indiana', 'tanis']--> steal-54-b5a7
+	Edge dummy_init-174-85eb --at['indiana', 'usa']--> travel-83-8718
+}
+dummy_init-174-85eb[]
+travel-83-8718['indiana', 'usa', 'tanis']
+excavate-68-83d0['indiana', 'ark', 'tanis']
+armed-axiom-16-8bde['nazis', 'gun']
+travel-82-a5b9['indiana', 'tanis', 'usa']
+indy-gets-ark-168-9758['indiana', 'ark', excavate-68-93fa['indiana', 'ark', 'tanis'], has['indiana', 'ark']]
+travel-83-abab['indiana', 'usa', 'tanis']
+link-excavate-steal-120-a2e1[excavate-68-83d0['indiana', 'ark', 'tanis'], steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis'], has['indiana', 'ark'], 'ark']
+travel-82-b0a0['indiana', 'tanis', 'usa']
+travel-83-b68c['indiana', 'usa', 'tanis']
+steal-54-b5a7['nazis', 'ark', 'indiana', 'tanis']
+dummy_goal-175-9f4b[]
+
+
+
+.
+----------------------------------------------------------------------
+Ran 1 test in 13.146s
+
+OK
+
+Process finished with exit code 0
