@@ -7,6 +7,7 @@ from clockdeco import clock
 import copy
 from uuid import uuid4
 from Flaws import FlawLib
+from GlobalContainer import GC
 
 ARGLABELS = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg', '6', '7', '8', '9', '10']
 
@@ -260,9 +261,11 @@ def rPrintFormulaElements(formula):
 
 
 def createElementByType(parameter, decomp):
+	paramtypes = GC.object_types[next(iter(parameter.types))]
+
 	if 'character' in parameter.types or 'actor' in parameter.types:
 		elm = Actor(arg_name=parameter.name)
-	elif 'arg' in parameter.types or 'item' in parameter.types or 'place' in parameter.types:
+	elif 'arg' in paramtypes or 'item' in paramtypes or 'place' in paramtypes:
 		arg_type = next(iter(parameter.types))
 		elm = Argument(typ=arg_type, arg_name=parameter.name)
 	elif 'step' in parameter.types:
@@ -417,6 +420,9 @@ def parseDomAndProb(domain_file, problem_file):
 	parser = Parser(domain_file, problem_file)
 	domain, dom = parser.parse_domain_drw()
 	problem, v = parser.parse_problem_drw(dom)
+
+	GC.object_types.update(obTypesDict(domain.types))
+
 	args, init, goal = problemToGraphs(problem)
 	objects = set(args.values())
 
@@ -428,8 +434,8 @@ def parseDomAndProb(domain_file, problem_file):
 	addStatics(Operators)
 	addStatics(DOperators)
 
-	from GlobalContainer import GC
-	GC.object_types.update(obTypesDict(domain.types))
+
+
 
 	return Operators, DOperators, objects, GC.object_types, init, goal
 

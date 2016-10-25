@@ -115,9 +115,11 @@ class GLib:
 		self.eff_dict = defaultdict(set)
 		self.threat_dict = defaultdict(set)
 		self.loadAll()
+		print('...Creating PlanGraph base level')
 
 		D = groundDecompStepList(dops, self, stepnum=len(self._gsteps))
 		self.loadPartition(D)
+		print('...Creating PlanGraph decompositional level 1')
 		#self._gsteps.extend(D)
 
 		# init at [-2]
