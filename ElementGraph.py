@@ -1,6 +1,7 @@
 from Restrictions import Restriction
 import uuid
 from Graph import Graph
+from GlobalContainer import GC
 import copy
 
 #if you subclass ElementGraph, please inform the authorities
@@ -8,7 +9,6 @@ import copy
 # prototyping.
 class ElementGraph(Graph):
 	"""An element graph is a graph with a root element"""
-	arglabels = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg']
 
 	def __init__(self, ID=None, type_graph=None, name=None, Elements=None, root_element=None, Edges=None,
 				 Restrictions=None):
@@ -74,7 +74,7 @@ class ElementGraph(Graph):
 
 	def updateArgs(self):
 		self.Args = []
-		for label in self.arglabels:
+		for label in GC.ARGLABELS:
 			arg = self.getSingleArgByLabel(label)
 			if arg is None:
 				break
@@ -99,6 +99,6 @@ class ElementGraph(Graph):
 			raise ValueError('cannot replace Args, arg_tuple too long/short for %s' % self.name)
 
 		for i, arg in enumerate(arg_tuple):
-			original = self.getSingleArgByLabel(self.arglabels[i])
+			original = self.getSingleArgByLabel(GC.ARGLABELS[i])
 			self.replaceArg(original, arg)
 		self.updateArgs()

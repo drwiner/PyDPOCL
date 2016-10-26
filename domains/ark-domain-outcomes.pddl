@@ -159,10 +159,7 @@
     )
 
    (:action betray-ally-fo-money
-        :parameters (?traitor - character ?victim - character ?enemy - character ?ark - ark
-                     ?take - step
-                     ?trade - step
-                     ?money - money)
+        :parameters (?traitor - character ?victim - character ?enemy - character ?ark - ark ?take - step ?trade - step ?money - money)
         :precondition (and  (not (= ?traitor ?victim))
                             (not (= ?take ?trade))
                             (not (= ?traitor ?enemy))
@@ -176,7 +173,8 @@
                             (has ?enemy ?money))
         :effect (and (not (alive ?victim))
                      (not (allies ?traitor ?victim))
-                     (has ?traitor ?ark))
+                     (has ?enemy ?ark)
+                     (has ?traitor ?money))
         :decomp (and
                   ;   (remove-precond ?take (not (allies ?trickster ?victim)))
                      (nth-step-arg 0 ?take ?traitor)

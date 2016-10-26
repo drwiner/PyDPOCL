@@ -19,6 +19,7 @@ Antestep = namedtuple('Antestep', 'action eff_link')
 def groundStoryList(operators, objects, obtypes):
 	stepnum = 0
 	gsteps = []
+	print('...Creating Ground Steps')
 	for op in operators:
 		op.updateArgs()
 		cndts = [[obj for obj in objects if arg.typ == obj.typ or arg.typ in obtypes[obj.typ]] for arg in op.Args]
@@ -39,10 +40,12 @@ def groundStoryList(operators, objects, obtypes):
 			gstep.replaceArgs(t)
 			gsteps.append(gstep)
 			gstep.replaceInternals()
+			print('Creating ground step {}'.format(gstep))
 	return gsteps
 
 def groundDecompStepList(doperators, GL, stepnum=0):
 	gsteps = []
+	print('...Creating Ground Decomp Steps')
 	for op in doperators:
 		#Subplans = Plannify(op.subplan, GL)
 		for sp in Plannify(op.subplan, GL):
@@ -114,12 +117,13 @@ class GLib:
 		self.id_dict = defaultdict(set)
 		self.eff_dict = defaultdict(set)
 		self.threat_dict = defaultdict(set)
-		self.loadAll()
 		print('...Creating PlanGraph base level')
+		self.loadAll()
 
+		print('...Creating PlanGraph decompositional level 1')
 		D = groundDecompStepList(dops, self, stepnum=len(self._gsteps))
 		self.loadPartition(D)
-		print('...Creating PlanGraph decompositional level 1')
+
 		#self._gsteps.extend(D)
 
 		# init at [-2]
@@ -140,9 +144,6 @@ class GLib:
 		print('{} ground steps created'.format(len(self)))
 		print('uploading')
 		upload(self, domain + problem)
-		for Pre in self[-1].preconditions:
-			print(self.id_dict[Pre.replaced_ID])
-			print(self.pre_dict[Pre.replaced_ID])
 
 	def insert(self, _pre, antestep, eff):
 		self.pre_dict[_pre.replaced_ID].add(antestep)
@@ -162,6 +163,7 @@ class GLib:
 	def load(self, antecedents, consequents):
 		for ante in antecedents:
 			for pre in ante.Preconditions:
+				print('... Processing antecedents for {} \t\tof step {}'.format(pre, ante))
 				self._loadAntecedentPerConsequent(consequents, ante, pre)
 
 	def _loadAntecedentPerConsequent(self, antecedents, _step, _pre):

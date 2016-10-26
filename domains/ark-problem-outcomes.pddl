@@ -15,6 +15,7 @@
          (at nazis tanis)
          (has nazis money)
          (allies indiana army)
+         (allies army indiana)
          (has nazis gun))
   (:goal (and
               (not (alive nazis))
