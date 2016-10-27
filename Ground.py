@@ -40,15 +40,18 @@ def groundStoryList(operators, objects, obtypes):
 			gstep.replaceArgs(t)
 			gsteps.append(gstep)
 			gstep.replaceInternals()
+			gstep.height = 0
+			gstep.root.height = 0
 			print('Creating ground step {}'.format(gstep))
 	return gsteps
 
-def groundDecompStepList(doperators, GL, stepnum=0):
+def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 	gsteps = []
 	print('...Creating Ground Decomp Steps')
 	for op in doperators:
 		#Subplans = Plannify(op.subplan, GL)
-		for sp in Plannify(op.subplan, GL):
+		print('processing operator: {}'.format(op))
+		for sp in Plannify(op.subplan, GL, height):
 
 			GDO = copy.deepcopy(op)
 			GDO.is_decomp = True
@@ -57,12 +60,16 @@ def groundDecompStepList(doperators, GL, stepnum=0):
 				assignElmToContainer(GDO, sp, elm, list(op.elements))
 
 			GDO.root.is_decomp = True
+
 			GDO.ground_subplan = sp
 			GDO.root.stepnumber = stepnum
 			GDO._replaceInternals()
 			GDO.replaceInternals()
 			gsteps.append(GDO)
+			sp.root = GDO.root
 			stepnum += 1
+			GDO.height = height + 1
+			GDO.root.height = height + 1
 
 	return gsteps
 
@@ -112,7 +119,6 @@ class GLib:
 		self._gsteps = groundStoryList(operators, self.objects, obtypes)
 
 		#dictionaries
-		self.pre_dict = defaultdict(set)
 		self.ante_dict = defaultdict(set)
 		self.id_dict = defaultdict(set)
 		self.eff_dict = defaultdict(set)
@@ -120,13 +126,15 @@ class GLib:
 		print('...Creating PlanGraph base level')
 		self.loadAll()
 
-		print('...Creating PlanGraph decompositional level 1')
-		D = groundDecompStepList(dops, self, stepnum=len(self._gsteps))
-		self.loadPartition(D)
+		for i in range(3):
+			print('...Creating PlanGraph decompositional level {}'.format(i+1))
+			D = groundDecompStepList(dops, self, stepnum=len(self._gsteps), height=i)
+			if not D or len(D) == 0:
+				break
+			self.loadPartition(D)
 
 		#self._gsteps.extend(D)
 
-		# init at [-2]
 		init_action.root.stepnumber = len(self._gsteps)
 		init_action._replaceInternals()
 		init_action.replaceInternals()
@@ -138,6 +146,9 @@ class GLib:
 	#	self._gsteps.append(goal_action)
 
 		self.loadPartition([init_action, goal_action])
+		#self.load({init_action}, self._gsteps)
+	#	self.load(self._gsteps, {goal_action})
+	#	self.load({init_action}, {goal_action})
 		#self._gsteps.append(init_action)
 		#self._gsteps.append(goal_action)
 
@@ -146,19 +157,18 @@ class GLib:
 		upload(self, domain + problem)
 
 	def insert(self, _pre, antestep, eff):
-		self.pre_dict[_pre.replaced_ID].add(antestep)
 		self.id_dict[_pre.replaced_ID].add(antestep.stepnumber)
 		self.eff_dict[_pre.replaced_ID].add(eff.replaced_ID)
 
 	def loadAll(self):
 		self.load(self._gsteps, self._gsteps)
 
-	def loadPartition(self, particals):
+	def loadPartition(self, particles):
 		#print('... for each decompositional operator ')
-		self.load(particals, self._gsteps)
-		self.load(self._gsteps, particals)
-		self.load(particals, particals)
-		self._gsteps.extend(particals)
+		self.load(particles, self._gsteps)
+		self.load(self._gsteps, particles)
+		self.load(particles, particles)
+		self._gsteps.extend(particles)
 
 	def load(self, antecedents, consequents):
 		for ante in antecedents:

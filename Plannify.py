@@ -6,17 +6,21 @@ from clockdeco import clock
 from Flaws import Flaw
 
 @clock
-def Plannify(RQ, GL):
+def Plannify(RQ, GL, h):
+	print('height: {}'.format(h))
 	#An ActionLib for steps in RQ - ActionLib is a container w/ all of its possible instances as ground steps
 	print('...ActionLibs')
-	Libs = [ActionLib(i, RS, GL) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
+	try:
+		Libs = [ActionLib(i, RS, GL) for i, RS in enumerate([Action.subgraph(RQ, step) for step in RQ.Steps])]
+	except:
+		return []
 
 	#A World is a combination of one ground-instance from each step
 	Worlds = productByPosition(Libs)
 
 	print('...Planets')
 	#A Planet is a plan s.t. all steps are "arg_name consistent", but a step may not be equiv to some ground step
-	Planets = [PlanElementGraph.Actions_2_Plan(W) for W in Worlds if isArgNameConsistent(W)]
+	Planets = [PlanElementGraph.Actions_2_Plan(W, h) for W in Worlds if isArgNameConsistent(W)]
 
 	print('...Linkify')
 	#Linkify installs orderings and causal links from RQ/decomp to Planets, rmvs Planets which cannot support links
@@ -27,7 +31,7 @@ def Plannify(RQ, GL):
 	Plans = Groundify(Planets, GL, has_links)
 
 	print('...returning consistent plans')
-	return [Plan for Plan in Plans if Plan.isInternallyConsistent()]
+	return [Plan for Plan in Plans if Plan is not None and Plan.isInternallyConsistent()]
 
 def partialUnify(PS, _map):
 	if _map is False:
@@ -57,6 +61,9 @@ def partialUnify(PS, _map):
 				#elm.replaced_ID = g_elm.ID
 				#elm.ID = g_elm.ID
 	NS.root.stepnumber = PS.root.stepnumber
+	NS.height = PS.height
+	NS.root.height = PS.root.height
+	NS.updateArgs()
 	return NS
 
 def isArgNameConsistent(Partially_Ground_Steps):
@@ -83,11 +90,11 @@ def Linkify(Planets, RQ, GL):
 	orderings = RQ.OrderingGraph.edges
 	if len(orderings) > 0:
 		for Planet in Planets:
+			if Planet is None:
+				continue
 			GtElm = Planet.getElementById
-			try:
-				Planet.OrderingGraph.edges = {Edge(GtElm(ord.source.ID), GtElm(ord.sink.ID),'<') for ord in orderings}
-			except:
-				raise AttributeError('why can I not use add ordering here?')
+			Planet.OrderingGraph.edges = {Edge(GtElm(ord.source.ID), GtElm(ord.sink.ID),'<') for ord in orderings}
+
 
 	links = RQ.CausalLinkGraph.edges
 	if len(links) == 0:
@@ -96,6 +103,10 @@ def Linkify(Planets, RQ, GL):
 	removable = set()
 	for link in links:
 		for i, Planet in enumerate(Planets):
+			if Planet is None:
+				removable.add(i)
+				continue
+
 			src = Planet.getElementById(link.source.ID)
 			snk = Planet.getElementById(link.sink.ID)
 			cond = Planet.getElementById(link.label.ID)
@@ -114,6 +125,8 @@ def Linkify(Planets, RQ, GL):
 		Planets[:] = [Planet for i, Planet in enumerate(Planets) if i not in removable]
 		removable = set()
 		if len(Planets) == 0:
+			for step in RQ.Steps:
+				print(step)
 			raise ValueError('no Planet could support links in {}'.format(RQ.name))
 
 	return True
@@ -123,6 +136,8 @@ def Groundify(Planets, GL, has_links):
 	print('...Groundify - Unifying Actions with GL')
 	i = 0
 	for Planet in Planets:
+		if Planet is None:
+			continue
 		print("... Planet {}".format(i))
 		i += 1
 		for Step in Planet.Step_Graphs:
@@ -136,6 +151,8 @@ def Groundify(Planets, GL, has_links):
 	print('...Groundify - Creating Causal Links')
 	Discovered_Planets = []
 	for Plan in Planets:
+		if Plan is None:
+			continue
 		#print(Plan)
 		Libs = [LinkLib(i, link, GL) for i, link in enumerate(Plan.CausalLinkGraph.edges)]
 
@@ -302,6 +319,8 @@ def Unify(story, other, GL):
 
 		#Add new flaws for other steps
 		for step in UW:
+			#other.root is the abstract step whose subplan is "other"
+			new_plan.OrderingGraph.addEdge(step, other.root)
 			if step not in SSteps:
 				AddNewFlaws(GL, step, new_plan)
 

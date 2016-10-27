@@ -162,6 +162,7 @@ class Operator(InternalElement):
 		self.stepnumber = stepnumber
 		self.executed = executed
 		self.is_decomp = False
+		self.height = 0
 
 	def __hash__(self):
 		return hash(self.ID)

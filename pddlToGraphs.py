@@ -9,7 +9,7 @@ from uuid import uuid4
 from Flaws import FlawLib
 from GlobalContainer import GC
 
-ARGLABELS = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg', '6', '7', '8', '9', '10']
+#ARGLABELS = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg', '6', '7', '8', '9', '10']
 
 
 def makeGoal(formula):
@@ -44,8 +44,8 @@ def getNonEquals(formula, op_graph, elements, edges):
 	arg2 = next(element for element in elements if c2.key.name == element.arg_name)
 	edge1 = next(edge for edge in edges if edge.source.typ == 'Action' and edge.sink == arg1)
 	edge2 = next(edge for edge in edges if edge.source.typ == 'Action' and edge.sink == arg2)
-	i1 = ARGLABELS.index(edge1.label)
-	i2 = ARGLABELS.index(edge2.label)
+	i1 = GC.ARGLABELS.index(edge1.label)
+	i2 = GC.ARGLABELS.index(edge2.label)
 	op_graph.nonequals.add((i1, i2))
 
 
@@ -82,7 +82,7 @@ def getSubFormulaGraph(formula, op_graph, parent=None, relationship=None, elemen
 		if relationship == 'actor-of':
 			edges.add(Edge(parent, arg, 'actor-of'))
 		else:
-			edges.add(Edge(lit, arg, ARGLABELS[i]))
+			edges.add(Edge(lit, arg, GC.ARGLABELS[i]))
 
 	return elements, edges
 
@@ -123,7 +123,7 @@ def getSubFormulaNoParent(formula, objects):
 	for i, child in enumerate(formula.children):
 		# children are list
 		arg = next(ob_element for ob_name, ob_element in objects.items() if child.key == ob_name)
-		edges.add(Edge(lit, arg, ARGLABELS[i]))
+		edges.add(Edge(lit, arg, GC.ARGLABELS[i]))
 		elements.add(arg)
 	return elements, edges
 
@@ -151,7 +151,7 @@ def decorateElm(child, DG):
 		elm.name = child.children[1].key
 	elif child.key == 'nth-step-arg' or child.key == 'nth-lit-arg':
 		args = child.children
-		label = ARGLABELS[int(args[0].key)]
+		label = GC.ARGLABELS[int(args[0].key)]
 		parent_elm = whichElm(args[1].key.name, DG)
 		child_elm = whichElm(args[2].key.name, DG)
 		DG.edges.add(Edge(parent_elm, child_elm, label))
@@ -212,7 +212,7 @@ def stepFromArg(arg, DG):
 	step_elm = whichElm(arg.children[0].key, DG)
 	args = [whichElm(child.key.name, DG) for child in arg.children[0].children]
 	for i, arg in enumerate(args):
-		DG.edges.add(Edge(step_elm, arg, ARGLABELS[i]))
+		DG.edges.add(Edge(step_elm, arg, GC.ARGLABELS[i]))
 
 
 def litFromArg(arg, DG):
@@ -225,7 +225,7 @@ def litFromArg(arg, DG):
 	lit_elm = Literal(name=lit_name, arg_name=lit_name + str(uuid4())[19:23], num_args=len(arg.children), truth=neg)
 	for i, ch in enumerate(arg.children):
 		e_i = whichElm(ch.key.name, DG)
-		DG.edges.add(Edge(lit_elm, e_i, ARGLABELS[i]))
+		DG.edges.add(Edge(lit_elm, e_i, GC.ARGLABELS[i]))
 	return lit_elm
 
 
@@ -294,7 +294,7 @@ def evalActionParams(params, op_graph):
 				arg_type = 'Condition'
 			arg = Argument(typ=arg_type, arg_name=parameter.name)
 			op_graph.elements.add(arg)
-		op_graph.edges.add(Edge(op_graph.root, arg, ARGLABELS[i]))
+		op_graph.edges.add(Edge(op_graph.root, arg, GC.ARGLABELS[i]))
 
 
 """ Convert pddl file to set of operator graphs"""
@@ -364,7 +364,7 @@ def problemToGraphs(problem):
 		init_graph.elements.add(lit)
 		init_graph.edges.add(Edge(init_op, lit, 'effect-of'))
 		for i, p in enumerate(condition.parameters):
-			init_graph.edges.add(Edge(lit, Args[p], ARGLABELS[i]))
+			init_graph.edges.add(Edge(lit, Args[p], GC.ARGLABELS[i]))
 
 	return Args, init_graph, goal_graph
 
@@ -376,7 +376,7 @@ def addNegativeInitStates(predicates, initAction, objects):
 	init_tups = defaultdict(set)
 	effects = initAction.getNeighbors(initAction.root)
 	for eff in effects:
-		nontup = sorted([(edge.sink, ARGLABELS.index(edge.label)) for edge in initAction.getIncidentEdges(eff)],
+		nontup = sorted([(edge.sink, GC.ARGLABELS.index(edge.label)) for edge in initAction.getIncidentEdges(eff)],
 						key=lambda x: x[1])
 		init_tups[eff.name].add(tuple(nontup[i][0] for i in range(len(nontup))))
 
@@ -400,7 +400,7 @@ def addNegativeInitStates(predicates, initAction, objects):
 			pc.ID = uuid4()
 
 			for i, arg in enumerate(pt):
-				initAction.edges.add(Edge(pc, arg, ARGLABELS[i]))
+				initAction.edges.add(Edge(pc, arg, GC.ARGLABELS[i]))
 
 			if len(pt) > 0:
 				initAction.elements.add(pc)
@@ -433,9 +433,6 @@ def parseDomAndProb(domain_file, problem_file):
 
 	addStatics(Operators)
 	addStatics(DOperators)
-
-
-
 
 	return Operators, DOperators, objects, GC.object_types, init, goal
 

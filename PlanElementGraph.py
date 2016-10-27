@@ -28,6 +28,7 @@ class Action(ElementGraph):
 
 		self.nonequals = set()
 		self.is_decomp = False
+		self.height = root_element.height
 
 		super(Action, self).__init__(ID, type_graph, name, Elements, root_element, Edges)
 		self.replaced_ID = root_element.replaced_ID
@@ -244,8 +245,11 @@ class PlanElementGraph(ElementGraph):
 		return hash(self.name) ^ hash(self.typ) ^ hash(self.ID)
 
 	@classmethod
-	def Actions_2_Plan(cls, Actions):
+	def Actions_2_Plan(cls, Actions, h):
 		# Used by Plannify
+
+		if not checkHeight(Actions, h):
+			return None
 
 		elements = set().union(*[A.elements for A in Actions])
 		edges = set().union(*[A.edges for A in Actions])
@@ -493,3 +497,9 @@ def topoSort(plan):
 			if len({edge for edge in OG.getParents(m_edge.sink)}) == 0:
 				S.add(m_edge.sink)
 	return L
+
+def checkHeight(listActions, height):
+	for a in listActions:
+		if a.height == height:
+			return True
+	return False
