@@ -166,8 +166,6 @@ class PlanSpacePlanner:
 			effect_token = self.GL.getConsistentEffect(Old, precondition)
 			#joint_literal = self.RetargetPrecondition(self.GL, new_plan, Old, precondition)
 
-			print('reuse: {}'.format(Old))
-			print('is_decomp={}'.format(Old.is_decomp))
 			if Old.is_decomp or s_need.is_decomp:
 				if not isIdenticalElmsInArgs(precondition.Args, Condition.subgraph(Old, effect_token).Args):
 					continue
@@ -211,7 +209,8 @@ class PlanSpacePlanner:
 		if new:
 			for Prec in s_add.Preconditions:
 				plan.flaws.insert(self.GL, plan, Flaw((s_add.root, Prec), 'opf'))
-				new_tclfs.update(plan.detectTCLFperStep(self.GL, s_add.root))
+			#only detect for new steps if adding this step threatens causal link
+			new_tclfs.update(plan.detectTCLFperStep(self.GL, s_add.root))
 
 		for tclf in new_tclfs:
 			plan.flaws.insert(self.GL, plan, tclf)
@@ -331,8 +330,8 @@ class TestPlanner(unittest.TestCase):
 	def testPlanner(self):
 		from GlobalContainer import GC
 
-		#domain = 'domains/ark-domain.pddl'
-		#problem = 'domains/ark-problem.pddl'
+	#	domain = 'domains/ark-domain.pddl'
+	#	problem = 'domains/ark-problem.pddl'
 		#domain = 'domains/ark-domain-decomp.pddl'
 		#problem = 'domains/ark-problem-decomp.pddl'
 	#	domain = 'domains/ark-domain-decomp-two.pddl'

@@ -17,6 +17,7 @@
          (has nazis gun))
   (:goal (and
               (not (alive nazis))
+              (cold-blooded army)
               ;(resourceful ark)
-              (has army ark)
+              ;(has army ark)
               )))

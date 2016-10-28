@@ -56,8 +56,10 @@ def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 			GDO = copy.deepcopy(op)
 			GDO.is_decomp = True
 
-			for elm in sp.elements:
-				assignElmToContainer(GDO, sp, elm, list(op.elements))
+			if not rewriteElms(GDO, sp, op):
+				continue
+		#	for elm in sp.elements:
+		#		assignElmToContainer(GDO, sp, elm, list(op.elements))
 
 			GDO.root.is_decomp = True
 
@@ -72,6 +74,20 @@ def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 			GDO.root.height = height + 1
 
 	return gsteps
+
+def rewriteElms(GDO, sp, op):
+
+	for elm in sp.elements:
+		assignElmToContainer(GDO, sp, elm, list(op.elements))
+	GDO.updateArgs()
+	for (u,v) in op.nonequals:
+		if GDO.Args[u] == GDO.Args[v]:
+			return False
+	for arg in GDO.Args:
+		if isinstance(arg, Argument):
+			if arg.name is None:
+				return False
+	return True
 
 def assignElmToContainer(GDO, SP, elm, ex_elms):
 	for ex_elm in ex_elms:
@@ -128,7 +144,10 @@ class GLib:
 
 		for i in range(3):
 			print('...Creating PlanGraph decompositional level {}'.format(i+1))
-			D = groundDecompStepList(dops, self, stepnum=len(self._gsteps), height=i)
+			try:
+				D = groundDecompStepList(dops, self, stepnum=len(self._gsteps), height=i)
+			except:
+				break
 			if not D or len(D) == 0:
 				break
 			self.loadPartition(D)

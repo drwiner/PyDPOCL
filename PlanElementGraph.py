@@ -345,52 +345,125 @@ class PlanElementGraph(ElementGraph):
 		self.elements.update(subgraph.elements)
 		self.edges.update(subgraph.edges)
 
-	def relaxedStep(self, GL, step, visited):
-
-		cost = 0
+	def h_add_a(self, GL, step, reusable_steps, visited):
+		#cost of an action 'a' is 1 + h_{add}(Prec(a)) where Prec(a) is the conjunction of preconditions
+		cost = 1
 		for pre in step.preconditions:
-			v = self.relaxedPre(GL, pre, visited)
-			cost += v
+			if pre.replaced_ID in visited:
+				v = visited[pre.replaced_ID]
+			else:
+				visited[pre.replaced_ID] = float('inf')
+				v = self.h_add_q(GL, pre, reusable_steps, visited)
+				visited[pre.replaced_ID] = v
 
+			if v == float('inf'):
+				return v
+
+			cost += v
 		return cost
 
-	def relaxedPre(self, GL, pre, visited=None):
-		if visited is None:
-			visited = collections.defaultdict(int)
+	def h_add_q(self, GL, pre, reusable_steps, visited):#, visited=None):
+		#additive heuristic with modification for reuse (VHPOP)
 
 		antecedents = GL.id_dict[pre.replaced_ID]
 
-		if len(antecedents) == 0:
-			return 1000
+		# 0 if q unifies with effect of exsting step
+		for rs in reusable_steps:
+			#includes initial dummy step
+			if rs in antecedents:
+				visited[rs] = 0
+				return 0
 
-		for ant in antecedents:
-			if len(GL[ant].preconditions) == 0:
-				visited[ant] = 1
+		least = float('inf')
+
+		#infinity otherwise
+		if len(antecedents) == 0:
+			visited[pre.replaced_ID] = least
+			return least
+
+		for ante in antecedents:
+			# Shortcut - if one of your antecedents has no preconditions
+			if len(GL[ante].preconditions) == 0:
+				visited[ante] = 1
 				return 1
 
-		if self.initial_dummy_step.stepnumber not in antecedents:
-			least = 1000
-			for ante in antecedents:
-
-				if ante in visited.keys():
-					v = visited[ante]
-				else:
-					visited[ante] = 1000
-					v = self.relaxedStep(GL, GL[ante], visited)
-					visited[ante] = v
+			if ante in visited:
+				if visited[ante] < least:
+					least = visited[ante]
+			else:
+				#in case it cycles...
+				visited[ante] = float('inf')
+				v = self.h_add_a(GL, GL[ante], reusable_steps, visited)
+				visited[ante] = v
+				if v ==0:
+					return 0
 				if v < least:
 					least = v
+		return least
 
-			return least + 1
-		return 0
+
+		#return min(self.h_add_a(GL, GL[ante], visited) for ante in antecedents)
+
+		#
+		# #_____________________
+		# for ant in antecedents:
+		# 	if len(GL[ant].preconditions) == 0:
+		# 		visited[ant] = 1
+		# 		return 1
+		# # _____________________
+		#
+		# if self.initial_dummy_step.stepnumber not in antecedents:
+		# 	least = float('inf')
+		# 	for ante in antecedents:
+		#
+		# 		if ante in visited.keys():
+		# 			v = visited[ante]
+		# 		else:
+		# 			visited[ante] = float('inf')
+		# 			v = self.relaxedStep(GL, GL[ante], visited)
+		# 			visited[ante] = v
+		# 		if v < least:
+		# 			least = v
+		#
+		# 	return least + 1
+		#return v
 
 	def calculateHeuristic(self, GL):
 		value = 0
+		#Sum of h_{add}(pre) for pre in <s_{need}, pre> for each open condition flaw
 
 		for oc in self.flaws.flaws:
-			_, pre = oc.flaw
-			c = self.relaxedPre(GL, pre)
-			oc.heuristic = c
+			s_need, pre = oc.flaw
+
+			antecedents = GL.id_dict[pre.replaced_ID]
+
+			if (pre.name, pre.truth) not in FlawLib.non_static_preds:
+				if self.initial_dummy_step not in antecedents:
+					return float('inf')
+
+			reusable_steps = [step.stepnumber for step in self.Steps if step != s_need
+							  and not self.OrderingGraph.isPath(s_need, step)]
+
+			found = False
+			for rs in reusable_steps:
+				if rs in antecedents:
+					found = True
+
+			#collections.defaultdict(int)
+			if not found:
+				visited = collections.defaultdict(int)
+				c = self.h_add_q(GL, pre, reusable_steps, visited)
+				oc.heuristic = c + s_need.height*30
+			else:
+				c = 0
+				oc.heuristic = 0 + s_need.height*30
+
+			#assign flaw heuristic here.
+			#oc.heuristic = c
+
+
+			#oc.criteria = c
+
 			# print('flaw: {} , heuristic = {}'.format(oc,c))
 			value += c
 

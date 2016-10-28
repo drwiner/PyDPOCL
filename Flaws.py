@@ -19,7 +19,7 @@ class Flaw:
 		self.cndts = 0
 		self.risks = 0
 		self.criteria = self.cndts
-		self.heuristic = 0
+		self.heuristic = float('inf')
 		if name == 'opf':
 			self.tiebreaker = hash(f[1].replaced_ID)
 
@@ -43,6 +43,8 @@ class Flaw:
 			self.tiebreaker = hash(self.flaw[1].label.replaced_ID) + self.flaw[1].sink.stepnumber
 		elif flaw_type == 'unsafe':
 			self.criteria = self.risks
+		elif flaw_type in {'inits', 'statics', 'nonreusable'}:
+			self.criteria = self.heuristic
 
 	def __repr__(self):
 		return 'Flaw({}, h={}, criteria={}, tb={})'.format(self.flaw, self.heuristic, self.criteria, self.tiebreaker)
@@ -63,14 +65,14 @@ class DCF(Flaw):
 	def __init__(self, f, name):
 		super(DCF, self).__init__(f, name)
 		self.criteria = len(f.Steps)
-		self.tiebreaker = f.heuristic
+		self.tiebreaker = f.root.stepnumber
 	def __repr__(self):
 		steps = [''.join(str(step) + ', ' for step in self.flaw.Step_Graphs)]
-		return 'DCF(' + ''.join(['{}'.format(step) for step in steps]) + 'h={}, criteria ={}, tb={})'.format(
-			self.heuristic, self.criteria, self.tiebreaker)
+		return 'DCF(' + ''.join(['{}'.format(step) for step in steps]) + 'criteria ={}, tb={})'.format(
+			self.criteria, self.tiebreaker)
 
 class Flawque:
-	""" A deque which pretends to be a set, and keeps everything sorted"""
+	""" A deque which pretends to be a set, and keeps everything sorted, highest-value first"""
 
 	def __init__(self, name=None):
 		self._flaws = collections.deque()
@@ -159,14 +161,14 @@ class FlawLib():
 		self.typs = [self.statics, self.inits, self.threats, self.decomps, self.unsafe, self.reusable, self.nonreusable]
 		self.restricted_names = ['threats', 'decomps']
 
-	@property
-	def heuristic(self):
-		value = 0
-		for i, flawques in enumerate(self.typs):
-			if flawques.name in self.restricted_names:
-				continue
-			value += i*len(flawques)
-		return value
+	# @property
+	# def heuristic(self):
+	# 	value = 0
+	# 	for i, flawques in enumerate(self.typs):
+	# 		if flawques.name in self.restricted_names:
+	# 			continue
+	# 		value += i*len(flawques)
+	# 	return value
 
 	def __len__(self):
 		return sum(len(flaw_set) for flaw_set in self.typs)
@@ -238,7 +240,7 @@ class FlawLib():
 
 		#Eval number of existing candidates
 		ante_nums = GL.id_dict[pre.replaced_ID]
-		risk_nums = GL.threat_dict[s_need.replaced_ID]
+		risk_nums = GL.threat_dict[s_need.stepnumber]
 
 		for step in plan.Steps:
 			#defense
@@ -250,7 +252,7 @@ class FlawLib():
 				flaw.cndts += 1
 				if step.name == 'dummy_init':
 					self.inits.add(flaw)
-			if step.replaced_ID in risk_nums:
+			if step.stepnumber in risk_nums:
 				flaw.risks += 1
 
 		if flaw in self.inits:
