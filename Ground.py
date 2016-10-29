@@ -16,8 +16,21 @@ import hashlib
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
 Antestep = namedtuple('Antestep', 'action eff_link')
 
-def groundLibraryList(predicates, objects, obtypes):
-	pass
+def groundLiteralList(objects):
+	glits = []
+	litnum = 0
+	ignorable = {'=', 'equals', 'equal'}
+	for p_name, arg_generator in GC.predicate_types.items():
+		if p_name in ignorable:
+			continue
+		cndts = [[obj for obj in objects if arg == obj.typ or arg in GC.object_types[obj.typ]] for arg in arg_generator]
+		tuples = itertools.product(*cndts)
+		for t in tuples:
+			glits.append(Condition.makeCondition(p_name, t, litnum, True))
+			glits.append(Condition.makeCondition(p_name, t, litnum+1, False))
+			litnum += 2
+	return glits
+
 
 def groundStoryList(operators, objects, obtypes):
 	stepnum = 0
@@ -135,6 +148,7 @@ class GLib:
 		self.non_static_preds = FlawLib.non_static_preds
 		self.object_types = GC.object_types
 		self.objects = objects
+		self._glits = groundLiteralList(objects)
 		self._gsteps = groundStoryList(operators, self.objects, obtypes)
 
 		#dictionaries

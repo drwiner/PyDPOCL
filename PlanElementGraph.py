@@ -175,6 +175,16 @@ class Condition(ElementGraph):
 		super(Condition, self).__init__(ID, type_graph, name, Elements, root_element, Edges, Restrictions)
 		self.replaced_ID = root_element.replaced_ID
 
+	@classmethod
+	def makeCondition(cls, pred_name, tup, lit_num, trudom):
+		parent = Literal(name=pred_name, truth=trudom)
+		elements = {parent}.union(set(tup))
+		edges = {Edge(parent, t, GC.ARGLABELS[i]) for i, t in enumerate(tup)}
+		condition = cls(Elements=elements, root_element=parent, Edges=edges)
+		condition.litnumber = lit_num
+		condition.root.litnumber = lit_num
+		return condition
+
 	def __hash__(self):
 		return hash(self.ID) ^ hash(self.root.name) ^ hash(self.root.truth) ^ hash(self.root.replaced_ID)
 
