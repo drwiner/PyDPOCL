@@ -330,8 +330,8 @@ class TestPlanner(unittest.TestCase):
 	def testPlanner(self):
 		from GlobalContainer import GC
 
-	#	domain = 'domains/ark-domain.pddl'
-	#	problem = 'domains/ark-problem.pddl'
+		domain = 'domains/ark-domain.pddl'
+		problem = 'domains/ark-problem.pddl'
 		#domain = 'domains/ark-domain-decomp.pddl'
 		#problem = 'domains/ark-problem-decomp.pddl'
 	#	domain = 'domains/ark-domain-decomp-two.pddl'
@@ -339,8 +339,8 @@ class TestPlanner(unittest.TestCase):
 		#domain = 'domains/ark-domain-decomp-three.pddl'
 	#	problem = 'domains/ark-problem-outcomes.pddl'
 	#	domain = 'domains/ark-domain-outcomes.pddl'
-		domain = 'domains/h1.pddl'
-		problem = 'domains/h1p1.pddl'
+	#	domain = 'domains/h1.pddl'
+	#	problem = 'domains/h1p1.pddl'
 
 		print('Reading {} and {}'.format(domain, problem))
 

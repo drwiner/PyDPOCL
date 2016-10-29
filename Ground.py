@@ -16,6 +16,9 @@ import hashlib
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
 Antestep = namedtuple('Antestep', 'action eff_link')
 
+def groundLibraryList(predicates, objects, obtypes):
+	pass
+
 def groundStoryList(operators, objects, obtypes):
 	stepnum = 0
 	gsteps = []
