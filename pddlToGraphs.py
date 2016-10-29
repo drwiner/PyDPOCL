@@ -421,8 +421,9 @@ def parseDomAndProb(domain_file, problem_file):
 	domain, dom = parser.parse_domain_drw()
 	problem, v = parser.parse_problem_drw(dom)
 
-	#GC.predicates.update()
+
 	GC.object_types.update(obTypesDict(domain.types))
+	GC.predicate_types.update(predTypesDict(list(dom.predicates.items())))
 
 	args, init, goal = problemToGraphs(problem)
 	objects = set(args.values())
@@ -452,8 +453,10 @@ def obTypesDict(object_types):
 	return obtypes
 
 def predTypesDict(pred_types):
-
-
+	predtypes = defaultdict(tuple)
+	for name, predicate in pred_types:
+		predtypes[name] = (tup[0].name for _, tup in predicate.signature)
+	return predtypes
 
 def rFollowHierarchy(object_types, child_name, accumulated=set()):
 	for ob in object_types:
