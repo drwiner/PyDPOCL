@@ -3,7 +3,7 @@ import itertools
 import copy
 import pickle
 from collections import namedtuple, defaultdict
-from PlanElementGraph import Condition, Action
+from PlanElementGraph import Condition, Action, GStep
 from clockdeco import clock
 from Plannify import Plannify
 from Element import Argument, Actor, Operator, Literal
@@ -32,7 +32,7 @@ def groundLiteralList(objects):
 	return glits
 
 
-def groundStoryList(operators, objects, obtypes):
+def groundStoryList(operators, glits, objects, obtypes):
 	stepnum = 0
 	gsteps = []
 	print('...Creating Ground Steps')
@@ -54,11 +54,15 @@ def groundStoryList(operators, objects, obtypes):
 			gstep.root.arg_name = stepnum
 			stepnum += 1
 			gstep.replaceArgs(t)
-			gsteps.append(gstep)
-			gstep.replaceInternals()
-			gstep.height = 0
-			gstep.root.height = 0
-			print('Creating ground step {}'.format(gstep))
+			args = gstep.Args
+			effects = [E for E in glits for effect in gstep.Effects if E == effect]
+			preconditions = [P for P in glits for pre in gstep.Preconditions if P == pre]
+			g = GStep(gstep.root, args, preconditions, effects)
+			gsteps.append(g)
+			#gstep.replaceInternals()
+			g.height = 0
+			g.root.height = 0
+			print('Creating ground step {}'.format(g))
 	return gsteps
 
 def groundDecompStepList(doperators, GL, stepnum=0, height=0):
@@ -149,7 +153,7 @@ class GLib:
 		self.object_types = GC.object_types
 		self.objects = objects
 		self._glits = groundLiteralList(objects)
-		self._gsteps = groundStoryList(operators, self.objects, obtypes)
+		self._gsteps = groundStoryList(operators, self._glits, self.objects, obtypes)
 
 		#dictionaries
 		self.ante_dict = defaultdict(set)

@@ -9,6 +9,27 @@ import copy
 import collections
 from clockdeco import clock
 
+#readonly ground step
+class GStep(ElementGraph):
+
+	def __init__(self, operator, args, preconditions, effects):
+		self.Args = args
+		self.Preconditions = preconditions
+		self.preconditions = [pre.root for pre in self.Preconditions]
+		self.Effects = effects
+		self.effects = [eff.root for eff in self.Effects]
+
+		edges = set()
+		for pre in self.Preconditions:
+			edges.update(pre.edges)
+		for eff in self.Effects:
+			edges.update(eff.edges)
+
+		super(GStep, self).__init__(name=operator.name, Elements=set(self.preconditions)|set(self.effects),
+									root_element=operator, Edges=edges)
+		self.nonequals = set()
+		self.is_decomp = False
+		self.replaced_ID = uuid4()
 
 class Action(ElementGraph):
 	# stepnumber = 2
@@ -32,6 +53,7 @@ class Action(ElementGraph):
 
 		super(Action, self).__init__(ID, type_graph, name, Elements, root_element, Edges)
 		self.replaced_ID = root_element.replaced_ID
+
 
 	def __hash__(self):
 		return hash(arg for arg in self.Args) ^ hash(self.root.name)
@@ -181,6 +203,7 @@ class Condition(ElementGraph):
 		elements = {parent}.union(set(tup))
 		edges = {Edge(parent, t, GC.ARGLABELS[i]) for i, t in enumerate(tup)}
 		condition = cls(Elements=elements, root_element=parent, Edges=edges)
+		condition.replaced_ID = uuid4()
 		condition.litnumber = lit_num
 		condition.root.litnumber = lit_num
 		return condition
