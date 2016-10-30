@@ -3,7 +3,7 @@ import itertools
 import copy
 import pickle
 from collections import namedtuple, defaultdict
-from PlanElementGraph import Condition, Action, GStep
+from PlanElementGraph import GStep, Cond
 from clockdeco import clock
 from Plannify import Plannify
 from Element import Argument, Actor, Operator, Literal
@@ -26,8 +26,8 @@ def groundLiteralList(objects):
 		cndts = [[obj for obj in objects if arg == obj.typ or arg in GC.object_types[obj.typ]] for arg in arg_generator]
 		tuples = itertools.product(*cndts)
 		for t in tuples:
-			glits.append(Condition.makeCondition(p_name, t, litnum, True))
-			glits.append(Condition.makeCondition(p_name, t, litnum+1, False))
+			glits.append(Cond(p_name, t, litnum, True))
+			glits.append(Cond(p_name, t, litnum+1, False))
 			litnum += 2
 	return glits
 
@@ -49,20 +49,18 @@ def groundStoryList(operators, glits, objects, obtypes):
 			if not legaltuple:
 				continue
 			gstep = copy.deepcopy(op)
-			gstep._replaceInternals()
-			gstep.root.stepnumber = stepnum
-			gstep.root.arg_name = stepnum
-			stepnum += 1
 			gstep.replaceArgs(t)
-			args = gstep.Args
-			effects = [E for E in glits for effect in gstep.Effects if E == effect]
-			preconditions = [P for P in glits for pre in gstep.Preconditions if P == pre]
-			g = GStep(gstep.root, args, preconditions, effects)
+			gstep.replaceInternals()
+			effects = [E.deepclone() for E in glits for effect in gstep.Effects if E == effect]
+			preconditions = [P.deepclone() for P in glits for pre in gstep.Preconditions if P == pre]
+			g = GStep(gstep.root, gstep.Args, preconditions, effects, stepnum)
+			g.root.stepnumber = stepnum
 			gsteps.append(g)
-			#gstep.replaceInternals()
 			g.height = 0
 			g.root.height = 0
+
 			print('Creating ground step {}'.format(g))
+			stepnum += 1
 	return gsteps
 
 def groundDecompStepList(doperators, GL, stepnum=0, height=0):
@@ -152,13 +150,13 @@ class GLib:
 		self.non_static_preds = FlawLib.non_static_preds
 		self.object_types = GC.object_types
 		self.objects = objects
+
 		self._glits = groundLiteralList(objects)
 		self._gsteps = groundStoryList(operators, self._glits, self.objects, obtypes)
 
 		#dictionaries
 		self.ante_dict = defaultdict(set)
-		self.id_dict = defaultdict(set)
-		self.eff_dict = defaultdict(set)
+		self.cndt_dict = defaultdict(set)
 		self.threat_dict = defaultdict(set)
 		print('...Creating PlanGraph base level')
 		self.loadAll()
@@ -174,18 +172,24 @@ class GLib:
 			self.loadPartition(D)
 
 		#self._gsteps.extend(D)
+		#Preconditions = [Action.subgraph(init_action, pre) for pre in init_action.edges.sink if pre.label ==
+		#				 'effect-of']
+		init_pre = [P.deepclone() for P in self._glits for prec in init_action.Effects if P == prec]
+		initial_dummy_step = GStep(init_action.root, [], [], init_pre, len(self._gsteps))
+		goal_eff = [E.deepclone() for E in self._glits for eff in goal_action.Preconditions if E == eff]
+		goal_dummy_step = GStep(goal_action.root, [], goal_eff, [], len(self._gsteps)+1)
+		self.loadPartition([initial_dummy_step, goal_dummy_step])
 
-		init_action.root.stepnumber = len(self._gsteps)
-		init_action._replaceInternals()
-		init_action.replaceInternals()
+		#	init_action._replaceInternals()
+			#init_action.replaceInternals()
 		#self._gsteps.append(init_action)
 		# goal at [-1]
-		goal_action.root.stepnumber = len(self._gsteps) + 1
-		goal_action._replaceInternals()
-		goal_action.replaceInternals()
+	#	goal_action.root.stepnumber = len(self._gsteps) + 1
+	#	goal_action._replaceInternals()
+	#	goal_action.replaceInternals()
 	#	self._gsteps.append(goal_action)
 
-		self.loadPartition([init_action, goal_action])
+	#	self.loadPartition([init_action, goal_action])
 		#self.load({init_action}, self._gsteps)
 	#	self.load(self._gsteps, {goal_action})
 	#	self.load({init_action}, {goal_action})
@@ -196,9 +200,9 @@ class GLib:
 		print('uploading')
 		upload(self, domain + problem)
 
-	def insert(self, _pre, antestep, eff):
-		self.id_dict[_pre.replaced_ID].add(antestep.stepnumber)
-		self.eff_dict[_pre.replaced_ID].add(eff.replaced_ID)
+	def insert(self, prelitnum, antestepnum, efflitnum):
+		self.id_dict[prelitnum].add(antestepnum)
+		#self.eff_dict[prelitnum].add(efflitnum)
 
 	def loadAll(self):
 		self.load(self._gsteps, self._gsteps)
@@ -210,73 +214,21 @@ class GLib:
 		self.load(particles, particles)
 		self._gsteps.extend(particles)
 
-	def load(self, antecedents, consequents):
-		for ante in antecedents:
-			for pre in ante.Preconditions:
-				print('... Processing antecedents for {} \t\tof step {}'.format(pre, ante))
-				self._loadAntecedentPerConsequent(consequents, ante, pre)
+	def load(self, group1, group2):
+		for t in group1:
 
-	def _loadAntecedentPerConsequent(self, antecedents, _step, _pre):
-		for gstep in antecedents:
-			if self._parseEffects(gstep, _step, _pre) > 0:
-				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
+			print('... Processing cndts of step {}'.format(t))
+			self.ante_dict[t.stepnumber].update({s.stepnumber for s in group2 if set(t.Preconditions).intersection(
+				s.Effects)})
 
-	def _parseEffects(self, gstep, _step, _pre):
-		count = 0
-		for Eff in gstep.Effects:
-			if Eff.Args != _pre.Args or Eff.name != _pre.name:
-				continue
-			if Eff.truth != _pre.truth:
-				self.threat_dict[_step.stepnumber].add(gstep.stepnumber)
-			else:
-				self.insert(_pre, gstep.deepcopy(replace_internals=True), Eff)
-				count += 1
-		return count
+			for pre in t.Preconditions:
 
-	def getPotentialLinkConditions(self, src, snk):
-		cndts = []
-		for pre in self[snk.stepnumber].preconditions:
-			if src.stepnumber not in self.id_dict[pre.replaced_ID]:
-				continue
-			cndts.append(Edge(src,snk, copy.deepcopy(pre)))
-		return cndts
+				print('... Processing cndts for {} of step {}'.format(pre, t))
+				self.cndt_dict[pre.litnumber].update({gstep.stepnumber for gstep in group2 if pre in gstep.Effects})
 
-	def getPotentialEffectLinkConditions(self, src, snk):
-		cndts = []
-		for eff in self[src.stepnumber].effects:
-			for pre in self[snk.stepnumber].preconditions:
-				if eff.replaced_ID not in self.id_dict[pre.replaced_ID]:
-					continue
-				cndts.append(Edge(src, snk, copy.deepcopy(eff)))
-
-		return cndts
-
-	def getConsistentEffect(self, S_Old, precondition):
-		effect_token = None
-		for eff in S_Old.effects:
-			if eff.replaced_ID in self.eff_dict[precondition.replaced_ID] or self.eff_dict[eff.replaced_ID] == \
-					self.eff_dict[precondition.replaced_ID]:
-				effect_token = eff
-				break
-		if effect_token is None:
-			raise AttributeError('story_GL.eff_dict empty but id_dict has antecedent')
-		return effect_token
-
-	def hasConsistentPrecondition(self, Sink, effect):
-		for pre in Sink.preconditions:
-			if effect.replaced_ID in self.eff_dict[pre.replaced_ID]:
-				return True
-		return False
-
-	def getConsistentPrecondition(self, Sink, effect):
-		pre_token = None
-		for pre in Sink.preconditions:
-			if effect.replaced_ID in self.eff_dict[pre.replaced_ID]:
-				pre_token = pre
-				break
-		if pre_token is None:
-			raise AttributeError('effect {} not in story_GL.eff_Dict for Sink {}'.format(effect, Sink))
-		return pre_token
+				print('... Processing threats to {} of step {}'.format(pre, t))
+				opp = self._glits[pre.getOppLitNum()]
+				self.threat_dict[pre.litnumber].update({gstep.stepnumber for gstep in group2 if opp in gstep.Effects})
 
 	def __len__(self):
 		return len(self._gsteps)
@@ -288,7 +240,8 @@ class GLib:
 		return item in self._gsteps
 
 	def __repr__(self):
-		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
+		steps = [str(step) + '\n' for step in self]
+		return 'Grounded Step Library: \n' + ''.join(['{}'.format(step) for step in steps])
 
 if __name__ ==  '__main__':
 	domain_file = 'domains/ark-domain.pddl'

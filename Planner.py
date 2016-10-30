@@ -74,16 +74,17 @@ class PlanSpacePlanner:
 			Add ordering from DI to DG
 		"""
 
-		s_init = copy.deepcopy(self.GL[-2])
-		s_init.replaceInternals()
-		s_goal = copy.deepcopy(self.GL[-1])
-		s_goal.replaceInternals()
+		s_init = self.GL[-2].deepcopy(replace_internals=True)
+		s_goal = self.GL[-1].deepcopy(replace_internals=True)
 
-		s_init_plan = PlanElementGraph(name=plan_name, Elements=self.objects|s_init.elements|s_goal.elements,
-									   Edges=s_init.edges|s_goal.edges)
+
+		s_init_plan = PlanElementGraph(name=plan_name)
 
 		s_init_plan.initial_dummy_step = s_init.root
 		s_init_plan.final_dummy_step = s_goal.root
+		s_init_plan.append(s_init)
+		s_init_plan.append(s_goal)
+
 
 		s_init_plan.OrderingGraph.addOrdering(s_init.root, s_goal.root)
 
@@ -92,32 +93,39 @@ class PlanSpacePlanner:
 		#for flaw in init_flaws:
 		for prec in s_goal.Preconditions:
 			s_init_plan.flaws.insert(self.GL, s_init_plan, Flaw((s_goal.root, prec), 'opf'))
+
+		s_init_plan.flaws.addCndtsAndRisks(self.GL, s_init)
 		return s_init_plan
 
 
 	#@clock
 	def newStep(self, plan, flaw):
 		results = set()
-		s_need, precondition = flaw.flaw
-		#antecedents = self.GL.pre_dict[precondition.replaced_ID]
-		antecedents = self.GL.id_dict[precondition.replaced_ID]
+		s_need, pre = flaw.flaw
 
+		antecedents = self.GL.cndt_dict[pre.litnumber]
 		for antenum in antecedents:
 			ante = self.GL[antenum]
 			if ante.stepnumber == plan.initial_dummy_step.stepnumber:
 				continue
 
 			new_plan = plan.deepcopy()
-			antestep = ante.deepcopy(replace_internals=True)
-			eff = self.IntegrateNewStep(new_plan, antestep, precondition)
+			s_add = ante.deepcopy(replace_internals=True)
+			new_plan.append(s_add)
+			if s_add.is_decomp:
+				eff = s_add.getElmByRID(pre.replaced_ID)
+				pass
+				#eargs = list(eff.Args)
+				#retargetArgs(antestep, eff.Args, pre.Args)
+				#retargetElmsInArgs(antestep.ground_subplan, eff.Args, pre.Args)
+			#eff = self.IntegrateNewStep(new_plan, antestep, precondition)
 
 			#add step, orderings and causal links, add flaws
-			self.addStep(new_plan,
-						 s_add=antestep,
-						 s_need=new_plan.getElementById(s_need.ID),
-						 condition=Condition.subgraph(new_plan, eff),
-						 new=True)
-			new_plan.flaws.addCndtsAndRisks(self.GL, antestep.root)
+			new_s_need = new_plan[s_need.index]
+			new_link_condition = new_s_need.Preconditions[pre.index]
+			self.addStep(new_plan, s_add, new_s_need, new_link_condition, new=True)
+
+			new_plan.flaws.addCndtsAndRisks(self.GL, s_add)
 
 			results.add(new_plan)
 
@@ -138,7 +146,7 @@ class PlanSpacePlanner:
 			new_plan.flaws.insert(self.GL, new_plan, DCF(antestep.ground_subplan, 'dcf'))
 
 		eff_link = antestep.RemoveSubgraph(eff)
-		eff_link.sink = new_plan.getElementById(precondition.root.ID)
+		eff_link.sink = new_plan.get_by_id(precondition.root.ID)
 		eff_link.sink.replaced_ID = eff.replaced_ID
 		new_plan.edges.add(eff_link)
 		new_plan.elements.update(antestep.elements)
@@ -148,69 +156,73 @@ class PlanSpacePlanner:
 	#@clock
 	def reuse(self, plan, flaw):
 		results = set()
-		s_need, precondition = flaw.flaw
+		s_need, pre = flaw.flaw
 
 		#antecedents - a set of stepnumbers
-		antecedents = self.GL.id_dict[precondition.replaced_ID]
+		antecedents = self.GL.cndt_dict[pre.litnumber]
 		if len(antecedents) == 0:
 			return set()
 
-		for s_old in plan.Steps:
+		for i, s_old in enumerate(plan.Steps):
 			if s_old.stepnumber not in antecedents:
 				continue
 			if s_old == s_need:
 				continue
 
 			new_plan = plan.deepcopy()
-			Old = Action.subgraph(new_plan, s_old)
-			effect_token = self.GL.getConsistentEffect(Old, precondition)
+			s_add = new_plan[i]
+			#Old = Action.subgraph(new_plan, s_old)
+			#effect_token = Old.getElmByRID(pre.replaced_ID)#self.GL.getConsistentEffect(Old, precondition)
 			#joint_literal = self.RetargetPrecondition(self.GL, new_plan, Old, precondition)
 
-			if Old.is_decomp or s_need.is_decomp:
-				if not isIdenticalElmsInArgs(precondition.Args, Condition.subgraph(Old, effect_token).Args):
+			if s_add.is_decomp or s_need.is_decomp:
+				eff = next(iter(eff for eff in s_add.Effects if eff.replaced_ID == pre.replaced_ID))
+				if not isIdenticalElmsInArgs(pre.Args, eff.Args):
 					continue
 				else:
 					print("not identical")
 
-			effect_edge = new_plan.ReplaceSubgraphs(precondition.root, effect_token)
+			#effect_edge = new_plan.ReplaceSubgraphs(precondition.root, effect_token)
 
 			#add step, orderings, causal links, and create flaws
-			self.addStep(new_plan, Old,
-						 s_need=new_plan.getElementById(s_need.ID),
-						 condition=Condition.subgraph(new_plan, effect_edge.sink),
-						 new=False)
+			new_s_need = new_plan[s_need.index]
+			new_link_condition = new_s_need.Preconditions[pre.index]
+			self.addStep(new_plan, s_add, new_s_need, new_link_condition, new=False)
 
 			results.add(new_plan)
 
 		return results
 
 	def addStep(self, plan, s_add, s_need, condition, new=None):
-		"""
-			when a step is added/reused,
-			add causal link and ordering edges (including to dummy steps)
-			If step is new, add open precondition flaws for each precondition
-		"""
 		if new is None:
 			new = False
 
+		if s_add.stepnumber == 72:
+			pass
+
 		if s_add.stepnumber != plan.initial_dummy_step.stepnumber:
 			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_add.root)
-			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_need)
+			plan.OrderingGraph.addEdge(plan.initial_dummy_step, s_need.root)
+		else:
+			pass
 
 		if s_need.stepnumber != plan.final_dummy_step.stepnumber:
 			plan.OrderingGraph.addEdge(s_add.root, plan.final_dummy_step)
-			plan.OrderingGraph.addEdge(s_need, plan.final_dummy_step)
+			plan.OrderingGraph.addEdge(s_need.root, plan.final_dummy_step)
+		else:
+			pass
 
 		#Always add this ordering
-		plan.OrderingGraph.addEdge(s_add.root, s_need)
-		new_link = plan.CausalLinkGraph.addEdge(s_add.root, s_need, condition)
+		plan.OrderingGraph.addEdge(s_add.root, s_need.root)
+		new_link = plan.CausalLinkGraph.addEdge(s_add.root, s_need.root, condition)
 		new_tclfs = plan.detectTCLFperCL(self.GL, new_link)
 
 		if new:
+
 			for Prec in s_add.Preconditions:
 				plan.flaws.insert(self.GL, plan, Flaw((s_add.root, Prec), 'opf'))
 			#only detect for new steps if adding this step threatens causal link
-			new_tclfs.update(plan.detectTCLFperStep(self.GL, s_add.root))
+			new_tclfs.update(plan.detectTCLFperStep(self.GL, s_add))
 
 		for tclf in new_tclfs:
 			plan.flaws.insert(self.GL, plan, tclf)
@@ -272,6 +284,8 @@ class PlanSpacePlanner:
 			#print(self._frontier)
 
 			plan = self.pop()
+			print(plan.cost, plan.heuristic)
+			#print(plan)
 			print(plan.flaws)
 			#print('\n selecting plan: {}'.format(plan))
 			#print(plan.flaws)
@@ -314,13 +328,17 @@ def topoSort(graph):
 	OG = copy.deepcopy(graph.OrderingGraph)
 	L =[]
 	S = {graph.initial_dummy_step}
+	#L = list(graph.Steps)
 	while len(S) > 0:
 		n = S.pop()
-		L.append(n)
+		if n not in L:
+			L.append(n)
 		for m_edge in OG.getIncidentEdges(n):
 			OG.edges.remove(m_edge)
+			#if the sink has no other ordering sources, add it to the visited
 			if len({edge for edge in OG.getParents(m_edge.sink)}) == 0:
 				S.add(m_edge.sink)
+
 	return L
 
 
@@ -356,7 +374,7 @@ class TestPlanner(unittest.TestCase):
 		for R in results:
 			print(R)
 			for step in topoSort(R):
-				print(Action.subgraph(R, step))
+				print(R[step.index])
 
 		print('\n\n')
 

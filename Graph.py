@@ -68,10 +68,10 @@ class Graph(Element):
 	def __iter__(self):
 		elms = iter(self.elements)
 		yield next(elms)
-	
-	def getElementById(self, ID):
+
+	def get_by_id(self, _id):
 		for element in self.elements:
-			if element.ID == ID:
+			if element.ID == _id:
 				return element
 		return None
 	
@@ -94,7 +94,7 @@ class Graph(Element):
 
 		self.assign(oldsnk, newsnk)
 
-		if self.getElementById(newsnk.ID) is None:
+		if self.get_by_id(newsnk.ID) is None:
 			raise NameError('newsnk replacer is not found in self')
 
 		# update constraint edges which might reference specific elements being replaced
@@ -237,7 +237,7 @@ def isIdenticalElmsInArgs(C1, C2):
 			continue
 		for elm in u.elements:
 			try:
-				v.getElementById(elm.ID)
+				v.get_by_id(elm.ID)
 			except:
 				if isinstance(elm, Literal):
 					for v_elm in v.elements:
@@ -259,11 +259,11 @@ def retargetElmsInArgs(GSP, C1, C2):
 			continue
 		for elm in u.elements:
 			bigger_map[elm] = v.getElmByRID(elm.replaced_ID)
-			if bigger_map[elm] is None and isinstance(elm, Literal):
-				for v_elm in v.elements:
-					if v_elm.name == elm.name and v_elm.truth == elm.truth:
-						bigger_map[elm] = v_elm
-						break
+			#if bigger_map[elm] is None and isinstance(elm, Literal):
+			#	for v_elm in v.elements:
+			#		if v_elm.name == elm.name and v_elm.truth == elm.truth:
+			#			bigger_map[elm] = v_elm
+			#			break
 	#for each elm in GSP, or story, replace
 	retarget(GSP, bigger_map)
 

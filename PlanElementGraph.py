@@ -10,26 +10,121 @@ import collections
 from clockdeco import clock
 
 #readonly ground step
-class GStep(ElementGraph):
+class GStep:
 
-	def __init__(self, operator, args, preconditions, effects):
+	def __init__(self, operator, args, preconditions, effects, stepnum):
 		self.Args = args
-		self.Preconditions = preconditions
-		self.preconditions = [pre.root for pre in self.Preconditions]
-		self.Effects = effects
-		self.effects = [eff.root for eff in self.Effects]
-
-		edges = set()
-		for pre in self.Preconditions:
-			edges.update(pre.edges)
-		for eff in self.Effects:
-			edges.update(eff.edges)
-
-		super(GStep, self).__init__(name=operator.name, Elements=set(self.preconditions)|set(self.effects),
-									root_element=operator, Edges=edges)
+		self.ID = uuid4()
+		self.Preconditions = []
+		self.Effects = []
+		self.extendPreconditions(preconditions)
+		self.extendEffects(effects)
+		self.root = operator
+		self.name = operator.name
+		self.stepnumber = stepnum
+		self.root.stepnumber = stepnum
 		self.nonequals = set()
 		self.is_decomp = False
-		self.replaced_ID = uuid4()
+		#self.replaced_ID = uuid4()
+
+	def extendEffects(self, iter):
+		for lit in iter:
+			self.addEff(lit)
+
+	def extendPreconditions(self, iter):
+		for lit in iter:
+			self.addPre(lit)
+
+	def addEff(self, eff):
+		eff.index = len(self.Effects)
+		self.Effects.append(eff)
+	def addPre(self, pre):
+		pre.index = len(self.Preconditions)
+		self.Preconditions.append(pre)
+
+	def addPreOrEff(self, lit, group):
+		lit.index = len(group)
+		group.append(lit)
+
+	def __hash__(self):
+		return hash(self.ID)
+
+	def __eq__(self, other):
+		return self.stepnumber == other.stepnumber
+
+	def replaceInternals(self):
+		self.ID = uuid4()
+		for pre in self.Preconditions:
+			pre.ID = uuid4()
+		for eff in self.Effects:
+			eff.ID = uuid4()
+
+	def deepcopy(self, replace_internals=False):
+		new_self = copy.deepcopy(self)
+		if replace_internals:
+			new_self.replaceInternals()
+		return new_self
+
+	def __repr__(self):
+		args = str([arg.name if not isinstance(arg, ElementGraph) else arg for arg in self.Args])
+		return '{}-{}-{}'.format(self.name, self.stepnumber, str(self.ID)[19:23]) + args
+
+
+class Cond:
+	def __init__(self, pred_name, tup, lit_num, trudom):
+		self.ID = uuid4()
+		self.name = pred_name
+		self.litnumber = lit_num
+		self.Args = []
+		self.truth = trudom
+		self.extend(tup)
+
+	def __len__(self):
+		return len(self.Args)
+
+	def __getitem__(self, position):
+		return self.Args[position]
+
+	def __hash__(self):
+		return self.litnumber #hash(self.ID)
+
+	def __eq__(self, other):
+		if isinstance(other, Condition):
+			return self.name == other.name and self.Args == other.Args and self.truth == other.truth
+		return self.litnumber == other.litnumber
+
+	def deepclone(self):
+		new_self = copy.deepcopy(self)
+		new_self.ID = uuid4()
+		return new_self
+
+	def append(self, arg):
+		arg.index = len(self)
+		self.Args.append(arg)
+
+	def extend(self, iter):
+		for arg in iter:
+			self.append(arg)
+
+	def isOpposite(self, other):
+		if self.getOppLitNum() == other.litnumber:
+			return True
+		return False
+		#return self.name == other.name and self.truth != other.truth and self.Args == other.Args
+
+	def getOppLitNum(self):
+		if self.truth:
+			return self.litnumber + 1
+		else:
+			return self.litnumber - 1
+
+	def __repr__(self):
+		args = str([arg if not isinstance(arg, Argument) else arg.name for arg in self])
+		#args = str([arg.name if not isinstance(arg, Action) else arg for arg in self.Args])
+		t = ''
+		if not self.truth:
+			t = 'not-'
+		return '{}{}'.format(t, self.name) + args
 
 class Action(ElementGraph):
 	# stepnumber = 2
@@ -72,7 +167,7 @@ class Action(ElementGraph):
 
 	def RemoveSubgraph(self, elm):
 		edges = list(self.edges)
-		elm = self.getElementById(elm.ID)
+		elm = self.get_by_id(elm.ID)
 
 		if isinstance(elm, Literal):
 			self.elements.remove(elm)
@@ -203,10 +298,15 @@ class Condition(ElementGraph):
 		elements = {parent}.union(set(tup))
 		edges = {Edge(parent, t, GC.ARGLABELS[i]) for i, t in enumerate(tup)}
 		condition = cls(Elements=elements, root_element=parent, Edges=edges)
-		condition.replaced_ID = uuid4()
+		#condition.replaced_ID = uuid4()
 		condition.litnumber = lit_num
-		condition.root.litnumber = lit_num
+		condition.Args = [t for t in tup]
 		return condition
+
+	def replaceInternals(self):
+		new_self = copy.deepcopy(self)
+		new_self.root.ID = uuid4()
+		return new_self
 
 	def __hash__(self):
 		return hash(self.ID) ^ hash(self.root.name) ^ hash(self.root.truth) ^ hash(self.root.replaced_ID)
@@ -246,36 +346,37 @@ class Condition(ElementGraph):
 		return '{}{}'.format(t, self.root.name) + args
 
 
-class PlanElementGraph(ElementGraph):
-	def __init__(self, ID=None, type_graph=None, name=None, Elements=None, plan_elm=None, Edges=None,
-				 Restrictions=None):
-
-		if ID is None:
-			ID = uuid4()
-		if type_graph is None:
-			type_graph = 'PlanElementGraph'
-		if Elements is None:
-			Elements = set()
-		if Edges is None:
-			Edges = set()
-		if Restrictions is None:
-			Restrictions = set()
-
+class PlanElementGraph:
+	def __init__(self, name, Restrictions=None):
+		self.name = name
+		self.ID = uuid4()
 		self.OrderingGraph = OrderingGraph()
 		self.CausalLinkGraph = CausalLinkGraph()
-
 		self.flaws = FlawLib()
 		self.solved = False
 		self.initial_dummy_step = None
 		self.final_dummy_step = None
-
-		if plan_elm is None:
-			plan_elm = Element(ID=ID, typ=type_graph, name=name)
-
-		super(PlanElementGraph, self).__init__(ID, type_graph, name, Elements, plan_elm, Edges, Restrictions)
+		self.steps = []
+		self.Steps = []
 
 	def __hash__(self):
-		return hash(self.name) ^ hash(self.typ) ^ hash(self.ID)
+		return hash(self.ID)
+
+	def __len__(self):
+		return len(self.steps)
+
+	def __getitem__(self, position):
+		return self.Steps[position]
+
+	def append(self, step):
+		step.index = len(self)
+		step.root.index = len(self)
+		self.steps.append(step.root)
+		self.Steps.append(step)
+
+	def extend(self, iter):
+		for step in iter:
+			self.append(step)
 
 	@classmethod
 	def Actions_2_Plan(cls, Actions, h):
@@ -289,7 +390,7 @@ class PlanElementGraph(ElementGraph):
 		Plan = cls(name='Action_2_Plan', Elements=elements, Edges=edges)
 		for edge in Plan.edges:
 			if edge.label == 'effect-of':
-				elm = Plan.getElementById(edge.sink.ID)
+				elm = Plan.get_by_id(edge.sink.ID)
 				elm.replaced_ID = edge.sink.replaced_ID
 
 		Plan.OrderingGraph = OrderingGraph()
@@ -339,196 +440,32 @@ class PlanElementGraph(ElementGraph):
 		new_self.ID = uuid4()
 		return new_self
 
-	def RemoveSubgraph(self, literal):
-		edges = list(self.edges)
-		elm = self.getElementById(literal.ID)
-		link = None
-		self.elements.remove(elm)
-
-		for edge in list(self.edges):
-			if edge.source == elm:
-				edges.remove(edge)
-			if link is None:
-				if edge.sink == elm:
-					link = edge
-		edges.remove(link)
-		self.edges = set(edges)
-		return link
-
-	def ReplaceSubgraphs(self, literal_old, literal_new):
-		edges = list(self.edges)
-		elm = self.getElementById(literal_old.ID)
-		link = None
-		self.elements.remove(elm)
-
-		for edge in list(self.edges):
-			if edge.source == elm:
-				edges.remove(edge)
-			if link is None:
-				if edge.sink == elm:
-					link = edge
-		edges.remove(link)
-		link.sink = literal_new
-		self.elements.add(literal_new)
-		self.edges = set(edges)
-		self.edges.add(link)
-		return link
-
-	def AddSubgraph(self, subgraph):
-		self.elements.update(subgraph.elements)
-		self.edges.update(subgraph.edges)
-
-	def h_add_a(self, GL, step, reusable_steps, visited):
-		#cost of an action 'a' is 1 + h_{add}(Prec(a)) where Prec(a) is the conjunction of preconditions
-		cost = 1
-		for pre in step.preconditions:
-			if pre.replaced_ID in visited:
-				v = visited[pre.replaced_ID]
-			else:
-				visited[pre.replaced_ID] = float('inf')
-				v = self.h_add_q(GL, pre, reusable_steps, visited)
-				visited[pre.replaced_ID] = v
-
-			if v == float('inf'):
-				return v
-
-			cost += v
-		return cost
-
-	def h_add_q(self, GL, pre, reusable_steps, visited):#, visited=None):
-		#additive heuristic with modification for reuse (VHPOP)
-
-		antecedents = GL.id_dict[pre.replaced_ID]
-
-		# 0 if q unifies with effect of exsting step
-		for rs in reusable_steps:
-			#includes initial dummy step
-			if rs in antecedents:
-				visited[rs] = 0
-				return 0
-
-		least = float('inf')
-
-		#infinity otherwise
-		if len(antecedents) == 0:
-			visited[pre.replaced_ID] = least
-			return least
-
-		for ante in antecedents:
-			# Shortcut - if one of your antecedents has no preconditions
-			if len(GL[ante].preconditions) == 0:
-				visited[ante] = 1
-				return 1
-
-			if ante in visited:
-				if visited[ante] < least:
-					least = visited[ante]
-			else:
-				#in case it cycles...
-				visited[ante] = float('inf')
-				v = self.h_add_a(GL, GL[ante], reusable_steps, visited)
-				visited[ante] = v
-				if v ==0:
-					return 0
-				if v < least:
-					least = v
-		return least
-
-
-		#return min(self.h_add_a(GL, GL[ante], visited) for ante in antecedents)
-
-		#
-		# #_____________________
-		# for ant in antecedents:
-		# 	if len(GL[ant].preconditions) == 0:
-		# 		visited[ant] = 1
-		# 		return 1
-		# # _____________________
-		#
-		# if self.initial_dummy_step.stepnumber not in antecedents:
-		# 	least = float('inf')
-		# 	for ante in antecedents:
-		#
-		# 		if ante in visited.keys():
-		# 			v = visited[ante]
-		# 		else:
-		# 			visited[ante] = float('inf')
-		# 			v = self.relaxedStep(GL, GL[ante], visited)
-		# 			visited[ante] = v
-		# 		if v < least:
-		# 			least = v
-		#
-		# 	return least + 1
-		#return v
-
-	def calculateHeuristic(self, GL):
-		value = 0
-		#Sum of h_{add}(pre) for pre in <s_{need}, pre> for each open condition flaw
-
-		for oc in self.flaws.flaws:
-			s_need, pre = oc.flaw
-
-			antecedents = GL.id_dict[pre.replaced_ID]
-
-			if (pre.name, pre.truth) not in FlawLib.non_static_preds:
-				if self.initial_dummy_step not in antecedents:
-					return float('inf')
-
-			reusable_steps = [step.stepnumber for step in self.Steps if step != s_need
-							  and not self.OrderingGraph.isPath(s_need, step)]
-
-			found = False
-			for rs in reusable_steps:
-				if rs in antecedents:
-					found = True
-
-			#collections.defaultdict(int)
-			if not found:
-				visited = collections.defaultdict(int)
-				c = self.h_add_q(GL, pre, reusable_steps, visited)
-				oc.heuristic = c + s_need.height*30
-			else:
-				c = 0
-				oc.heuristic = 0 + s_need.height*30
-
-			#assign flaw heuristic here.
-			#oc.heuristic = c
-
-
-			#oc.criteria = c
-
-			# print('flaw: {} , heuristic = {}'.format(oc,c))
-			value += c
-
-		return value
-
 	@property
 	def heuristic(self):
-		return self.calculateHeuristic(GC.SGL)
+		return sum(oc.heuristic for oc in self.flaws.flaws)
 
 	@property
 	def cost(self):
 		return len(self.Steps) - 2
 
 	def isInternallyConsistent(self):
-		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent() and \
-			   super(PlanElementGraph, self).isInternallyConsistent()
+		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent()
 
-	@property
-	def Steps(self):
-		return [element for element in self.elements if type(element) is Operator]
+	# @property
+	# def Steps(self):
+	# 	return [element for element in self.elements if type(element) is Operator]
+	#
+	# @property
+	# def Step_Graphs(self):
+	# 	return [Action.subgraph(self, step) for step in self.Steps]
 
-	@property
-	def Step_Graphs(self):
-		return [Action.subgraph(self, step) for step in self.Steps]
-
-	@property
-	def Steps_Sorted(self):
-		pass
+	# @property
+	# def Steps_Sorted(self):
+	# 	pass
 
 	def detectTCLFperCL(self, GL, causal_link):
 		detectedThreatenedCausalLinks = set()
-		for step in self.Steps:
+		for step in self:
 			self.testThreat(GL, self.CausalLinkGraph.nonThreats, causal_link, step, detectedThreatenedCausalLinks)
 		return detectedThreatenedCausalLinks
 
@@ -539,29 +476,29 @@ class PlanElementGraph(ElementGraph):
 		return detectedThreatenedCausalLinks
 
 	def testThreat(self, GL, nonThreats, causal_link, step, dTCLFs):
-		if step in nonThreats[causal_link]:
+		if step.index in nonThreats[causal_link]:
 			return
-		if step == causal_link.source or step == causal_link.sink:
-			nonThreats[causal_link].add(step)
+		if step.root == causal_link.source or step.root == causal_link.sink:
 			return
-		if self.OrderingGraph.isPath(causal_link.sink, step):
-			nonThreats[causal_link].add(step)
+		if self.OrderingGraph.isPath(causal_link.sink, step.root):
+			nonThreats[causal_link].add(step.index)
 			return
 		if self.OrderingGraph.isPath(step, causal_link.source):
-			nonThreats[causal_link].add(step)
+			nonThreats[causal_link].add(step.index)
 			return
-		if step.stepnumber not in GL.threat_dict[causal_link.sink.stepnumber]:
-			nonThreats[causal_link].add(step)
+		if step.stepnumber not in GL.threat_dict[causal_link.label.litnumber]:
+		#if step.stepnumber not in GL.threat_dict[causal_link.sink.stepnumber]:
+			nonThreats[causal_link].add(step.index)
 			return
-		if test(Action.subgraph(self, step), causal_link):
-			dTCLFs.add(TCLF((step, causal_link), 'tclf'))
-		nonThreats[causal_link].add(step)
+	#	if test(self[step.index], causal_link):
+		dTCLFs.add(TCLF((step.root, causal_link), 'tclf'))
+		nonThreats[causal_link].add(step.index)
 
 	#@clock
 	def detectThreatenedCausalLinks(self, GL):
 		detectedThreatenedCausalLinks = set()
 		for causal_link in self.CausalLinkGraph.edges:
-			for step in self.Steps:
+			for step in self:
 				self.testThreat(GL, self.CausalLinkGraph.nonThreats, causal_link, step, detectedThreatenedCausalLinks)
 		return detectedThreatenedCausalLinks
 
@@ -572,7 +509,7 @@ class PlanElementGraph(ElementGraph):
 #																	  flaws, name in F]) + '______________________'
 #
 		c = '\ncost {} + heuristic {}'.format(self.cost, self.heuristic)
-		steps = [''.join('\t' + str(step) + '\n' for step in self.Step_Graphs)]
+		steps = [''.join('\t' + str(step.index) + ': ' + str(step) + '\n' for step in self)]
 		order = [''.join('\t' + str(ordering.source) + ' < ' + str(ordering.sink) + '\n' for ordering in
 			self.OrderingGraph.edges)] #if ordering.source.stepnumber != self.initial_dummy_step.stepnumber and
 			#ordering.sink.stepnumber != self.final_dummy_step.stepnumber)]

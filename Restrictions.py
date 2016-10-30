@@ -72,10 +72,10 @@ class Restriction(Graph):
 		if consistency == None:
 			consistency = False
 		if consistency == True and identities == None:
-			identities = {elm: EG.getElementById(elm.ID) for elm in self.elements
-							  if not EG.getElementById(elm.ID) == None}
+			identities = {elm: EG.get_by_id(elm.ID) for elm in self.elements
+						  if not EG.get_by_id(elm.ID) == None}
 		if identities == None:
-			identities = {elm:EG.getElementById(elm.ID) for elm in self.elements}
+			identities = {elm:EG.get_by_id(elm.ID) for elm in self.elements}
 
 		#identify graph sources for graph traversals
 		sinks = {edge.sink for edge in self.edges}

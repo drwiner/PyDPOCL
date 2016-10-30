@@ -92,7 +92,7 @@ def Linkify(Planets, RQ, GL):
 		for Planet in Planets:
 			if Planet is None:
 				continue
-			GtElm = Planet.getElementById
+			GtElm = Planet.get_by_id
 			Planet.OrderingGraph.edges = {Edge(GtElm(ord.source.ID), GtElm(ord.sink.ID),'<') for ord in orderings}
 
 
@@ -107,9 +107,9 @@ def Linkify(Planets, RQ, GL):
 				removable.add(i)
 				continue
 
-			src = Planet.getElementById(link.source.ID)
-			snk = Planet.getElementById(link.sink.ID)
-			cond = Planet.getElementById(link.label.ID)
+			src = Planet.get_by_id(link.source.ID)
+			snk = Planet.get_by_id(link.sink.ID)
+			cond = Planet.get_by_id(link.label.ID)
 
 			if src.stepnumber not in GL.ante_dict[snk.stepnumber]:
 				removable.add(i)

@@ -21,7 +21,7 @@ class Flaw:
 		self.criteria = self.cndts
 		self.heuristic = float('inf')
 		if name == 'opf':
-			self.tiebreaker = hash(f[1].replaced_ID)
+			self.tiebreaker = f[1].litnumber
 
 	def __hash__(self):
 		return hash(self.flaw)
@@ -38,13 +38,101 @@ class Flaw:
 
 
 	def setCriteria(self, flaw_type):
+		#if flaw_type == 'statics':
+			#self.heuristic = 0
+			#self.criteria = 0
+		if flaw_type == 'threats':
+			self.heuristic = 0.01
 		if self.name == 'tclf':
 			self.criteria = self.flaw[0].stepnumber
-			self.tiebreaker = hash(self.flaw[1].label.replaced_ID) + self.flaw[1].sink.stepnumber
+			self.tiebreaker = self.flaw[1].label.litnumber + self.flaw[1].sink.stepnumber*100
 		elif flaw_type == 'unsafe':
-			self.criteria = self.risks
-		elif flaw_type in {'inits', 'statics', 'nonreusable'}:
+			#self.criteria = self.risks
 			self.criteria = self.heuristic
+		elif flaw_type == 'reusable':
+			self.criteria = self.heuristic
+		elif flaw_type in {'inits', 'nonreusable'}:
+			self.criteria = self.heuristic
+
+	def calcHeuristic(self, GL, plan):
+		s_need, pre = self.flaw
+		antecedents = GL.cndt_dict[pre.litnumber]
+
+		if (pre.name, pre.truth) not in FlawLib.non_static_preds:
+			if plan.initial_dummy_step.stepnumber not in antecedents:
+				self.heuristic = float('inf')
+				return self.heuristic
+
+		reusable_steps = [step.stepnumber for step in plan if step.root != s_need
+						  and not plan.OrderingGraph.isPath(s_need, step.root)]
+
+		for rs in reusable_steps:
+			if rs in antecedents:
+				self.heuristic = s_need.height * 30
+				return self.heuristic
+
+		c = self.h_add_q(GL, pre, collections.defaultdict(int))
+		self.heuristic = c + s_need.height * 30
+		return self.heuristic
+
+	def h_add_q(self, GL, pre, visited):
+		#additive heuristic with modification for reuse (VHPOP)
+
+		antecedents = GL.cndt_dict[pre.litnumber]
+		least = float('inf')
+
+		#infinity otherwise
+		if len(antecedents) == 0:
+			#lisited[pre.litnumber] = least
+			return least
+
+		for ante in antecedents:
+			# Shortcut - if one of your antecedents has no preconditions
+			if len(GL[ante].Preconditions) == 0:
+				visited[ante] = 1
+				return 1
+
+			if ante in visited:
+				if visited[ante] < least:
+					least = visited[ante]
+			else:
+				#in case it cycles...
+				visited[ante] = float('inf')
+				if len(GL.ante_dict[ante]) == 0:
+					continue
+				v = self.h_add_a(GL, GL[ante], visited)
+				if v == float('inf'):
+					pass
+				visited[ante] = v
+				if v == 0:
+					return 0
+				if v < least:
+					least = v
+		if least == float('inf'):
+			pass
+		return least
+
+	def h_add_a(self, GL, step, visited):
+		#cost of an action 'a' is 1 + h_{add}(Prec(a)) where Prec(a) is the conjunction of preconditions
+		cost = 1
+		for pre in step.Preconditions:
+			#if pre.litnumber in visited:
+				#v = lisited[pre.litnumber]
+		#	else:
+				#lisited[pre.litnumber] = float('inf')
+			if len(GL.cndt_dict[pre.litnumber]) == 0:
+				return float('inf')
+
+			v = self.h_add_q(GL, pre, visited)
+			if v == float('inf'):
+				pass
+				#lisited[pre.litnumber] = v
+
+			if v == float('inf'):
+				return v
+
+			cost += v
+		return cost
 
 	def __repr__(self):
 		return 'Flaw({}, h={}, criteria={}, tb={})'.format(self.flaw, self.heuristic, self.criteria, self.tiebreaker)
@@ -55,11 +143,11 @@ class TCLF(Flaw):
 		self.threat = self.flaw[0]
 		self.link = self.flaw[1]
 		self.criteria = self.threat.stepnumber
-		self.tiebreaker = hash(self.link.label.replaced_ID) + self.link.sink.stepnumber
+		self.tiebreaker = self.link.label.litnumber + self.link.sink.stepnumber
 
 	def __hash__(self):
-	 	return self.threat.stepnumber*1000 + self.link.source.stepnumber + self.link.sink.stepnumber + hash(
-			self.link.label.replaced_ID)
+	 	return self.threat.stepnumber*1000 + self.link.source.stepnumber + self.link.sink.stepnumber + \
+			   self.link.label.litnumber
 
 class DCF(Flaw):
 	def __init__(self, f, name):
@@ -67,7 +155,7 @@ class DCF(Flaw):
 		self.criteria = len(f.Steps)
 		self.tiebreaker = f.root.stepnumber
 	def __repr__(self):
-		steps = [''.join(str(step) + ', ' for step in self.flaw.Step_Graphs)]
+		steps = [''.join(str(step) + ', ' for step in self.flaw)]
 		return 'DCF(' + ''.join(['{}'.format(step) for step in steps]) + 'criteria ={}, tb={})'.format(
 			self.criteria, self.tiebreaker)
 
@@ -210,11 +298,11 @@ class FlawLib():
 			s_need, pre = oc.flaw
 
 			# step numbers of antecdent types
-			if action.stepnumber in GL.id_dict[pre.replaced_ID]:
+			if action.stepnumber in GL.cndt_dict[pre.litnumber]:
 				oc.cndts += 1
 
 			# step numbers of threatening steps
-			elif action.stepnumber in GL.threat_dict[s_need.stepnumber]:
+			elif action.stepnumber in GL.threat_dict[pre.litnumber]:
 				oc.risks += 1
 
 	#@clock
@@ -231,6 +319,7 @@ class FlawLib():
 			return
 
 		#unpack flaw
+		flaw.calcHeuristic(GL, plan)
 		s_need, pre = flaw.flaw
 
 		#if pre.predicate is static
@@ -239,8 +328,8 @@ class FlawLib():
 			return
 
 		#Eval number of existing candidates
-		ante_nums = GL.id_dict[pre.replaced_ID]
-		risk_nums = GL.threat_dict[s_need.stepnumber]
+		ante_nums = GL.cndt_dict[pre.litnumber]
+		risk_nums = GL.threat_dict[pre.litnumber]
 
 		for step in plan.Steps:
 			#defense
@@ -268,6 +357,8 @@ class FlawLib():
 			return
 
 		#last, must be nonreusable
+		if flaw.heuristic == float('inf'):
+			pass
 		self.nonreusable.add(flaw)
 
 	def __repr__(self):

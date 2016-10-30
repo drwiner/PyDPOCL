@@ -57,7 +57,7 @@ class ElementGraph(Graph):
 		INPLACE subgraph - still references same parent
 		"""
 
-		elm = EG.getElementById(e.ID)
+		elm = EG.get_by_id(e.ID)
 		edges = EG.rGetDescendantEdges(elm)
 		elms = {edge.source for edge in edges}|{edge.sink for edge in edges}|{elm}
 		new_EG = cls(root_element=elm, Elements=elms, Edges=edges)
