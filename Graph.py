@@ -350,7 +350,7 @@ def isConsistentEdgeSet(Rem, Avail, map_=None, return_map=False):
 				return _Map
 	return False
 
-def findConsistentEdgeMap(Rem, Avail, map_ = None, Super_Maps = None):
+def findConsistentEdgeMap(Rem, Avail, map_=None, Super_Maps=None):
 	if map_ is None:
 		map_ = {}
 	if Super_Maps is None:
@@ -379,7 +379,7 @@ def findConsistentEdgeMap(Rem, Avail, map_ = None, Super_Maps = None):
 			Map_[edge_match.source] = cndt.source
 		if not cndt.sink in map_:
 			Map_[edge_match.sink] = cndt.sink
-		findConsistentEdgeMap(copy.deepcopy(Rem), Avail, Map_, Super_Maps)
+		findConsistentEdgeMap(Rem, Avail, Map_, Super_Maps)
 
 	return Super_Maps
 

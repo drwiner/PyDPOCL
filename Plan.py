@@ -65,6 +65,39 @@ class GStep:
 			new_self.replaceInternals()
 		return new_self
 
+	def to_edges(self):
+		edges = set()
+		for i, arg in enumerate(self.Args):
+			edges.add(Edge(self.root, arg, GC.ARGLABELS[i]))
+		for prec in self.Preconditions:
+			edges.update(prec.to_edges())
+		for eff in self.Effects:
+			edges.update(eff.to_edges())
+		return edges
+
+	def UnifyWithPartial(self, partial):
+		fresh_step = self.deepcopy()
+		#
+		# for ground_lit in fresh_step.Preconditions:
+		# 	for prec in partial.Preconditions:
+		# 		#if
+		# 		if prec.root.name != ground_lit.name:
+		# 			continue
+		# 		if prec.root.truth != ground_lit.truth:
+		# 			continue
+		# 		if ground_lit.Args != prec.Args:
+		# 			continue
+		# 		ground_prec.ID = prec.root.ID
+		# 		break
+		# for ground_lit in fresh_step.Effects:
+		# 	for eff in partial.Effects:
+		# 		if eff.root.name != ground_lit.name:
+		# 			continue
+		# 		if eff.root.truth != ground_lit.truth:
+		# 			continue
+		# 		if ground_lit.Args != eff.Args:
+		# 			continue
+
 	def __repr__(self):
 		args = str([arg.name if not isinstance(arg, ElementGraph) else arg for arg in self.Args])
 		return '{}-{}-{}'.format(self.name, self.stepnumber, str(self.ID)[19:23]) + args
@@ -118,6 +151,15 @@ class Cond:
 			return self.litnumber + 1
 		else:
 			return self.litnumber - 1
+
+	def to_edges(self):
+		edges = set()
+		root = Literal(name=self.name, truth=self.truth)
+		root.litnumber = self.litnumber
+		root.index = self.index
+		for i, arg in enumerate(self.Args):
+			edges.add(Edge(root, arg, GC.ARGLABELS[i]))
+		return edges
 
 	def __repr__(self):
 		args = str([arg if not isinstance(arg, Argument) else arg.name for arg in self])
@@ -183,6 +225,8 @@ class Plan:
 		Plan.CausalLinkGraph = CausalLinkGraph()
 		# Plan.Steps = [A.root for A in Actions]
 		return Plan
+
+
 
 	def UnifyActions(self, P, G):
 		# Used by Plannify

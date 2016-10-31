@@ -1,9 +1,11 @@
 import itertools
-from Plan import Action, Plan, Condition
+from Plan import Plan
+from ElementGraph import Action, Condition
 from Element import Operator
-from Graph import Edge
+from Graph import Edge, findConsistentEdgeMap
 from clockdeco import clock
 from Flaws import Flaw
+import copy
 
 @clock
 def Plannify(RQ, GL, h):
@@ -11,7 +13,7 @@ def Plannify(RQ, GL, h):
 	#An ActionLib for steps in RQ - ActionLib is a container w/ all of its possible instances as ground steps
 	print('...ActionLibs')
 	try:
-		Libs = [ActionLib(i, RS, GL) for i, RS in enumerate(RQ.Steps)]
+		Libs = [ActionLib(i, RS, GL) for i, RS in enumerate(RQ.Step_Graphs)]
 	except:
 		return []
 
@@ -36,8 +38,6 @@ def Plannify(RQ, GL, h):
 def partialUnify(PS, _map):
 	if _map is False:
 		return False
-#	NS = PS.deepcopy()
-	import copy
 	NS = copy.deepcopy(PS)
 	effects = [edge.sink for edge in NS.edges if edge.label == 'effect-of']
 	for elm in effects:
@@ -65,6 +65,30 @@ def partialUnify(PS, _map):
 	NS.root.height = PS.root.height
 	NS.updateArgs()
 	return NS
+
+def unify(GL, partial, _map):
+	if _map is False:
+		return False
+
+	gstep = GL[_map[partial.root].stepnumber].deepcopy()
+
+	for eff in partial.effects:
+		if eff in _map:
+			elm = _map[eff]
+			glit = GL._glits[elm.litnumber]
+			glit.index = elm.index
+			glit.ID = eff.ID
+			gstep.Effects[elm.index] = glit
+
+	for pre in partial.preconditions:
+		if pre in _map:
+			elm = _map[pre]
+			glit = GL._glits[elm.litnumber]
+			glit.index = elm.index
+			glit.ID = pre.ID
+			gstep.Preconditions[elm.index] = glit
+
+	return gstep
 
 def isArgNameConsistent(Partially_Ground_Steps):
 	"""
@@ -142,7 +166,9 @@ def Groundify(Planets, GL, has_links):
 		i += 1
 		for Step in Planet.Step_Graphs:
 			print('... Unifying {} with {}'.format(Step, GL[Step.stepnumber]))
+			Step.Unify(GL[Step.stepnumber])
 			Planet.UnifyActions(Step, GL[Step.stepnumber])
+			#Do the following: find GL[step.stepnumber], but IDs should take place of args in Step.
 
 	if not has_links:
 		#we're done
@@ -186,15 +212,17 @@ class ActionLib:
 		self.root = RS.root
 		self._cndts = []
 		for gs in GL:
-			if not gs.root.isConsistent(self.RS.root):
-				continue
-			elm_maps = gs.findConsistentSubgraph(self.RS)
+			if RS.root.name is not None:
+				if gs.name != self.RS.root.name:
+					continue
+			elm_maps = findConsistentEdgeMap(gs.to_edges, set(self.RS.edges))
 			if len(elm_maps) == 0:
 				continue
 			for map in elm_maps:
 				if len(map) == 0:
 					self.RS.root.merge(gs.root)
-					self.RS.root.replaced_ID = gs.root.replaced_ID
+					self.RS.root.stepnumber = gs.stepnumber
+					#self.RS.root.replaced_ID = gs.root.replaced_ID
 				self.append(partialUnify(self.RS, map), gs.stepnumber)
 		if len(self) == 0:
 			raise ValueError('no gstep compatible with RS {}'.format(self))

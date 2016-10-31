@@ -258,7 +258,6 @@ class Action(ElementGraph):
 		id = str(self.root.ID)[19:23]
 		return '{}{}-{}-{}'.format(exe, self.root.name, self.root.stepnumber, id) + args
 
-
 class Condition(ElementGraph):
 	""" A Literal used in causal link"""
 
