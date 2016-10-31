@@ -1,5 +1,5 @@
 from pddlToGraphs import parseDomAndProb
-from PlanElementGraph import PlanElementGraph, Action, Condition
+from Plan import Plan, Action, Condition
 from Flaws import Flaw, DCF
 from heapq import heappush, heappop
 from clockdeco import clock
@@ -78,7 +78,7 @@ class PlanSpacePlanner:
 		s_goal = self.GL[-1].deepcopy(replace_internals=True)
 
 
-		s_init_plan = PlanElementGraph(name=plan_name)
+		s_init_plan = Plan(name=plan_name)
 
 		s_init_plan.initial_dummy_step = s_init.root
 		s_init_plan.final_dummy_step = s_goal.root

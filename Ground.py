@@ -3,7 +3,7 @@ import itertools
 import copy
 import pickle
 from collections import namedtuple, defaultdict
-from PlanElementGraph import GStep, Cond
+from Plan import GStep, Cond
 from clockdeco import clock
 from Plannify import Plannify
 from Element import Argument, Actor, Operator, Literal
@@ -16,20 +16,32 @@ import hashlib
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
 Antestep = namedtuple('Antestep', 'action eff_link')
 
-def groundLiteralList(objects):
+
+
+def groundPrimitiveLiteralList(objects):
 	glits = []
 	litnum = 0
 	ignorable = {'=', 'equals', 'equal'}
-	for p_name, arg_generator in GC.predicate_types.items():
+	for p_name, arg_generator in  GC.prim_predtypes.items():
 		if p_name in ignorable:
 			continue
 		cndts = [[obj for obj in objects if arg == obj.typ or arg in GC.object_types[obj.typ]] for arg in arg_generator]
 		tuples = itertools.product(*cndts)
 		for t in tuples:
-			glits.append(Cond(p_name, t, litnum, True))
-			glits.append(Cond(p_name, t, litnum+1, False))
+			glits.append(Cond(p_name, t, litnum, True, 0))
+			glits.append(Cond(p_name, t, litnum+1, False, 0))
 			litnum += 2
 	return glits
+
+# def groundAbstractLiteralList(objects, glits, gsteps, i):
+# 	aglits = []
+# 	litnum = len(glits)
+# 	ignorable = {'=', 'equals', 'equal'}
+# 	#arguments must use at least one gstep from height i
+# 	for p_name, arg_generator in GC.abs_predtypes.items():
+# 		if p_name in ignorable:
+# 			continue
+# 		cndts = [[obj for obj in objects if arg_typ == obj.typ or arg.typ in obtypes[obj.typ]]
 
 
 def groundStoryList(operators, glits, objects, obtypes):
@@ -73,13 +85,20 @@ def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 
 			GDO = copy.deepcopy(op)
 			GDO.is_decomp = True
+			litnum = len(GL._glits)
+
+# operator, args, preconditions, effects, stepnum):
 
 			if not rewriteElms(GDO, sp, op):
 				continue
 		#	for elm in sp.elements:
 		#		assignElmToContainer(GDO, sp, elm, list(op.elements))
+				# t is a tuple of of the form (arg1, arg2,...etc)
+			Cond(p_name, t, litnum, True, height)
+			Cond(p_name, t, litnum + 1, False, height)
 
 			GDO.root.is_decomp = True
+
 
 			GDO.ground_subplan = sp
 			GDO.root.stepnumber = stepnum
@@ -151,7 +170,8 @@ class GLib:
 		self.object_types = GC.object_types
 		self.objects = objects
 
-		self._glits = groundLiteralList(objects)
+		self._glits = groundPrimitiveLiteralList(objects)
+
 		self._gsteps = groundStoryList(operators, self._glits, self.objects, obtypes)
 
 		#dictionaries
@@ -161,19 +181,19 @@ class GLib:
 		print('...Creating PlanGraph base level')
 		self.loadAll()
 
+
 		for i in range(3):
 			print('...Creating PlanGraph decompositional level {}'.format(i+1))
 			try:
+				#absglits = groundAbstractLiteralList(self.objects, self._glits, self._gsteps)
+				self._glits.extend(groundAbstractLiteralList(self.objects, self._glits, self._gsteps, i))
 				D = groundDecompStepList(dops, self, stepnum=len(self._gsteps), height=i)
 			except:
 				break
 			if not D or len(D) == 0:
 				break
 			self.loadPartition(D)
-
-		#self._gsteps.extend(D)
-		#Preconditions = [Action.subgraph(init_action, pre) for pre in init_action.edges.sink if pre.label ==
-		#				 'effect-of']
+]
 		init_pre = [P.deepclone() for P in self._glits for prec in init_action.Effects if P == prec]
 		initial_dummy_step = GStep(init_action.root, [], [], init_pre, len(self._gsteps))
 		goal_eff = [E.deepclone() for E in self._glits for eff in goal_action.Preconditions if E == eff]

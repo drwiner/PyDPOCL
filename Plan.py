@@ -71,13 +71,14 @@ class GStep:
 
 
 class Cond:
-	def __init__(self, pred_name, tup, lit_num, trudom):
+	def __init__(self, pred_name, tup, lit_num, trudom, height):
 		self.ID = uuid4()
 		self.name = pred_name
 		self.litnumber = lit_num
 		self.Args = []
 		self.truth = trudom
 		self.extend(tup)
+		self.height = height
 
 	def __len__(self):
 		return len(self.Args)
@@ -126,227 +127,8 @@ class Cond:
 			t = 'not-'
 		return '{}{}'.format(t, self.name) + args
 
-class Action(ElementGraph):
-	# stepnumber = 2
-	def __init__(self, ID=None, type_graph=None, name=None, Elements=None, root_element=None, Edges=None):
 
-		if type_graph is None:
-			type_graph = 'Action'
-
-		if Edges is None:
-			Edges = set()
-
-		if root_element is None:
-			root_element = Operator()
-
-		if Elements is None:
-			Elements = {root_element}
-
-		self.nonequals = set()
-		self.is_decomp = False
-		self.height = root_element.height
-
-		super(Action, self).__init__(ID, type_graph, name, Elements, root_element, Edges)
-		self.replaced_ID = root_element.replaced_ID
-
-
-	def __hash__(self):
-		return hash(arg for arg in self.Args) ^ hash(self.root.name)
-
-	def __eq__(self, other):
-		if not isinstance(other, ElementGraph):
-			return False
-		if self.root.name == other.root.name:
-			if self.Args == other.Args:
-				return True
-		return False
-
-	# @property
-	# def executed(self):
-	# 	return self.root.executed
-
-	def RemoveSubgraph(self, elm):
-		edges = list(self.edges)
-		elm = self.get_by_id(elm.ID)
-
-		if isinstance(elm, Literal):
-			self.elements.remove(elm)
-
-		link = None
-		for edge in list(self.edges):
-			if edge.source == elm:
-				edges.remove(edge)
-			if link is None:
-				if edge.sink == elm:
-					link = edge
-		edges.remove(link)
-		self.edges = set(edges)
-		return link
-
-	@property
-	def Preconditions(self):
-		self.updatePreconditionsOrEffects('precond-of')
-		return [Condition.subgraph(self, pre) for pre in self.preconditions]
-
-	@property
-	def Effects(self):
-		self.updatePreconditionsOrEffects('effect-of')
-		return [Condition.subgraph(self, eff) for eff in self.effects]
-
-	def updatePreconditionsOrEffects(self, label):
-		if label == 'effect-of':
-			self.effects = self.getPreconditionsOrEffects(label)
-		elif label == 'precond-of':
-			self.preconditions = self.getPreconditionsOrEffects(label)
-
-	def getPreconditionsOrEffects(self, label):
-		return [edge.sink for edge in self.edges if edge.label == label]
-
-	def __getattr__(self, name):
-		if name == 'preconditions':
-			self.preconditions = self.getPreconditionsOrEffects('precond-of')
-			return self.preconditions
-		elif name == 'effects':
-			self.effects = self.getPreconditionsOrEffects('effect-of')
-			return self.effects
-		elif name == 'Args':
-			self.updateArgs()
-			return self.Args
-		else:
-			raise AttributeError('no attribute {}'.format(name))
-
-	@property
-	def stepnumber(self):
-		return self.root.stepnumber
-
-	def replaceInternals(self):
-		self.ID = uuid4()
-		for elm in self.elements:
-			if not isinstance(elm, Argument):
-				elm.ID = uuid4()
-
-	def _replaceInternals(self):
-		self.ID = uuid4()
-		for elm in self.elements:
-			if not isinstance(elm, Argument):
-				elm.replaced_ID = uuid4()
-
-	def deepcopy(self, replace_internals=False, _replace_internals=False):
-		new_self = copy.deepcopy(self)
-		if replace_internals:
-			new_self.replaceInternals()
-		if _replace_internals:
-			new_self._replaceInternals()
-		return new_self
-
-	# '''for debugging'''
-	# def getConditions(self):
-	# pres = {edge for edge in self.edges if edge.label == 'precond-of'}
-	# effs = {edge for edge in self.edges if edge.label == 'effect-of'}
-	# print('Preconditions:\n')
-	# for pre in pres:
-	# pre.sink
-	# print('Effects:\n')
-	# for eff in effs:
-	# eff.sink
-
-	def isConsistent(self, other):
-		""" an action is consistent just when one can absolve the other"""
-		if isinstance(other, ElementGraph):
-			return self.isConsistentSubgraph(other)
-		if isinstance(other, Operator):
-			return self.root.isConsistent(other)
-
-	def __repr__(self):
-		self.updateArgs()
-		args = str([arg.name if not isinstance(arg, ElementGraph) else arg for arg in
-				   self.Args])
-		if hasattr(self.root, 'executed'):
-			exe = self.root.executed
-			if exe is None:
-				exe = ''
-			else:
-				exe += '-'
-		else:
-			exe = 'ex'
-		id = str(self.root.ID)[19:23]
-		return '{}{}-{}-{}'.format(exe, self.root.name, self.root.stepnumber, id) + args
-
-
-class Condition(ElementGraph):
-	""" A Literal used in causal link"""
-
-	def __init__(self, ID=None, type_graph=None, name=None, Elements=None, root_element=None, Edges=None,
-				 Restrictions=None):
-		if type_graph is None:
-			type_graph = 'Condition'
-		if ID is None:
-			ID = root_element.ID
-		if root_element is None:
-			root_element = Literal()
-		if Elements is None:
-			Elements = {root_element}
-		if name is None:
-			name = root_element.name
-
-		super(Condition, self).__init__(ID, type_graph, name, Elements, root_element, Edges, Restrictions)
-		self.replaced_ID = root_element.replaced_ID
-
-	@classmethod
-	def makeCondition(cls, pred_name, tup, lit_num, trudom):
-		parent = Literal(name=pred_name, truth=trudom)
-		elements = {parent}.union(set(tup))
-		edges = {Edge(parent, t, GC.ARGLABELS[i]) for i, t in enumerate(tup)}
-		condition = cls(Elements=elements, root_element=parent, Edges=edges)
-		#condition.replaced_ID = uuid4()
-		condition.litnumber = lit_num
-		condition.Args = [t for t in tup]
-		return condition
-
-	def replaceInternals(self):
-		new_self = copy.deepcopy(self)
-		new_self.root.ID = uuid4()
-		return new_self
-
-	def __hash__(self):
-		return hash(self.ID) ^ hash(self.root.name) ^ hash(self.root.truth) ^ hash(self.root.replaced_ID)
-
-	@property
-	def truth(self):
-		return self.root.truth
-
-	def __eq__(self, other):
-		if not isinstance(other, ElementGraph):
-			return False
-		if self.root.name == other.root.name and self.root.truth == other.root.truth:
-			if self.Args == other.Args:
-				return True
-		return False
-
-	def isConsistent(self, other):
-		if isinstance(other, ElementGraph):
-			return self.isConsistentSubgraph(other)
-		if isinstance(other, Literal):
-			return self.root.isConsistent(other)
-
-	def isOpposite(self, other):
-		return self.name == other.name and self.truth != other.truth and self.Args == other.Args
-
-	def numArgs(self):
-		if not hasattr(self, 'Args'):
-			self.updateArgs()
-		return len([arg for arg in self.Args if arg.name is not None])
-
-	def __repr__(self):
-		self.updateArgs()
-		args = str([arg.name if not isinstance(arg, Action) else arg for arg in self.Args])
-		t = ''
-		if not self.root.truth:
-			t = 'not-'
-		return '{}{}'.format(t, self.root.name) + args
-
-
-class PlanElementGraph:
+class Plan:
 	def __init__(self, name, Restrictions=None):
 		self.name = name
 		self.ID = uuid4()
@@ -385,13 +167,17 @@ class PlanElementGraph:
 		if not checkHeight(Actions, h):
 			return None
 
-		elements = set().union(*[A.elements for A in Actions])
-		edges = set().union(*[A.edges for A in Actions])
-		Plan = cls(name='Action_2_Plan', Elements=elements, Edges=edges)
-		for edge in Plan.edges:
-			if edge.label == 'effect-of':
-				elm = Plan.get_by_id(edge.sink.ID)
-				elm.replaced_ID = edge.sink.replaced_ID
+		Plan = cls(name='Action_2_Plan')
+		for action in Actions:
+			Plan.append(action)
+
+		#elements = set().union(*[A.elements for A in Actions])
+	#	edges = set().union(*[A.edges for A in Actions])
+		#Plan = cls(name='Action_2_Plan', Elements=elements, Edges=edges)
+	#	for edge in Plan.edges:
+		#	if edge.label == 'effect-of':
+		#		elm = Plan.get_by_id(edge.sink.ID)
+		#		elm.replaced_ID = edge.sink.replaced_ID
 
 		Plan.OrderingGraph = OrderingGraph()
 		Plan.CausalLinkGraph = CausalLinkGraph()

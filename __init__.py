@@ -6,7 +6,7 @@ from Planner import obTypesDict
 from Element import Argument
 from Planner import PlanSpacePlanner
 from Planner import topoSort
-from PlanElementGraph import Action
+from Plan import Action
 
 
 if __name__ ==  '__main__':

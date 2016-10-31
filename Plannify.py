@@ -1,5 +1,5 @@
 import itertools
-from PlanElementGraph import Action, PlanElementGraph, Condition
+from Plan import Action, Plan, Condition
 from Element import Operator
 from Graph import Edge
 from clockdeco import clock
@@ -11,7 +11,7 @@ def Plannify(RQ, GL, h):
 	#An ActionLib for steps in RQ - ActionLib is a container w/ all of its possible instances as ground steps
 	print('...ActionLibs')
 	try:
-		Libs = [ActionLib(i, RS, GL) for i, RS in enumerate(RQ.Step_Graphs)]
+		Libs = [ActionLib(i, RS, GL) for i, RS in enumerate(RQ.Steps)]
 	except:
 		return []
 
@@ -20,7 +20,7 @@ def Plannify(RQ, GL, h):
 
 	print('...Planets')
 	#A Planet is a plan s.t. all steps are "arg_name consistent", but a step may not be equiv to some ground step
-	Planets = [PlanElementGraph.Actions_2_Plan(W, h) for W in Worlds if isArgNameConsistent(W)]
+	Planets = [Plan.Actions_2_Plan(W, h) for W in Worlds if isArgNameConsistent(W)]
 
 	print('...Linkify')
 	#Linkify installs orderings and causal links from RQ/decomp to Planets, rmvs Planets which cannot support links
