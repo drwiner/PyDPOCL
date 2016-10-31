@@ -1,8 +1,8 @@
 from Restrictions import Restriction
-import uuid
-from Graph import Graph
+from uuid import uuid4
+from Graph import Graph, Edge
 from GlobalContainer import GC
-from Element import Operator
+from Element import Operator, Literal, Argument
 import copy
 
 #if you subclass ElementGraph, please inform the authorities
@@ -57,7 +57,6 @@ class ElementGraph(Graph):
 		"""
 		INPLACE subgraph - still references same parent
 		"""
-
 		elm = EG.get_by_id(e.ID)
 		edges = EG.rGetDescendantEdges(elm)
 		elms = {edge.source for edge in edges}|{edge.sink for edge in edges}|{elm}
@@ -73,9 +72,6 @@ class ElementGraph(Graph):
 	@property
 	def Step_Graphs(self):
 		return [Action.subgraph(self, step) for step in self.Steps]
-
-	@property
-	def Steps(self):
 
 	def getSingleArgByLabel(self, label):
 		for edge in self.edges:
