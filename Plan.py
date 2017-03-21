@@ -75,6 +75,22 @@ class GStep:
 			edges.update(eff.to_edges())
 		return edges
 
+	def to_elms(self):
+		elms = set()
+		elms.update(set(self.Args))
+		for prec in self.Preconditions:
+			#if not hasattr(prec, 'arg_name'):
+		#		prec.arg_name = None
+			elms.add(Literal(ID=prec.ID, name=prec.name, truth=prec.truth, arg_name=prec.arg_name if hasattr(prec,
+																										'arg_name')
+			else None))
+		for eff in self.Effects:
+			if not hasattr(eff, 'arg_name'):
+				eff.arg_name = None
+			elms.add(Literal(ID=eff.ID, name=eff.name, truth=eff.truth, arg_name=eff.arg_name))
+		return elms
+
+
 	def UnifyWithPartial(self, partial):
 		fresh_step = self.deepcopy()
 		#
@@ -201,6 +217,33 @@ class Plan:
 	def extend(self, iter):
 		for step in iter:
 			self.append(step)
+
+	def to_edges(self):
+		edges = set()
+		edges.update(*[step.to_edges for step in self])
+		return edges
+
+	def to_elms(self):
+		elms = set()
+		elms.update(*[step.to_elms for step in self])
+		return elms
+
+	def to_op_elms(self):
+		elms = set()
+		elms.update({step.root for step in self.steps})
+		return elms
+
+	def getElmByIDFromElms(self, _id, elms):
+		for elm in elms:
+			if elm.ID == _id:
+				return elm
+		return False
+
+	def getElmByID(self, _id):
+		for elm in self.to_elms():
+			if elm.ID == _id:
+				return elm
+		return False
 
 	@classmethod
 	def Actions_2_Plan(cls, Actions, h):
