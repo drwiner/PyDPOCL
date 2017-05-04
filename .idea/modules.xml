@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/story-elements.iml" filepath="$PROJECT_DIR$/.idea/story-elements.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/GroundStepCompiler.iml" filepath="$PROJECT_DIR$/.idea/GroundStepCompiler.iml" />
     </modules>
   </component>
 </project>

@@ -16,15 +16,25 @@ import hashlib
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')
 Antestep = namedtuple('Antestep', 'action eff_link')
 
+
 def groundStoryList(operators, objects, obtypes):
+	"""
+
+	:param operators: non-ground operator schemas
+	:param objects: constants/values
+	:param obtypes: object type ontology
+	:return: primitive ground steps
+	"""
 	stepnum = 0
 	gsteps = []
-	print('...Creating Ground Steps')
+	print('...Creating Primitive Ground Steps')
 	for op in operators:
 		op.updateArgs()
 		cndts = [[obj for obj in objects if arg.typ == obj.typ or arg.typ in obtypes[obj.typ]] for arg in op.Args]
 		tuples = itertools.product(*cndts)
 		for t in tuples:
+
+			# check for inconsistent tuple of arg types
 			legaltuple = True
 			for (u,v) in op.nonequals:
 				if t[u] == t[v]:
@@ -32,17 +42,31 @@ def groundStoryList(operators, objects, obtypes):
 					break
 			if not legaltuple:
 				continue
+
 			gstep = copy.deepcopy(op)
+			print('Creating ground step {}'.format(gstep))
+
+			# replace the ID of the internal elements
 			gstep._replaceInternals()
+
+			# assign the step number (only one of the following should be necessary)
 			gstep.root.stepnumber = stepnum
 			gstep.root.arg_name = stepnum
 			stepnum += 1
+
+			# swap the leaves of the step with the objects in tuple "t"
 			gstep.replaceArgs(t)
+
+			# append the step to our growin glist
 			gsteps.append(gstep)
-			gstep.replaceInternals()
+
+			# not sure why one would need the following:
+			# gstep.replaceInternals()
+
+			# assign height of the step to the root element and
 			gstep.height = 0
 			gstep.root.height = 0
-			print('Creating ground step {}'.format(gstep))
+
 	return gsteps
 
 def groundDecompStepList(doperators, GL, stepnum=0, height=0):
@@ -109,10 +133,9 @@ def assignElmToContainer(GDO, SP, elm, ex_elms):
 import re
 @clock
 def upload(GL, name):
-	n = re.sub('[^A-Za-z0-9]+', '', name)
-	afile = open(n, "wb")
-	pickle.dump(GL, afile)
-	afile.close()
+	# n = re.sub('[^A-Za-z0-9]+', '', name)
+	with open(name, 'wb') as afile:
+		pickle.dump(GL, afile)
 
 @clock
 def reload(name):
@@ -125,6 +148,7 @@ def reload(name):
 
 	return GL
 
+
 class GLib:
 
 	def __init__(self, domain, problem):
@@ -132,13 +156,22 @@ class GLib:
 		self.non_static_preds = FlawLib.non_static_preds
 		self.object_types = GC.object_types
 		self.objects = objects
+
+		# primitive steps
 		self._gsteps = groundStoryList(operators, self.objects, obtypes)
 
 		#dictionaries
+		# a candidate map is a dictionary such that cndt_map[step_id][pre_id] = [(s_1, e_1),...,(s_k, e_k)] values are steps whose effect is same
+		# self.cndt_map = defaultdict(lambda x: defaultdict(list))
+		# self.threat_map = defaultdict(lambda x: defaultdict(list))
+		# cndts (key is step number, value is set of step numbers)
 		self.ante_dict = defaultdict(set)
+		# threats (key is step number, value is set of step numbers)
+		self.threat_dict = defaultdict(set)
+		# id_dict is just by precondition ID
 		self.id_dict = defaultdict(set)
 		self.eff_dict = defaultdict(set)
-		self.threat_dict = defaultdict(set)
+
 		print('...Creating PlanGraph base level')
 		self.loadAll()
 
@@ -152,28 +185,26 @@ class GLib:
 				break
 			self.loadPartition(D)
 
-		#self._gsteps.extend(D)
-
 		init_action.root.stepnumber = len(self._gsteps)
+		# replacing internal replaced_IDs
 		init_action._replaceInternals()
+		# replace IDs
 		init_action.replaceInternals()
-		#self._gsteps.append(init_action)
-		# goal at [-1]
-		goal_action.root.stepnumber = len(self._gsteps) + 1
-		goal_action._replaceInternals()
-		goal_action.replaceInternals()
-	#	self._gsteps.append(goal_action)
 
+		goal_action.root.stepnumber = len(self._gsteps) + 1
+		# replace internal replaced_IDs
+		goal_action._replaceInternals()
+		# replace IDs
+		goal_action.replaceInternals()
+
+		# check if init and goal have potential causal relationships
 		self.loadPartition([init_action, goal_action])
-		#self.load({init_action}, self._gsteps)
-	#	self.load(self._gsteps, {goal_action})
-	#	self.load({init_action}, {goal_action})
-		#self._gsteps.append(init_action)
-		#self._gsteps.append(goal_action)
 
 		print('{} ground steps created'.format(len(self)))
 		print('uploading')
-		upload(self, domain + problem)
+		d_name = domain.split('/')[1].split('.')[0]
+		p_name = problem.split('/')[1].split('.')[0]
+		self.name = d_name + '.' + p_name
 
 	def insert(self, _pre, antestep, eff):
 		self.id_dict[_pre.replaced_ID].add(antestep.stepnumber)
@@ -212,15 +243,19 @@ class GLib:
 				count += 1
 		return count
 
-	def getPotentialLinkConditions(self, src, snk):
-		cndts = []
-		for pre in self[snk.stepnumber].preconditions:
-			if src.stepnumber not in self.id_dict[pre.replaced_ID]:
-				continue
-			cndts.append(Edge(src,snk, copy.deepcopy(pre)))
-		return cndts
+	# def getPotentialLinkConditions(self, src, snk):
+	# 	cndts = []
+	# 	for pre in self[snk.stepnumber].preconditions:
+	# 		if src.stepnumber not in self.id_dict[pre.replaced_ID]:
+	# 			continue
+	# 		cndts.append(Edge(src,snk, copy.deepcopy(pre)))
+	# 	return cndts
 
 	def getPotentialEffectLinkConditions(self, src, snk):
+		"""
+		Given source and sink steps, return {eff(src) \cap pre(snk)}
+		But, let those conditions be those of the src.
+		"""
 		cndts = []
 		for eff in self[src.stepnumber].effects:
 			for pre in self[snk.stepnumber].preconditions:
@@ -268,6 +303,7 @@ class GLib:
 
 	def __repr__(self):
 		return 'Grounded Step Library: \n' +  str([step.__repr__() for step in self._gsteps])
+
 
 if __name__ ==  '__main__':
 	domain_file = 'domains/ark-domain.pddl'

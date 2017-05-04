@@ -107,6 +107,13 @@ class Graph(Element):
 		return self
 
 	def assign(self, old_elm_in_edge, new_elm, remove_old=True):
+		"""
+		swaps vertices in graph and updates edges
+		:param old_elm_in_edge: element to swap out
+		:param new_elm: element to replace old
+		:param remove_old: some cases, we keep the old one?
+		:return: in place swap
+		"""
 		if old_elm_in_edge.ID == new_elm.ID:
 			return
 		new_elements = list(self.elements)
@@ -350,7 +357,7 @@ def isConsistentEdgeSet(Rem, Avail, map_=None, return_map=False):
 				return _Map
 	return False
 
-def findConsistentEdgeMap(Rem, Avail, map_ = None, Super_Maps = None):
+def findConsistentEdgeMap(Rem, Avail, map_=None, Super_Maps=None):
 	if map_ is None:
 		map_ = {}
 	if Super_Maps is None:

@@ -132,6 +132,21 @@ class simpleQueueWrapper(collections.deque):
 		for it in iter:
 			self.append(it)
 
+
+from collections import namedtuple
+
+Flaw_Type_List = namedtuple('FlawTypes', 'statics inits threats decomps unsafe reusable nonreusable'.split())
+class FlawTypes:
+	def __init__(self, statics, inits, threats, decomps, unsafe, reusable, nonreusable):
+		self._list = [statics, inits, threats, decomps, unsafe, reusable, nonreusable]
+
+	def __len__(self):
+		return len(self._list)
+	def __getitem__(self, item):
+		return self._list[item]
+
+
+
 class FlawLib():
 	non_static_preds = set()
 
@@ -158,7 +173,7 @@ class FlawLib():
 		#nonreusable = open conditions inconsistent with existing effect sorted by number of cndts
 		self.nonreusable = Flawque('nonreusable')
 
-		self.typs = [self.statics, self.inits, self.threats, self.decomps, self.unsafe, self.reusable, self.nonreusable]
+		self.typs = FlawTypes(self.statics, self.inits, self.threats, self.decomps, self.unsafe, self.reusable, self.nonreusable)
 		self.restricted_names = ['threats', 'decomps']
 
 	# @property
@@ -271,11 +286,8 @@ class FlawLib():
 		self.nonreusable.add(flaw)
 
 	def __repr__(self):
-		#flaw_str_list = [str([flaw for flaw in flaw_set]) for flaw_set in self.typs]
 		F = [('|' + ''.join([str(flaw) + '\n|' for flaw in T]) , T.name) for T in self.typs if len(T) > 0]
-		#flaw_lib_string = str(['\n {}: \n {} '.format(flaws, name) + '\n' for flaws, name in F])
-		return '______________________\n|FLAWLIBRARY: \n|' + ''.join(['\n|{}: \n{}'.format(name, flaws) for
-																		  flaws, name in F]) + '______________________'
+		return '\n|FLAWLIBRARY: \n|' + ''.join(['\n|{}: \n{}'.format(name, flaws) for flaws, name in F])
 
 import unittest
 class TestOrderingGraphMethods(unittest.TestCase):

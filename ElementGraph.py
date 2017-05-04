@@ -74,8 +74,8 @@ class ElementGraph(Graph):
 
 	def updateArgs(self):
 		self.Args = []
-		for label in GC.ARGLABELS:
-			arg = self.getSingleArgByLabel(label)
+		for i in range(10):
+			arg = self.getSingleArgByLabel(i)
 			if arg is None:
 				break
 			else:
@@ -99,6 +99,6 @@ class ElementGraph(Graph):
 			raise ValueError('cannot replace Args, arg_tuple too long/short for %s' % self.name)
 
 		for i, arg in enumerate(arg_tuple):
-			original = self.getSingleArgByLabel(GC.ARGLABELS[i])
+			original = self.getSingleArgByLabel(i)
 			self.replaceArg(original, arg)
 		self.updateArgs()

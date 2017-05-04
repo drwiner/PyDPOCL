@@ -33,6 +33,7 @@ def Plannify(RQ, GL, h):
 	print('...returning consistent plans')
 	return [Plan for Plan in Plans if Plan is not None and Plan.isInternallyConsistent()]
 
+
 def partialUnify(PS, _map):
 	if _map is False:
 		return False
@@ -85,74 +86,87 @@ def isArgNameConsistent(Partially_Ground_Steps):
 def productByPosition(Libs):
 	return itertools.product(*[list(Libs[T.position]) for T in Libs])
 
-def Linkify(Planets, RQ, GL):
-	#Planets are plans containing steps which may not be ground steps from story_GL
+
+def filter_and_add_orderings(planets, RQ):
 	orderings = RQ.OrderingGraph.edges
-	if len(orderings) > 0:
-		for Planet in Planets:
-			if Planet is None:
-				continue
-			GtElm = Planet.getElementById
-			Planet.OrderingGraph.edges = {Edge(GtElm(ord.source.ID), GtElm(ord.sink.ID),'<') for ord in orderings}
+	indices = []
+	for i in range(len(planets)):
+		# filter None Planets, which are scratched possible worlds
+		if planets[i] is None:
+			continue
+
+		# add orderings
+		if len(orderings) > 0:
+			GtElm = planets[i].getElementById
+			planets[i].OrderingGraph.edges = {Edge(GtElm(ord.source.ID), GtElm(ord.sink.ID), '<') for ord in orderings}
+
+		indices.append(i)
+
+	planets[:] = [planets[i] for i in indices]
 
 
+def Linkify(Planets, RQ, GL):
+	"""
+	:param Planets: A list of plan-element-graphs
+	:param RQ: ReQuirements
+	:param GL: Ground Library
+	:return: List of Plan-element-graphs which include causal link and ordering graphs
+	"""
+	# Filter "None" planets, which exist if they did not have step at level "h", and add ReQuired orderings
+	filter_and_add_orderings(Planets, RQ)
+
+	# If there's no causal link requirements, end here.
 	links = RQ.CausalLinkGraph.edges
 	if len(links) == 0:
 		return False
 
-	removable = set()
+	# For each link, test if the planet supports that link
 	for link in links:
-		for i, Planet in enumerate(Planets):
-			if Planet is None:
-				removable.add(i)
-				continue
+		indices = []
+		for i in range(len(Planets)):
 
-			src = Planet.getElementById(link.source.ID)
-			snk = Planet.getElementById(link.sink.ID)
-			cond = Planet.getElementById(link.label.ID)
+			src = Planets[i].getElementById(link.source.ID)
+			snk = Planets[i].getElementById(link.sink.ID)
+			# This condition could be a blank element literal
+			cond = Planets[i].getElementById(link.label.ID)
 
+			# use the step numbers in order to reason about "ground steps" not these partial shits.
+			# ante_dict == cndt_dict
 			if src.stepnumber not in GL.ante_dict[snk.stepnumber]:
-				removable.add(i)
 				continue
 
-			if not GL.hasConsistentPrecondition(GL[snk.stepnumber],cond):
-				removable.add(i)
+			if not GL.hasConsistentPrecondition(GL[snk.stepnumber], cond):
 				continue
 
-			Planet.CausalLinkGraph.addEdge(src, snk, cond)
-			Planet.OrderingGraph.addEdge(src, snk)
+			Planets[i].CausalLinkGraph.addEdge(src, snk, cond)
+			Planets[i].OrderingGraph.addEdge(src, snk)
+			indices.append(i)
 
-		Planets[:] = [Planet for i, Planet in enumerate(Planets) if i not in removable]
-		removable = set()
-		if len(Planets) == 0:
-			for step in RQ.Steps:
-				print(step)
-			raise ValueError('no Planet could support links in {}'.format(RQ.name))
+		# Remove planets which cannot support link
+		Planets[:] = [Planets[i] for i in indices]
+
+	if len(Planets) == 0:
+		raise ValueError('no Planet could support links in {}'.format(RQ.name))
 
 	return True
 
 
 def Groundify(Planets, GL, has_links):
 	print('...Groundify - Unifying Actions with GL')
-	i = 0
-	for Planet in Planets:
-		if Planet is None:
-			continue
+	for i, Planet in enumerate(Planets):
 		print("... Planet {}".format(i))
-		i += 1
 		for Step in Planet.Step_Graphs:
 			print('... Unifying {} with {}'.format(Step, GL[Step.stepnumber]))
+			# Unify Actions (1) swaps step graphs with ground step
 			Planet.UnifyActions(Step, GL[Step.stepnumber])
 
 	if not has_links:
-		#we're done
 		return Planets
 
 	print('...Groundify - Creating Causal Links')
 	Discovered_Planets = []
 	for Plan in Planets:
-		if Plan is None:
-			continue
+
 		#print(Plan)
 		Libs = [LinkLib(i, link, GL) for i, link in enumerate(Plan.CausalLinkGraph.edges)]
 
@@ -162,6 +176,7 @@ def Groundify(Planets, GL, has_links):
 		LW = productByPosition(Libs)
 
 		for lw in LW:
+			# create new Planet ("discovered planet") for each linkworld.
 			NP = Plan.deepcopy()
 			for _link in list(lw):
 				pre_token = GL.getConsistentPrecondition(Action.subgraph(NP, _link.sink), _link.label)
@@ -177,22 +192,38 @@ def Groundify(Planets, GL, has_links):
 
 
 class ActionLib:
-
+	"""
+	A class (list) of ground step candidates for an action graph "RS"
+	"""
 	def __init__(self, i, RS, GL):
+		"""
+		:param i: position in some list for a possible world
+		:param RS: Action Graph
+		:param GL: Ground Library
+		"""
+
 		#RS.root.stepnumber = stepnum
 		self.position = i
 		RS.root.position = i
 		self.RS = RS
 		self.root = RS.root
 		self._cndts = []
+
+		# for each primitive ground step in the library
 		for gs in GL:
+			# start with checking consistency at root as shortcut
 			if not gs.root.isConsistent(self.RS.root):
 				continue
+			# return a set of E(RS) --> E(gs) mappings, if possible
 			elm_maps = gs.findConsistentSubgraph(self.RS)
 			if len(elm_maps) == 0:
 				continue
+			""" for each map, we're going to unify JUST THOSE elements in the mapping
+			 (for instance, an "operator element" might not yet be assigned a particular schema)
+			 We don't just swap completely because we must respect global bindings for this world """
 			for map in elm_maps:
 				if len(map) == 0:
+					# why?
 					self.RS.root.merge(gs.root)
 					self.RS.root.replaced_ID = gs.root.replaced_ID
 				self.append(partialUnify(self.RS, map), gs.stepnumber)
@@ -248,6 +279,7 @@ class LinkLib:
 			self._links = [Edge(link.source, link.sink, self.condition)]
 		else:
 			# add new condition for each potential condition
+			# "effect" mentioned in method below to emphasize whose condition becomes dependency
 			self._links = GL.getPotentialEffectLinkConditions(link.source, link.sink)
 			#self._links = story_GL.getPotentialLinkConditions(link.source, link.sink)
 

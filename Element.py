@@ -23,10 +23,15 @@ class Element:
 		if ID is None:
 			ID = uuid4()
 
+		# ID is a unique reference instance
 		self.ID = ID
+		# typ refers to the python object type of the graph whose root is this element
 		self.typ = typ
+		# name is op_type, or literal predicate name, etc.
 		self.name = name
+		# arg_name is the name designated as a variable in some operator
 		self.arg_name = arg_name
+		# replaced_ID is the unchanging ID designed once the element is part of an instance of a ground step
 		self.replaced_ID = -1
 
 	def isConsistent(self, other):
@@ -290,6 +295,8 @@ class Argument(Element):
 		return True
 
 	def isConsistentType(self, other):
+		if not isinstance(other, Argument):
+			return False
 		if not self.typ == other.typ:
 			try:
 				if self.typ not in GC.object_types[other.typ.lower()] and \

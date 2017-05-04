@@ -108,6 +108,7 @@ class Action(ElementGraph):
 			if not isinstance(elm, Argument):
 				elm.ID = uuid4()
 
+	# USE THIS ONLY when creating GROUND STEPS for first time (replacing replaced_ID)
 	def _replaceInternals(self):
 		self.ID = uuid4()
 		for elm in self.elements:
