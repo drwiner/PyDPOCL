@@ -13,7 +13,6 @@
 
 import copy
 from uuid import uuid4
-from GlobalContainer import GC
 
 
 class Element:

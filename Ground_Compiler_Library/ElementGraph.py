@@ -1,7 +1,6 @@
-from Restrictions import Restriction
+from Ground_Compiler_Library.Restrictions import Restriction
 import uuid
-from Graph import Graph
-from GlobalContainer import GC
+from Ground_Compiler_Library.Graph import Graph
 import copy
 
 #if you subclass ElementGraph, please inform the authorities

@@ -2,7 +2,7 @@
 import collections
 import bisect
 from uuid import uuid1, uuid4
-from Graph import isConsistentEdgeSet
+from Ground_Compiler_Library.Graph import isConsistentEdgeSet
 
 import itertools
 from clockdeco import clock

@@ -1,9 +1,9 @@
-from OrderingGraph import OrderingGraph, CausalLinkGraph
-from Flaws import Flaw, FlawLib, TCLF
+from Ground_Compiler_Library.OrderingGraph import OrderingGraph, CausalLinkGraph
+from Ground_Compiler_Library.Flaws import Flaw, FlawLib, TCLF
 from uuid import uuid4
-from Element import Argument, Element, Operator, Literal
-from Graph import Edge
-from ElementGraph import ElementGraph
+from Ground_Compiler_Library.Element import Argument, Element, Operator, Literal
+from Ground_Compiler_Library.Graph import Edge
+from Ground_Compiler_Library.ElementGraph import ElementGraph
 import copy
 import collections
 from clockdeco import clock

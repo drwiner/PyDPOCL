@@ -3,13 +3,13 @@ import itertools
 import copy
 import pickle
 from collections import namedtuple, defaultdict
-from PlanElementGraph import Condition, Action
+from Ground_Compiler_Library.PlanElementGraph import Condition, Action
 from clockdeco import clock
-from Plannify import Plannify
-from Element import Argument, Actor, Operator, Literal
-from pddlToGraphs import parseDomAndProb
-from Graph import Edge
-from Flaws import FlawLib
+from Ground_Compiler_Library.Plannify import Plannify
+from Ground_Compiler_Library.Element import Argument, Actor, Operator, Literal
+from Ground_Compiler_Library.pddlToGraphs import parseDomAndProb
+from Ground_Compiler_Library.Graph import Edge
+from Ground_Compiler_Library.Flaws import FlawLib
 from GlobalContainer import GC
 import hashlib
 
@@ -144,7 +144,6 @@ def reload(name):
 	GL = pickle.load(afile)
 	afile.close()
 	FlawLib.non_static_preds = GL.non_static_preds
-	GC.object_types = GL.object_types
 
 	return GL
 
@@ -154,7 +153,7 @@ class GLib:
 	def __init__(self, domain, problem):
 		operators, dops, objects, obtypes, init_action, goal_action = parseDomAndProb(domain, problem)
 		self.non_static_preds = FlawLib.non_static_preds
-		self.object_types = GC.object_types
+		self.object_types = obtypes
 		self.objects = objects
 
 		# primitive steps

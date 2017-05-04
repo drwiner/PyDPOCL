@@ -1,15 +1,12 @@
-from pddl.parser import Parser
+from Ground_Compiler_Library.pddl.parser import Parser
 from collections import defaultdict
-from PlanElementGraph import Action, PlanElementGraph
-from Graph import Edge
-from Element import Argument, Operator, Literal, Element, Actor
+from Ground_Compiler_Library.PlanElementGraph import Action, PlanElementGraph
+from Ground_Compiler_Library.Graph import Edge
+from Ground_Compiler_Library.Element import Argument, Operator, Literal, Element, Actor
 from clockdeco import clock
 import copy
 from uuid import uuid4
-from Flaws import FlawLib
-from GlobalContainer import GC
-
-#ARGLABELS = ['first-arg', 'sec-arg', 'third-arg', 'fourth-arg', 'fifth-arg', '6', '7', '8', '9', '10']
+from Ground_Compiler_Library.Flaws import FlawLib
 
 
 def makeGoal(formula):
@@ -44,9 +41,7 @@ def getNonEquals(formula, op_graph, elements, edges):
 	arg2 = next(element for element in elements if c2.key.name == element.arg_name)
 	edge1 = next(edge for edge in edges if edge.source.typ == 'Action' and edge.sink == arg1)
 	edge2 = next(edge for edge in edges if edge.source.typ == 'Action' and edge.sink == arg2)
-	i1 = GC.ARGLABELS.index(edge1.label)
-	i2 = GC.ARGLABELS.index(edge2.label)
-	op_graph.nonequals.add((i1, i2))
+	op_graph.nonequals.add((edge1.label, edge2.label))
 
 
 def getSubFormulaGraph(formula, op_graph, parent=None, relationship=None, elements=None, edges=None):
@@ -151,7 +146,7 @@ def decorateElm(child, DG):
 		elm.name = child.children[1].key
 	elif child.key == 'nth-step-arg' or child.key == 'nth-lit-arg':
 		args = child.children
-		label = GC.ARGLABELS[int(args[0].key)]
+		label = int(args[0].key)
 		parent_elm = whichElm(args[1].key.name, DG)
 		child_elm = whichElm(args[2].key.name, DG)
 		DG.edges.add(Edge(parent_elm, child_elm, label))
@@ -237,9 +232,9 @@ def whichElm(name, dg):
 	return next(element for element in dg.elements if name == element.arg_name)
 
 
-def getDecompGraph(formula, decomp_graph, params):
+def getDecompGraph(formula, decomp_graph, params, p_types):
 	for param in params:
-		createElementByType(param, decomp_graph)
+		createElementByType(param, decomp_graph, p_types)
 
 	if formula.key == 'and':
 		for child in formula.children:
@@ -264,8 +259,7 @@ def rPrintFormulaElements(formula):
 	print('\n')
 
 
-def createElementByType(parameter, decomp):
-	paramtypes = GC.object_types[next(iter(parameter.types))]
+def createElementByType(parameter, decomp, p_types):
 
 	if 'character' in parameter.types:
 		elm = Actor(typ='character', arg_name=parameter.name)
@@ -273,7 +267,7 @@ def createElementByType(parameter, decomp):
 		elm = Actor(typ='actor', arg_name=parameter.name)
 	elif 'person' in parameter.types:
 		elm = Actor(typ='person', arg_name=parameter.name)
-	elif 'arg' in paramtypes or 'item' in paramtypes or 'place' in paramtypes:
+	elif 'arg' in p_types or 'item' in p_types or 'place' in p_types:
 		arg_type = next(iter(parameter.types))
 		elm = Argument(typ=arg_type, arg_name=parameter.name)
 	elif 'step' in parameter.types:
@@ -318,7 +312,7 @@ def evalActionParams(params, op_graph):
 
 
 @clock
-def domainToOperatorGraphs(domain):
+def domainToOperatorGraphs(domain, obj_types):
 	opGraphs = set()
 	dopGraphs = set()
 	for action in domain.actions:
@@ -337,7 +331,9 @@ def domainToOperatorGraphs(domain):
 		if action.decomp is not None:
 			# henceforth, action.decomp is tuple (sub-params, decomp)
 			decomp_graph = PlanElementGraph(name=action.name, type_graph='decomp')
-			getDecompGraph(action.decomp.formula, decomp_graph, action.parameters + action.decomp.sub_params)
+			params = action.parameters + action.decomp.sub_params
+			param_types = obj_types[params]
+			getDecompGraph(action.decomp.formula, decomp_graph, params, param_types)
 			op_graph.subplan = decomp_graph
 
 			# This searches for params that are listed as params and sub-params, may not be needed
@@ -442,7 +438,8 @@ def parseDomAndProb(domain_file, problem_file):
 	domain, dom = parser.parse_domain_drw()
 	problem, v = parser.parse_problem_drw(dom)
 
-	GC.object_types.update(obTypesDict(domain.types))
+	# GC.object_types.update()
+	obj_types = obTypesDict(domain.types)
 
 	args, init, goal = problemToGraphs(problem)
 	objects = set(args.values())
@@ -455,7 +452,7 @@ def parseDomAndProb(domain_file, problem_file):
 	addStatics(Operators)
 	addStatics(DOperators)
 
-	return Operators, DOperators, objects, GC.object_types, init, goal
+	return Operators, DOperators, objects, obj_types, init, goal
 
 def addStatics(operators):
 	for op in operators:
