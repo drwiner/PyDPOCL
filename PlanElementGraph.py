@@ -4,6 +4,7 @@ from uuid import uuid4
 from Ground_Compiler_Library.Element import Argument, Element, Operator, Literal
 from Ground_Compiler_Library.Graph import Edge
 from Ground_Compiler_Library.ElementGraph import ElementGraph
+from GlobalContainer import GC
 import copy
 import collections
 from clockdeco import clock
@@ -287,6 +288,20 @@ class PlanElementGraph(ElementGraph):
 
 			self.edges.add(Edge(source, sink, edge.label))
 
+	#@clock
+	def __lt__(self, other):
+		if self.cost + self.heuristic != other.cost + other.heuristic:
+			return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+		elif self.heuristic != other.heuristic:
+			return self.heuristic < other.heuristic
+		elif self.cost != other.cost:
+			return self.cost < other.cost
+		elif len(self.flaws) != len(other.flaws):
+			return len(self.flaws) < len(other.flaws)
+		else:
+			return self.OrderingGraph < other.OrderingGraph
+
+
 	def deepcopy(self):
 		new_self = copy.deepcopy(self)
 		new_self.ID = uuid4()
@@ -330,6 +345,105 @@ class PlanElementGraph(ElementGraph):
 	def AddSubgraph(self, subgraph):
 		self.elements.update(subgraph.elements)
 		self.edges.update(subgraph.edges)
+
+	def h_add_a(self, GL, step, reusable_steps, visited):
+		#cost of an action 'a' is 1 + h_{add}(Prec(a)) where Prec(a) is the conjunction of preconditions
+		cost = 1
+		for pre in step.preconditions:
+			if pre.replaced_ID in visited:
+				v = visited[pre.replaced_ID]
+			else:
+				visited[pre.replaced_ID] = float('inf')
+				v = self.h_add_q(GL, pre, reusable_steps, visited)
+				visited[pre.replaced_ID] = v
+
+			if v == float('inf'):
+				return v
+
+			cost += v
+		return cost
+
+	def h_add_q(self, GL, pre, reusable_steps, visited):#, visited=None):
+		#additive heuristic with modification for reuse (VHPOP)
+
+		antecedents = GL.id_dict[pre.replaced_ID]
+
+		# 0 if q unifies with effect of exsting step
+		for rs in reusable_steps:
+			#includes initial dummy step
+			if rs in antecedents:
+				visited[rs] = 0
+				return 0
+
+		least = float('inf')
+
+		#infinity otherwise
+		if len(antecedents) == 0:
+			visited[pre.replaced_ID] = least
+			return least
+
+		for ante in antecedents:
+			# Shortcut - if one of your antecedents has no preconditions
+			if len(GL[ante].preconditions) == 0:
+				visited[ante] = 1
+				return 1
+
+			if ante in visited:
+				if visited[ante] < least:
+					least = visited[ante]
+			else:
+				#in case it cycles...
+				visited[ante] = float('inf')
+				v = self.h_add_a(GL, GL[ante], reusable_steps, visited)
+				visited[ante] = v
+				if v ==0:
+					return 0
+				if v < least:
+					least = v
+		return least
+
+
+	def calculateHeuristic(self, GL):
+		value = 0
+		#Sum of h_{add}(pre) for pre in <s_{need}, pre> for each open condition flaw
+
+		for oc in self.flaws.flaws:
+			s_need, pre = oc.flaw
+
+			antecedents = GL.id_dict[pre.replaced_ID]
+
+			if (pre.name, pre.truth) not in FlawLib.non_static_preds:
+				if self.initial_dummy_step not in antecedents:
+					return float('inf')
+
+			reusable_steps = [step.stepnumber for step in self.Steps if step != s_need
+							  and not self.OrderingGraph.isPath(s_need, step)]
+
+			found = False
+			for rs in reusable_steps:
+				if rs in antecedents:
+					found = True
+
+			#collections.defaultdict(int)
+			if not found:
+				visited = collections.defaultdict(int)
+				c = self.h_add_q(GL, pre, reusable_steps, visited)
+				oc.heuristic = c + s_need.height*30
+			else:
+				c = 0
+				oc.heuristic = 0 + s_need.height*30
+
+			value += c
+
+		return value
+
+	@property
+	def heuristic(self):
+		return self.calculateHeuristic(GC.SGL)
+
+	@property
+	def cost(self):
+		return len(self.Steps) - 2
 
 	def isInternallyConsistent(self):
 		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent() and \
@@ -392,6 +506,7 @@ class PlanElementGraph(ElementGraph):
 		order = [''.join('\t' + str(ordering.source) + ' < ' + str(ordering.sink) + '\n' for ordering in
 			self.OrderingGraph.edges)]
 		links = [''.join('\t' + str(cl) + '\n' for cl in self.CausalLinkGraph.edges)]
+
 		return 'PLAN: ' + str(self.ID) + c + '\n*Steps: \n' + ''.join(['{}'.format(step) for step in steps]) + \
 			   '*Orderings:\n' + \
 			   ''.join(['{}'.format(o) for o in order]) + '*CausalLinks:\n' + ''.join(['{}'.format(link) for link in links]) + '}'

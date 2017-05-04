@@ -1,7 +1,7 @@
 import collections
 
-from Graph import Graph, Edge
-from Element import Element
+from Ground_Compiler_Library.Graph import Graph, Edge
+from Ground_Compiler_Library.Element import Element
 #from clockdeco import clock
 
 

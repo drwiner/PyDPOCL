@@ -10,7 +10,6 @@ from Ground_Compiler_Library.Element import Argument, Actor, Operator, Literal
 from Ground_Compiler_Library.pddlToGraphs import parseDomAndProb
 from Ground_Compiler_Library.Graph import Edge
 from Ground_Compiler_Library.Flaws import FlawLib
-from GlobalContainer import GC
 import hashlib
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')

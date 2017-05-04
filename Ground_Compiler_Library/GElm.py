@@ -78,7 +78,9 @@ class GStep:
 		# remove precondition from open precond
 		self.open_preconds.remove(pre)
 		# update choices to just those which are needed to fulfill open conditions
-		self.choices = [choice for pre in self.open_preconds for choice in self.cndt_map[pre.ID]]
+
+	def update_choices(self, steps):
+		self.choices = [choice for pre in self.open_preconds for choice in self.cndt_map[pre.ID] if choice in steps]
 
 	def is_cndt(self, other):
 		return other.stepnum in self.cndts
@@ -119,8 +121,13 @@ class GLiteral:
 	def __len__(self):
 		return len(self.Args)
 
+	def __eq__(self, other):
+		if not isinstance(other, GLiteral):
+			return False
+		return self.name == other.name and self.Args == other.Args and self.truth == other.truth
+
 	def __repr__(self):
-		args = str([arg if not isinstance(arg, Argument) else arg.name for arg in self])
+		args = str([arg if not isinstance(arg, Argument) else arg.name for arg in self.Args])
 		#args = str([arg.name if not isinstance(arg, Action) else arg for arg in self.Args])
 		t = ''
 		if not self.truth:

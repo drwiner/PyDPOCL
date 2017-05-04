@@ -1,11 +1,11 @@
-from pddlToGraphs import parseDomAndProb
-from PlanElementGraph import PlanElementGraph, Action, Condition
-from Flaws import Flaw, DCF
+from Ground_Compiler_Library.pddlToGraphs import parseDomAndProb
+from Ground_Compiler_Library.PlanElementGraph import PlanElementGraph, Action, Condition
+from Ground_Compiler_Library.Flaws import Flaw, DCF
 from heapq import heappush, heappop
 from clockdeco import clock
-from Ground import reload, GLib
-from Graph import Edge, isIdenticalElmsInArgs, retargetElmsInArgs, retargetArgs
-from Plannify import Unify
+from Ground_Compiler_Library.Ground import reload, GLib
+from Ground_Compiler_Library.Graph import Edge, isIdenticalElmsInArgs, retargetElmsInArgs, retargetArgs
+from Ground_Compiler_Library.Plannify import Unify
 import copy
 
 """

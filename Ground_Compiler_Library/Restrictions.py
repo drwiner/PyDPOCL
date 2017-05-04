@@ -11,7 +11,7 @@ element in 'E'.
 
 """
 
-from Graph import *
+from Ground_Compiler_Library.Graph import *
 #graph has import copy
 import collections
 
