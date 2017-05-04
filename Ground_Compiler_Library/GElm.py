@@ -77,7 +77,6 @@ class GStep:
 			raise ValueError('{} found in cndt_map w/ id={}, but {} not found in preconds'.format(pre, pre.ID, pre))
 		# remove precondition from open precond
 		self.open_preconds.remove(pre)
-		# update choices to just those which are needed to fulfill open conditions
 
 	def update_choices(self, steps):
 		self.choices = [choice for pre in self.open_preconds for choice in self.cndt_map[pre.ID] if choice in steps]

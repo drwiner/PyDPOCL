@@ -18,16 +18,9 @@ class Flaw:
 		self.flaw = f
 		self.cndts = 0
 		self.risks = 0
-		self.criteria = self.cndts
+		self.criteria = 0
 		self.heuristic = float('inf')
-		if name == 'opf':
-			self.tiebreaker = hash(f[1].replaced_ID)
-
-	def __hash__(self):
-		return hash(self.flaw)
-		
-	def __eq__(self, other):
-		return hash(self) == hash(other)
+		self.tiebreaker = int(f[0].ID)
 
 	#For comparison via bisect
 	def __lt__(self, other):
@@ -38,10 +31,7 @@ class Flaw:
 
 
 	def setCriteria(self, flaw_type):
-		if self.name == 'tclf':
-			self.criteria = self.flaw[0].stepnumber
-			self.tiebreaker = hash(self.flaw[1].label.replaced_ID) + self.flaw[1].sink.stepnumber
-		elif flaw_type == 'unsafe':
+		if flaw_type == 'unsafe':
 			self.criteria = self.risks
 		elif flaw_type in {'inits', 'statics', 'nonreusable'}:
 			self.criteria = self.heuristic
@@ -49,17 +39,26 @@ class Flaw:
 	def __repr__(self):
 		return 'Flaw({}, h={}, criteria={}, tb={})'.format(self.flaw, self.heuristic, self.criteria, self.tiebreaker)
 
-class TCLF(Flaw):
-	def __init__(self, f, name):
-		super(TCLF, self).__init__(f, name)
-		self.threat = self.flaw[0]
-		self.link = self.flaw[1]
-		self.criteria = self.threat.stepnumber
-		self.tiebreaker = hash(self.link.label.replaced_ID) + self.link.sink.stepnumber
+
+class OPF(Flaw):
+
+	def __init__(self, s_need, pre):
+		super(OPF, self).__init__((s_need, pre), 'opf')
 
 	def __hash__(self):
-	 	return self.threat.stepnumber*1000 + self.link.source.stepnumber + self.link.sink.stepnumber + hash(
-			self.link.label.replaced_ID)
+		return hash(self.flaw[0].ID) ^ hash(self.flaw[1].ID)
+
+
+class TCLF(Flaw):
+
+	def __init__(self, threatening_step, causal_link_edge):
+		super(TCLF, self).__init__((threatening_step, causal_link_edge), 'tclf')
+		self.threat = self.flaw[0]
+		self.link = self.flaw[1]
+		self.criteria = self.threat.step_num
+
+	def __hash__(self):
+		return hash(self.threat.ID) ^ hash(self.link.source.ID) ^ hash(self.link.sink.ID) ^ hash(self.link.label.ID)
 
 class DCF(Flaw):
 	def __init__(self, f, name):
@@ -218,22 +217,25 @@ class FlawLib():
 		return None
 
 	#@clock
-	def addCndtsAndRisks(self, GL, action):
+	def addCndtsAndRisks(self, plan, action):
 		""" For each effect of Action, add to open-condition mapping if consistent"""
 
 		for oc in self.OCs():
 			s_need, pre = oc.flaw
 
 			# step numbers of antecdent types
-			if action.stepnumber in GL.id_dict[pre.replaced_ID]:
+			if plan.OrderingGraph.isPath(s_need, action):
+				continue
+
+			if action.stepnumber in action.cndt_map[pre.ID]:
 				oc.cndts += 1
 
 			# step numbers of threatening steps
-			elif action.stepnumber in GL.threat_dict[s_need.stepnumber]:
+			elif action.stepnumber in action.threats:
 				oc.risks += 1
 
 	#@clock
-	def insert(self, GL, plan, flaw):
+	def insert(self, plan, flaw):
 		''' for each effect of an existing step, check and update mapping to consistent effects'''
 
 		if flaw.name == 'tclf':
@@ -249,28 +251,23 @@ class FlawLib():
 		s_need, pre = flaw.flaw
 
 		#if pre.predicate is static
-		if (pre.name, pre.truth) not in FlawLib.non_static_preds:
+		if pre.is_static:
 			self.statics.add(flaw)
 			return
 
-		#Eval number of existing candidates
-		ante_nums = GL.id_dict[pre.replaced_ID]
-		risk_nums = GL.threat_dict[s_need.stepnumber]
-
-		for step in plan.Steps:
-			#defense
-			if step == s_need:
+		for step in plan.steps:
+			if step.ID == s_need.ID:
 				continue
 			if plan.OrderingGraph.isPath(s_need, step):
 				continue
-			if step.stepnumber in ante_nums:
+			if step.stepnumber in s_need.cndt_map[pre.ID]:
 				flaw.cndts += 1
-				if step.name == 'dummy_init':
-					self.inits.add(flaw)
-			if step.stepnumber in risk_nums:
+			if step.stepnumber in s_need.threat_map[pre.ID]:
 				flaw.risks += 1
 
-		if flaw in self.inits:
+
+		if pre in plan.init:
+			self.inits.add(flaw)
 			return
 
 		if flaw.risks > 0:
@@ -287,7 +284,7 @@ class FlawLib():
 
 	def __repr__(self):
 		F = [('|' + ''.join([str(flaw) + '\n|' for flaw in T]) , T.name) for T in self.typs if len(T) > 0]
-		return '\n|FLAWLIBRARY: \n|' + ''.join(['\n|{}: \n{}'.format(name, flaws) for flaws, name in F])
+		return 'Flaw Lib\n' + '\n'.join(['{}: {}'.format(name, flaws) for flaws, name in F])
 
 import unittest
 class TestOrderingGraphMethods(unittest.TestCase):

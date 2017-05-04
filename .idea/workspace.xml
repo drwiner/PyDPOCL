@@ -2,20 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9e164480-2de6-415b-9fb3-731e65390256" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Flaws.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/GPlan.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/PlanElementGraph.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Plannify.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/PyDPOCL.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/PlanElementGraph.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Planner.py" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Flaws.py" afterPath="$PROJECT_DIR$/Flaws.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GPlan.py" afterPath="$PROJECT_DIR$/GPlan.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Ground_Compiler_Library/GElm.py" afterPath="$PROJECT_DIR$/Ground_Compiler_Library/GElm.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Ground_Compiler_Library/Ground.py" afterPath="$PROJECT_DIR$/Ground_Compiler_Library/Ground.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Ground_Compiler_Library/OrderingGraph.py" afterPath="$PROJECT_DIR$/Ground_Compiler_Library/OrderingGraph.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Ground_Compiler_Library/PlanElementGraph.py" afterPath="$PROJECT_DIR$/Ground_Compiler_Library/PlanElementGraph.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Ground_Compiler_Library/Plannify.py" afterPath="$PROJECT_DIR$/Ground_Compiler_Library/Plannify.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Ground_Compiler_Library/Restrictions.py" afterPath="$PROJECT_DIR$/Ground_Compiler_Library/Restrictions.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Ground_Compiler_Library/__init__.py" afterPath="$PROJECT_DIR$/Ground_Compiler_Library/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/__init__.py" afterPath="$PROJECT_DIR$/__init__.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Ground_Compiler_Library/Planner.py" afterPath="$PROJECT_DIR$/Planner.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,11 +23,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="GPlan.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="GPlan.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GPlan.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="75" column="40" lean-forward="true" selection-start-line="75" selection-start-column="40" selection-end-line="75" selection-end-column="40" />
+            <state relative-caret-position="726">
+              <caret line="172" column="25" lean-forward="true" selection-start-line="172" selection-start-column="25" selection-end-line="172" selection-end-column="25" />
               <folding>
                 <element signature="e#0#56#0" expanded="true" />
               </folding>
@@ -42,14 +35,58 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Flaws.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Ground_Compiler_Library/Flaws.py">
+      <file leaf-file-name="PyDPOCL.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/PyDPOCL.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="774">
-              <caret line="224" column="28" lean-forward="false" selection-start-line="224" selection-start-column="26" selection-end-line="224" selection-end-column="28" />
+            <state relative-caret-position="435">
+              <caret line="15" column="37" lean-forward="true" selection-start-line="15" selection-start-column="37" selection-end-line="15" selection-end-column="37" />
               <folding>
-                <element signature="e#28#46#0" expanded="true" />
+                <element signature="e#0#23#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OrderingGraph.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Ground_Compiler_Library/OrderingGraph.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="447">
+              <caret line="126" column="23" lean-forward="true" selection-start-line="126" selection-start-column="23" selection-end-line="126" selection-end-column="23" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Flaws.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Flaws.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="747">
+              <caret line="51" column="17" lean-forward="false" selection-start-line="51" selection-start-column="17" selection-end-line="51" selection-end-column="17" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Plannify.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Plannify.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="550">
+              <caret line="309" column="31" lean-forward="true" selection-start-line="309" selection-start-column="31" selection-end-line="309" selection-end-column="31" />
+              <folding>
+                <element signature="e#0#16#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -57,8 +94,8 @@
       <file leaf-file-name="GElm.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Ground_Compiler_Library/GElm.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-675">
-              <caret line="131" column="14" lean-forward="true" selection-start-line="131" selection-start-column="14" selection-end-line="131" selection-end-column="14" />
+            <state relative-caret-position="400">
+              <caret line="85" column="0" lean-forward="true" selection-start-line="85" selection-start-column="0" selection-end-line="85" selection-end-column="0" />
               <folding>
                 <element signature="e#0#80#0" expanded="true" />
               </folding>
@@ -73,18 +110,6 @@
               <caret line="189" column="19" lean-forward="false" selection-start-line="189" selection-start-column="8" selection-end-line="189" selection-end-column="19" />
               <folding>
                 <element signature="e#1#17#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PlanElementGraph.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="555">
-              <caret line="354" column="17" lean-forward="true" selection-start-line="354" selection-start-column="17" selection-end-line="354" selection-end-column="17" />
-              <folding>
-                <element signature="e#0#80#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -123,12 +148,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>character</find>
-      <find>problem</find>
-      <find>findConsistentSubgraph</find>
-      <find>findConsistentEdgeMap</find>
-      <find>has</find>
-      <find>Step_Graphs</find>
       <find>Actor</find>
       <find>occurs</find>
       <find>self.typs</find>
@@ -153,6 +172,12 @@
       <find>chocies</find>
       <find>OC</find>
       <find>Ordering</find>
+      <find>open_</find>
+      <find>init.</find>
+      <find>choices</find>
+      <find>frontier</find>
+      <find>updatecho</find>
+      <find>addCndtsAndRisks</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -161,7 +186,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Planner.py" />
         <option value="$PROJECT_DIR$/GlobalContainer.py" />
         <option value="$PROJECT_DIR$/Plannify.py" />
         <option value="$PROJECT_DIR$/pddl/parser.py" />
@@ -170,7 +194,6 @@
         <option value="$PROJECT_DIR$/domains/travel_domain.pddl" />
         <option value="$PROJECT_DIR$/Graph.py" />
         <option value="$PROJECT_DIR$/Element.py" />
-        <option value="$PROJECT_DIR$/Flaws.py" />
         <option value="$PROJECT_DIR$/Plan.py" />
         <option value="$PROJECT_DIR$/Ground.py" />
         <option value="$PROJECT_DIR$/GElm.py" />
@@ -188,8 +211,11 @@
         <option value="$PROJECT_DIR$/__init__.py" />
         <option value="$PROJECT_DIR$/PlanElementGraph.py" />
         <option value="$PROJECT_DIR$/Ground_Compiler_Library/__init__.py" />
+        <option value="$PROJECT_DIR$/Flaws.py" />
         <option value="$PROJECT_DIR$/Ground_Compiler_Library/GElm.py" />
+        <option value="$PROJECT_DIR$/Planner.py" />
         <option value="$PROJECT_DIR$/GPlan.py" />
+        <option value="$PROJECT_DIR$/PyDPOCL.py" />
       </list>
     </option>
   </component>
@@ -488,11 +514,11 @@
           <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/PlanElementGraph.py</url>
-          <option name="timeStamp" value="40" />
+          <url>file://$PROJECT_DIR$/Plannify.py</url>
+          <option name="timeStamp" value="41" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="41" />
+      <option name="time" value="42" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -548,7 +574,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Graph.py" />
     <entry file="file://$PROJECT_DIR$/pddlToGraphs.py" />
-    <entry file="file://$PROJECT_DIR$/Flaws.py" />
     <entry file="file://$PROJECT_DIR$/ElementGraph.py" />
     <entry file="file://$PROJECT_DIR$/Element.py" />
     <entry file="file://$PROJECT_DIR$/GElm.py" />
@@ -595,34 +620,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Plannify.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Planner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Ground_Compiler_Library/ElementGraph.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="29" lean-forward="false" selection-start-line="0" selection-start-column="29" selection-end-line="0" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Ground_Compiler_Library/OrderingGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="3" column="29" lean-forward="false" selection-start-line="3" selection-start-column="29" selection-end-line="3" selection-end-column="29" />
           <folding />
         </state>
       </provider>
@@ -655,34 +656,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="20" lean-forward="false" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="555">
-          <caret line="354" column="17" lean-forward="true" selection-start-line="354" selection-start-column="17" selection-end-line="354" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#80#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Ground_Compiler_Library/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="22" column="62" lean-forward="true" selection-start-line="22" selection-start-column="62" selection-end-line="22" selection-end-column="62" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Ground_Compiler_Library/Flaws.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="774">
@@ -703,10 +676,46 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/PlanElementGraph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="8850">
+          <caret line="354" column="17" lean-forward="true" selection-start-line="354" selection-start-column="17" selection-end-line="354" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Ground_Compiler_Library/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="484">
+          <caret line="22" column="62" lean-forward="true" selection-start-line="22" selection-start-column="62" selection-end-line="22" selection-end-column="62" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="20" lean-forward="false" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Ground_Compiler_Library/OrderingGraph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="447">
+          <caret line="126" column="23" lean-forward="true" selection-start-line="126" selection-start-column="23" selection-end-line="126" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Ground_Compiler_Library/GElm.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-675">
-          <caret line="131" column="14" lean-forward="true" selection-start-line="131" selection-start-column="14" selection-end-line="131" selection-end-column="14" />
+        <state relative-caret-position="400">
+          <caret line="85" column="0" lean-forward="true" selection-start-line="85" selection-start-column="0" selection-end-line="85" selection-end-column="0" />
           <folding>
             <element signature="e#0#80#0" expanded="true" />
           </folding>
@@ -715,10 +724,54 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/GPlan.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="75" column="40" lean-forward="true" selection-start-line="75" selection-start-column="40" selection-end-line="75" selection-end-column="40" />
+        <state relative-caret-position="726">
+          <caret line="172" column="25" lean-forward="true" selection-start-line="172" selection-start-column="25" selection-end-line="172" selection-end-column="25" />
           <folding>
             <element signature="e#0#56#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Planner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7700">
+          <caret line="308" column="34" lean-forward="true" selection-start-line="308" selection-start-column="34" selection-end-line="308" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Plannify.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="550">
+          <caret line="309" column="31" lean-forward="true" selection-start-line="309" selection-start-column="31" selection-end-line="309" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Flaws.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="747">
+          <caret line="51" column="17" lean-forward="false" selection-start-line="51" selection-start-column="17" selection-end-line="51" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PyDPOCL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="435">
+          <caret line="15" column="37" lean-forward="true" selection-start-line="15" selection-start-column="37" selection-end-line="15" selection-end-column="37" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
