@@ -277,12 +277,13 @@ class Argument(Element):
 		if typ is None:
 			typ = 'Arg'
 		super(Argument, self).__init__(ID, typ, name, arg_name)
+		self.p_types = [typ]
 
 	def isEquivalent(self, other):
 		""" 'equivalent' arguments are consistent and have been assigned the same name """
 
 		if not super(Argument, self).isEquivalent(other):
-			if self.typ not in GC.object_types[other.typ] and other.typ not in GC.object_types[self.typ]:
+			if self.typ not in other.p_types and other.typ not in self.p_types:
 				return False
 
 		if self.name is not None:
@@ -297,12 +298,9 @@ class Argument(Element):
 		if not isinstance(other, Argument):
 			return False
 		if not self.typ == other.typ:
-			try:
-				if self.typ not in GC.object_types[other.typ.lower()] and \
-								other.typ not in GC.object_types[self.typ.lower()]:
-					return False
-			except:
-				raise TypeError('what self {} / other {} typs are these?'.format(self.typ, other.typ))
+			return False
+		if self.typ not in other.p_types and other.typ not in self.p_types:
+			return False
 		return True
 
 	def isConsistent(self, other):
@@ -313,7 +311,7 @@ class Argument(Element):
 	def merge(self, other):
 		if super(Argument, self).merge(other) is None:
 			return None
-		if self.typ in GC.object_types[other.typ.lower()]:
+		if self.typ in other.p_types:
 			self.typ = other.typ
 		return self
 

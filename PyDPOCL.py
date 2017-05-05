@@ -4,6 +4,7 @@ from uuid import uuid4
 import copy
 from heapq import heappush, heappop
 
+
 class Frontier:
 
 	def __init__(self):
@@ -41,17 +42,16 @@ class GPlanner:
 		self.gsteps = gsteps
 		self.ID = uuid4()
 		self.h_step_dict = dict()
+		self.h_lit_dict = dict()
 
-		root_plan = GPlan(self.gsteps)
+		root_plan = GPlan(gsteps[-2].instantiate(), gsteps[-1].instantiate())
 		root_plan.OrderingGraph.addOrdering(root_plan.dummy.init, root_plan.dummy.final)
 		for p in root_plan.dummy.final.open_preconds:
 			root_plan.flaws.insert(root_plan, OPF(root_plan.dummy.final, p))
 
-		# update heuristic
-		root_plan.heuristic = self.heuristic(root_plan)
-
 		self._frontier = Frontier()
-		self._frontier.insert(root_plan)
+		self.insert(root_plan)
+		self._h_visited = []
 
 	# Private Hooks #
 
@@ -67,8 +67,8 @@ class GPlanner:
 		return self._frontier.pop()
 
 	def insert(self, plan):
+		plan.heuristic = self.h_plan(plan)
 		self._frontier.insert(plan)
-
 
 	def solve(self, k=4):
 		# find k solutions to problem
@@ -86,17 +86,17 @@ class GPlanner:
 			if len(plan.flaws) == 0:
 				print('solution found at {} nodes expanded and {} nodes visited'.format(expanded, len(self)+expanded))
 				completed.append(plan)
-				if len(completed) == k:
-					return completed
 				for step in topoSort(plan):
 					print(step)
+				if len(completed) == k:
+					return completed
 				continue
 
 			# Select Flaw
 			flaw = plan.flaws.next()
 			print('{} selected : {}\n'.format(flaw.name, flaw))
 
-			if isinstance(flaw, 'TCLF'):
+			if isinstance(flaw, TCLF):
 				self.resolve_threat(plan, flaw)
 			else:
 				self.add_step(plan, flaw)
@@ -106,7 +106,7 @@ class GPlanner:
 
 	def add_step(self, plan, flaw):
 		s_need, p = flaw.flaw
-		cndts = self.gsteps[s_need.step_num].cndt_map[p.ID]
+		cndts = self.gsteps[s_need.stepnum].cndt_map[p.ID]
 
 		if len(cndts) == 0:
 			return
@@ -115,17 +115,20 @@ class GPlanner:
 		s_index = plan.index(s_need)
 		p_index = s_need.preconds.index(p)
 		for cndt in cndts:
+			# cannot add a step which is the inital step
+			if cndt in {plan.dummy.init.stepnum, plan.dummy.final.stepnum}:
+				continue
 			# clone plan and new step
 			new_plan = plan.instantiate()
-			new_step = cndt.instantiate()
-			new_plan.steps.append(new_step)
+			new_step = self.gsteps[cndt].instantiate()
+			new_plan.insert(new_step)
 
 			# operate on cloned plan
 			mutable_s_need = new_plan[s_index]
 			mutable_p = mutable_s_need.preconds[p_index]
 			mutable_s_need.fulfill(mutable_p)
-			mutable_s_need.update_choices(new_plan.steps)
-			# add ordering
+			mutable_s_need.update_choices(new_plan)
+			# add orderings
 			new_plan.OrderingGraph.addEdge(new_step, mutable_s_need)
 			new_plan.OrderingGraph.addEdge(new_plan.dummy.init, new_step)
 			new_plan.OrderingGraph.addEdge(new_step, new_plan.dummy.final)
@@ -141,16 +144,15 @@ class GPlanner:
 			for step in new_plan.steps:
 				if step.ID in ignore_these:
 					continue
-				if step.step_num in mutable_s_need.threats:
+				if step.stepnum in mutable_s_need.threats:
 					new_plan.flaws.insert(new_plan, TCLF(step, c_link))
 
 			# check if adding this step threatens other causal links
 			for cl in new_plan.CausalLinkGraph.edges:
 				if cl == c_link:
 					continue
-				if new_step.step_num not in cl.sink.threats:
+				if new_step.stepnum not in cl.sink.threats:
 					continue
-
 				if new_plan.OrderingGraph.isPath(new_step, cl.source):
 					continue
 				if new_plan.OrderingGraph.isPath(cl.sink, new_step):
@@ -161,7 +163,7 @@ class GPlanner:
 
 	def reuse_step(self, plan, flaw):
 		s_need, p = flaw.flaw
-		choices = [step for step in plan.steps if step.step_num in self.gsteps[s_need.step_num].cndt_map[p.ID]]
+		choices = [step for step in plan.steps if step.stepnum in self.gsteps[s_need.stepnum].cndt_map[p.ID]]
 		if len(choices) == 0:
 			return
 
@@ -174,7 +176,7 @@ class GPlanner:
 			mutable_s_need = new_plan.steps[s_index]
 			mutable_p = mutable_s_need.preconds[p_index]
 			mutable_s_need.fulfill(mutable_p)
-			mutable_s_need.update_choices(new_plan.steps)
+			mutable_s_need.update_choices(new_plan)
 
 			old_step = new_plan.steps[plan.index(choice)]
 			new_plan.OrderingGraph.addEdge(old_step, mutable_s_need)
@@ -186,7 +188,7 @@ class GPlanner:
 			for step in new_plan.steps:
 				if step.ID in ignore_these:
 					continue
-				if step.step_num not in mutable_s_need.threats:
+				if step.stepnum not in mutable_s_need.threats:
 					continue
 				if new_plan.OrderingGraph.isPath(s_need, step):
 					continue
@@ -198,9 +200,8 @@ class GPlanner:
 			for cl in new_plan.CausalLinkGraph.edges:
 				if cl == c_link:
 					continue
-				if old_step.step_num not in cl.sink.threats:
+				if old_step.stepnum not in cl.sink.threats:
 					continue
-
 				if new_plan.OrderingGraph.isPath(old_step, cl.source):
 					continue
 				if new_plan.OrderingGraph.isPath(cl.sink, old_step):
@@ -226,51 +227,59 @@ class GPlanner:
 		threat = new_plan[threat_index]
 		source = new_plan[src_index]
 		new_plan.OrderingGraph.addEdge(threat, source)
+
 		self.insert(new_plan)
 
 	# Heuristic Methods #
 
-	def heuristic(self, plan):
-		return self.h_plan(plan)
-
-	def h_condition(self, plan, step_num, precond):
+	def h_condition(self, plan, stepnum, precond):
 		if precond.is_static:
 			return 0
 		if precond in plan.init:
 			return 0
+		if precond in self.h_lit_dict.keys():
+			return self.h_lit_dict[precond]
+		if precond in self._h_visited:
+			return 0
+
+		self._h_visited.append(precond)
 
 		min_so_far = float('inf')
-		for cndt in self.gsteps[step_num].cndt_map[precond.ID]:
+		for cndt in self.gsteps[stepnum].cndt_map[precond.ID]:
 			cndt_heuristic = self.h_step(plan, cndt)
 			if cndt_heuristic < min_so_far:
 				min_so_far = cndt_heuristic
+
+		self.h_lit_dict[precond] = min_so_far
 		return min_so_far
 
-	def h_step(self, plan, step_num):
-		if step_num in self.h_step_dict.keys():
-			return self.h_step_dict[step_num]
-		if step_num == plan.dummy.init.step_num:
+	def h_step(self, plan, stepnum):
+		if stepnum in self.h_step_dict.keys():
+			return self.h_step_dict[stepnum]
+		if stepnum == plan.dummy.init.stepnum:
+			return 1
+		if stepnum in self._h_visited:
 			return 1
 
+		self._h_visited.append(stepnum)
 		sumo = 1
-		for pre in self.gsteps[step_num].preconds:
-			sumo += self.h_condition(plan, step_num, pre)
+		for pre in self.gsteps[stepnum].preconds:
+			sumo += self.h_condition(plan, stepnum, pre)
 
-		self.h_step_dict[step_num] = sumo
+		self.h_step_dict[stepnum] = sumo
 		return sumo
 
 	def h_plan(self, plan):
 		sumo = 0
 
-		for s_need, p in plan.flaws.OCs():
-
+		self._h_visited = []
+		for flaw in plan.flaws.OCs():
 			exists_choice = False
-			for choice in s_need.choices:
-				if plan.OrderingGraph.isPath(s_need, choice):
-					exists_choice = True
+			if len(flaw.s_need.choices) > 0:
+				exists_choice = True
 
-			if len(s_need.choices) == 0 or not exists_choice:
-				sumo += self.h_condition(plan, s_need.step_num, p)
+			if len(flaw.s_need.choices) == 0 or not exists_choice:
+				sumo += self.h_condition(plan, flaw.s_need.stepnum, flaw.p)
 
 		return sumo
 

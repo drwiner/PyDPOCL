@@ -166,6 +166,7 @@ class GLib:
 		self.ante_dict = defaultdict(set)
 		# threats (key is step number, value is set of step numbers)
 		self.threat_dict = defaultdict(set)
+		self.flaw_threat_dict = defaultdict(set)
 		# id_dict is just by precondition ID
 		self.id_dict = defaultdict(set)
 		self.eff_dict = defaultdict(set)
@@ -236,6 +237,7 @@ class GLib:
 				continue
 			if Eff.truth != _pre.truth:
 				self.threat_dict[_step.stepnumber].add(gstep.stepnumber)
+				self.flaw_threat_dict[_pre.replaced_ID].add(gstep.stepnumber)
 			else:
 				self.insert(_pre, gstep.deepcopy(replace_internals=True), Eff)
 				count += 1

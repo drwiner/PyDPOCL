@@ -1,11 +1,12 @@
-from Ground_Compiler_Library.pddl.parser import Parser
 from collections import defaultdict
+import copy
+from uuid import uuid4
+from clockdeco import clock
+
 from Ground_Compiler_Library.PlanElementGraph import Action, PlanElementGraph
 from Ground_Compiler_Library.Graph import Edge
 from Ground_Compiler_Library.Element import Argument, Operator, Literal, Element, Actor
-from clockdeco import clock
-import copy
-from uuid import uuid4
+from Ground_Compiler_Library.pddl.parser import Parser
 from Ground_Compiler_Library.Flaws import FlawLib
 
 
@@ -232,9 +233,9 @@ def whichElm(name, dg):
 	return next(element for element in dg.elements if name == element.arg_name)
 
 
-def getDecompGraph(formula, decomp_graph, params, p_types):
+def getDecompGraph(formula, decomp_graph, params, p_type_dict):
 	for param in params:
-		createElementByType(param, decomp_graph, p_types)
+		createElementByType(param, decomp_graph, p_type_dict)
 
 	if formula.key == 'and':
 		for child in formula.children:
@@ -259,17 +260,21 @@ def rPrintFormulaElements(formula):
 	print('\n')
 
 
-def createElementByType(parameter, decomp, p_types):
+def createElementByType(parameter, decomp, p_type_dict):
 
 	if 'character' in parameter.types:
 		elm = Actor(typ='character', arg_name=parameter.name)
+		elm.p_types = p_type_dict[parameter]
 	elif 'actor' in parameter.types:
 		elm = Actor(typ='actor', arg_name=parameter.name)
+		elm.p_types = p_type_dict[parameter]
 	elif 'person' in parameter.types:
 		elm = Actor(typ='person', arg_name=parameter.name)
-	elif 'arg' in p_types or 'item' in p_types or 'place' in p_types:
+		elm.p_types = p_type_dict[parameter]
+	elif 'arg' in p_type_dict[parameter] or 'item' in p_type_dict[parameter] or 'place' in p_type_dict[parameter]:
 		arg_type = next(iter(parameter.types))
 		elm = Argument(typ=arg_type, arg_name=parameter.name)
+		elm.p_types = p_type_dict[parameter]
 	elif 'step' in parameter.types:
 		elm = Operator(arg_name=parameter.name)
 	elif 'literal' in parameter.types or 'lit' in parameter.types:
@@ -278,6 +283,7 @@ def createElementByType(parameter, decomp, p_types):
 		# assume its type object, treat as Argument.
 		arg_type = next(iter(parameter.types))
 		elm = Argument(typ=arg_type, arg_name=parameter.name)
+		elm.p_types = p_type_dict[parameter]
 		# raise ValueError('parameter {} not story element'.format(parameter.name))
 
 	decomp.elements.add(elm)
@@ -332,8 +338,9 @@ def domainToOperatorGraphs(domain, obj_types):
 			# henceforth, action.decomp is tuple (sub-params, decomp)
 			decomp_graph = PlanElementGraph(name=action.name, type_graph='decomp')
 			params = action.parameters + action.decomp.sub_params
-			param_types = obj_types[params]
-			getDecompGraph(action.decomp.formula, decomp_graph, params, param_types)
+			param_types = [obj_types[next(iter(p.types))] for p in params]
+			p_type_dict = dict(zip(params, param_types))
+			getDecompGraph(action.decomp.formula, decomp_graph, params, p_type_dict)
 			op_graph.subplan = decomp_graph
 
 			# This searches for params that are listed as params and sub-params, may not be needed
@@ -447,7 +454,7 @@ def parseDomAndProb(domain_file, problem_file):
 	addNegativeInitStates(domain.predicates.predicates, init, objects)
 
 	domainAxiomsToGraphs(domain)
-	Operators, DOperators = domainToOperatorGraphs(domain)
+	Operators, DOperators = domainToOperatorGraphs(domain, obj_types)
 
 	addStatics(Operators)
 	addStatics(DOperators)
@@ -488,22 +495,22 @@ if __name__ == '__main__':
 	else:
 		domain_file = 'domains/mini-indy-domain.pddl'
 		problem_file = 'domains/mini-indy-problem.pddl'
-
-	parser = Parser(domain_file, problem_file)
-	domain, dom = parser.parse_domain_drw()
-	problem, v = parser.parse_problem_drw(dom)
-	op_graphs, dops = domainToOperatorGraphs(domain)
-	for opgraph in op_graphs:
-		opgraph.print_graph_names()
-		print('\n')
-
-	strucDict = problemToGraphs(problem)
-	print('\nargs \n')
-	Args = strucDict['args']
-	for argElement in Args.values():
-		print(argElement)
-	print('\ninit\n')
-	strucDict['init'].print_graph_names()
-	print('\ngoal\n')
-	strucDict['goal'].print_graph_names()
-	print('\n')
+	#
+	# parser = Parser(domain_file, problem_file)
+	# domain, dom = parser.parse_domain_drw()
+	# problem, v = parser.parse_problem_drw(dom)
+	# op_graphs, dops = domainToOperatorGraphs(domain)
+	# for opgraph in op_graphs:
+	# 	opgraph.print_graph_names()
+	# 	print('\n')
+	#
+	# strucDict = problemToGraphs(problem)
+	# print('\nargs \n')
+	# Args = strucDict['args']
+	# for argElement in Args.values():
+	# 	print(argElement)
+	# print('\ninit\n')
+	# strucDict['init'].print_graph_names()
+	# print('\ngoal\n')
+	# strucDict['goal'].print_graph_names()
+	# print('\n')

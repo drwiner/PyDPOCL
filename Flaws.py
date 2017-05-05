@@ -1,13 +1,7 @@
-#from pddlToGraphs import *
-import collections
-import bisect
-from uuid import uuid1, uuid4
-from Ground_Compiler_Library.Graph import isConsistentEdgeSet
+from collections import deque
+from bisect import bisect_left
+from uuid import uuid4
 
-import itertools
-from clockdeco import clock
-#from PlanElementGraph import Condition
-#import PlanElementGraph
 """
 	Flaws for plan element graphs
 """
@@ -19,31 +13,31 @@ class Flaw:
 		self.cndts = 0
 		self.risks = 0
 		self.criteria = 0
-		self.heuristic = float('inf')
-		self.tiebreaker = int(f[0].ID)
+		self.tiebreaker = 0
+		self.flaw_type = None
 
 	#For comparison via bisect
 	def __lt__(self, other):
-		if self.criteria != other.criteria:
+		if self.flaw_type == 'unsafe':
+			if self.risks != other.risks:
+				return self.risks < other.risks
+		elif self.criteria != other.criteria:
 			return self.criteria < other.criteria
 		else:
 			return self.tiebreaker < other.tiebreaker
 
-
-	def setCriteria(self, flaw_type):
-		if flaw_type == 'unsafe':
-			self.criteria = self.risks
-		elif flaw_type in {'inits', 'statics', 'nonreusable'}:
-			self.criteria = self.heuristic
-
 	def __repr__(self):
-		return 'Flaw({}, h={}, criteria={}, tb={})'.format(self.flaw, self.heuristic, self.criteria, self.tiebreaker)
+		return 'Flaw({}, criteria={}, tb={})'.format(self.flaw, self.criteria, self.tiebreaker)
 
 
 class OPF(Flaw):
 
 	def __init__(self, s_need, pre):
 		super(OPF, self).__init__((s_need, pre), 'opf')
+		self.s_need = s_need
+		self.p = pre
+		self.criteria = hash(s_need.stepnum) ^ hash(pre.name) ^ hash(pre.truth)
+		self.tiebreaker = sum(hash(arg) for arg in pre.Args)
 
 	def __hash__(self):
 		return hash(self.flaw[0].ID) ^ hash(self.flaw[1].ID)
@@ -55,7 +49,8 @@ class TCLF(Flaw):
 		super(TCLF, self).__init__((threatening_step, causal_link_edge), 'tclf')
 		self.threat = self.flaw[0]
 		self.link = self.flaw[1]
-		self.criteria = self.threat.step_num
+		self.criteria = self.threat.stepnum ^ self.link.source.stepnum ^ self.link.sink.stepnum
+		self.tiebreaker = hash(self.link.label.name) ^ hash(self.link.label.truth) ^ sum(hash(arg) for arg in self.link.label.Args)
 
 	def __hash__(self):
 		return hash(self.threat.ID) ^ hash(self.link.source.ID) ^ hash(self.link.sink.ID) ^ hash(self.link.label.ID)
@@ -74,13 +69,12 @@ class Flawque:
 	""" A deque which pretends to be a set, and keeps everything sorted, highest-value first"""
 
 	def __init__(self, name=None):
-		self._flaws = collections.deque()
+		self._flaws = deque()
 		self.name = name
 
 	def add(self, flaw):
-		flaw.setCriteria(self.name)
+		flaw.flaw_type = self.name
 		self.insert(flaw)
-		#self._flaws.append(item)
 
 	def update(self, iter):
 		for flaw in iter:
@@ -93,7 +87,7 @@ class Flawque:
 		return len(self._flaws)
 
 	def removeDuplicates(self):
-		self._flaws = collections.deque(set(self._flaws))
+		self._flaws = deque(set(self._flaws))
 
 	def head(self):
 		return self._flaws.popleft()
@@ -108,7 +102,7 @@ class Flawque:
 		return self._flaws[-1]
 
 	def insert(self, flaw):
-		index = bisect.bisect_left(self._flaws, flaw)
+		index = bisect_left(self._flaws, flaw)
 		self._flaws.rotate(-index)
 		self._flaws.appendleft(flaw)
 		self._flaws.rotate(index)
@@ -119,22 +113,7 @@ class Flawque:
 	def __repr__(self):
 		return str(self._flaws)
 
-class simpleQueueWrapper(collections.deque):
-	#def __init__(self, name):
-		#super(simpleQueueWrapper, self).__init__()
-		#self.name = name
-	def add(self, item):
-		self.append(item)
-	def pop(self):
-		return self.popleft()
-	def update(self, iter):
-		for it in iter:
-			self.append(it)
 
-
-from collections import namedtuple
-
-Flaw_Type_List = namedtuple('FlawTypes', 'statics inits threats decomps unsafe reusable nonreusable'.split())
 class FlawTypes:
 	def __init__(self, statics, inits, threats, decomps, unsafe, reusable, nonreusable):
 		self._list = [statics, inits, threats, decomps, unsafe, reusable, nonreusable]
@@ -143,7 +122,6 @@ class FlawTypes:
 		return len(self._list)
 	def __getitem__(self, item):
 		return self._list[item]
-
 
 
 class FlawLib():
@@ -175,18 +153,8 @@ class FlawLib():
 		self.typs = FlawTypes(self.statics, self.inits, self.threats, self.decomps, self.unsafe, self.reusable, self.nonreusable)
 		self.restricted_names = ['threats', 'decomps']
 
-	# @property
-	# def heuristic(self):
-	# 	value = 0
-	# 	for i, flawques in enumerate(self.typs):
-	# 		if flawques.name in self.restricted_names:
-	# 			continue
-	# 		value += i*len(flawques)
-	# 	return value
-
 	def __len__(self):
 		return sum(len(flaw_set) for flaw_set in self.typs)
-	#	return len(self.threats) + len(self.unsafe) + len(self.statics) + len(self.reusable) + len(self.nonreusable)
 
 	def __contains__(self, flaw):
 		for flaw_set in self.typs:
@@ -260,11 +228,10 @@ class FlawLib():
 				continue
 			if plan.OrderingGraph.isPath(s_need, step):
 				continue
-			if step.stepnumber in s_need.cndt_map[pre.ID]:
+			if step.stepnum in s_need.cndt_map[pre.ID]:
 				flaw.cndts += 1
-			if step.stepnumber in s_need.threat_map[pre.ID]:
+			if step.stepnum in s_need.threat_map[pre.ID]:
 				flaw.risks += 1
-
 
 		if pre in plan.init:
 			self.inits.add(flaw)
@@ -286,12 +253,13 @@ class FlawLib():
 		F = [('|' + ''.join([str(flaw) + '\n|' for flaw in T]) , T.name) for T in self.typs if len(T) > 0]
 		return 'Flaw Lib\n' + '\n'.join(['{}: {}'.format(name, flaws) for flaws, name in F])
 
-import unittest
-class TestOrderingGraphMethods(unittest.TestCase):
-
-	def test_flaw_counter(self):
-		assert True
-
-
-if __name__ ==  '__main__':
-	unittest.main()
+# import unittest
+#
+#
+# class TestOrderingGraphMethods(unittest.TestCase):
+#
+# 	def test_flaw_counter(self):
+# 		assert True
+#
+# if __name__ ==  '__main__':
+# 	unittest.main()
