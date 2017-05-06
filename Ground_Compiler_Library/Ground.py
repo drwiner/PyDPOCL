@@ -85,16 +85,43 @@ def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 		#		assignElmToContainer(GDO, sp, elm, list(op.elements))
 
 			GDO.root.is_decomp = True
+			GDO._replaceInternals()
+			GDO.replaceInternals()
+
+			# Now create dummy init step and goal step
+			dummy_init = Action(name='dummy_init_of:' + str(stepnum-1))
+			dummy_init.has_cndt = False
+			dummy_init.root.stepnumber = stepnum
+			for condition in GDO.Preconditions:
+				dummy_init.edges.add(dummy_init.root, condition.root, 'effect-of')
+				dummy_init.edges.update(condition.edges)
+				dummy_init.edges.update(condition.elements)
+			gsteps.append(dummy_init)
+			stepnum+=1
+
+			dummy_goal = Action(name='dummy_goal_of:' + str(stepnum-2))
+			dummy_goal.is_cndt = False
+			dummy_goal.root.stepnumber = stepnum
+			for condition in GDO.Effects:
+				dummy_goal.edges.add(dummy_goal.root, condition.root, 'precond-of')
+				dummy_goal.edges.update(condition.edges)
+				dummy_goal.edges.update(condition.elements)
+			gsteps.append(dummy_goal)
+			stepnum+=1
+
+			GDO.sub_dummy.init = dummy_init
+			GDO.sub_dummy_goal = dummy_goal
 
 			GDO.ground_subplan = sp
 			GDO.root.stepnumber = stepnum
-			GDO._replaceInternals()
-			GDO.replaceInternals()
-			gsteps.append(GDO)
 			sp.root = GDO.root
 			stepnum += 1
 			GDO.height = height + 1
 			GDO.root.height = height + 1
+
+			# important to add init and goal steps first
+			gsteps.append(GDO)
+
 
 	return gsteps
 
@@ -189,12 +216,14 @@ class GLib:
 		init_action._replaceInternals()
 		# replace IDs
 		init_action.replaceInternals()
+		init_action.instantiable = False
 
 		goal_action.root.stepnumber = len(self._gsteps) + 1
 		# replace internal replaced_IDs
 		goal_action._replaceInternals()
 		# replace IDs
 		goal_action.replaceInternals()
+		goal_action.reusable = False
 
 		# check if init and goal have potential causal relationships
 		self.loadPartition([init_action, goal_action])
@@ -221,12 +250,18 @@ class GLib:
 
 	def load(self, antecedents, consequents):
 		for ante in antecedents:
+			# steps which have no preconditions needn't have any candidates
+			if not ante.has_cndt:
+				continue
 			for pre in ante.Preconditions:
 				print('... Processing antecedents for {} \t\tof step {}'.format(pre, ante))
 				self._loadAntecedentPerConsequent(consequents, ante, pre)
 
 	def _loadAntecedentPerConsequent(self, antecedents, _step, _pre):
 		for gstep in antecedents:
+			# skip steps which cannever be a candidate (such as goal)
+			if not gstep.is_cndt:
+				continue
 			if self._parseEffects(gstep, _step, _pre) > 0:
 				self.ante_dict[_step.stepnumber].add(gstep.stepnumber)
 

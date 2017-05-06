@@ -28,9 +28,15 @@ class Action(ElementGraph):
 		self.nonequals = set()
 		self.is_decomp = False
 		self.height = root_element.height
+		if self.height > 0:
+			self.sub_dummy_init = None
+			self.sub_dummy_goal = None
 
 		super(Action, self).__init__(ID, type_graph, name, Elements, root_element, Edges)
 		self.replaced_ID = root_element.replaced_ID
+		self.is_cndt = True
+		self.has_cndt = True
+
 
 	def __hash__(self):
 		return hash(arg for arg in self.Args) ^ hash(self.root.name)

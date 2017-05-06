@@ -4,10 +4,11 @@ from uuid import uuid4
 from Ground_Compiler_Library.Element import Argument, Element, Operator, Literal
 from Ground_Compiler_Library.Graph import Edge
 from Ground_Compiler_Library.ElementGraph import ElementGraph
+from Ground_Compiler_Library.PlanElementGraph import Condition
 import copy
 import collections
 from clockdeco import clock
-
+from GPlan import dummyTuple
 
 class GStep:
 	"""
@@ -30,12 +31,20 @@ class GStep:
 		self.stepnumber = stepnum
 		# height is 0 when primitive
 		self.height = height
+		if height > 0:
+			self.sub_steps = []
+			self.sub_orderings = OrderingGraph()
+			self.sub_links = CausalLinkGraph()
+			self.sub_dummy = dummyTuple(None, None)
+			self.sub_init = None
+			self.sub_final = None
 
 		self.cndts = None
 		self.cndt_map = None
 		self.threat_map = None
 		self.threats = None
 
+		self.instantiable = True
 
 		# INSTANCE ATTRIBUTES #
 		# risks are number of threat instances
@@ -58,6 +67,47 @@ class GStep:
 		self.cndt_map = {pre.ID: list(precond_to_cndt[pre.ID]) for pre in self.preconds}
 		self.threats = list(step_to_threat[self.stepnum])
 		self.threat_map = {pre.ID: list(precond_to_threat[pre.ID]) for pre in self.preconds}
+
+	def swap_substeps(self, gsteps, decomp_step, num_GL_steps):
+		change_dict = {step: gsteps[step.stepnumber].instantiate() for step in decomp_step.ground_subplan.Steps}
+		self.sub_steps = list(change_dict.values())
+		for edge in decomp_step.subplan.OrderingGraph.edges:
+			self.sub_orderings.addEdge(change_dict[edge.source], change_dict[edge.sink])
+		for edge in decomp_step.subplan.CausalLinkGraph.edges:
+			new_sink = change_dict[edge.sink]
+			# Condition.subgraph(subplan, edge.label)
+			g_label = GLiteral(edge.label.name, edge.label.Args, edge.label.truth, -1, None)
+			for p in new_sink.preconds:
+				if p != g_label:
+					continue
+				self.sub_links.addEdge(change_dict[edge.source], new_sink, p)
+				new_sink.fulfill(p)
+				break
+
+		init_step = gsteps[decomp_step.sub_dummy_init.stepnumber].instantiate()
+		final_step = gsteps[decomp_step.sub_dummy_goal.stepnumber].instantiate()
+		init_step.instantiable = False
+		final_step.instantiable = False
+
+		for step in self.sub_steps:
+			self.sub_orderings.addEdge(init_step, step)
+			self.sub_orderings.addEdge(step, final_step)
+
+		# reconfigure init step to be top cndt for all steps and goal
+
+		for step in self.sub_steps:
+			for other_step in self.sub_steps:
+				if other_step == step:
+					continue
+				prioritize_cndt(other_step, step)
+			prioritize_cndt(init_step, step)
+			prioritize_cndt(step, final_step)
+		prioritize_cndt(init_step, final_step)
+
+		# add init_step as top cndt for all
+
+		self.sub_steps.append(init_step)
+		self.sub_steps.append(final_step)
 
 	def instantiate(self, default_refresh=None, default_None_is_to_refresh_open_preconds=None):
 		new_self = copy.deepcopy(self)
@@ -148,12 +198,14 @@ class GLiteral:
 			t = 'not-'
 		return '{}{}'.format(t, self.name) + args
 
+
 #@clock
 def test(step, causal_link):
 	for eff in step.Effects:
 		if eff.isOpposite(causal_link.label):
 			return True
 	return False
+
 
 def topoSort(plan):
 	OG = copy.deepcopy(plan.OrderingGraph)
@@ -168,8 +220,20 @@ def topoSort(plan):
 				S.add(m_edge.sink)
 	return L
 
+
 def checkHeight(listActions, height):
 	for a in listActions:
 		if a.height == height:
 			return True
 	return False
+
+
+def prioritize_cndt(cndt, whose):
+	if cndt.stepnum in whose.cndts:
+		whose.cndts.remove(cndt.stepnum)
+		whose.cndts.insert(0, cndt.stepnum)
+		for pre in whose.preconds:
+			if cndt.stepnum not in whose.cndt_map[pre.ID]:
+				continue
+			whose.cndt_map[pre.ID].remove(cndt.stepnum)
+			whose.cndt_map[pre.ID].insert(0, cndt.stepnum)

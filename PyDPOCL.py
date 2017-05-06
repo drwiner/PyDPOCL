@@ -106,7 +106,7 @@ class GPlanner:
 
 	def add_step(self, plan, flaw):
 		s_need, p = flaw.flaw
-		cndts = self.gsteps[s_need.stepnum].cndt_map[p.ID]
+		cndts = s_need.cndt_map[p.ID]
 
 		if len(cndts) == 0:
 			return
@@ -116,7 +116,7 @@ class GPlanner:
 		p_index = s_need.preconds.index(p)
 		for cndt in cndts:
 			# cannot add a step which is the inital step
-			if cndt in {plan.dummy.init.stepnum, plan.dummy.final.stepnum}:
+			if not self.gsteps[cndt].instantiable:
 				continue
 			# clone plan and new step
 			new_plan = plan.instantiate()
@@ -151,7 +151,9 @@ class GPlanner:
 			for cl in new_plan.CausalLinkGraph.edges:
 				if cl == c_link:
 					continue
-				if new_step.stepnum not in cl.sink.threats:
+				# if new_step.stepnum not in cl.sink.threats:
+				# 	continue
+				if new_step.stepnum not in cl.sink.threat_map[cl.label]:
 					continue
 				if new_plan.OrderingGraph.isPath(new_step, cl.source):
 					continue
@@ -163,7 +165,7 @@ class GPlanner:
 
 	def reuse_step(self, plan, flaw):
 		s_need, p = flaw.flaw
-		choices = [step for step in plan.steps if step.stepnum in self.gsteps[s_need.stepnum].cndt_map[p.ID]]
+		choices = [step for step in plan.steps if step.stepnum in s_need.cndt_map[p.ID]]
 		if len(choices) == 0:
 			return
 
@@ -200,7 +202,7 @@ class GPlanner:
 			for cl in new_plan.CausalLinkGraph.edges:
 				if cl == c_link:
 					continue
-				if old_step.stepnum not in cl.sink.threats:
+				if old_step.stepnum not in cl.sink.threat_map[cl.label.ID]:
 					continue
 				if new_plan.OrderingGraph.isPath(old_step, cl.source):
 					continue
