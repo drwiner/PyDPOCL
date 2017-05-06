@@ -68,6 +68,12 @@ class GStep:
 		self.threats = list(step_to_threat[self.stepnum])
 		self.threat_map = {pre.ID: list(precond_to_threat[pre.ID]) for pre in self.preconds}
 
+	def swap_setup(self, cndts, cndtmap, threats, threatmap):
+		self.cndts = cndts
+		self.cndt_map = cndtmap
+		self.threats = threats
+		self.threat_map = threatmap
+
 	def swap_substeps(self, gsteps, decomp_step, num_GL_steps):
 		change_dict = {step: gsteps[step.stepnumber].instantiate() for step in decomp_step.ground_subplan.Steps}
 		self.sub_steps = list(change_dict.values())

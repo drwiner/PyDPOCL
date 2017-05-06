@@ -1,6 +1,6 @@
 from Ground_Compiler_Library.GElm import GLiteral, GStep
 from uuid import uuid4
-from Flaws import FlawLib, OPF, TCLF
+from Flaws import FlawLib, OPF, TCLF, DTCLF
 from Ground_Compiler_Library.OrderingGraph import OrderingGraph, CausalLinkGraph
 import copy
 
@@ -111,19 +111,28 @@ class GPlan:
 
 		# sub dummy init
 		d_i = new_step.sub_dummy.sub_init.instantiate()
-		swap_dict[new_step.sub_dummy.sub_init.ID] = d_i.ID
+		swap_dict[new_step.sub_dummy.sub_init.ID] = d_i
 		self.insert(d_i)
+		# add flaws for each new_step precondition, but make s_need d_i and update cndt_map/ threat_map
+		for pre in new_step.preconds:
+			self.flaws.insert(self, OPF(d_i, pre))
+		d_i.swap_setup(new_step.cndts, new_step.cndt_map, new_step.threats, new_step.threat_map)
 
 		# sub dummy final
 		d_f = new_step.sub_dummy.sub_final.instantiate(default_None_is_to_refresh_open_preconds=False)
-		swap_dict[new_step.sub_dummy.sub_final.ID] = d_f.ID
+		swap_dict[new_step.sub_dummy.sub_final.ID] = d_f
 		self.insert(d_f)
+		# add flaws for each d_f pre
+		for pre in d_f.open_preconds:
+			self.flaws.insert(self, OPF(d_f, pre))
 
 		# sub steps
 		for substep in new_step.sub_steps:
 			new_substep = substep.instantiate(default_None_is_to_refresh_open_preconds=False)
-			swap_dict[substep.ID] = new_substep.ID
+			swap_dict[substep.ID] = new_substep
 			self.insert(new_substep)
+			for open_condition in new_substep.open_preconds:
+				self.flaws.insert(self, OPF(new_substep, open_condition))
 
 		# sub orderings
 		for edge in new_step.sub_orderings.edges:
@@ -131,19 +140,20 @@ class GPlan:
 
 		# sub links
 		for edge in new_step.sub_links.edges:
-			self.CausalLinkGraph.addEdge(swap_dict[edge.source.ID], swap_dict[edge.sink.ID], edge.label.instantiate())
+			clink = self.CausalLinkGraph.addEdge(swap_dict[edge.source.ID], swap_dict[edge.sink.ID], edge.label.instantiate())
+			# check if this link is threatened
+			for substep in new_step.sub_steps:
+				new_substep = swap_dict[substep.ID]
+				if new_substep.ID in {clink.source.ID, clink.sink.ID}:
+					continue
+				if new_substep.stepnum not in clink.sink.threat_map[clink.label.ID]:
+					continue
+				if self.OrderingGraph.isPath(new_substep, clink.source):
+					continue
+				if self.OrderingGraph.isPath(clink.sink, new_substep):
+					continue
+				self.flaws.insert(self, TCLF(new_substep, clink))
 
-		# add flaws for each new_step precondition, but make s_need d_i and update cndt_map/ threat_map
-		d_i.cndts = new_step.cndts
-		d_i.cndt_map = new_step.cndt_map
-		d_i.threats = new_step.threats
-		d_i.threat_map = new_step.threat_map
-		for pre in new_step.preconds:
-			self.flaws.insert(self, OPF(d_i, pre))
-
-		# add flaws for each d_f precondition (it doesn't need to connect with the p in <s_need, p> b/c its about establishing p
-		for pre in d_f.open_preconds:
-			self.flaws.insert(self, OPF(d_f, pre))
 
 		# operate on cloned plan
 		mutable_s_need = self[s_index]
@@ -161,7 +171,7 @@ class GPlan:
 		# add causal link
 		c_link = self.CausalLinkGraph.addEdge(d_f, mutable_s_need, mutable_p)
 
-		# check if this link is threatened
+		# check if df -> s_need is threatened
 		ignore_these = {mutable_s_need.ID, d_f.ID, d_i.ID}
 		for step in self.steps:
 			if step.ID in ignore_these:
@@ -183,7 +193,7 @@ class GPlan:
 				continue
 			if self.OrderingGraph.isPath(cl.sink, d_i):
 				continue
-			self.flaws.insert(self, DTCLF(d_f, cl))
+			self.flaws.insert(self, DTCLF(d_i, d_f, cl))
 
 	def __lt__(self, other):
 		if self.cost + self.heuristic != other.cost + other.heuristic:
