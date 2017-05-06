@@ -92,6 +92,7 @@ class GStep:
 		for step in self.sub_steps:
 			self.sub_orderings.addEdge(init_step, step)
 			self.sub_orderings.addEdge(step, final_step)
+		self.sub_orderings.addEdge(init_step, final_step)
 
 		# reconfigure init step to be top cndt for all steps and goal
 
@@ -106,8 +107,7 @@ class GStep:
 
 		# add init_step as top cndt for all
 
-		self.sub_steps.append(init_step)
-		self.sub_steps.append(final_step)
+		self.sub_dummy = (init_step, final_step)
 
 	def instantiate(self, default_refresh=None, default_None_is_to_refresh_open_preconds=None):
 		new_self = copy.deepcopy(self)

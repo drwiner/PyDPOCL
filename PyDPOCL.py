@@ -1,5 +1,5 @@
 from GPlan import GPlan
-from Flaws import OPF, TCLF
+from Flaws import OPF, TCLF, DTCLF
 from uuid import uuid4
 import copy
 from heapq import heappush, heappop
@@ -98,6 +98,8 @@ class GPlanner:
 
 			if isinstance(flaw, TCLF):
 				self.resolve_threat(plan, flaw)
+			elif isinstance(flaw, DTCLF):
+				self.resolve_decomp_threat(plan, flaw)
 			else:
 				self.add_step(plan, flaw)
 				self.reuse_step(plan, flaw)
@@ -121,47 +123,14 @@ class GPlanner:
 			# clone plan and new step
 			new_plan = plan.instantiate()
 			new_step = self.gsteps[cndt].instantiate()
-			new_plan.insert(new_step)
-
-			# operate on cloned plan
-			mutable_s_need = new_plan[s_index]
-			mutable_p = mutable_s_need.preconds[p_index]
-			mutable_s_need.fulfill(mutable_p)
-			mutable_s_need.update_choices(new_plan)
-			# add orderings
-			new_plan.OrderingGraph.addEdge(new_step, mutable_s_need)
-			new_plan.OrderingGraph.addEdge(new_plan.dummy.init, new_step)
-			new_plan.OrderingGraph.addEdge(new_step, new_plan.dummy.final)
-			# add causal link
-			c_link = new_plan.CausalLinkGraph.addEdge(new_step, mutable_s_need, mutable_p)
-
-			# add open conditions for new step
-			for pre in new_step.open_preconds:
-				new_plan.flaws.insert(new_plan, OPF(new_step, pre))
-
-			# check if this link is threatened
-			ignore_these = {mutable_s_need.ID, new_step.ID}
-			for step in new_plan.steps:
-				if step.ID in ignore_these:
-					continue
-				if step.stepnum in mutable_s_need.threats:
-					new_plan.flaws.insert(new_plan, TCLF(step, c_link))
-
-			# check if adding this step threatens other causal links
-			for cl in new_plan.CausalLinkGraph.edges:
-				if cl == c_link:
-					continue
-				# if new_step.stepnum not in cl.sink.threats:
-				# 	continue
-				if new_step.stepnum not in cl.sink.threat_map[cl.label]:
-					continue
-				if new_plan.OrderingGraph.isPath(new_step, cl.source):
-					continue
-				if new_plan.OrderingGraph.isPath(cl.sink, new_step):
-					continue
-				new_plan.flaws.insert(new_plan, TCLF(new_step, cl))
-
-			self.insert(new_plan)
+			if new_step.height == 0:
+				new_plan.insert_primitive(new_step, s_index, p_index)
+				self.insert(new_plan)
+			else:
+				# pass
+				new_plan.insert_decomp(new_step, s_index, p_index)
+				self.insert(new_plan)
+				# decomp step
 
 	def reuse_step(self, plan, flaw):
 		s_need, p = flaw.flaw
@@ -232,6 +201,27 @@ class GPlanner:
 
 		self.insert(new_plan)
 
+	def resolve_decomp_threat(self, plan, dtclf):
+
+		anterior_index = plan.index(dtclf.anterior)
+		posterior_index = plan.index(dtclf.posterior)
+		src_index = plan.index(dtclf.link.source)
+		snk_index = plan.index(dtclf.link.sink)
+
+		# Promotion
+		new_plan = plan.instantiate()
+		threat = new_plan[anterior_index]
+		sink = new_plan[snk_index]
+		new_plan.OrderingGraph.addEdge(sink, threat)
+		self.insert(new_plan)
+
+		# Demotion
+		new_plan = plan.instantiate()
+		threat = new_plan[posterior_index]
+		source = new_plan[src_index]
+		new_plan.OrderingGraph.addEdge(threat, source)
+
+		self.insert(new_plan)
 	# Heuristic Methods #
 
 	def h_condition(self, plan, stepnum, precond):

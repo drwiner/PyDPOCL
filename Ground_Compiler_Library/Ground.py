@@ -81,15 +81,15 @@ def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 
 			if not rewriteElms(GDO, sp, op):
 				continue
-		#	for elm in sp.elements:
-		#		assignElmToContainer(GDO, sp, elm, list(op.elements))
 
 			GDO.root.is_decomp = True
+
+			# swap constructor IDs and replaced_IDs
 			GDO._replaceInternals()
 			GDO.replaceInternals()
 
 			# Now create dummy init step and goal step
-			dummy_init = Action(name='dummy_init_of:' + str(stepnum-1))
+			dummy_init = Action(name='begin:' + str(GDO.name))
 			dummy_init.has_cndt = False
 			dummy_init.root.stepnumber = stepnum
 			for condition in GDO.Preconditions:
@@ -99,7 +99,7 @@ def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 			gsteps.append(dummy_init)
 			stepnum+=1
 
-			dummy_goal = Action(name='dummy_goal_of:' + str(stepnum-2))
+			dummy_goal = Action(name='finish:' + str(GDO.name))
 			dummy_goal.is_cndt = False
 			dummy_goal.root.stepnumber = stepnum
 			for condition in GDO.Effects:

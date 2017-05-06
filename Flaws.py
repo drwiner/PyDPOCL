@@ -55,6 +55,18 @@ class TCLF(Flaw):
 	def __hash__(self):
 		return hash(self.threat.ID) ^ hash(self.link.source.ID) ^ hash(self.link.sink.ID) ^ hash(self.link.label.ID)
 
+class DTCLF(Flaw):
+	def __init__(self, dummy_init, dummy_final, causal_link_edge):
+		super(DTCLF, self).__init__(((dummy_init, dummy_final), causal_link_edge), 'tclf')
+		self.anterior = dummy_init
+		self.posterior = dummy_final
+		self.link = self.flaw[1]
+		self.criteria = self.anterior.stepnum ^ self.posterior.stepnum ^ self.link.source.stepnum ^ self.link.sink.stepnum
+		self.tiebreaker = hash(self.link.label.name) ^ hash(self.link.label.truth) ^ sum(hash(arg) for arg in self.link.label.Args)
+
+	def __hash__(self):
+		return hash(self.anterior.ID) ^ hash(self.posterior.ID) ^ hash(self.link.source.ID) ^ hash(self.link.sink.ID) ^ hash(self.link.label.ID)
+
 class DCF(Flaw):
 	def __init__(self, f, name):
 		super(DCF, self).__init__(f, name)
