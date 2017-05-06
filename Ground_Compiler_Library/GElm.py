@@ -136,7 +136,7 @@ class GStep:
 		if pre in self.open_preconds:
 			self.open_preconds.remove(pre)
 		else:
-			print('pre: {} not found in {} to remove'.format(pre, self))
+			print('pre: {} not found in {} to remove, allowed in some cases'.format(pre, self))
 
 	def update_choices(self, plan):
 		choices = set()

@@ -114,7 +114,7 @@ class GPlan:
 		swap_dict[new_step.sub_dummy.sub_init.ID] = d_i
 		self.insert(d_i)
 		# add flaws for each new_step precondition, but make s_need d_i and update cndt_map/ threat_map
-		for pre in new_step.preconds:
+		for pre in new_step.open_preconds:
 			self.flaws.insert(self, OPF(d_i, pre))
 		d_i.swap_setup(new_step.cndts, new_step.cndt_map, new_step.threats, new_step.threat_map)
 
@@ -130,9 +130,11 @@ class GPlan:
 		for substep in new_step.sub_steps:
 			new_substep = substep.instantiate(default_None_is_to_refresh_open_preconds=False)
 			swap_dict[substep.ID] = new_substep
-			self.insert(new_substep)
-			for open_condition in new_substep.open_preconds:
-				self.flaws.insert(self, OPF(new_substep, open_condition))
+			if new_substep.height > 0:
+				# check what links this new_substep is a source of.
+				self.insert(new_substep)
+			# for open_condition in new_substep.open_preconds:
+			# 	self.flaws.insert(self, OPF(new_substep, open_condition))
 
 		# sub orderings
 		for edge in new_step.sub_orderings.edges:

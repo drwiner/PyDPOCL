@@ -29,7 +29,9 @@ class OrderingGraph(Graph):
 		self.edges.add(Edge(source, sink, '<'))
 
 	def addEdge(self, source, sink):
-		self.addOrdering(source, sink)
+		self.elements.add(source)
+		self.elements.add(sink)
+		self.edges.add(Edge(source, sink, '<'))
 
 	def detectCycle(self, ):
 		''' Returns True if cycle, False otherwise
