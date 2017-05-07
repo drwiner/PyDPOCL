@@ -142,27 +142,25 @@ class GPlanner:
 			new_plan.resolve(old_step, s_index, p_index)
 			self.insert(new_plan)
 
-	def resolve_threat(self, plan, dtclf):
-		# anterior=posterior when threat is not decomp
-		anterior_index = plan.index(dtclf.anterior)
-		posterior_index = plan.index(dtclf.posterior)
-		src_index = plan.index(dtclf.link.source)
-		snk_index = plan.index(dtclf.link.sink)
+	def resolve_threat(self, plan, tclf):
+		threat_index = plan.index(tclf.threat)
+		src_index = plan.index(tclf.link.source)
+		snk_index = plan.index(tclf.link.sink)
 
 		# Promotion
 		new_plan = plan.instantiate()
-		threat = new_plan[anterior_index]
-		threat.update_choices()
+		threat = new_plan[threat_index]
 		sink = new_plan[snk_index]
 		new_plan.OrderingGraph.addEdge(sink, threat)
+		threat.update_choices(new_plan)
 		self.insert(new_plan)
 
 		# Demotion
 		new_plan = plan.instantiate()
-		threat = new_plan[posterior_index]
+		threat = new_plan[threat_index]
 		source = new_plan[src_index]
 		new_plan.OrderingGraph.addEdge(threat, source)
-
+		threat.update_choices(new_plan)
 		self.insert(new_plan)
 
 	# Heuristic Methods #
@@ -180,6 +178,10 @@ class GPlanner:
 		self._h_visited.append(precond)
 
 		min_so_far = float('inf')
+		# if the following is true, then we have an "sub-init" step in our mist
+		if len(self.gsteps[stepnum].cndts) == 0:
+			stepnum += 2
+
 		for cndt in self.gsteps[stepnum].cndt_map[precond.ID]:
 			cndt_heuristic = self.h_step(plan, cndt)
 			if cndt_heuristic < min_so_far:

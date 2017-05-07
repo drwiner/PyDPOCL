@@ -92,10 +92,11 @@ class GStep:
 				new_sink.fulfill(p)
 				break
 
+		# set these babes to not be instantiable "fo' life"
+		gsteps[decomp_step.sub_dummy_init.stepnumber].instantiable = False
+		gsteps[decomp_step.sub_dummy_goal.stepnumber].instantiable = False
 		init_step = gsteps[decomp_step.sub_dummy_init.stepnumber].instantiate()
 		final_step = gsteps[decomp_step.sub_dummy_goal.stepnumber].instantiate()
-		init_step.instantiable = False
-		final_step.instantiable = False
 
 		for step in self.sub_steps:
 			self.sub_orderings.addEdge(init_step, step)
