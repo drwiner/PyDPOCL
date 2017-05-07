@@ -93,9 +93,9 @@ def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 			dummy_init.has_cndt = False
 			dummy_init.root.stepnumber = stepnum
 			for condition in GDO.Preconditions:
-				dummy_init.edges.add(dummy_init.root, condition.root, 'effect-of')
+				dummy_init.edges.add(Edge(dummy_init.root, condition.root, 'effect-of'))
 				dummy_init.edges.update(condition.edges)
-				dummy_init.edges.update(condition.elements)
+				dummy_init.elements.update(condition.elements)
 			gsteps.append(dummy_init)
 			stepnum+=1
 
@@ -103,13 +103,13 @@ def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 			dummy_goal.is_cndt = False
 			dummy_goal.root.stepnumber = stepnum
 			for condition in GDO.Effects:
-				dummy_goal.edges.add(dummy_goal.root, condition.root, 'precond-of')
+				dummy_goal.edges.add(Edge(dummy_goal.root, condition.root, 'precond-of'))
 				dummy_goal.edges.update(condition.edges)
-				dummy_goal.edges.update(condition.elements)
+				dummy_goal.elements.update(condition.elements)
 			gsteps.append(dummy_goal)
 			stepnum+=1
 
-			GDO.sub_dummy.init = dummy_init
+			GDO.sub_dummy_init = dummy_init
 			GDO.sub_dummy_goal = dummy_goal
 
 			GDO.ground_subplan = sp
@@ -128,7 +128,11 @@ def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 def rewriteElms(GDO, sp, op):
 
 	for elm in sp.elements:
-		assignElmToContainer(GDO, sp, elm, list(op.elements))
+		EG = elm
+		if elm.typ in {'Action', 'Condition'}:
+			EG = eval(elm.typ).subgraph(sp, elm)
+
+		assignElmToContainer(GDO, EG, list(op.elements))
 	GDO.updateArgs()
 	for (u,v) in op.nonequals:
 		if GDO.Args[u] == GDO.Args[v]:
@@ -139,20 +143,17 @@ def rewriteElms(GDO, sp, op):
 				return False
 	return True
 
-def assignElmToContainer(GDO, SP, elm, ex_elms):
+def assignElmToContainer(GDO, EG, ex_elms):
+
 	for ex_elm in ex_elms:
 		if ex_elm.arg_name is None:
 			continue
-		if elm.arg_name != ex_elm.arg_name:
-			if isinstance(elm, Argument):
-				if elm.name != ex_elm.name:
+		if EG.arg_name != ex_elm.arg_name:
+			if isinstance(EG, Argument):
+				if EG.name != ex_elm.name:
 					continue
 			else:
 				continue
-
-		EG = elm
-		if elm.typ in {'Action', 'Condition'}:
-			EG = eval(elm.typ).subgraph(SP, elm)
 
 		GDO.assign(ex_elm, EG)
 
@@ -160,6 +161,7 @@ import re
 @clock
 def upload(GL, name):
 	# n = re.sub('[^A-Za-z0-9]+', '', name)
+	print(name)
 	with open(name, 'wb') as afile:
 		pickle.dump(GL, afile)
 

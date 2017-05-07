@@ -1,9 +1,11 @@
-import itertools
 from Ground_Compiler_Library.PlanElementGraph import Action, PlanElementGraph, Condition
 from Ground_Compiler_Library.Element import Operator
 from Ground_Compiler_Library.Graph import Edge
-from clockdeco import clock
 from Ground_Compiler_Library.Flaws import Flaw
+
+from clockdeco import clock
+import copy
+import itertools
 
 @clock
 def Plannify(RQ, GL, h):
@@ -38,7 +40,6 @@ def partialUnify(PS, _map):
 	if _map is False:
 		return False
 #	NS = PS.deepcopy()
-	import copy
 	NS = copy.deepcopy(PS)
 	effects = [edge.sink for edge in NS.edges if edge.label == 'effect-of']
 	for elm in effects:
@@ -67,6 +68,7 @@ def partialUnify(PS, _map):
 	NS.updateArgs()
 	return NS
 
+
 def isArgNameConsistent(Partially_Ground_Steps):
 	"""
 		@param Partially_Ground_Steps <-- partially ground required steps (PGRS), reach required step associated with ground step
@@ -74,14 +76,15 @@ def isArgNameConsistent(Partially_Ground_Steps):
 	arg_name_dict = {}
 
 	for PGS in Partially_Ground_Steps:
-		for elm in PGS.elements:
-			if elm.arg_name is not None:
-				if elm.arg_name in arg_name_dict.keys():
-					if not elm.isConsistent(arg_name_dict[elm.arg_name]):
+		for arg in PGS.Args:
+			if arg.arg_name is not None:
+				if arg.arg_name in arg_name_dict.keys():
+					if not arg.isConsistent(arg_name_dict[arg.arg_name]):
 						return False
 				else:
-					arg_name_dict[elm.arg_name] = elm
+					arg_name_dict[arg.arg_name] = arg
 	return True
+
 
 def productByPosition(Libs):
 	return itertools.product(*[list(Libs[T.position]) for T in Libs])

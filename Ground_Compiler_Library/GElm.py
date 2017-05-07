@@ -8,7 +8,9 @@ from Ground_Compiler_Library.PlanElementGraph import Condition
 import copy
 import collections
 from clockdeco import clock
-from GPlan import dummyTuple
+from collections import namedtuple
+
+dummyTuple = namedtuple('dummyTuple', ['init', 'final'])
 
 class GStep:
 	"""
@@ -35,9 +37,7 @@ class GStep:
 			self.sub_steps = []
 			self.sub_orderings = OrderingGraph()
 			self.sub_links = CausalLinkGraph()
-			self.sub_dummy = dummyTuple(None, None)
-			self.sub_init = None
-			self.sub_final = None
+			self.dummy = dummyTuple(None, None)
 
 		self.cndts = None
 		self.cndt_map = None
@@ -51,6 +51,7 @@ class GStep:
 		self.risks = list()
 		self.choices = list()
 		# choices are instances of cndt antecedents
+		self.choice_map = dict()
 		# self.num_choices = 0
 		# open preconditions which need causal link
 		self.open_preconds = list(self.preconds)
@@ -77,9 +78,9 @@ class GStep:
 	def swap_substeps(self, gsteps, decomp_step, num_GL_steps):
 		change_dict = {step: gsteps[step.stepnumber].instantiate() for step in decomp_step.ground_subplan.Steps}
 		self.sub_steps = list(change_dict.values())
-		for edge in decomp_step.subplan.OrderingGraph.edges:
+		for edge in decomp_step.ground_subplan.OrderingGraph.edges:
 			self.sub_orderings.addEdge(change_dict[edge.source], change_dict[edge.sink])
-		for edge in decomp_step.subplan.CausalLinkGraph.edges:
+		for edge in decomp_step.ground_subplan.CausalLinkGraph.edges:
 			new_sink = change_dict[edge.sink]
 			# Condition.subgraph(subplan, edge.label)
 			g_label = GLiteral(edge.label.name, edge.label.Args, edge.label.truth, -1, None)
@@ -87,6 +88,7 @@ class GStep:
 				if p != g_label:
 					continue
 				self.sub_links.addEdge(change_dict[edge.source], new_sink, p)
+				self.sub_orderings.addEdge(change_dict[edge.source], new_sink)
 				new_sink.fulfill(p)
 				break
 
@@ -113,16 +115,20 @@ class GStep:
 
 		# add init_step as top cndt for all
 
-		self.sub_dummy = (init_step, final_step)
+		self.dummy = dummyTuple(init_step, final_step)
 
 	def instantiate(self, default_refresh=None, default_None_is_to_refresh_open_preconds=None):
 		new_self = copy.deepcopy(self)
 		new_self.ID = uuid4()
+		self.choice_map = dict()
+
 		if default_refresh is None:
 			self.risks = list()
 			self.choices = list()
+
 		if default_None_is_to_refresh_open_preconds is None:
 			self.open_preconds = list(self.preconds)
+
 		return new_self
 
 	def fulfill(self, pre):

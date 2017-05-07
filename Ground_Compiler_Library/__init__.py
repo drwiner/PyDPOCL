@@ -45,5 +45,14 @@ if __name__ == '__main__':
 		problem_file = 'domains/travel-to-la.pddl'
 
 	GL = GLib(domain_file, problem_file)
+	with open('ground_steps.txt', 'w') as gs:
+		for step in GL:
+			gs.write(str(step))
+			gs.write('\n')
 	ground_step_list = deelementize_ground_library(GL)
+	with open('ground_steps.txt', 'a') as gs:
+		gs.write('\n\n')
+		for step in ground_step_list:
+			gs.write(str(step))
+			gs.write('\n')
 	upload(ground_step_list, GL.name)

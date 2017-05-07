@@ -1,5 +1,5 @@
 from GPlan import GPlan
-from Flaws import OPF, TCLF, DTCLF
+from Flaws import OPF, TCLF
 from uuid import uuid4
 import copy
 from heapq import heappush, heappop
@@ -98,8 +98,6 @@ class GPlanner:
 
 			if isinstance(flaw, TCLF):
 				self.resolve_threat(plan, flaw)
-			elif isinstance(flaw, DTCLF):
-				self.resolve_decomp_threat(plan, flaw)
 			else:
 				self.add_step(plan, flaw)
 				self.reuse_step(plan, flaw)
@@ -123,18 +121,14 @@ class GPlanner:
 			# clone plan and new step
 			new_plan = plan.instantiate()
 			new_step = self.gsteps[cndt].instantiate()
-			if new_step.height == 0:
-				new_plan.insert_primitive(new_step, s_index, p_index)
-				self.insert(new_plan)
-			else:
-				# pass
-				new_plan.insert_decomp(new_step, s_index, p_index)
-				self.insert(new_plan)
-				# decomp step
+			new_plan.insert(new_step)
+			new_plan.resolve(new_step, s_index, p_index)
+			self.insert(new_plan)
 
 	def reuse_step(self, plan, flaw):
 		s_need, p = flaw.flaw
-		choices = [step for step in plan.steps if step.stepnum in s_need.cndt_map[p.ID]]
+
+		choices = [step for step in plan.steps if step.stepnum in s_need.cndt_map[p.ID] and not plan.OrderingGraph.isPath(s_need, step)]
 		if len(choices) == 0:
 			return
 
@@ -144,65 +138,12 @@ class GPlanner:
 		for choice in choices:
 			# clone plan and new step
 			new_plan = plan.instantiate()
-			mutable_s_need = new_plan.steps[s_index]
-			mutable_p = mutable_s_need.preconds[p_index]
-			mutable_s_need.fulfill(mutable_p)
-			mutable_s_need.update_choices(new_plan)
-
 			old_step = new_plan.steps[plan.index(choice)]
-			new_plan.OrderingGraph.addEdge(old_step, mutable_s_need)
-			# add causal link
-			c_link = new_plan.CausalLinkGraph.addEdge(old_step, mutable_s_need, mutable_p)
-
-			# check if this link is threatened
-			ignore_these = {mutable_s_need.ID, old_step.ID}
-			for step in new_plan.steps:
-				if step.ID in ignore_these:
-					continue
-				if step.stepnum not in mutable_s_need.threats:
-					continue
-				if new_plan.OrderingGraph.isPath(s_need, step):
-					continue
-				if new_plan.OrderingGraph.isPath(step, old_step):
-					continue
-				new_plan.flaws.insert(new_plan, TCLF(step, c_link))
-
-			# check if adding this step threatens other causal links
-			for cl in new_plan.CausalLinkGraph.edges:
-				if cl == c_link:
-					continue
-				if old_step.stepnum not in cl.sink.threat_map[cl.label.ID]:
-					continue
-				if new_plan.OrderingGraph.isPath(old_step, cl.source):
-					continue
-				if new_plan.OrderingGraph.isPath(cl.sink, old_step):
-					continue
-				new_plan.flaws.insert(new_plan, TCLF(old_step, cl))
-
+			new_plan.resolve(old_step, s_index, p_index)
 			self.insert(new_plan)
 
-	def resolve_threat(self, plan, tclf):
-		threat_index = plan.index(tclf.threat)
-		src_index = plan.index(tclf.link.source)
-		snk_index = plan.index(tclf.link.sink)
-
-		# Promotion
-		new_plan = plan.instantiate()
-		threat = new_plan[threat_index]
-		sink = new_plan[snk_index]
-		new_plan.OrderingGraph.addEdge(sink, threat)
-		self.insert(new_plan)
-
-		# Demotion
-		new_plan = plan.instantiate()
-		threat = new_plan[threat_index]
-		source = new_plan[src_index]
-		new_plan.OrderingGraph.addEdge(threat, source)
-
-		self.insert(new_plan)
-
-	def resolve_decomp_threat(self, plan, dtclf):
-
+	def resolve_threat(self, plan, dtclf):
+		# anterior=posterior when threat is not decomp
 		anterior_index = plan.index(dtclf.anterior)
 		posterior_index = plan.index(dtclf.posterior)
 		src_index = plan.index(dtclf.link.source)
@@ -211,6 +152,7 @@ class GPlanner:
 		# Promotion
 		new_plan = plan.instantiate()
 		threat = new_plan[anterior_index]
+		threat.update_choices()
 		sink = new_plan[snk_index]
 		new_plan.OrderingGraph.addEdge(sink, threat)
 		self.insert(new_plan)
@@ -222,6 +164,7 @@ class GPlanner:
 		new_plan.OrderingGraph.addEdge(threat, source)
 
 		self.insert(new_plan)
+
 	# Heuristic Methods #
 
 	def h_condition(self, plan, stepnum, precond):
@@ -274,6 +217,9 @@ class GPlanner:
 				sumo += self.h_condition(plan, flaw.s_need.stepnum, flaw.p)
 
 		return sumo
+
+	def h_subplan(self, subplan):
+		pass
 
 def topoSort(plan):
 	OG = copy.deepcopy(plan.OrderingGraph)

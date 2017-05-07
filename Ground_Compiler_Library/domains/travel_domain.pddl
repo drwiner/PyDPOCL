@@ -68,9 +68,9 @@
 		:decomp(
 			:sub-params (?car - car ?s1 ?s2 ?s3 - step)
 			:requirements( and
-				(= ?s1 (get-in-car ?person ?car ?to))
+				(= ?s1 (get-in-car ?person ?car ?from))
                 (= ?s2 (drive ?person ?car ?from ?to))
-                (= ?s3 (get-out-of-car ?person ?car ?from))
+                (= ?s3 (get-out-of-car ?person ?car ?to))
 				(linked-by ?s1 ?s2 (in ?person ?car))
 				(linked-by ?s1 ?s3 (in ?person ?car))
 				(linked-by ?s2 ?s3 (at ?car ?to)))))
