@@ -100,7 +100,7 @@ class GPlan:
 		for pre in new_step.open_preconds:
 			self.flaws.insert(self, OPF(d_i, pre))
 		d_i.preconds = list(new_step.open_preconds)
-		d_i.open_perconds = list(new_step.open_preconds)
+		d_i.open_preconds = list(new_step.open_preconds)
 
 		self.OrderingGraph.addEdge(self.dummy.init, d_i)
 		self.OrderingGraph.addEdge(d_i, self.dummy.final)

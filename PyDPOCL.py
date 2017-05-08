@@ -4,11 +4,13 @@ from uuid import uuid4
 import copy
 from heapq import heappush, heappop
 
-LOG = 1
+LOG = 0
+
 
 def log_message(message):
 	if LOG:
 		print(message)
+
 
 class Frontier:
 
@@ -182,12 +184,7 @@ class GPlanner:
 
 	def resolve_threat(self, plan, tclf):
 		threat_index = plan.index(tclf.threat)
-		# try:
 		src_index = plan.index(tclf.link.source)
-		# except:
-		# 	for step in plan.steps:
-		# 		print(step)
-		# 	raise ValueError('Plan Index error: plan {} should have step {} whereis it?'.format(plan.name, str(tclf.link.source)))
 		snk_index = plan.index(tclf.link.sink)
 
 		# Promotion
