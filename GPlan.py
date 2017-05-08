@@ -20,7 +20,6 @@ class GPlan:
 		self.solved = False
 		self.dummy = dummyTuple(dummy_init_constructor.instantiate(), dummy_goal_constructor.instantiate())
 
-
 		self.init = self.dummy.init.preconds
 		self.goal = self.dummy.final.preconds
 		self.steps = [self.dummy.init, self.dummy.final]
@@ -50,6 +49,9 @@ class GPlan:
 		for i, s in enumerate(self.steps):
 			if s.ID == step.ID:
 				return i
+		print('{} {} {}'.format(self.name, step, step.ID))
+		for i, s in enumerate(self.steps):
+			print('{} {} {}'.format(i, s, s.ID))
 		raise ValueError('{} with ID={} not found in plan {}'.format(step, step.ID, self.name))
 
 	def instantiate(self, add_to_name):
@@ -97,8 +99,8 @@ class GPlan:
 		d_i.swap_setup(new_step.cndts, new_step.cndt_map, new_step.threats, new_step.threat_map)
 		for pre in new_step.open_preconds:
 			self.flaws.insert(self, OPF(d_i, pre))
-		d_i.preconds = new_step.open_preconds
-		d_i.open_perconds = new_step.open_preconds
+		d_i.preconds = list(new_step.open_preconds)
+		d_i.open_perconds = list(new_step.open_preconds)
 
 		self.OrderingGraph.addEdge(self.dummy.init, d_i)
 		self.OrderingGraph.addEdge(d_i, self.dummy.final)
@@ -107,6 +109,8 @@ class GPlan:
 		d_f = new_step.dummy.final.instantiate(default_None_is_to_refresh_open_preconds=False)
 		swap_dict[new_step.dummy.final.ID] = d_f
 		self.insert(d_f)
+
+		new_step.dummy = dummyTuple(d_i, d_f)
 
 		# sub steps
 		for substep in new_step.sub_steps:
@@ -125,11 +129,13 @@ class GPlan:
 
 		# sub links
 		for edge in new_step.sub_links.edges:
+			# instantiating a GLiteral does not give it new ID (just returns deep copy)
 			source, sink, label = swap_dict[edge.source.ID], swap_dict[edge.sink.ID], edge.label.instantiate()
 			if source.height > 0:
 				source = source.dummy.final
 			if sink.height > 0:
 				sink = sink.dummy.init
+
 			clink = self.CausalLinkGraph.addEdge(source, sink, label)
 
 			# check if this link is threatened

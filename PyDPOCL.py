@@ -4,8 +4,8 @@ from uuid import uuid4
 import copy
 from heapq import heappush, heappop
 
+LOG = 1
 
-LOG = 0
 def log_message(message):
 	if LOG:
 		print(message)
@@ -49,7 +49,7 @@ class GPlanner:
 		self.h_step_dict = dict()
 		self.h_lit_dict = dict()
 
-		root_plan = GPlan(gsteps[-2].instantiate(), gsteps[-1].instantiate())
+		root_plan = GPlan(gsteps[-2], gsteps[-1])
 		root_plan.OrderingGraph.addOrdering(root_plan.dummy.init, root_plan.dummy.final)
 		for p in root_plan.dummy.final.open_preconds:
 			root_plan.flaws.insert(root_plan, OPF(root_plan.dummy.final, p))
@@ -86,13 +86,13 @@ class GPlanner:
 			plan = self.pop()
 			expanded += 1
 			if not plan.isInternallyConsistent():
-				# print('prune {}'.format(plan.ID))
+				log_message('prune {}'.format(plan.name))
 				continue
 
 			log_message('Plan {} selected cost={} heuristic={}'.format(plan.name, plan.cost, plan.heuristic))
 
 			if len(plan.flaws) == 0:
-				print('solution found at {} nodes expanded and {} nodes visited'.format(expanded, len(self)+expanded))
+				print('solution {} found at {} nodes expanded and {} nodes visited'.format(plan.name, expanded, len(self)+expanded))
 				completed.append(plan)
 				for step in topoSort(plan):
 					print(step)
@@ -172,6 +172,7 @@ class GPlanner:
 
 			# use index to find old step
 			old_step = new_plan.steps[plan.index(choice)]
+			log_message('Reuse step {} to plan {}\n'.format(str(old_step), new_plan.name))
 
 			# resolve open condition with old step
 			new_plan.resolve(old_step, mutable_s_need, mutable_p)
@@ -181,7 +182,12 @@ class GPlanner:
 
 	def resolve_threat(self, plan, tclf):
 		threat_index = plan.index(tclf.threat)
+		# try:
 		src_index = plan.index(tclf.link.source)
+		# except:
+		# 	for step in plan.steps:
+		# 		print(step)
+		# 	raise ValueError('Plan Index error: plan {} should have step {} whereis it?'.format(plan.name, str(tclf.link.source)))
 		snk_index = plan.index(tclf.link.sink)
 
 		# Promotion
@@ -192,6 +198,7 @@ class GPlanner:
 		new_plan.OrderingGraph.addEdge(sink, threat)
 		threat.update_choices(new_plan)
 		self.insert(new_plan)
+		log_message('promote {} in front of {} in plan {}'.format(threat, sink, new_plan.name))
 
 		# Demotion
 		new_plan = plan.instantiate(str(self.plan_num))
@@ -201,6 +208,7 @@ class GPlanner:
 		new_plan.OrderingGraph.addEdge(threat, source)
 		threat.update_choices(new_plan)
 		self.insert(new_plan)
+		log_message('demotion {} behind {} in plan {}'.format(threat, source, new_plan.name))
 
 	# Heuristic Methods #
 
@@ -313,4 +321,4 @@ if __name__ == '__main__':
 
 	ground_steps = pickle.load(open(uploadable_ground_step_library_name, 'rb'))
 	planner = GPlanner(ground_steps)
-	planner.solve(k=6)
+	planner.solve(k=22)
