@@ -35,6 +35,7 @@ class GPlan:
 		# self.h_step_dict = dict()
 
 		self.heuristic = float('inf')
+		self.name = '0'
 
 	def __len__(self):
 		return len(self.steps)
@@ -46,11 +47,15 @@ class GPlan:
 		self.steps[pos] = item
 
 	def index(self, step):
-		return self.steps.index(step)
+		for i, s in enumerate(self.steps):
+			if s.ID == step.ID:
+				return i
+		raise ValueError('{} with ID={} not found in plan {}'.format(step, step.ID, self.name))
 
-	def instantiate(self):
+	def instantiate(self, add_to_name):
 		new_self = copy.deepcopy(self)
 		new_self.ID = uuid4()
+		new_self.name += add_to_name
 		# refresh attributes
 		return new_self
 
@@ -92,6 +97,8 @@ class GPlan:
 		d_i.swap_setup(new_step.cndts, new_step.cndt_map, new_step.threats, new_step.threat_map)
 		for pre in new_step.open_preconds:
 			self.flaws.insert(self, OPF(d_i, pre))
+		d_i.preconds = new_step.open_preconds
+		d_i.open_perconds = new_step.open_preconds
 
 		self.OrderingGraph.addEdge(self.dummy.init, d_i)
 		self.OrderingGraph.addEdge(d_i, self.dummy.final)
@@ -106,8 +113,6 @@ class GPlan:
 			new_substep = substep.instantiate(default_None_is_to_refresh_open_preconds=False)
 			swap_dict[substep.ID] = new_substep
 			self.insert(new_substep)
-			for open_condition in new_substep.open_preconds:
-				self.flaws.insert(self, OPF(new_substep, open_condition))
 
 		# sub orderings
 		for edge in new_step.sub_orderings.edges:
@@ -151,23 +156,24 @@ class GPlan:
 
 	# Resolve Methods #
 
-	def resolve(self, new_step, s_index, p_index):
+	def resolve(self, new_step, s_need, p):
 		if new_step.height > 0:
-			self.resolve_with_decomp(new_step, s_index, p_index)
+			self.resolve_with_decomp(new_step, s_need, p)
 		else:
-			self.resolve_with_primitive(new_step, s_index, p_index)
+			self.resolve_with_primitive(new_step, s_need, p)
 
-	def resolve_with_primitive(self, new_step, s_index, p_index):
+	def resolve_with_primitive(self, new_step, mutable_s_need, mutable_p):
 
 		# operate on cloned plan
-		mutable_s_need = self[s_index]
-		mutable_p = mutable_s_need.preconds[p_index]
+
 		mutable_s_need.fulfill(mutable_p)
-		mutable_s_need.update_choices(self)
+
 		# add orderings
 		self.OrderingGraph.addEdge(new_step, mutable_s_need)
 		# add causal link
 		c_link = self.CausalLinkGraph.addEdge(new_step, mutable_s_need, mutable_p)
+
+		mutable_s_need.update_choices(self)
 
 		# check if this link is threatened
 		ignore_these = {mutable_s_need.ID, new_step.ID}
@@ -195,20 +201,22 @@ class GPlan:
 				continue
 			self.flaws.insert(self, TCLF(new_step, cl))
 
-	def resolve_with_decomp(self, new_step, s_index, p_index):
+	def resolve_with_decomp(self, new_step, mutable_s_need, mutable_p):
 		d_i, d_f = new_step.dummy
 
 		# operate on cloned plan
-		mutable_s_need = self[s_index]
-		mutable_p = mutable_s_need.preconds[p_index]
+		# mutable_s_need = self[s_index]
+		# mutable_p = mutable_s_need.preconds[p_index]
 		mutable_s_need.fulfill(mutable_p)
-		mutable_s_need.update_choices(self)
+
 
 		# add ordering
 		self.OrderingGraph.addEdge(d_f, mutable_s_need)
 
 		# add causal link
 		c_link = self.CausalLinkGraph.addEdge(d_f, mutable_s_need, mutable_p)
+
+		mutable_s_need.update_choices(self)
 
 		# check if df -> s_need is threatened
 		ignore_these = {mutable_s_need.ID, d_f.ID, d_i.ID}
@@ -247,14 +255,19 @@ class GPlan:
 			return self.cost < other.cost
 		elif len(self.flaws) != len(other.flaws):
 			return len(self.flaws) < len(other.flaws)
+		elif len(self.CausalLinkGraph.edges) != len(other.CausalLinkGraph.edges):
+			return len(self.CausalLinkGraph.edges) > len(other.CausalLinkGraph.edges)
+		elif len(self.OrderingGraph.edges) != len(other.OrderingGraph.edges):
+			return len(self.OrderingGraph.edges) > len(other.OrderingGraph.edges)
 		elif sum([step.stepnum for step in self]) != sum([step.stepnum for step in other]):
 			return sum([step.stepnum for step in self]) < sum([step.stepnum for step in other])
 		else:
 			return self.OrderingGraph < other.OrderingGraph
 
 	def __str__(self):
-		return 'GPlan{} c={} h={}\t'.format(self.ID[-4:], self.cost, self.heuristic) + \
-				str(self.steps) + '\n' + str(self.OrderingGraph) + '\n' + str(self.CausalLinkGraph)
+		return self.name
+		# return 'GPlan{} c={} h={}\t'.format(self.ID[-4:], self.cost, self.heuristic) + \
+		# 		str(self.steps) + '\n' + str(self.OrderingGraph) + '\n' + str(self.CausalLinkGraph)
 
 	def __repr__(self):
 		return self.__str__()
@@ -264,7 +277,7 @@ def topoSort(ordering_graph):
 	L =[]
 	# ogr = copy.deepcopy(ordering_graph)
 	ogr = OrderingGraph()
-	init_dummy = GSte(name='init_dummy')
+	init_dummy = GStep(name='init_dummy')
 	ogr.elements.add(init_dummy)
 	for elm in list(ordering_graph.elements):
 		ogr.addOrdering(init_dummy, elm)

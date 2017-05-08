@@ -5,6 +5,11 @@ import copy
 from heapq import heappush, heappop
 
 
+LOG = 0
+def log_message(message):
+	if LOG:
+		print(message)
+
 class Frontier:
 
 	def __init__(self):
@@ -52,6 +57,7 @@ class GPlanner:
 		self._frontier = Frontier()
 		self.insert(root_plan)
 		self._h_visited = []
+		self.plan_num = 0
 
 	# Private Hooks #
 
@@ -80,21 +86,26 @@ class GPlanner:
 			plan = self.pop()
 			expanded += 1
 			if not plan.isInternallyConsistent():
-				print('prune {}'.format(plan.ID))
+				# print('prune {}'.format(plan.ID))
 				continue
+
+			log_message('Plan {} selected cost={} heuristic={}'.format(plan.name, plan.cost, plan.heuristic))
 
 			if len(plan.flaws) == 0:
 				print('solution found at {} nodes expanded and {} nodes visited'.format(expanded, len(self)+expanded))
 				completed.append(plan)
 				for step in topoSort(plan):
 					print(step)
+				print('\n')
 				if len(completed) == k:
 					return completed
 				continue
 
 			# Select Flaw
 			flaw = plan.flaws.next()
-			print('{} selected : {}\n'.format(flaw.name, flaw))
+			log_message('{} selected : {}\n'.format(flaw.name, flaw))
+
+			self.plan_num = 0
 
 			if isinstance(flaw, TCLF):
 				self.resolve_threat(plan, flaw)
@@ -119,10 +130,25 @@ class GPlanner:
 			if not self.gsteps[cndt].instantiable:
 				continue
 			# clone plan and new step
-			new_plan = plan.instantiate()
+
+			new_plan = plan.instantiate(str(self.plan_num))
+			self.plan_num += 1
+
+			# use indices befoer inserting new steps
+			mutable_s_need = new_plan[s_index]
+			mutable_p = mutable_s_need.preconds[p_index]
+
+			# instantiate new step
 			new_step = self.gsteps[cndt].instantiate()
+
+			# recursively insert new step and substeps into plan, adding orderings and flaws
 			new_plan.insert(new_step)
-			new_plan.resolve(new_step, s_index, p_index)
+			log_message('Add step {} to plan {}\n'.format(str(new_step), new_plan.name))
+
+			# resolve s_need with the new step
+			new_plan.resolve(new_step, mutable_s_need, mutable_p)
+
+			# insert our new mutated plan into the frontier
 			self.insert(new_plan)
 
 	def reuse_step(self, plan, flaw):
@@ -137,9 +163,20 @@ class GPlanner:
 		p_index = s_need.preconds.index(p)
 		for choice in choices:
 			# clone plan and new step
-			new_plan = plan.instantiate()
+			new_plan = plan.instantiate(str(self.plan_num))
+			self.plan_num += 1
+
+			# use indices befoer inserting new steps
+			mutable_s_need = new_plan[s_index]
+			mutable_p = mutable_s_need.preconds[p_index]
+
+			# use index to find old step
 			old_step = new_plan.steps[plan.index(choice)]
-			new_plan.resolve(old_step, s_index, p_index)
+
+			# resolve open condition with old step
+			new_plan.resolve(old_step, mutable_s_need, mutable_p)
+
+			# insert mutated plan into frontier
 			self.insert(new_plan)
 
 	def resolve_threat(self, plan, tclf):
@@ -148,7 +185,8 @@ class GPlanner:
 		snk_index = plan.index(tclf.link.sink)
 
 		# Promotion
-		new_plan = plan.instantiate()
+		new_plan = plan.instantiate(str(self.plan_num))
+		self.plan_num += 1
 		threat = new_plan[threat_index]
 		sink = new_plan[snk_index]
 		new_plan.OrderingGraph.addEdge(sink, threat)
@@ -156,7 +194,8 @@ class GPlanner:
 		self.insert(new_plan)
 
 		# Demotion
-		new_plan = plan.instantiate()
+		new_plan = plan.instantiate(str(self.plan_num))
+		self.plan_num += 1
 		threat = new_plan[threat_index]
 		source = new_plan[src_index]
 		new_plan.OrderingGraph.addEdge(threat, source)
@@ -183,6 +222,8 @@ class GPlanner:
 			stepnum += 2
 
 		for cndt in self.gsteps[stepnum].cndt_map[precond.ID]:
+			if not self.gsteps[cndt].instantiable:
+				continue
 			cndt_heuristic = self.h_step(plan, cndt)
 			if cndt_heuristic < min_so_far:
 				min_so_far = cndt_heuristic

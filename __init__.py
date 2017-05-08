@@ -35,4 +35,4 @@ if __name__ == '__main__':
 
 	ground_steps = pickle.load(open(uploadable_ground_step_library_name, 'rb'))
 	planner = GPlanner(ground_steps)
-	planner.solve(k=1)
+	planner.solve(k=6)
