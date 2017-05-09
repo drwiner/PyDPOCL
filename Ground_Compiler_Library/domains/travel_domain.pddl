@@ -92,4 +92,13 @@
 				(linked-by ?s2 ?s3 (in ?person ?plane))
 				(linked-by ?s2 ?s4 (in ?person ?plane))
 				(linked-by ?s3 ?s4 (at ?plane ?to)))))
+
+	(:action travel
+	    :parameters (?person - person ?to - place)
+	    :precondition ()
+	    :effect(and (at ?person ?to))
+	    :decomp (
+	        :sub-params(?travel-step - step)
+	        :requirements(and
+	            (effect ?travel-step (at ?person ?to)))))
 )

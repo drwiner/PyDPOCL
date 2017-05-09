@@ -96,9 +96,11 @@ class GPlanner:
 			if len(plan.flaws) == 0:
 				print('solution {} found at {} nodes expanded and {} nodes visited'.format(plan.name, expanded, len(self)+expanded))
 				completed.append(plan)
-				for step in topoSort(plan):
+				for step in plan.OrderingGraph.topoSort():
 					print(step)
 				print('\n')
+				if len(completed) in {8,4}:
+					print('l')
 				if len(completed) == k:
 					return completed
 				continue
@@ -193,6 +195,10 @@ class GPlanner:
 		threat = new_plan[threat_index]
 		sink = new_plan[snk_index]
 		new_plan.OrderingGraph.addEdge(sink, threat)
+		if hasattr(threat, 'sibling'):
+			new_plan.OrderingGraph.addEdge(sink, threat.sibling)
+		if hasattr(sink, 'sibling'):
+			new_plan.OrderingGraph.addEdge(sink.sibling, threat)
 		threat.update_choices(new_plan)
 		self.insert(new_plan)
 		log_message('promote {} in front of {} in plan {}'.format(threat, sink, new_plan.name))
@@ -203,6 +209,10 @@ class GPlanner:
 		threat = new_plan[threat_index]
 		source = new_plan[src_index]
 		new_plan.OrderingGraph.addEdge(threat, source)
+		if hasattr(threat, 'sibling'):
+			new_plan.OrderingGraph.addEdge(source, threat.sibling)
+		if hasattr(source, 'sibling'):
+			new_plan.OrderingGraph.addEdge(source.sibling, threat)
 		threat.update_choices(new_plan)
 		self.insert(new_plan)
 		log_message('demotion {} behind {} in plan {}'.format(threat, source, new_plan.name))
@@ -269,20 +279,6 @@ class GPlanner:
 	def h_subplan(self, subplan):
 		pass
 
-def topoSort(plan):
-	OG = copy.deepcopy(plan.OrderingGraph)
-	L =[]
-	S = {plan.dummy.init}
-	while len(S) > 0:
-		n = S.pop()
-		L.append(n)
-		for m_edge in OG.getIncidentEdges(n):
-			OG.edges.remove(m_edge)
-			if len({edge for edge in OG.getParents(m_edge.sink)}) == 0:
-				S.add(m_edge.sink)
-	return L
-
-
 import sys
 import pickle
 import Ground_Compiler_Library
@@ -301,7 +297,7 @@ if __name__ == '__main__':
 	uploadable_ground_step_library_name = 'Ground_Compiler_Library//' + d_name + '.' + p_name
 
 
-	RELOAD = 0
+	RELOAD = 1
 	if RELOAD:
 		GL = Ground_Compiler_Library.Ground.GLib(domain_file, problem_file)
 		with open('ground_steps.txt', 'w') as gs:
@@ -318,4 +314,4 @@ if __name__ == '__main__':
 
 	ground_steps = pickle.load(open(uploadable_ground_step_library_name, 'rb'))
 	planner = GPlanner(ground_steps)
-	planner.solve(k=22)
+	planner.solve(k=15)

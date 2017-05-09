@@ -3,8 +3,6 @@ from uuid import uuid4
 from Flaws import FlawLib, OPF, TCLF
 from Ground_Compiler_Library.OrderingGraph import OrderingGraph, CausalLinkGraph
 import copy
-
-
 from collections import namedtuple, defaultdict
 
 dummyTuple = namedtuple('dummyTuple', ['init', 'final'])
@@ -99,8 +97,9 @@ class GPlan:
 		d_i.swap_setup(new_step.cndts, new_step.cndt_map, new_step.threats, new_step.threat_map)
 		for pre in new_step.open_preconds:
 			self.flaws.insert(self, OPF(d_i, pre))
-		d_i.preconds = list(new_step.open_preconds)
-		d_i.open_preconds = list(new_step.open_preconds)
+		preconds = list(new_step.open_preconds)
+		d_i.preconds = preconds
+		d_i.open_preconds = preconds
 
 		self.OrderingGraph.addEdge(self.dummy.init, d_i)
 		self.OrderingGraph.addEdge(d_i, self.dummy.final)
@@ -110,7 +109,10 @@ class GPlan:
 		swap_dict[new_step.dummy.final.ID] = d_f
 		self.insert(d_f)
 
+		# log who your family is
 		new_step.dummy = dummyTuple(d_i, d_f)
+		d_i.sibling = d_f
+		d_f.sibling = d_i
 
 		# sub steps
 		for substep in new_step.sub_steps:
@@ -171,7 +173,6 @@ class GPlan:
 	def resolve_with_primitive(self, new_step, mutable_s_need, mutable_p):
 
 		# operate on cloned plan
-
 		mutable_s_need.fulfill(mutable_p)
 
 		# add orderings
@@ -215,7 +216,6 @@ class GPlan:
 		# mutable_p = mutable_s_need.preconds[p_index]
 		mutable_s_need.fulfill(mutable_p)
 
-
 		# add ordering
 		self.OrderingGraph.addEdge(d_f, mutable_s_need)
 
@@ -248,7 +248,7 @@ class GPlan:
 				continue
 			if self.OrderingGraph.isPath(d_f, cl.source):
 				continue
-			if self.OrderingGraph.isPath(cl.sink, d_i): # LOOK HERE TODO: DECIDE
+			if self.OrderingGraph.isPath(cl.sink, d_f):  # LOOK HERE TODO: DECIDE
 				continue
 			self.flaws.insert(self, TCLF(d_f, cl))
 

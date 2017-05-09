@@ -89,6 +89,18 @@ class OrderingGraph(Graph):
 				return True
 		return False
 
+	def topoSort(self):
+		L = []
+		for step in self.elements:
+			L.append(step)
+			for i in range(len(L)-1):
+				if self.isPath(step, L[i]):
+					L.insert(i, step)
+					L = L[0:-1]
+					break
+		return L
+
+
 	def __lt__(self, other):
 		#only compared when already has same number of elements
 		if len(self.edges) != len(other.edges):
