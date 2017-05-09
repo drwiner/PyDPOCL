@@ -229,7 +229,7 @@ class ActionLib:
 					# why?
 					self.RS.root.merge(gs.root)
 					self.RS.root.replaced_ID = gs.root.replaced_ID
-				self.append(partialUnify(self.RS, map), gs.stepnumber)
+				self.append(partialUnify(self.RS, map), gs)
 		if len(self) == 0:
 			raise ValueError('no gstep compatible with RS {}'.format(self))
 
@@ -242,8 +242,11 @@ class ActionLib:
 	def __setitem__(self, key, value):
 		self._cndts[key] = value
 
-	def append(self, item, stepnum):
-		item.root.stepnumber = stepnum
+	def append(self, item, gs):
+		item.root.stepnumber = gs.stepnumber
+		item.root.height = gs.height
+		item.height = gs.height
+		item.is_decomp = gs.is_decomp
 		self._cndts.append(item)
 
 	@property

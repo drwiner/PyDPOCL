@@ -99,8 +99,6 @@ class GPlanner:
 				for step in plan.OrderingGraph.topoSort():
 					print(step)
 				print('\n')
-				if len(completed) in {8,4}:
-					print('l')
 				if len(completed) == k:
 					return completed
 				continue
@@ -297,7 +295,7 @@ if __name__ == '__main__':
 	uploadable_ground_step_library_name = 'Ground_Compiler_Library//' + d_name + '.' + p_name
 
 
-	RELOAD = 1
+	RELOAD = 0
 	if RELOAD:
 		GL = Ground_Compiler_Library.Ground.GLib(domain_file, problem_file)
 		with open('ground_steps.txt', 'w') as gs:

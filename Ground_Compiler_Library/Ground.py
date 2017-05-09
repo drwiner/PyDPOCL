@@ -74,7 +74,11 @@ def groundDecompStepList(doperators, GL, stepnum=0, height=0):
 	for op in doperators:
 		#Subplans = Plannify(op.subplan, GL)
 		print('processing operator: {}'.format(op))
-		for sp in Plannify(op.subplan, GL, height):
+		try:
+			sub_plans = Plannify(op.subplan, GL, height)
+		except:
+			continue
+		for sp in sub_plans:
 
 			GDO = copy.deepcopy(op)
 			GDO.is_decomp = True
@@ -270,7 +274,9 @@ class GLib:
 	def _parseEffects(self, gstep, _step, _pre):
 		count = 0
 		for Eff in gstep.Effects:
-			if Eff.Args != _pre.Args or Eff.name != _pre.name:
+			if Eff.name != _pre.name:
+				continue
+			if False in [ea.name == pa.name for ea, pa in zip(Eff.Args, _pre.Args)]:
 				continue
 			if Eff.truth != _pre.truth:
 				self.threat_dict[_step.stepnumber].add(gstep.stepnumber)
