@@ -309,6 +309,52 @@ def upload(GL, name):
 	with open(name, 'wb') as afile:
 		pickle.dump(GL, afile)
 
+
+def just_compile(domain_file, problem_file):
+	GL = Ground_Compiler_Library.Ground.GLib(domain_file, problem_file)
+	with open('ground_steps.txt', 'w') as gs:
+		for step in GL:
+			gs.write(str(step))
+			gs.write('\n\tpreconditions:')
+			for pre in step.Preconditions:
+				gs.write('\n\t\t' + str(pre))
+			gs.write('\n\teffects:')
+			for eff in step.Effects:
+				gs.write('\n\t\t' + str(eff))
+			gs.write('\n\n')
+	ground_step_list = Ground_Compiler_Library.deelementize_ground_library(GL)
+	with open('ground_steps_stripped.txt', 'w') as gs:
+		# gs.write('\n\n')
+		for i, step in enumerate(ground_step_list):
+			gs.write('\n')
+			gs.write(str(i) + '\n')
+			gs.write(str(step))
+			gs.write('\n\tpreconditions:')
+			for pre in step.preconds:
+				gs.write('\n\t\t' + str(pre))
+				if step.cndt_map is not None:
+					if pre.ID in step.cndt_map.keys():
+						gs.write('\n\t\t\tcndts:\t{}'.format(str(step.cndt_map[pre.ID])))
+				if step.threat_map is not None:
+					if pre.ID in step.threat_map.keys():
+						gs.write('\n\t\t\trisks:\t{}'.format(str(step.threat_map[pre.ID])))
+
+			if step.height > 0:
+				gs.write('\n\tsub_steps:')
+				for sub in step.sub_steps:
+					gs.write('\n\t\t{}'.format(str(sub)))
+				gs.write('\n\tsub_orderings:')
+				for ord in step.sub_orderings.edges:
+					gs.write('\n\t\t{}'.format(str(ord.source) + ' < ' + str(ord.sink)))
+				for link in step.sub_links.edges:
+					gs.write('\n\t\t{}'.format(str(link)))
+			gs.write('\n\n')
+
+	for i, gstep in enumerate(ground_step_list):
+		with open(uploadable_ground_step_library_name + str(i), 'wb') as ugly:
+			pickle.dump(gstep, ugly)
+	return GL
+
 if __name__ == '__main__':
 	num_args = len(sys.argv)
 	if num_args >1:
@@ -317,63 +363,31 @@ if __name__ == '__main__':
 			problem_file = sys.argv[2]
 	else:
 		domain_file = 'Ground_Compiler_Library//domains/travel_domain.pddl'
-		problem_file = 'Ground_Compiler_Library//domains/travel-around.pddl'
+		problem_file = 'Ground_Compiler_Library//domains/travel-to-la.pddl'
 		# problem_file = 'Ground_Compiler_Library//domains/travel-to-la.pddl'
 	d_name = domain_file.split('/')[-1].split('.')[0]
 	p_name = problem_file.split('/')[-1].split('.')[0]
 	uploadable_ground_step_library_name = 'Ground_Compiler_Library//' + d_name + '.' + p_name
 
 
-	RELOAD = 0
+	RELOAD = 1
 	if RELOAD:
-		GL = Ground_Compiler_Library.Ground.GLib(domain_file, problem_file)
-		with open('ground_steps.txt', 'w') as gs:
-			for step in GL:
-				gs.write(str(step))
-				gs.write('\n')
-		ground_step_list = Ground_Compiler_Library.deelementize_ground_library(GL)
-		with open('ground_steps.txt', 'a') as gs:
-			gs.write('\n\n')
-			for step in ground_step_list:
-				gs.write(str(step))
-				gs.write('\n')
-		# json.dumps(ground_step_list, uploadable_ground_step_library_name)
-		#
-		for i, gstep in enumerate(ground_step_list):
-			with open(uploadable_ground_step_library_name + str(i), 'wb') as ugly:
-				pickle.dump(gstep, ugly)
-		# with open(uploadable_ground_step_library_name, 'wb') as ugly:
-		# 	for i, gstep in enumerate(ground_step_list):
-		# 		json.dump(gstep, ugly + str(i))
-				# ugly.write('\n')
-				# ugly.write(bytes(jsonpickle.encode(gstep, keys=True, warn=True), 'UTF-8'))
-				# ugly.write(bytes('\n', 'UTF-8'))
-			# ugly.write(jsonpickle.encode(ground_step_list))
+		GL = just_compile(domain_file, problem_file)
 
-		# [gstep_encoder.encode(gstep) for gstep in ground_step_list]
-		# json.dumps(cls=gstep_encoder)
 
-	# ground_steps = json.load(open(uploadable_ground_step_library_name, 'rb'))
-	ground_steps = []
-	i = 0
-	while True:
-		try:
-			print(i)
-			with open(uploadable_ground_step_library_name + str(i), 'rb') as ugly:
-				ground_steps.append(pickle.load(ugly))
-			i += 1
-		except:
-			break
-	print('finished uploading')
-	# with open(uploadable_ground_step_library_name, 'rb') as ugly:
-	# 	for line in ugly:
-	# 		try:
-	# 			# x = line.decode('UTF-8')
-	# 			z = jsonpickle.decode()
-	# 			ground_steps.append(z)
-	# 		except:
-	# 			print('here')
-			# ugly.write(bytes(jsonpickle.encode(gstep), 'UTF-8'))
-	# ground_steps = jsonpickle.decode(open(uploadable_ground_step_library_name, 'rb'))
-	planner = GPlanner(ground_steps)
-	planner.solve(k=1)
+	PLAN = 0
+	if PLAN:
+		ground_steps = []
+		i = 0
+		while True:
+			try:
+				print(i)
+				with open(uploadable_ground_step_library_name + str(i), 'rb') as ugly:
+					ground_steps.append(pickle.load(ugly))
+				i += 1
+			except:
+				break
+		print('finished uploading')
+
+		planner = GPlanner(ground_steps)
+		planner.solve(k=1)
