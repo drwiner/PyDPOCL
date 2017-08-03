@@ -9,8 +9,14 @@ import copy
 import collections
 from clockdeco import clock
 from collections import namedtuple
-
+# import json
+# import jsonpickle
 dummyTuple = namedtuple('dummyTuple', ['init', 'final'])
+
+# class dummyTuple:
+# 	def __init__(self, init, final):
+# 		self.init = init
+# 		self.final = final
 
 class GStep:
 	"""
@@ -56,7 +62,17 @@ class GStep:
 		# open preconditions which need causal link
 		self.open_preconds = list(self.preconds)
 
+	# def to_json(self):
+	# 	return '{}:{}, {}'
+		# return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
 	# public methods #
+
+	# def default(self):
+	# 	def default(self, obj):
+	# 		if hasattr(obj, 'to_json'):
+	# 			return obj.to_json()
+	# 		return json.JSONEncoder.default(self, obj)
 
 	def setup(self, step_to_cndt, precond_to_cndt, step_to_threat, precond_to_threat):
 		"""
@@ -191,6 +207,13 @@ class GLiteral:
 
 	def instantiate(self):
 		return copy.deepcopy(self)
+
+	# def to_json(self):
+	# 	return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+	# 	# return 'u{name}: {}}'
+	#
+	# def from_json(self):
+	# 	pass
 
 	def __hash__(self):
 		return hash(self.ID)

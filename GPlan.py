@@ -6,7 +6,10 @@ import copy
 from collections import namedtuple, defaultdict
 
 dummyTuple = namedtuple('dummyTuple', ['init', 'final'])
-
+# class dummyTuple:
+# 	def __init__(self, init, final):
+# 		self.init = init
+# 		self.final = final
 
 class GPlan:
 
@@ -33,6 +36,7 @@ class GPlan:
 
 		self.heuristic = float('inf')
 		self.name = '0'
+		self.cost = 0
 
 	def __len__(self):
 		return len(self.steps)
@@ -59,9 +63,9 @@ class GPlan:
 		# refresh attributes
 		return new_self
 
-	@property
-	def cost(self):
-		return len(self.steps) - 2
+	# @property
+	# def cost(self):
+	# 	return len(self.steps) - 2
 
 	def isInternallyConsistent(self):
 		return self.OrderingGraph.isInternallyConsistent() and self.CausalLinkGraph.isInternallyConsistent()

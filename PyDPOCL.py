@@ -4,7 +4,7 @@ from uuid import uuid4
 import copy
 from heapq import heappush, heappop
 
-LOG = 0
+LOG = 1
 
 
 def log_message(message):
@@ -149,6 +149,7 @@ class GPlanner:
 
 			# resolve s_need with the new step
 			new_plan.resolve(new_step, mutable_s_need, mutable_p)
+			new_plan.cost += 1
 
 			# insert our new mutated plan into the frontier
 			self.insert(new_plan)
@@ -257,6 +258,9 @@ class GPlanner:
 		for pre in self.gsteps[stepnum].preconds:
 			sumo += self.h_condition(plan, stepnum, pre)
 
+		if self.gsteps[stepnum].height > 0:
+			sumo += self.h_subplan(plan, self.gsteps[stepnum])
+
 		self.h_step_dict[stepnum] = sumo
 		return sumo
 
@@ -274,12 +278,36 @@ class GPlanner:
 
 		return sumo
 
-	def h_subplan(self, subplan):
-		pass
+	def h_subplan(self, plan, abstract_step):
+		sumo = 0
+		for sub_step in abstract_step.sub_steps:
+			for pre in sub_step.open_preconds:
+				if pre in abstract_step.preconds or pre in plan.init:
+					continue
+				sumo += self.h_condition(plan, sub_step.stepnum, pre)
+		for pre in abstract_step.dummy.final.open_preconds:
+			if pre in abstract_step.preconds or pre in plan.init:
+				continue
+			sumo += self.h_condition(plan, abstract_step.dummy.final.stepnum, pre)
+		return sumo
 
 import sys
 import pickle
 import Ground_Compiler_Library
+# import json
+# import jsonpickle
+#
+# class gstep_encoder(json.JSONEncoder):
+# 	def default(self, obj):
+# 		if hasattr(obj, 'to_json'):
+# 			return obj.to_json()
+# 		return json.JSONEncoder.default(self, obj)
+
+
+def upload(GL, name):
+	print(name)
+	with open(name, 'wb') as afile:
+		pickle.dump(GL, afile)
 
 if __name__ == '__main__':
 	num_args = len(sys.argv)
@@ -289,7 +317,8 @@ if __name__ == '__main__':
 			problem_file = sys.argv[2]
 	else:
 		domain_file = 'Ground_Compiler_Library//domains/travel_domain.pddl'
-		problem_file = 'Ground_Compiler_Library//domains/travel-to-la.pddl'
+		problem_file = 'Ground_Compiler_Library//domains/travel-around.pddl'
+		# problem_file = 'Ground_Compiler_Library//domains/travel-to-la.pddl'
 	d_name = domain_file.split('/')[-1].split('.')[0]
 	p_name = problem_file.split('/')[-1].split('.')[0]
 	uploadable_ground_step_library_name = 'Ground_Compiler_Library//' + d_name + '.' + p_name
@@ -308,8 +337,43 @@ if __name__ == '__main__':
 			for step in ground_step_list:
 				gs.write(str(step))
 				gs.write('\n')
-		Ground_Compiler_Library.Ground.upload(ground_step_list, uploadable_ground_step_library_name)
+		# json.dumps(ground_step_list, uploadable_ground_step_library_name)
+		#
+		for i, gstep in enumerate(ground_step_list):
+			with open(uploadable_ground_step_library_name + str(i), 'wb') as ugly:
+				pickle.dump(gstep, ugly)
+		# with open(uploadable_ground_step_library_name, 'wb') as ugly:
+		# 	for i, gstep in enumerate(ground_step_list):
+		# 		json.dump(gstep, ugly + str(i))
+				# ugly.write('\n')
+				# ugly.write(bytes(jsonpickle.encode(gstep, keys=True, warn=True), 'UTF-8'))
+				# ugly.write(bytes('\n', 'UTF-8'))
+			# ugly.write(jsonpickle.encode(ground_step_list))
 
-	ground_steps = pickle.load(open(uploadable_ground_step_library_name, 'rb'))
+		# [gstep_encoder.encode(gstep) for gstep in ground_step_list]
+		# json.dumps(cls=gstep_encoder)
+
+	# ground_steps = json.load(open(uploadable_ground_step_library_name, 'rb'))
+	ground_steps = []
+	i = 0
+	while True:
+		try:
+			print(i)
+			with open(uploadable_ground_step_library_name + str(i), 'rb') as ugly:
+				ground_steps.append(pickle.load(ugly))
+			i += 1
+		except:
+			break
+	print('finished uploading')
+	# with open(uploadable_ground_step_library_name, 'rb') as ugly:
+	# 	for line in ugly:
+	# 		try:
+	# 			# x = line.decode('UTF-8')
+	# 			z = jsonpickle.decode()
+	# 			ground_steps.append(z)
+	# 		except:
+	# 			print('here')
+			# ugly.write(bytes(jsonpickle.encode(gstep), 'UTF-8'))
+	# ground_steps = jsonpickle.decode(open(uploadable_ground_step_library_name, 'rb'))
 	planner = GPlanner(ground_steps)
-	planner.solve(k=15)
+	planner.solve(k=1)

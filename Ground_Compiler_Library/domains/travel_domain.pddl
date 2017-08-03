@@ -9,6 +9,7 @@
         (at ?thing - object ?place - object)
         (in ?person - person ?vehicle - transportation-device)
         (has-ticket ?person - person)
+        (= ?o1 ?o2 - object)
         )
                     
     (:action get-in-car
@@ -21,6 +22,7 @@
     (:action drive
         :parameters (?person - person ?car - car ?from ?to - place)
         :precondition (and (at ?car ?from)
+                        (not (= ?from ?to))
                            (in ?person ?car))
         :effect(and (at ?car ?to)
                     (not (at ?car ?from))))
@@ -48,7 +50,7 @@
                     
     (:action fly
         :parameters (?person - person ?plane - plane ?from ?to - place)
-        :precondition (and (at ?plane ?from)
+        :precondition (and (at ?plane ?from) (not (= ?from ?to))
                             (in ?person ?plane))
         :effect(and (at ?plane ?to)
                    (not (at ?plane ?from))))
@@ -62,7 +64,7 @@
                      
     (:action travel-by-car
         :parameters (?person - person ?from ?to - place)
-		:precondition (at ?person ?from)
+		:precondition (and (at ?person ?from) (not (= ?from ?to)))
         :effect(and (at ?person ?to)
                     (not (at ?person ?from)))
 		:decomp(
@@ -77,7 +79,7 @@
 		
     (:action travel-by-plane
         :parameters (?person - person ?from ?to - place)
-		:precondition (at ?person ?from)
+		:precondition (and (at ?person ?from) (not (= ?from ?to)))
         :effect(and (at ?person ?to)
                     (not (at ?person ?from)))
 		:decomp(
@@ -93,12 +95,12 @@
 				(linked-by ?s2 ?s4 (in ?person ?plane))
 				(linked-by ?s3 ?s4 (at ?plane ?to)))))
 
-	(:action travel
-	    :parameters (?person - person ?to - place)
-	    :precondition ()
-	    :effect(and (at ?person ?to))
-	    :decomp (
-	        :sub-params(?travel-step - step)
-	        :requirements(and
-	            (effect ?travel-step (at ?person ?to)))))
+	;(:action travel
+	 ;   :parameters (?person - person ?to - place)
+	  ;  :precondition ()
+	   ; :effect(and (at ?person ?to))
+	    ;:decomp (
+	     ;   :sub-params(?travel-step - step)
+	      ;  :requirements(and
+	       ;     (effect ?travel-step (at ?person ?to)))))
 )
