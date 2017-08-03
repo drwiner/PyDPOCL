@@ -1,0 +1,629 @@
+
+0
+buy-tickets['bob']
+	preconditions:
+
+
+1
+get-out-of-car['bob', 'accord', 'raleigh']
+	preconditions:
+		in['bob', 'accord']
+			cndts:	[3, 4]
+			risks:	[1, 2]
+		at['accord', 'raleigh']
+			cndts:	[10, 61]
+			risks:	[9]
+
+
+2
+get-out-of-car['bob', 'accord', 'la']
+	preconditions:
+		in['bob', 'accord']
+			cndts:	[3, 4]
+			risks:	[1, 2]
+		at['accord', 'la']
+			cndts:	[9]
+			risks:	[10]
+
+
+3
+get-in-car['bob', 'accord', 'raleigh']
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[10, 61]
+			risks:	[9]
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+
+
+4
+get-in-car['bob', 'accord', 'la']
+	preconditions:
+		at['accord', 'la']
+			cndts:	[9]
+			risks:	[10]
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
+
+5
+fly['bob', '747', 'raleigh', 'la']
+	preconditions:
+		in['bob', '747']
+			cndts:	[11, 12]
+			risks:	[8, 7]
+		at['747', 'raleigh']
+			cndts:	[61, 6]
+			risks:	[5]
+
+
+6
+fly['bob', '747', 'la', 'raleigh']
+	preconditions:
+		in['bob', '747']
+			cndts:	[11, 12]
+			risks:	[8, 7]
+		at['747', 'la']
+			cndts:	[5]
+			risks:	[6]
+
+
+7
+deplane['bob', '747', 'raleigh']
+	preconditions:
+		in['bob', '747']
+			cndts:	[11, 12]
+			risks:	[8, 7]
+		at['747', 'raleigh']
+			cndts:	[61, 6]
+			risks:	[5]
+
+
+8
+deplane['bob', '747', 'la']
+	preconditions:
+		in['bob', '747']
+			cndts:	[11, 12]
+			risks:	[8, 7]
+		at['747', 'la']
+			cndts:	[5]
+			risks:	[6]
+
+
+9
+drive['bob', 'accord', 'raleigh', 'la']
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[10, 61]
+			risks:	[9]
+		in['bob', 'accord']
+			cndts:	[3, 4]
+			risks:	[1, 2]
+
+
+10
+drive['bob', 'accord', 'la', 'raleigh']
+	preconditions:
+		at['accord', 'la']
+			cndts:	[9]
+			risks:	[10]
+		in['bob', 'accord']
+			cndts:	[3, 4]
+			risks:	[1, 2]
+
+
+11
+board-plane['bob', '747', 'raleigh']
+	preconditions:
+		at['747', 'raleigh']
+			cndts:	[61, 6]
+			risks:	[5]
+		has-ticket['bob']
+			cndts:	[0]
+			risks:	[11, 12, 61]
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+
+
+12
+board-plane['bob', '747', 'la']
+	preconditions:
+		at['747', 'la']
+			cndts:	[5]
+			risks:	[6]
+		has-ticket['bob']
+			cndts:	[0]
+			risks:	[11, 12, 61]
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
+
+13
+begin:travel-by-plane[]
+	preconditions:
+
+
+14
+finish:travel-by-plane[]
+	preconditions:
+		not-at['bob', 'la']
+			cndts:	[12, 4, 21, 15]
+			risks:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+
+
+15
+travel-by-plane['bob', 'la', 'raleigh']
+	preconditions:
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+	sub_steps:
+		deplane['bob', '747', 'raleigh']
+		buy-tickets['bob']
+		board-plane['bob', '747', 'la']
+		fly['bob', '747', 'la', 'raleigh']
+	sub_orderings:
+		begin:travel-by-plane[] < deplane['bob', '747', 'raleigh']
+		begin:travel-by-plane[] < finish:travel-by-plane[]
+		fly['bob', '747', 'la', 'raleigh'] < deplane['bob', '747', 'raleigh']
+		begin:travel-by-plane[] < fly['bob', '747', 'la', 'raleigh']
+		deplane['bob', '747', 'raleigh'] < finish:travel-by-plane[]
+		begin:travel-by-plane[] < board-plane['bob', '747', 'la']
+		board-plane['bob', '747', 'la'] < deplane['bob', '747', 'raleigh']
+		buy-tickets['bob'] < board-plane['bob', '747', 'la']
+		fly['bob', '747', 'la', 'raleigh'] < finish:travel-by-plane[]
+		board-plane['bob', '747', 'la'] < fly['bob', '747', 'la', 'raleigh']
+		begin:travel-by-plane[] < buy-tickets['bob']
+		board-plane['bob', '747', 'la'] < finish:travel-by-plane[]
+		buy-tickets['bob'] < finish:travel-by-plane[]
+		Edge fly['bob', '747', 'la', 'raleigh'] --at['747', 'raleigh']--> deplane['bob', '747', 'raleigh']
+		Edge board-plane['bob', '747', 'la'] --in['bob', '747']--> fly['bob', '747', 'la', 'raleigh']
+		Edge buy-tickets['bob'] --has-ticket['bob']--> board-plane['bob', '747', 'la']
+		Edge board-plane['bob', '747', 'la'] --in['bob', '747']--> deplane['bob', '747', 'raleigh']
+
+
+16
+begin:travel-by-plane[]
+	preconditions:
+
+
+17
+finish:travel-by-plane[]
+	preconditions:
+		not-at['bob', 'raleigh']
+			cndts:	[11, 24, 18, 3]
+			risks:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
+
+18
+travel-by-plane['bob', 'raleigh', 'la']
+	preconditions:
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+	sub_steps:
+		deplane['bob', '747', 'la']
+		buy-tickets['bob']
+		board-plane['bob', '747', 'raleigh']
+		fly['bob', '747', 'raleigh', 'la']
+	sub_orderings:
+		fly['bob', '747', 'raleigh', 'la'] < finish:travel-by-plane[]
+		board-plane['bob', '747', 'raleigh'] < fly['bob', '747', 'raleigh', 'la']
+		board-plane['bob', '747', 'raleigh'] < finish:travel-by-plane[]
+		begin:travel-by-plane[] < deplane['bob', '747', 'la']
+		buy-tickets['bob'] < board-plane['bob', '747', 'raleigh']
+		buy-tickets['bob'] < finish:travel-by-plane[]
+		deplane['bob', '747', 'la'] < finish:travel-by-plane[]
+		board-plane['bob', '747', 'raleigh'] < deplane['bob', '747', 'la']
+		begin:travel-by-plane[] < buy-tickets['bob']
+		fly['bob', '747', 'raleigh', 'la'] < deplane['bob', '747', 'la']
+		begin:travel-by-plane[] < fly['bob', '747', 'raleigh', 'la']
+		begin:travel-by-plane[] < board-plane['bob', '747', 'raleigh']
+		begin:travel-by-plane[] < finish:travel-by-plane[]
+		Edge fly['bob', '747', 'raleigh', 'la'] --at['747', 'la']--> deplane['bob', '747', 'la']
+		Edge buy-tickets['bob'] --has-ticket['bob']--> board-plane['bob', '747', 'raleigh']
+		Edge board-plane['bob', '747', 'raleigh'] --in['bob', '747']--> fly['bob', '747', 'raleigh', 'la']
+		Edge board-plane['bob', '747', 'raleigh'] --in['bob', '747']--> deplane['bob', '747', 'la']
+
+
+19
+begin:travel-by-car[]
+	preconditions:
+
+
+20
+finish:travel-by-car[]
+	preconditions:
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+		not-at['bob', 'la']
+			cndts:	[12, 4, 21, 15]
+			risks:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+
+
+21
+travel-by-car['bob', 'la', 'raleigh']
+	preconditions:
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+	sub_steps:
+		drive['bob', 'accord', 'la', 'raleigh']
+		get-out-of-car['bob', 'accord', 'raleigh']
+		get-in-car['bob', 'accord', 'la']
+	sub_orderings:
+		begin:travel-by-car[] < get-out-of-car['bob', 'accord', 'raleigh']
+		get-out-of-car['bob', 'accord', 'raleigh'] < finish:travel-by-car[]
+		drive['bob', 'accord', 'la', 'raleigh'] < get-out-of-car['bob', 'accord', 'raleigh']
+		get-in-car['bob', 'accord', 'la'] < drive['bob', 'accord', 'la', 'raleigh']
+		get-in-car['bob', 'accord', 'la'] < finish:travel-by-car[]
+		begin:travel-by-car[] < get-in-car['bob', 'accord', 'la']
+		drive['bob', 'accord', 'la', 'raleigh'] < finish:travel-by-car[]
+		begin:travel-by-car[] < drive['bob', 'accord', 'la', 'raleigh']
+		begin:travel-by-car[] < finish:travel-by-car[]
+		get-in-car['bob', 'accord', 'la'] < get-out-of-car['bob', 'accord', 'raleigh']
+		Edge get-in-car['bob', 'accord', 'la'] --in['bob', 'accord']--> get-out-of-car['bob', 'accord', 'raleigh']
+		Edge drive['bob', 'accord', 'la', 'raleigh'] --at['accord', 'raleigh']--> get-out-of-car['bob', 'accord', 'raleigh']
+		Edge get-in-car['bob', 'accord', 'la'] --in['bob', 'accord']--> drive['bob', 'accord', 'la', 'raleigh']
+
+
+22
+begin:travel-by-car[]
+	preconditions:
+
+
+23
+finish:travel-by-car[]
+	preconditions:
+		not-at['bob', 'raleigh']
+			cndts:	[11, 24, 18, 3]
+			risks:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
+
+24
+travel-by-car['bob', 'raleigh', 'la']
+	preconditions:
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+	sub_steps:
+		drive['bob', 'accord', 'raleigh', 'la']
+		get-out-of-car['bob', 'accord', 'la']
+		get-in-car['bob', 'accord', 'raleigh']
+	sub_orderings:
+		drive['bob', 'accord', 'raleigh', 'la'] < get-out-of-car['bob', 'accord', 'la']
+		begin:travel-by-car[] < drive['bob', 'accord', 'raleigh', 'la']
+		drive['bob', 'accord', 'raleigh', 'la'] < finish:travel-by-car[]
+		get-in-car['bob', 'accord', 'raleigh'] < drive['bob', 'accord', 'raleigh', 'la']
+		begin:travel-by-car[] < get-in-car['bob', 'accord', 'raleigh']
+		get-in-car['bob', 'accord', 'raleigh'] < finish:travel-by-car[]
+		begin:travel-by-car[] < get-out-of-car['bob', 'accord', 'la']
+		begin:travel-by-car[] < finish:travel-by-car[]
+		get-in-car['bob', 'accord', 'raleigh'] < get-out-of-car['bob', 'accord', 'la']
+		get-out-of-car['bob', 'accord', 'la'] < finish:travel-by-car[]
+		Edge drive['bob', 'accord', 'raleigh', 'la'] --at['accord', 'la']--> get-out-of-car['bob', 'accord', 'la']
+		Edge get-in-car['bob', 'accord', 'raleigh'] --in['bob', 'accord']--> drive['bob', 'accord', 'raleigh', 'la']
+		Edge get-in-car['bob', 'accord', 'raleigh'] --in['bob', 'accord']--> get-out-of-car['bob', 'accord', 'la']
+
+
+25
+begin:travel[]
+	preconditions:
+
+
+26
+finish:travel[]
+	preconditions:
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+
+
+27
+travel['bob', 'raleigh']
+	preconditions:
+	sub_steps:
+		get-out-of-car['bob', 'accord', 'raleigh']
+	sub_orderings:
+		begin:travel[] < get-out-of-car['bob', 'accord', 'raleigh']
+		begin:travel[] < finish:travel[]
+		get-out-of-car['bob', 'accord', 'raleigh'] < finish:travel[]
+
+
+28
+begin:travel[]
+	preconditions:
+
+
+29
+finish:travel[]
+	preconditions:
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
+
+30
+travel['bob', 'la']
+	preconditions:
+	sub_steps:
+		get-out-of-car['bob', 'accord', 'la']
+	sub_orderings:
+		get-out-of-car['bob', 'accord', 'la'] < finish:travel[]
+		begin:travel[] < finish:travel[]
+		begin:travel[] < get-out-of-car['bob', 'accord', 'la']
+
+
+31
+begin:travel[]
+	preconditions:
+
+
+32
+finish:travel[]
+	preconditions:
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+
+
+33
+travel['bob', 'raleigh']
+	preconditions:
+	sub_steps:
+		deplane['bob', '747', 'raleigh']
+	sub_orderings:
+		begin:travel[] < finish:travel[]
+		deplane['bob', '747', 'raleigh'] < finish:travel[]
+		begin:travel[] < deplane['bob', '747', 'raleigh']
+
+
+34
+begin:travel[]
+	preconditions:
+
+
+35
+finish:travel[]
+	preconditions:
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
+
+36
+travel['bob', 'la']
+	preconditions:
+	sub_steps:
+		deplane['bob', '747', 'la']
+	sub_orderings:
+		deplane['bob', '747', 'la'] < finish:travel[]
+		begin:travel[] < deplane['bob', '747', 'la']
+		begin:travel[] < finish:travel[]
+
+
+37
+begin:travel[]
+	preconditions:
+
+
+38
+finish:travel[]
+	preconditions:
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+
+
+39
+travel['bob', 'raleigh']
+	preconditions:
+	sub_steps:
+		travel-by-plane['bob', 'la', 'raleigh']
+	sub_orderings:
+		begin:travel[] < finish:travel[]
+		begin:travel[] < travel-by-plane['bob', 'la', 'raleigh']
+		travel-by-plane['bob', 'la', 'raleigh'] < finish:travel[]
+
+
+40
+begin:travel[]
+	preconditions:
+
+
+41
+finish:travel[]
+	preconditions:
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
+
+42
+travel['bob', 'la']
+	preconditions:
+	sub_steps:
+		travel-by-plane['bob', 'raleigh', 'la']
+	sub_orderings:
+		travel-by-plane['bob', 'raleigh', 'la'] < finish:travel[]
+		begin:travel[] < finish:travel[]
+		begin:travel[] < travel-by-plane['bob', 'raleigh', 'la']
+
+
+43
+begin:travel[]
+	preconditions:
+
+
+44
+finish:travel[]
+	preconditions:
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+
+
+45
+travel['bob', 'raleigh']
+	preconditions:
+	sub_steps:
+		travel-by-car['bob', 'la', 'raleigh']
+	sub_orderings:
+		begin:travel[] < finish:travel[]
+		begin:travel[] < travel-by-car['bob', 'la', 'raleigh']
+		travel-by-car['bob', 'la', 'raleigh'] < finish:travel[]
+
+
+46
+begin:travel[]
+	preconditions:
+
+
+47
+finish:travel[]
+	preconditions:
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
+
+48
+travel['bob', 'la']
+	preconditions:
+	sub_steps:
+		travel-by-car['bob', 'raleigh', 'la']
+	sub_orderings:
+		begin:travel[] < travel-by-car['bob', 'raleigh', 'la']
+		begin:travel[] < finish:travel[]
+		travel-by-car['bob', 'raleigh', 'la'] < finish:travel[]
+
+
+49
+begin:travel[]
+	preconditions:
+
+
+50
+finish:travel[]
+	preconditions:
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+
+
+51
+travel['bob', 'raleigh']
+	preconditions:
+	sub_steps:
+		travel['bob', 'raleigh']
+	sub_orderings:
+		travel['bob', 'raleigh'] < finish:travel[]
+		begin:travel[] < travel['bob', 'raleigh']
+		begin:travel[] < finish:travel[]
+
+
+52
+begin:travel[]
+	preconditions:
+
+
+53
+finish:travel[]
+	preconditions:
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
+
+54
+travel['bob', 'la']
+	preconditions:
+	sub_steps:
+		travel['bob', 'la']
+	sub_orderings:
+		travel['bob', 'la'] < finish:travel[]
+		begin:travel[] < finish:travel[]
+		begin:travel[] < travel['bob', 'la']
+
+
+55
+begin:travel[]
+	preconditions:
+
+
+56
+finish:travel[]
+	preconditions:
+		at['bob', 'raleigh']
+			cndts:	[1, 33, 7, 39, 45, 15, 16, 51, 21, 22, 57, 27, 61]
+			risks:	[11, 24, 18, 3]
+
+
+57
+travel['bob', 'raleigh']
+	preconditions:
+	sub_steps:
+		travel['bob', 'raleigh']
+	sub_orderings:
+		travel['bob', 'raleigh'] < finish:travel[]
+		begin:travel[] < finish:travel[]
+		begin:travel[] < travel['bob', 'raleigh']
+
+
+58
+begin:travel[]
+	preconditions:
+
+
+59
+finish:travel[]
+	preconditions:
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
+
+60
+travel['bob', 'la']
+	preconditions:
+	sub_steps:
+		travel['bob', 'la']
+	sub_orderings:
+		travel['bob', 'la'] < finish:travel[]
+		begin:travel[] < travel['bob', 'la']
+		begin:travel[] < finish:travel[]
+
+
+61
+dummy_init[]
+	preconditions:
+		not-has-ticket['bob']
+		not-person['bob']
+		at['accord', 'raleigh']
+		not-place['la']
+		not-place['raleigh']
+		at['bob', 'raleigh']
+		at['747', 'raleigh']
+
+
+62
+dummy_goal[]
+	preconditions:
+		at['bob', 'la']
+			cndts:	[2, 36, 8, 42, 13, 48, 18, 19, 54, 24, 60, 30]
+			risks:	[12, 4, 21, 15]
+
