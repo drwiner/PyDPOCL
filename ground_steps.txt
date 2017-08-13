@@ -1,73 +1,156 @@
-buy-tickets-0-abb9['bob']
+fly-0-babb['sara', '747', 'raleigh', 'la']
 	preconditions:
+		at['747', 'raleigh']
+		in['sara', '747']
 	effects:
-		has-ticket['bob']
+		not-at['747', 'raleigh']
+		at['747', 'la']
 
-get-out-of-car-1-a292['bob', 'accord', 'raleigh']
+fly-1-babb['sara', '747', 'la', 'raleigh']
 	preconditions:
-		in['bob', 'accord']
-		at['accord', 'raleigh']
+		at['747', 'la']
+		in['sara', '747']
+	effects:
+		not-at['747', 'la']
+		at['747', 'raleigh']
+
+fly-2-babb['bob', '747', 'raleigh', 'la']
+	preconditions:
+		at['747', 'raleigh']
+		in['bob', '747']
+	effects:
+		not-at['747', 'raleigh']
+		at['747', 'la']
+
+fly-3-babb['bob', '747', 'la', 'raleigh']
+	preconditions:
+		at['747', 'la']
+		in['bob', '747']
+	effects:
+		not-at['747', 'la']
+		at['747', 'raleigh']
+
+board-plane-4-a452['sara', '747', 'raleigh']
+	preconditions:
+		at['sara', 'raleigh']
+		at['747', 'raleigh']
+		has-ticket['sara']
+	effects:
+		not-has-ticket['sara']
+		in['sara', '747']
+		not-at['sara', 'raleigh']
+
+board-plane-5-a452['sara', '747', 'la']
+	preconditions:
+		at['sara', 'la']
+		at['747', 'la']
+		has-ticket['sara']
+	effects:
+		not-has-ticket['sara']
+		in['sara', '747']
+		not-at['sara', 'la']
+
+board-plane-6-a452['bob', '747', 'raleigh']
+	preconditions:
+		at['bob', 'raleigh']
+		at['747', 'raleigh']
+		has-ticket['bob']
+	effects:
+		not-has-ticket['bob']
+		in['bob', '747']
+		not-at['bob', 'raleigh']
+
+board-plane-7-a452['bob', '747', 'la']
+	preconditions:
+		at['bob', 'la']
+		at['747', 'la']
+		has-ticket['bob']
+	effects:
+		not-has-ticket['bob']
+		in['bob', '747']
+		not-at['bob', 'la']
+
+deplane-8-8753['sara', '747', 'raleigh']
+	preconditions:
+		at['747', 'raleigh']
+		in['sara', '747']
+	effects:
+		at['sara', 'raleigh']
+		not-in['sara', '747']
+
+deplane-9-8753['sara', '747', 'la']
+	preconditions:
+		at['747', 'la']
+		in['sara', '747']
+	effects:
+		at['sara', 'la']
+		not-in['sara', '747']
+
+deplane-10-8753['bob', '747', 'raleigh']
+	preconditions:
+		at['747', 'raleigh']
+		in['bob', '747']
 	effects:
 		at['bob', 'raleigh']
-		not-in['bob', 'accord']
+		not-in['bob', '747']
 
-get-out-of-car-2-a292['bob', 'accord', 'la']
+deplane-11-8753['bob', '747', 'la']
 	preconditions:
-		in['bob', 'accord']
-		at['accord', 'la']
+		at['747', 'la']
+		in['bob', '747']
 	effects:
 		at['bob', 'la']
-		not-in['bob', 'accord']
+		not-in['bob', '747']
 
-get-in-car-3-964b['bob', 'accord', 'raleigh']
+get-in-car-12-b8c2['sara', 'accord', 'raleigh']
 	preconditions:
+		at['sara', 'raleigh']
 		at['accord', 'raleigh']
+	effects:
+		not-at['sara', 'raleigh']
+		in['sara', 'accord']
+
+get-in-car-13-b8c2['sara', 'accord', 'la']
+	preconditions:
+		at['sara', 'la']
+		at['accord', 'la']
+	effects:
+		not-at['sara', 'la']
+		in['sara', 'accord']
+
+get-in-car-14-b8c2['bob', 'accord', 'raleigh']
+	preconditions:
 		at['bob', 'raleigh']
+		at['accord', 'raleigh']
 	effects:
 		not-at['bob', 'raleigh']
 		in['bob', 'accord']
 
-get-in-car-4-964b['bob', 'accord', 'la']
+get-in-car-15-b8c2['bob', 'accord', 'la']
 	preconditions:
-		at['accord', 'la']
 		at['bob', 'la']
+		at['accord', 'la']
 	effects:
 		not-at['bob', 'la']
 		in['bob', 'accord']
 
-fly-5-9deb['bob', '747', 'raleigh', 'la']
+drive-16-a52e['sara', 'accord', 'raleigh', 'la']
 	preconditions:
-		in['bob', '747']
-		at['747', 'raleigh']
+		at['accord', 'raleigh']
+		in['sara', 'accord']
 	effects:
-		at['747', 'la']
-		not-at['747', 'raleigh']
+		at['accord', 'la']
+		not-at['accord', 'raleigh']
 
-fly-6-9deb['bob', '747', 'la', 'raleigh']
+drive-17-a52e['sara', 'accord', 'la', 'raleigh']
 	preconditions:
-		in['bob', '747']
-		at['747', 'la']
+		at['accord', 'la']
+		in['sara', 'accord']
 	effects:
-		at['747', 'raleigh']
-		not-at['747', 'la']
+		at['accord', 'raleigh']
+		not-at['accord', 'la']
 
-deplane-7-8d94['bob', '747', 'raleigh']
-	preconditions:
-		in['bob', '747']
-		at['747', 'raleigh']
-	effects:
-		not-in['bob', '747']
-		at['bob', 'raleigh']
-
-deplane-8-8d94['bob', '747', 'la']
-	preconditions:
-		in['bob', '747']
-		at['747', 'la']
-	effects:
-		not-in['bob', '747']
-		at['bob', 'la']
-
-drive-9-92e6['bob', 'accord', 'raleigh', 'la']
+drive-18-a52e['bob', 'accord', 'raleigh', 'la']
 	preconditions:
 		at['accord', 'raleigh']
 		in['bob', 'accord']
@@ -75,7 +158,7 @@ drive-9-92e6['bob', 'accord', 'raleigh', 'la']
 		at['accord', 'la']
 		not-at['accord', 'raleigh']
 
-drive-10-92e6['bob', 'accord', 'la', 'raleigh']
+drive-19-a52e['bob', 'accord', 'la', 'raleigh']
 	preconditions:
 		at['accord', 'la']
 		in['bob', 'accord']
@@ -83,279 +166,64 @@ drive-10-92e6['bob', 'accord', 'la', 'raleigh']
 		at['accord', 'raleigh']
 		not-at['accord', 'la']
 
-board-plane-11-ae7c['bob', '747', 'raleigh']
+buy-tickets-20-915a['sara']
 	preconditions:
-		at['747', 'raleigh']
+	effects:
+		has-ticket['sara']
+
+buy-tickets-21-915a['bob']
+	preconditions:
+	effects:
 		has-ticket['bob']
-		at['bob', 'raleigh']
-	effects:
-		in['bob', '747']
-		not-at['bob', 'raleigh']
-		not-has-ticket['bob']
 
-board-plane-12-ae7c['bob', '747', 'la']
+get-out-of-car-22-9d55['sara', 'accord', 'raleigh']
 	preconditions:
-		at['747', 'la']
-		has-ticket['bob']
-		at['bob', 'la']
-	effects:
-		in['bob', '747']
-		not-at['bob', 'la']
-		not-has-ticket['bob']
-
-None-13-b659[]
-	preconditions:
-	effects:
-		at['bob', 'la']
-
-None-14-b4a6[]
-	preconditions:
-		not-at['bob', 'la']
-		at['bob', 'raleigh']
-	effects:
-
-travel-by-plane-15-b45b['bob', 'la', 'raleigh']
-	preconditions:
-		at['bob', 'la']
-	effects:
-		at['bob', 'raleigh']
-		not-at['bob', 'la']
-
-None-16-874f[]
-	preconditions:
-	effects:
-		at['bob', 'raleigh']
-
-None-17-83d0[]
-	preconditions:
-		not-at['bob', 'raleigh']
-		at['bob', 'la']
-	effects:
-
-travel-by-plane-18-aaf2['bob', 'raleigh', 'la']
-	preconditions:
-		at['bob', 'raleigh']
-	effects:
-		at['bob', 'la']
-		not-at['bob', 'raleigh']
-
-None-19-9cc1[]
-	preconditions:
-	effects:
-		at['bob', 'la']
-
-None-20-b86f[]
-	preconditions:
-		at['bob', 'raleigh']
-		not-at['bob', 'la']
-	effects:
-
-travel-by-car-21-967e['bob', 'la', 'raleigh']
-	preconditions:
-		at['bob', 'la']
-	effects:
-		at['bob', 'raleigh']
-		not-at['bob', 'la']
-
-None-22-91b8[]
-	preconditions:
-	effects:
-		at['bob', 'raleigh']
-
-None-23-a9da[]
-	preconditions:
-		not-at['bob', 'raleigh']
-		at['bob', 'la']
-	effects:
-
-travel-by-car-24-8297['bob', 'raleigh', 'la']
-	preconditions:
-		at['bob', 'raleigh']
-	effects:
-		at['bob', 'la']
-		not-at['bob', 'raleigh']
-
-None-25-b99e[]
-	preconditions:
-	effects:
-
-None-26-b4d3[]
-	preconditions:
-		at['bob', 'raleigh']
-	effects:
-
-travel-27-9fcb['bob', 'raleigh']
-	preconditions:
-	effects:
-		at['bob', 'raleigh']
-
-None-28-9f0a[]
-	preconditions:
-	effects:
-
-None-29-92f6[]
-	preconditions:
-		at['bob', 'la']
-	effects:
-
-travel-30-8ca6['bob', 'la']
-	preconditions:
-	effects:
-		at['bob', 'la']
-
-None-31-b5a8[]
-	preconditions:
-	effects:
-
-None-32-97fd[]
-	preconditions:
-		at['bob', 'raleigh']
-	effects:
-
-travel-33-8f9f['bob', 'raleigh']
-	preconditions:
-	effects:
-		at['bob', 'raleigh']
-
-None-34-ac36[]
-	preconditions:
-	effects:
-
-None-35-b0f1[]
-	preconditions:
-		at['bob', 'la']
-	effects:
-
-travel-36-85e7['bob', 'la']
-	preconditions:
-	effects:
-		at['bob', 'la']
-
-None-37-8093[]
-	preconditions:
-	effects:
-
-None-38-8cbf[]
-	preconditions:
-		at['bob', 'raleigh']
-	effects:
-
-travel-39-83d5['bob', 'raleigh']
-	preconditions:
-	effects:
-		at['bob', 'raleigh']
-
-None-40-bbde[]
-	preconditions:
-	effects:
-
-None-41-af4e[]
-	preconditions:
-		at['bob', 'la']
-	effects:
-
-travel-42-870d['bob', 'la']
-	preconditions:
-	effects:
-		at['bob', 'la']
-
-None-43-bc13[]
-	preconditions:
-	effects:
-
-None-44-95a0[]
-	preconditions:
-		at['bob', 'raleigh']
-	effects:
-
-travel-45-80da['bob', 'raleigh']
-	preconditions:
-	effects:
-		at['bob', 'raleigh']
-
-None-46-94c5[]
-	preconditions:
-	effects:
-
-None-47-aeb6[]
-	preconditions:
-		at['bob', 'la']
-	effects:
-
-travel-48-8b43['bob', 'la']
-	preconditions:
-	effects:
-		at['bob', 'la']
-
-None-49-a5fd[]
-	preconditions:
-	effects:
-
-None-50-a0e8[]
-	preconditions:
-		at['bob', 'raleigh']
-	effects:
-
-travel-51-92e3['bob', 'raleigh']
-	preconditions:
-	effects:
-		at['bob', 'raleigh']
-
-None-52-ae23[]
-	preconditions:
-	effects:
-
-None-53-bf36[]
-	preconditions:
-		at['bob', 'la']
-	effects:
-
-travel-54-9324['bob', 'la']
-	preconditions:
-	effects:
-		at['bob', 'la']
-
-None-55-8089[]
-	preconditions:
-	effects:
-
-None-56-a013[]
-	preconditions:
-		at['bob', 'raleigh']
-	effects:
-
-travel-57-a593['bob', 'raleigh']
-	preconditions:
-	effects:
-		at['bob', 'raleigh']
-
-None-58-a231[]
-	preconditions:
-	effects:
-
-None-59-9b8c[]
-	preconditions:
-		at['bob', 'la']
-	effects:
-
-travel-60-90e3['bob', 'la']
-	preconditions:
-	effects:
-		at['bob', 'la']
-
-dummy_init-61-9c80[]
-	preconditions:
-	effects:
-		not-has-ticket['bob']
-		not-person['bob']
+		in['sara', 'accord']
 		at['accord', 'raleigh']
-		not-place['la']
-		not-place['raleigh']
-		at['bob', 'raleigh']
-		at['747', 'raleigh']
+	effects:
+		at['sara', 'raleigh']
+		not-in['sara', 'accord']
 
-dummy_goal-62-adb5[]
+get-out-of-car-23-9d55['sara', 'accord', 'la']
 	preconditions:
+		in['sara', 'accord']
+		at['accord', 'la']
+	effects:
+		at['sara', 'la']
+		not-in['sara', 'accord']
+
+get-out-of-car-24-9d55['bob', 'accord', 'raleigh']
+	preconditions:
+		in['bob', 'accord']
+		at['accord', 'raleigh']
+	effects:
+		at['bob', 'raleigh']
+		not-in['bob', 'accord']
+
+get-out-of-car-25-9d55['bob', 'accord', 'la']
+	preconditions:
+		in['bob', 'accord']
+		at['accord', 'la']
+	effects:
 		at['bob', 'la']
+		not-in['bob', 'accord']
+
+dummy_init-26-9ce9[]
+	preconditions:
+	effects:
+		at['accord', 'raleigh']
+		not-person['sara']
+		not-place['la']
+		at['sara', 'la']
+		not-has-ticket['bob']
+		at['bob', 'raleigh']
+		not-has-ticket['sara']
+		at['747', 'raleigh']
+		not-person['bob']
+		not-place['raleigh']
+
+dummy_goal-27-b886[]
+	preconditions:
+		at['sara', 'raleigh']
 	effects:
 

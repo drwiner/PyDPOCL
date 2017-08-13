@@ -1,7 +1,7 @@
 from Ground_Compiler_Library.PlanElementGraph import Action, PlanElementGraph, Condition
 from Ground_Compiler_Library.Element import Operator
 from Ground_Compiler_Library.Graph import Edge
-from Ground_Compiler_Library.Flaws import Flaw
+from Ground_Compiler_Library.Flaws_unused import Flaw
 
 from clockdeco import clock
 import copy

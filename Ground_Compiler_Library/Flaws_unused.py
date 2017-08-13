@@ -1,13 +1,7 @@
-#from pddlToGraphs import *
-import collections
-import bisect
-from uuid import uuid1, uuid4
-from Ground_Compiler_Library.Graph import isConsistentEdgeSet
+from collections import deque
+from bisect import bisect_left
+from uuid import uuid4
 
-import itertools
-from clockdeco import clock
-#from PlanElementGraph import Condition
-#import PlanElementGraph
 """
 	Flaws for plan element graphs
 """
@@ -18,48 +12,62 @@ class Flaw:
 		self.flaw = f
 		self.cndts = 0
 		self.risks = 0
-		self.criteria = self.cndts
-		self.heuristic = float('inf')
-		if name == 'opf':
-			self.tiebreaker = hash(f[1].replaced_ID)
-
-	def __hash__(self):
-		return hash(self.flaw)
-		
-	def __eq__(self, other):
-		return hash(self) == hash(other)
+		self.criteria = 0
+		self.tiebreaker = 0
+		self.flaw_type = None
 
 	#For comparison via bisect
 	def __lt__(self, other):
-		if self.criteria != other.criteria:
+		if self.flaw_type == 'unsafe':
+			if self.risks != other.risks:
+				return self.risks < other.risks
+		elif self.criteria != other.criteria:
 			return self.criteria < other.criteria
 		else:
 			return self.tiebreaker < other.tiebreaker
 
-
-	def setCriteria(self, flaw_type):
-		if self.name == 'tclf':
-			self.criteria = self.flaw[0].stepnumber
-			self.tiebreaker = hash(self.flaw[1].label.replaced_ID) + self.flaw[1].sink.stepnumber
-		elif flaw_type == 'unsafe':
-			self.criteria = self.risks
-		elif flaw_type in {'inits', 'statics', 'nonreusable'}:
-			self.criteria = self.heuristic
-
 	def __repr__(self):
-		return 'Flaw({}, h={}, criteria={}, tb={})'.format(self.flaw, self.heuristic, self.criteria, self.tiebreaker)
+		return 'Flaw({}, criteria={}, tb={})'.format(self.flaw, self.criteria, self.tiebreaker)
 
-class TCLF(Flaw):
-	def __init__(self, f, name):
-		super(TCLF, self).__init__(f, name)
-		self.threat = self.flaw[0]
-		self.link = self.flaw[1]
-		self.criteria = self.threat.stepnumber
-		self.tiebreaker = hash(self.link.label.replaced_ID) + self.link.sink.stepnumber
+
+class OPF(Flaw):
+
+	def __init__(self, s_need, pre):
+		super(OPF, self).__init__((s_need, pre), 'opf')
+		self.s_need = s_need
+		self.p = pre
+		# self.criteria = hash(s_need.stepnum) ^ hash(pre.name) ^ hash(pre.truth)
+		self.criteria = len(str(s_need.schema)) + len(str(pre.name)) + len(str(pre.truth))
+		self.tiebreaker = sum(len(str(arg.name)) for arg in pre.Args)
 
 	def __hash__(self):
-	 	return self.threat.stepnumber*1000 + self.link.source.stepnumber + self.link.sink.stepnumber + hash(
-			self.link.label.replaced_ID)
+		return hash(self.flaw[0].ID) ^ hash(self.flaw[1].ID)
+
+
+class TCLF(Flaw):
+
+	def __init__(self, threatening_step, causal_link_edge):
+		super(TCLF, self).__init__((threatening_step, causal_link_edge), 'tclf')
+		self.threat = self.flaw[0]
+		self.link = self.flaw[1]
+		self.criteria = len(str(self.threat.schema)) + len(str(self.link.label.name)) + len(str(self.link.label.truth))
+		self.tiebreaker = len(str(self.link.label.truth)) + len(str(self.link.label.name)) \
+		                  + len(str(causal_link_edge.sink.schema)) - len(causal_link_edge.source.preconds)
+
+	def __hash__(self):
+		return hash(self.threat.ID) ^ hash(self.link.source.ID) ^ hash(self.link.sink.ID) ^ hash(self.link.label.ID)
+
+# class DTCLF(Flaw):
+# 	def __init__(self, dummy_init, dummy_final, causal_link_edge):
+# 		super(DTCLF, self).__init__(((dummy_init, dummy_final), causal_link_edge), 'tclf')
+# 		self.anterior = dummy_init
+# 		self.posterior = dummy_final
+# 		self.link = self.flaw[1]
+# 		self.criteria = self.anterior.stepnum ^ self.posterior.stepnum ^ self.link.source.stepnum ^ self.link.sink.stepnum
+# 		self.tiebreaker = hash(self.link.label.name) ^ hash(self.link.label.truth) ^ sum(hash(arg) for arg in self.link.label.Args)
+
+	def __hash__(self):
+		return hash(self.anterior.ID) ^ hash(self.posterior.ID) ^ hash(self.link.source.ID) ^ hash(self.link.sink.ID) ^ hash(self.link.label.ID)
 
 class DCF(Flaw):
 	def __init__(self, f, name):
@@ -75,13 +83,12 @@ class Flawque:
 	""" A deque which pretends to be a set, and keeps everything sorted, highest-value first"""
 
 	def __init__(self, name=None):
-		self._flaws = collections.deque()
+		self._flaws = deque()
 		self.name = name
 
 	def add(self, flaw):
-		flaw.setCriteria(self.name)
+		flaw.flaw_type = self.name
 		self.insert(flaw)
-		#self._flaws.append(item)
 
 	def update(self, iter):
 		for flaw in iter:
@@ -94,7 +101,7 @@ class Flawque:
 		return len(self._flaws)
 
 	def removeDuplicates(self):
-		self._flaws = collections.deque(set(self._flaws))
+		self._flaws = deque(set(self._flaws))
 
 	def head(self):
 		return self._flaws.popleft()
@@ -109,7 +116,7 @@ class Flawque:
 		return self._flaws[-1]
 
 	def insert(self, flaw):
-		index = bisect.bisect_left(self._flaws, flaw)
+		index = bisect_left(self._flaws, flaw)
 		self._flaws.rotate(-index)
 		self._flaws.appendleft(flaw)
 		self._flaws.rotate(index)
@@ -120,22 +127,7 @@ class Flawque:
 	def __repr__(self):
 		return str(self._flaws)
 
-class simpleQueueWrapper(collections.deque):
-	#def __init__(self, name):
-		#super(simpleQueueWrapper, self).__init__()
-		#self.name = name
-	def add(self, item):
-		self.append(item)
-	def pop(self):
-		return self.popleft()
-	def update(self, iter):
-		for it in iter:
-			self.append(it)
 
-
-from collections import namedtuple
-
-Flaw_Type_List = namedtuple('FlawTypes', 'statics inits threats decomps unsafe reusable nonreusable'.split())
 class FlawTypes:
 	def __init__(self, statics, inits, threats, decomps, unsafe, reusable, nonreusable):
 		self._list = [statics, inits, threats, decomps, unsafe, reusable, nonreusable]
@@ -144,7 +136,6 @@ class FlawTypes:
 		return len(self._list)
 	def __getitem__(self, item):
 		return self._list[item]
-
 
 
 class FlawLib():
@@ -176,18 +167,8 @@ class FlawLib():
 		self.typs = FlawTypes(self.statics, self.inits, self.threats, self.decomps, self.unsafe, self.reusable, self.nonreusable)
 		self.restricted_names = ['threats', 'decomps']
 
-	# @property
-	# def heuristic(self):
-	# 	value = 0
-	# 	for i, flawques in enumerate(self.typs):
-	# 		if flawques.name in self.restricted_names:
-	# 			continue
-	# 		value += i*len(flawques)
-	# 	return value
-
 	def __len__(self):
 		return sum(len(flaw_set) for flaw_set in self.typs)
-	#	return len(self.threats) + len(self.unsafe) + len(self.statics) + len(self.reusable) + len(self.nonreusable)
 
 	def __contains__(self, flaw):
 		for flaw_set in self.typs:
@@ -200,15 +181,29 @@ class FlawLib():
 		return [flaw for i, flaw_set in enumerate(self.typs) for flaw in flaw_set if flaw_set.name not in
 				self.restricted_names]
 
-	def OCs(self):
+
+	def counts_for_heuristic(self, flaw_set):
+		if len(flaw_set) == 0:
+			return False
+		if flaw_set.name in self.restricted_names:
+			return False
+		return True
+
+	def OC_gen(self):
 		''' Generator for open conditions'''
-		for i, flaw_set in enumerate(self.typs):
-			if len(flaw_set) == 0:
-				continue
-			if flaw_set.name in self.restricted_names:
-				continue
-			g = (flaw for flaw in flaw_set)
-			yield(next(g))
+		# for flaw_set in self.typs:
+		# 	if not self.counts_for_heuristic(flaw_set):
+		return [flaw for flaw_set in self.typs for flaw in flaw_set
+		        if self.counts_for_heuristic(flaw_set) and flaw.flaw[0].height == 0]
+		# for i, flaw_set in enumerate(self.typs):
+		# 	if len(flaw_set) == 0:
+		# 		continue
+		# 	if flaw_set.name in self.restricted_names:
+		# 		continue
+		# 	# if flaw_set.name == 'statics':
+		# 	# 	continue
+		# 	return (flaw for flaw in flaw_set if flaw.flaw[0].height == 0)
+			# return(g)
 
 	def next(self):
 		''' Returns flaw with highest priority, and removes'''
@@ -218,22 +213,25 @@ class FlawLib():
 		return None
 
 	#@clock
-	def addCndtsAndRisks(self, GL, action):
+	def addCndtsAndRisks(self, plan, action):
 		""" For each effect of Action, add to open-condition mapping if consistent"""
 
 		for oc in self.OCs():
 			s_need, pre = oc.flaw
 
 			# step numbers of antecdent types
-			if action.stepnumber in GL.id_dict[pre.replaced_ID]:
+			if plan.OrderingGraph.isPath(s_need, action):
+				continue
+
+			if action.stepnumber in action.cndt_map[pre.ID]:
 				oc.cndts += 1
 
 			# step numbers of threatening steps
-			elif action.stepnumber in GL.threat_dict[s_need.stepnumber]:
+			elif action.stepnumber in action.threats:
 				oc.risks += 1
 
 	#@clock
-	def insert(self, GL, plan, flaw):
+	def insert(self, plan, flaw):
 		''' for each effect of an existing step, check and update mapping to consistent effects'''
 
 		if flaw.name == 'tclf':
@@ -249,28 +247,22 @@ class FlawLib():
 		s_need, pre = flaw.flaw
 
 		#if pre.predicate is static
-		if (pre.name, pre.truth) not in FlawLib.non_static_preds:
+		if pre.is_static:
 			self.statics.add(flaw)
 			return
 
-		#Eval number of existing candidates
-		ante_nums = GL.id_dict[pre.replaced_ID]
-		risk_nums = GL.threat_dict[s_need.stepnumber]
-
-		for step in plan.Steps:
-			#defense
-			if step == s_need:
+		for step in plan.steps:
+			if step.ID == s_need.ID:
 				continue
 			if plan.OrderingGraph.isPath(s_need, step):
 				continue
-			if step.stepnumber in ante_nums:
+			if step.stepnum in s_need.cndt_map[pre.ID]:
 				flaw.cndts += 1
-				if step.name == 'dummy_init':
-					self.inits.add(flaw)
-			if step.stepnumber in risk_nums:
+			if step.stepnum in s_need.threat_map[pre.ID]:
 				flaw.risks += 1
 
-		if flaw in self.inits:
+		if pre in plan.init:
+			self.inits.add(flaw)
 			return
 
 		if flaw.risks > 0:
@@ -287,14 +279,15 @@ class FlawLib():
 
 	def __repr__(self):
 		F = [('|' + ''.join([str(flaw) + '\n|' for flaw in T]) , T.name) for T in self.typs if len(T) > 0]
-		return '\n|FLAWLIBRARY: \n|' + ''.join(['\n|{}: \n{}'.format(name, flaws) for flaws, name in F])
+		return 'Flaw Lib\n' + '\n'.join(['{}: {}'.format(name, flaws) for flaws, name in F])
 
-import unittest
-class TestOrderingGraphMethods(unittest.TestCase):
-
-	def test_flaw_counter(self):
-		assert True
-
-
-if __name__ ==  '__main__':
-	unittest.main()
+# import unittest
+#
+#
+# class TestOrderingGraphMethods(unittest.TestCase):
+#
+# 	def test_flaw_counter(self):
+# 		assert True
+#
+# if __name__ ==  '__main__':
+# 	unittest.main()

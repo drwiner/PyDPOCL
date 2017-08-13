@@ -40,7 +40,8 @@ class OrderingGraph(Graph):
 
 		for element in self.elements:
 			visited = self.rDetectCycle(element) - {element}
-			predecessors = self.getParents(element)
+			predecessors = set(edge.source for edge in self.edges if edge.sink.ID == element.ID)
+			# predecessors = self.getParents(element)
 			for elm in visited:
 				if elm in predecessors:
 					return True
@@ -48,7 +49,7 @@ class OrderingGraph(Graph):
 
 	######       rDetect       ####################
 	def rDetectCycle(self, element, visited=None):
-		if visited == None:
+		if visited is None:
 			visited = set()
 
 		# Base Case 1
@@ -142,6 +143,9 @@ class CausalLinkGraph(OrderingGraph):
 
 	def __repr__(self):
 		return str(['{} --{}--> {}'.format(edge.source, edge.label, edge.sink) for edge in self.edges])
+
+
+
 
 import unittest
 

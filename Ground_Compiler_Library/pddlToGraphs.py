@@ -7,7 +7,7 @@ from Ground_Compiler_Library.PlanElementGraph import Action, PlanElementGraph
 from Ground_Compiler_Library.Graph import Edge
 from Ground_Compiler_Library.Element import Argument, Operator, Literal, Element, Actor
 from Ground_Compiler_Library.pddl.parser import Parser
-from Ground_Compiler_Library.Flaws import FlawLib
+from Ground_Compiler_Library.Flaws_unused import FlawLib
 
 
 def makeGoal(formula):

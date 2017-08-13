@@ -1,0 +1,529 @@
+D:\Python\python.exe D:/Documents/Python/pydpocl/PyDPOCL.py
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+finished uploading
+>	add plan to frontier:  with cost 0 and heuristic 2
+
+Plan  selected cost=0 heuristic=2
+		 dummy_init[]_1ec1
+
+		 dummy_goal[]_e0e5
+
+opf selected : Flaw((dummy_goal[]_e0e5, at['bob', 'la']), criteria=16, tb=5)
+
+Add step travel['bob', 'la']_678b to plan [n]0[a] 
+
+>	add plan to frontier: [n]0[a]  with cost 4 and heuristic 5
+
+Add step get-out-of-car['bob', 'accord', 'la']_9b66 to plan [n]1[a] 
+
+>	add plan to frontier: [n]1[a]  with cost 5 and heuristic 2
+
+Add step travel['bob', 'la']_6121 to plan [n]2[a] 
+
+>	add plan to frontier: [n]2[a]  with cost 1 and heuristic 5
+
+Add step deplane['bob', '747', 'la']_eda3 to plan [n]3[a] 
+
+>	add plan to frontier: [n]3[a]  with cost 5 and heuristic 3
+
+Add step travel['bob', 'la']_ba8b to plan [n]4[a] 
+
+>	add plan to frontier: [n]4[a]  with cost 1 and heuristic 5
+
+Add step travel-by-car['bob', 'raleigh', 'la']_5225 to plan [n]5[a] 
+
+>	add plan to frontier: [n]5[a]  with cost 4 and heuristic 3
+
+Add step travel['bob', 'la']_e6cf to plan [n]6[a] 
+
+>	add plan to frontier: [n]6[a]  with cost 1 and heuristic 6
+
+Add step travel-by-plane['bob', 'raleigh', 'la']_2ab5 to plan [n]7[a] 
+
+>	add plan to frontier: [n]7[a]  with cost 4 and heuristic 3
+
+Add step travel['bob', 'la']_2496 to plan [n]8[a] 
+
+>	add plan to frontier: [n]8[a]  with cost 1 and heuristic 7
+
+Add step travel['bob', 'la']_3c67 to plan [n]9[a] 
+
+>	add plan to frontier: [n]9[a]  with cost 4 and heuristic 4
+
+Plan [n]4[a]  selected cost=1 heuristic=5
+		 dummy_init[]_1ec1
+
+		 begin:travel[]_4b26
+
+		 begin:travel-by-plane[]_5bf4
+
+		 buy-tickets['bob']_2fbe
+
+		 board-plane['bob', '747', 'raleigh']_a914
+
+		 fly['bob', '747', 'raleigh', 'la']_8638
+
+		 deplane['bob', '747', 'la']_4f10
+
+		 finish:travel-by-plane[]_745c
+
+		 finish:travel[]_d7b9
+
+		 dummy_goal[]_e0e5
+
+opf selected : Flaw((begin:travel-by-plane[]_5bf4, at['bob', 'raleigh']), criteria=27, tb=10)
+
+Add step travel['bob', 'raleigh']_fa7b to plan [n]4[a] [i]0[a] 
+
+>	add plan to frontier: [n]4[a] [i]0[a]  with cost 2 and heuristic 8
+
+Add step travel['bob', 'raleigh']_3928 to plan [n]4[a] [i]1[a] 
+
+>	add plan to frontier: [n]4[a] [i]1[a]  with cost 5 and heuristic 7
+
+Add step get-out-of-car['bob', 'accord', 'raleigh']_a5b8 to plan [n]4[a] [i]2[a] 
+
+>	add plan to frontier: [n]4[a] [i]2[a]  with cost 6 and heuristic 6
+
+Add step travel['bob', 'raleigh']_57d2 to plan [n]4[a] [i]3[a] 
+
+>	add plan to frontier: [n]4[a] [i]3[a]  with cost 2 and heuristic 8
+
+Add step deplane['bob', '747', 'raleigh']_a17b to plan [n]4[a] [i]4[a] 
+
+>	add plan to frontier: [n]4[a] [i]4[a]  with cost 6 and heuristic 7
+
+Add step travel-by-car['bob', 'la', 'raleigh']_75e1 to plan [n]4[a] [i]5[a] 
+
+>	add plan to frontier: [n]4[a] [i]5[a]  with cost 5 and heuristic 8
+
+Add step travel['bob', 'raleigh']_9891 to plan [n]4[a] [i]6[a] 
+
+>	add plan to frontier: [n]4[a] [i]6[a]  with cost 2 and heuristic 6
+
+Add step travel-by-plane['bob', 'la', 'raleigh']_80dd to plan [n]4[a] [i]7[a] 
+
+>	add plan to frontier: [n]4[a] [i]7[a]  with cost 5 and heuristic 8
+
+Add step travel['bob', 'raleigh']_2620 to plan [n]4[a] [i]8[a] 
+
+>	add plan to frontier: [n]4[a] [i]8[a]  with cost 2 and heuristic 7
+
+Add step travel['bob', 'raleigh']_724f to plan [n]4[a] [i]9[a] 
+
+>	add plan to frontier: [n]4[a] [i]9[a]  with cost 5 and heuristic 6
+
+Reuse step dummy_init[]_1ec1 to plan [n]4[a] [i]10[r] 
+
+>	add plan to frontier: [n]4[a] [i]10[r]  with cost 1 and heuristic 5
+
+Plan [n]4[a] [i]10[r]  selected cost=1 heuristic=5
+		 dummy_init[]_1ec1
+
+		 begin:travel[]_4b26
+
+		 begin:travel-by-plane[]_5bf4
+
+		 buy-tickets['bob']_2fbe
+
+		 board-plane['bob', '747', 'raleigh']_a914
+
+		 fly['bob', '747', 'raleigh', 'la']_8638
+
+		 deplane['bob', '747', 'la']_4f10
+
+		 finish:travel-by-plane[]_745c
+
+		 finish:travel[]_d7b9
+
+		 dummy_goal[]_e0e5
+
+opf selected : Flaw((board-plane['bob', '747', 'raleigh']_a914, at['747', 'raleigh']), criteria=17, tb=10)
+
+Add step fly['bob', '747', 'la', 'raleigh']_e0ac to plan [n]4[a] [i]10[r] [i]0[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]0[a]  with cost 6 and heuristic 8
+
+Reuse step dummy_init[]_1ec1 to plan [n]4[a] [i]10[r] [i]1[r] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r]  with cost 1 and heuristic 5
+
+Plan [n]4[a] [i]10[r] [i]1[r]  selected cost=1 heuristic=5
+		 dummy_init[]_1ec1
+
+		 begin:travel[]_4b26
+
+		 begin:travel-by-plane[]_5bf4
+
+		 buy-tickets['bob']_2fbe
+
+		 board-plane['bob', '747', 'raleigh']_a914
+
+		 fly['bob', '747', 'raleigh', 'la']_8638
+
+		 deplane['bob', '747', 'la']_4f10
+
+		 finish:travel-by-plane[]_745c
+
+		 finish:travel[]_d7b9
+
+		 dummy_goal[]_e0e5
+
+opf selected : Flaw((board-plane['bob', '747', 'raleigh']_a914, at['bob', 'raleigh']), criteria=17, tb=10)
+
+Add step travel['bob', 'raleigh']_4cc5 to plan [n]4[a] [i]10[r] [i]1[r] [i]0[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]0[a]  with cost 2 and heuristic 8
+
+Add step travel['bob', 'raleigh']_6437 to plan [n]4[a] [i]10[r] [i]1[r] [i]1[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]1[a]  with cost 5 and heuristic 7
+
+Add step get-out-of-car['bob', 'accord', 'raleigh']_b60a to plan [n]4[a] [i]10[r] [i]1[r] [i]2[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]2[a]  with cost 6 and heuristic 6
+
+Add step travel['bob', 'raleigh']_6904 to plan [n]4[a] [i]10[r] [i]1[r] [i]3[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]3[a]  with cost 2 and heuristic 8
+
+Add step deplane['bob', '747', 'raleigh']_cab2 to plan [n]4[a] [i]10[r] [i]1[r] [i]4[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]4[a]  with cost 6 and heuristic 7
+
+Add step travel-by-car['bob', 'la', 'raleigh']_332e to plan [n]4[a] [i]10[r] [i]1[r] [i]5[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]5[a]  with cost 5 and heuristic 8
+
+Add step travel['bob', 'raleigh']_feb8 to plan [n]4[a] [i]10[r] [i]1[r] [i]6[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]6[a]  with cost 2 and heuristic 6
+
+Add step travel-by-plane['bob', 'la', 'raleigh']_ae30 to plan [n]4[a] [i]10[r] [i]1[r] [i]7[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]7[a]  with cost 5 and heuristic 8
+
+Add step travel['bob', 'raleigh']_18c1 to plan [n]4[a] [i]10[r] [i]1[r] [i]8[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]8[a]  with cost 2 and heuristic 7
+
+Add step travel['bob', 'raleigh']_cb45 to plan [n]4[a] [i]10[r] [i]1[r] [i]9[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]9[a]  with cost 5 and heuristic 6
+
+Reuse step dummy_init[]_1ec1 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r]  with cost 1 and heuristic 5
+
+Reuse step begin:travel-by-plane[]_5bf4 to plan [n]4[a] [i]10[r] [i]1[r] [i]11[r] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]11[r]  with cost 1 and heuristic 5
+
+Plan [n]4[a] [i]10[r] [i]1[r] [i]10[r]  selected cost=1 heuristic=5
+		 dummy_init[]_1ec1
+
+		 begin:travel[]_4b26
+
+		 begin:travel-by-plane[]_5bf4
+
+		 buy-tickets['bob']_2fbe
+
+		 board-plane['bob', '747', 'raleigh']_a914
+
+		 fly['bob', '747', 'raleigh', 'la']_8638
+
+		 deplane['bob', '747', 'la']_4f10
+
+		 finish:travel-by-plane[]_745c
+
+		 finish:travel[]_d7b9
+
+		 dummy_goal[]_e0e5
+
+opf selected : Flaw((fly['bob', '747', 'raleigh', 'la']_8638, at['747', 'raleigh']), criteria=9, tb=10)
+
+Add step fly['bob', '747', 'la', 'raleigh']_2fac to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]0[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]0[a]  with cost 6 and heuristic 8
+
+Reuse step dummy_init[]_1ec1 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r]  with cost 1 and heuristic 5
+
+Plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r]  selected cost=1 heuristic=5
+		 dummy_init[]_1ec1
+
+		 begin:travel[]_4b26
+
+		 begin:travel-by-plane[]_5bf4
+
+		 buy-tickets['bob']_2fbe
+
+		 board-plane['bob', '747', 'raleigh']_a914
+
+		 fly['bob', '747', 'raleigh', 'la']_8638
+
+		 deplane['bob', '747', 'la']_4f10
+
+		 finish:travel-by-plane[]_745c
+
+		 finish:travel[]_d7b9
+
+		 dummy_goal[]_e0e5
+
+opf selected : Flaw((finish:travel-by-plane[]_745c, not-at['bob', 'raleigh']), criteria=29, tb=10)
+
+Add step board-plane['bob', '747', 'raleigh']_f88a to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]0[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]0[a]  with cost 6 and heuristic 3
+
+Add step get-in-car['bob', 'accord', 'raleigh']_e841 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]1[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]1[a]  with cost 6 and heuristic 2
+
+Add step travel-by-car['bob', 'raleigh', 'la']_e9c8 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]2[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]2[a]  with cost 5 and heuristic 5
+
+Add step travel-by-plane['bob', 'raleigh', 'la']_ad9b to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]3[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]3[a]  with cost 5 and heuristic 5
+
+Reuse step board-plane['bob', '747', 'raleigh']_a914 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r]  with cost 1 and heuristic 2
+
+Plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r]  selected cost=1 heuristic=2
+		 dummy_init[]_1ec1
+
+		 begin:travel[]_4b26
+
+		 begin:travel-by-plane[]_5bf4
+
+		 buy-tickets['bob']_2fbe
+
+		 board-plane['bob', '747', 'raleigh']_a914
+
+		 fly['bob', '747', 'raleigh', 'la']_8638
+
+		 deplane['bob', '747', 'la']_4f10
+
+		 finish:travel-by-plane[]_745c
+
+		 finish:travel[]_d7b9
+
+		 dummy_goal[]_e0e5
+
+opf selected : Flaw((finish:travel-by-plane[]_745c, at['bob', 'la']), criteria=28, tb=5)
+
+Add step deplane['bob', '747', 'la']_64da to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]0[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]0[a]  with cost 6 and heuristic 5
+
+Add step travel['bob', 'la']_6d00 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]1[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]1[a]  with cost 5 and heuristic 7
+
+Add step get-out-of-car['bob', 'accord', 'la']_c4d5 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]2[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]2[a]  with cost 6 and heuristic 4
+
+Add step travel['bob', 'la']_4397 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]3[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]3[a]  with cost 2 and heuristic 5
+
+Add step travel['bob', 'la']_f96f to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]4[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]4[a]  with cost 2 and heuristic 7
+
+Add step travel-by-car['bob', 'raleigh', 'la']_852d to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]5[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]5[a]  with cost 5 and heuristic 5
+
+Add step travel['bob', 'la']_2093 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]6[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]6[a]  with cost 2 and heuristic 6
+
+Add step travel-by-plane['bob', 'raleigh', 'la']_f1a4 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]7[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]7[a]  with cost 5 and heuristic 5
+
+Add step travel['bob', 'la']_e413 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]8[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]8[a]  with cost 2 and heuristic 7
+
+Add step travel['bob', 'la']_1e52 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]9[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]9[a]  with cost 5 and heuristic 6
+
+Reuse step deplane['bob', '747', 'la']_4f10 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r]  with cost 1 and heuristic 2
+
+Plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r]  selected cost=1 heuristic=2
+		 dummy_init[]_1ec1
+
+		 begin:travel[]_4b26
+
+		 begin:travel-by-plane[]_5bf4
+
+		 buy-tickets['bob']_2fbe
+
+		 board-plane['bob', '747', 'raleigh']_a914
+
+		 fly['bob', '747', 'raleigh', 'la']_8638
+
+		 deplane['bob', '747', 'la']_4f10
+
+		 finish:travel-by-plane[]_745c
+
+		 finish:travel[]_d7b9
+
+		 dummy_goal[]_e0e5
+
+opf selected : Flaw((finish:travel[]_d7b9, at['bob', 'la']), criteria=19, tb=5)
+
+Add step travel-by-plane['bob', 'raleigh', 'la']_759e to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]0[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]0[a]  with cost 5 and heuristic 3
+
+Add step travel['bob', 'la']_7986 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]1[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]1[a]  with cost 5 and heuristic 5
+
+Add step get-out-of-car['bob', 'accord', 'la']_6b61 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]2[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]2[a]  with cost 6 and heuristic 2
+
+Add step travel['bob', 'la']_e58d to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]3[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]3[a]  with cost 2 and heuristic 5
+
+Add step deplane['bob', '747', 'la']_8672 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]4[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]4[a]  with cost 6 and heuristic 3
+
+Add step travel['bob', 'la']_303b to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]5[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]5[a]  with cost 2 and heuristic 5
+
+Add step travel-by-car['bob', 'raleigh', 'la']_5690 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]6[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]6[a]  with cost 5 and heuristic 3
+
+Add step travel['bob', 'la']_2bc7 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]7[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]7[a]  with cost 2 and heuristic 6
+
+Add step travel['bob', 'la']_613d to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]8[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]8[a]  with cost 2 and heuristic 7
+
+Add step travel['bob', 'la']_8d7f to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]9[a] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]9[a]  with cost 5 and heuristic 4
+
+Reuse step deplane['bob', '747', 'la']_4f10 to plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]10[r] 
+
+>	add plan to frontier: [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]10[r]  with cost 1 and heuristic 0
+
+Plan [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]10[r]  selected cost=1 heuristic=0
+		 dummy_init[]_1ec1
+
+		 begin:travel[]_4b26
+
+		 begin:travel-by-plane[]_5bf4
+
+		 buy-tickets['bob']_2fbe
+
+		 board-plane['bob', '747', 'raleigh']_a914
+
+		 fly['bob', '747', 'raleigh', 'la']_8638
+
+		 deplane['bob', '747', 'la']_4f10
+
+		 finish:travel-by-plane[]_745c
+
+		 finish:travel[]_d7b9
+
+		 dummy_goal[]_e0e5
+
+1.14106488	8	64	0	2	[n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]10[r] 
+solution [n]4[a] [i]10[r] [i]1[r] [i]10[r] [i]1[r] [u]4[r] [n]10[r] [n]10[r]  found at 8 nodes expanded and 64 nodes visited and 0 branches terminated
+dummy_init[]_1ec1
+begin:travel[]_4b26
+begin:travel-by-plane[]_5bf4
+buy-tickets['bob']_2fbe
+board-plane['bob', '747', 'raleigh']_a914
+fly['bob', '747', 'raleigh', 'la']_8638
+deplane['bob', '747', 'la']_4f10
+finish:travel-by-plane[]_745c
+finish:travel[]_d7b9
+dummy_goal[]_e0e5
+
+
+
+Process finished with exit code 0

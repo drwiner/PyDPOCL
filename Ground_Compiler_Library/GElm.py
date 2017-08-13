@@ -1,5 +1,5 @@
 from Ground_Compiler_Library.OrderingGraph import OrderingGraph, CausalLinkGraph
-from Ground_Compiler_Library.Flaws import Flaw, FlawLib, TCLF
+from Ground_Compiler_Library.Flaws_unused import Flaw, FlawLib, TCLF
 from uuid import uuid4
 from Ground_Compiler_Library.Element import Argument, Element, Operator, Literal
 from Ground_Compiler_Library.Graph import Edge
@@ -166,6 +166,8 @@ class GStep:
 		for pre in self.open_preconds:
 			choice_nums = self.cndt_map[pre.ID]
 			for step in plan.steps:
+				if self.ID == step.ID:
+					continue
 				if plan.OrderingGraph.isPath(self, step):
 					continue
 				if step.stepnum in choice_nums:
@@ -184,11 +186,11 @@ class GStep:
 		return hash(self.ID)
 
 	def __eq__(self, other):
-		return self.stepnum == other.stepnum
+		return self.ID == other.ID
 
 	def __str__(self):
 		args = str([arg.name if not isinstance(arg, ElementGraph) else arg for arg in self.Args])
-		return str(self.schema) + args
+		return str(self.schema) + args + '_{}'.format(str(self.ID)[-4:])
 
 	def __repr__(self):
 		return self.__str__()

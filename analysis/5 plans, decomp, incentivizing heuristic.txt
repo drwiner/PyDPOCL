@@ -1,0 +1,72 @@
+
+
+solution 0610110141010 found at 8 nodes expanded and 64 nodes visited and 0 branches terminated
+dummy_init[]_1b0e
+begin:travel[]_13af
+begin:travel-by-plane[]_5f2d
+buy-tickets['bob']_215a
+board-plane['bob', '747', 'raleigh']_9f89
+fly['bob', '747', 'raleigh', 'la']_d94c
+deplane['bob', '747', 'la']_01fc
+finish:travel-by-plane[]_6189
+finish:travel[]_50c1
+dummy_goal[]_6a92
+
+
+solution 0610111141010 found at 12 nodes expanded and 92 nodes visited and 0 branches terminated
+dummy_init[]_1b0e
+begin:travel[]_13af
+begin:travel-by-plane[]_5f2d
+buy-tickets['bob']_215a
+board-plane['bob', '747', 'raleigh']_9f89
+fly['bob', '747', 'raleigh', 'la']_d94c
+deplane['bob', '747', 'la']_01fc
+finish:travel-by-plane[]_6189
+finish:travel[]_50c1
+dummy_goal[]_6a92
+
+
+solution 0710110141010 found at 19 nodes expanded and 145 nodes visited and 0 branches terminated
+dummy_init[]_1b0e
+begin:travel[]_346d
+begin:travel-by-car[]_1233
+get-in-car['bob', 'accord', 'raleigh']_40af
+drive['bob', 'accord', 'raleigh', 'la']_6272
+get-out-of-car['bob', 'accord', 'la']_a25b
+finish:travel-by-car[]_5c6d
+finish:travel[]_34c7
+dummy_goal[]_6a92
+
+
+solution 0710111141010 found at 23 nodes expanded and 173 nodes visited and 0 branches terminated
+dummy_init[]_1b0e
+begin:travel[]_346d
+begin:travel-by-car[]_1233
+get-in-car['bob', 'accord', 'raleigh']_40af
+drive['bob', 'accord', 'raleigh', 'la']_6272
+get-out-of-car['bob', 'accord', 'la']_a25b
+finish:travel-by-car[]_5c6d
+finish:travel[]_34c7
+dummy_goal[]_6a92
+
+
+solution 09101101410 found at 121 nodes expanded and 469 nodes visited and 204 branches terminated
+dummy_init[]_1b0e
+begin:travel-by-plane[]_6f56
+buy-tickets['bob']_c5d5
+board-plane['bob', '747', 'raleigh']_ec6a
+fly['bob', '747', 'raleigh', 'la']_af06
+deplane['bob', '747', 'la']_0fde
+finish:travel-by-plane[]_b533
+dummy_goal[]_6a92
+
+
+
+Process finished with exit code 0
+
+TIME: 
+k=1, [0.95705509s] solve
+k=2, [1.48608518s] solve
+k=3, [2.29013085s] solve
+k=4, [2.76015806s] solve
+k=5, [20.63118005s] solve

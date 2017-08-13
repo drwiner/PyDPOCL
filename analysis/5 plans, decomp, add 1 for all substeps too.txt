@@ -1,0 +1,100 @@
+
+
+solution 00111001002 found at 12 nodes expanded and 48 nodes visited and 0 branches terminated
+dummy_init[]_a198
+get-in-car['bob', 'accord', 'raleigh']_a6b2
+drive['bob', 'accord', 'raleigh', 'la']_da9e
+get-out-of-car['bob', 'accord', 'la']_18b4
+dummy_goal[]_b501
+
+
+solution 041101001002 found at 19 nodes expanded and 65 nodes visited and 6 branches terminated
+dummy_init[]_a198
+buy-tickets['bob']_40f7
+board-plane['bob', '747', 'raleigh']_c0b6
+fly['bob', '747', 'raleigh', 'la']_7ccc
+deplane['bob', '747', 'la']_6d43
+dummy_goal[]_b501
+
+
+
+solution 00113101002110110 found at 43 nodes expanded and 113 nodes visited and 38 branches terminated
+dummy_init[]_a198
+buy-tickets['bob']_85cd
+board-plane['bob', '747', 'raleigh']_0c2f
+deplane['bob', '747', 'raleigh']_9d6f
+get-in-car['bob', 'accord', 'raleigh']_a6b2
+drive['bob', 'accord', 'raleigh', 'la']_3dc0
+get-out-of-car['bob', 'accord', 'la']_18b4
+dummy_goal[]_b501
+
+
+solution 04111101110101002 found at 76 nodes expanded and 231 nodes visited and 58 branches terminated
+dummy_init[]_a198
+buy-tickets['bob']_2d0c
+get-in-car['bob', 'accord', 'raleigh']_042e
+get-out-of-car['bob', 'accord', 'raleigh']_3c24
+board-plane['bob', '747', 'raleigh']_c0b6
+fly['bob', '747', 'raleigh', 'la']_0e46
+deplane['bob', '747', 'la']_6d43
+dummy_goal[]_b501
+
+
+solution 08101101001002 found at 78 nodes expanded and 233 nodes visited and 60 branches terminated
+dummy_init[]_a198
+begin:travel[]_206f
+buy-tickets['bob']_1b03
+board-plane['bob', '747', 'raleigh']_e41a
+fly['bob', '747', 'raleigh', 'la']_9ad5
+deplane['bob', '747', 'la']_8e33
+finish:travel[]_f8f2
+dummy_goal[]_b501
+
+
+Process finished with exit code 0
+
+
+---- separate run, 6th plan
+solution 0611100100210 found at 110 nodes expanded and 290 nodes visited and 117 branches terminated
+dummy_init[]_ac4b
+begin:travel[]_bb5e
+get-in-car['bob', 'accord', 'raleigh']_b10d
+drive['bob', 'accord', 'raleigh', 'la']_6466
+get-out-of-car['bob', 'accord', 'la']_1c43
+finish:travel[]_3a22
+dummy_goal[]_f9ae
+
+
+--- separate run, 7th plan
+solution 09101101410 found at 126 nodes expanded and 352 nodes visited and 124 branches terminated
+dummy_init[]_7cf9
+begin:travel-by-car[]_d7fa
+get-in-car['bob', 'accord', 'raleigh']_059f
+drive['bob', 'accord', 'raleigh', 'la']_2027
+get-out-of-car['bob', 'accord', 'la']_c2cc
+finish:travel-by-car[]_6be0
+dummy_goal[]_d747
+
+
+---- separate run, 8th plan
+k=8
+solution 09101111410 found at 134 nodes expanded and 387 nodes visited and 136 branches terminated
+dummy_init[]_91dd
+begin:travel-by-car[]_eb84
+get-in-car['bob', 'accord', 'raleigh']_edd8
+drive['bob', 'accord', 'raleigh', 'la']_dbeb
+get-out-of-car['bob', 'accord', 'la']_581f
+finish:travel-by-car[]_fc7f
+dummy_goal[]_a2f6
+
+
+
+TIME:
+k=1, [0.31201792s] solve
+k=2, [0.52503014s] solve
+k=3, [1.55108905s] solve
+k=4, [2.94916892s] solve
+k=5, [3.02117300s] solve
+k=6, [4.51125789s] solve
+k=7, [5.37030697s] solve
+k=8, [6.04934597s] solve

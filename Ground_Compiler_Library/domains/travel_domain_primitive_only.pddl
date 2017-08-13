@@ -62,45 +62,4 @@
         :effect (and (at ?person ?place)
                      (not (in ?person ?plane))))
 
-    (:action travel-by-car
-        :parameters (?person - person ?from ?to - place)
-		:precondition (and (at ?person ?from) (not (= ?from ?to)))
-        :effect(and (at ?person ?to)
-                    (not (at ?person ?from)))
-		:decomp(
-			:sub-params (?car - car ?s1 ?s2 ?s3 - step)
-			:requirements( and
-				(= ?s1 (get-in-car ?person ?car ?from))
-                (= ?s2 (drive ?person ?car ?from ?to))
-                (= ?s3 (get-out-of-car ?person ?car ?to))
-				(linked-by ?s1 ?s2 (in ?person ?car))
-				(linked-by ?s1 ?s3 (in ?person ?car))
-				(linked-by ?s2 ?s3 (at ?car ?to)))))
-
-    (:action travel-by-plane
-        :parameters (?person - person ?from ?to - place)
-		:precondition (and (at ?person ?from) (not (= ?from ?to)))
-        :effect(and (at ?person ?to)
-                    (not (at ?person ?from)))
-		:decomp(
-			:sub-params (?plane - plane
-				?s1 ?s2 ?s3 ?s4 - step)
-			:requirements(and
-				(= ?s1 (buy-tickets ?person))
-                (= ?s2 (board-plane ?person ?plane ?from))
-                (= ?s3 (fly ?person ?plane ?from ?to))
-                (= ?s4 (deplane ?person ?plane ?to))
-				(linked-by ?s1 ?s2 (has-ticket ?person))
-				(linked-by ?s2 ?s3 (in ?person ?plane))
-				(linked-by ?s2 ?s4 (in ?person ?plane))
-				(linked-by ?s3 ?s4 (at ?plane ?to)))))
-
-	(:action travel
-	    :parameters (?person - person ?to - place)
-	    :precondition ()
-	    :effect(and (at ?person ?to))
-	    :decomp (
-	        :sub-params(?travel-step - step)
-	        :requirements(and
-	            (effect ?travel-step (at ?person ?to)))))
 )

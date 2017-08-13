@@ -1,0 +1,159 @@
+D:\Python\python.exe D:/Documents/Python/pydpocl/PyDPOCL.py
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+finished uploading
+[0.64903712s]
+solution 01101011410 found at 9 nodes expanded and 57 nodes visited and 0 branches terminated
+dummy_init[]_b863
+begin:travel-by-plane[]_e9d2
+buy-tickets['bob']_b6bf
+board-plane['bob', '747', 'raleigh']_9bcb
+fly['bob', '747', 'raleigh', 'la']_282f
+deplane['bob', '747', 'la']_264a
+finish:travel-by-plane[]_e7de
+dummy_goal[]_e37e
+
+
+[1.61409307s]
+solution 01101111410 found at 18 nodes expanded and 102 nodes visited and 20 branches terminated
+dummy_init[]_b863
+begin:travel-by-plane[]_e9d2
+buy-tickets['bob']_b6bf
+board-plane['bob', '747', 'raleigh']_9bcb
+fly['bob', '747', 'raleigh', 'la']_282f
+deplane['bob', '747', 'la']_264a
+finish:travel-by-plane[]_e7de
+dummy_goal[]_e37e
+
+
+[2.78115916s]
+solution 09101101410 found at 29 nodes expanded and 170 nodes visited and 40 branches terminated
+dummy_init[]_b863
+begin:travel-by-car[]_450d
+get-in-car['bob', 'accord', 'raleigh']_54ad
+drive['bob', 'accord', 'raleigh', 'la']_316b
+get-out-of-car['bob', 'accord', 'la']_44ff
+finish:travel-by-car[]_73c6
+dummy_goal[]_e37e
+
+
+[3.51420116s]
+solution 09101111410 found at 37 nodes expanded and 213 nodes visited and 52 branches terminated
+dummy_init[]_b863
+begin:travel-by-car[]_450d
+get-in-car['bob', 'accord', 'raleigh']_54ad
+drive['bob', 'accord', 'raleigh', 'la']_316b
+get-out-of-car['bob', 'accord', 'la']_44ff
+finish:travel-by-car[]_73c6
+dummy_goal[]_e37e
+
+
+[4.53726006s]
+solution 00111001002 found at 55 nodes expanded and 282 nodes visited and 80 branches terminated
+dummy_init[]_b863
+get-in-car['bob', 'accord', 'raleigh']_141d
+drive['bob', 'accord', 'raleigh', 'la']_04fb
+get-out-of-car['bob', 'accord', 'la']_002d
+dummy_goal[]_e37e
+
+
+[45.97563004s]
+solution 08101101001002 found at 413 nodes expanded and 1662 nodes visited and 828 branches terminated
+dummy_init[]_b863
+buy-tickets['bob']_03d5
+board-plane['bob', '747', 'raleigh']_7765
+fly['bob', '747', 'raleigh', 'la']_796c
+begin:travel[]_4038
+deplane['bob', '747', 'la']_331a
+finish:travel[]_1e62
+dummy_goal[]_e37e
+
+
+[46.01963305s]
+solution 041101001002 found at 415 nodes expanded and 1666 nodes visited and 830 branches terminated
+dummy_init[]_b863
+buy-tickets['bob']_5a5b
+board-plane['bob', '747', 'raleigh']_514e
+fly['bob', '747', 'raleigh', 'la']_115d
+deplane['bob', '747', 'la']_1c97
+dummy_goal[]_e37e
+
+
+[59.45540118s]
+solution 0310101141010 found at 517 nodes expanded and 2103 nodes visited and 1034 branches terminated
+dummy_init[]_b863
+begin:travel[]_304a
+begin:travel-by-plane[]_a528
+buy-tickets['bob']_41f3
+board-plane['bob', '747', 'raleigh']_6e1d
+fly['bob', '747', 'raleigh', 'la']_2759
+deplane['bob', '747', 'la']_f7d6
+finish:travel-by-plane[]_3334
+finish:travel[]_516d
+dummy_goal[]_e37e
+
+
+
+Process finished with exit code 0

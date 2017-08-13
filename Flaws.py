@@ -36,8 +36,9 @@ class OPF(Flaw):
 		super(OPF, self).__init__((s_need, pre), 'opf')
 		self.s_need = s_need
 		self.p = pre
-		self.criteria = hash(s_need.stepnum) ^ hash(pre.name) ^ hash(pre.truth)
-		self.tiebreaker = sum(hash(arg) for arg in pre.Args)
+		# self.criteria = hash(s_need.stepnum) ^ hash(pre.name) ^ hash(pre.truth)
+		self.criteria = len(str(s_need.schema)) + len(str(pre.name)) + len(str(pre.truth))
+		self.tiebreaker = sum(len(str(arg.name)) for arg in pre.Args)
 
 	def __hash__(self):
 		return hash(self.flaw[0].ID) ^ hash(self.flaw[1].ID)
@@ -49,8 +50,9 @@ class TCLF(Flaw):
 		super(TCLF, self).__init__((threatening_step, causal_link_edge), 'tclf')
 		self.threat = self.flaw[0]
 		self.link = self.flaw[1]
-		self.criteria = self.threat.stepnum ^ self.link.source.stepnum ^ self.link.sink.stepnum
-		self.tiebreaker = hash(self.link.label.name) ^ hash(self.link.label.truth) ^ sum(hash(arg) for arg in self.link.label.Args)
+		self.criteria = len(str(self.threat.schema)) + len(str(self.link.label.name)) + len(str(self.link.label.truth))
+		self.tiebreaker = len(str(self.link.label.truth)) + len(str(self.link.label.name)) \
+		                  + len(str(causal_link_edge.sink.schema)) - len(causal_link_edge.source.preconds)
 
 	def __hash__(self):
 		return hash(self.threat.ID) ^ hash(self.link.source.ID) ^ hash(self.link.sink.ID) ^ hash(self.link.label.ID)
@@ -179,15 +181,29 @@ class FlawLib():
 		return [flaw for i, flaw_set in enumerate(self.typs) for flaw in flaw_set if flaw_set.name not in
 				self.restricted_names]
 
-	def OCs(self):
+
+	def counts_for_heuristic(self, flaw_set):
+		if len(flaw_set) == 0:
+			return False
+		if flaw_set.name in self.restricted_names:
+			return False
+		return True
+
+	def OC_gen(self):
 		''' Generator for open conditions'''
-		for i, flaw_set in enumerate(self.typs):
-			if len(flaw_set) == 0:
-				continue
-			if flaw_set.name in self.restricted_names:
-				continue
-			g = (flaw for flaw in flaw_set)
-			yield(next(g))
+		# for flaw_set in self.typs:
+		# 	if not self.counts_for_heuristic(flaw_set):
+		return [flaw for flaw_set in self.typs for flaw in flaw_set
+		        if self.counts_for_heuristic(flaw_set) and flaw.flaw[0].height == 0]
+		# for i, flaw_set in enumerate(self.typs):
+		# 	if len(flaw_set) == 0:
+		# 		continue
+		# 	if flaw_set.name in self.restricted_names:
+		# 		continue
+		# 	# if flaw_set.name == 'statics':
+		# 	# 	continue
+		# 	return (flaw for flaw in flaw_set if flaw.flaw[0].height == 0)
+			# return(g)
 
 	def next(self):
 		''' Returns flaw with highest priority, and removes'''

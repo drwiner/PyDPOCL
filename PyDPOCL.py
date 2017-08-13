@@ -3,9 +3,11 @@ from Flaws import OPF, TCLF
 from uuid import uuid4
 import copy
 from heapq import heappush, heappop
-
+from clockdeco import clock
+import time
 LOG = 1
-
+REPORT = 1
+from collections import Counter
 
 def log_message(message):
 	if LOG:
@@ -60,6 +62,7 @@ class GPlanner:
 		self.insert(root_plan)
 		self._h_visited = []
 		self.plan_num = 0
+		self.max_height = gsteps[-3].height
 
 	# Private Hooks #
 
@@ -76,42 +79,83 @@ class GPlanner:
 
 	def insert(self, plan):
 		plan.heuristic = self.h_plan(plan)
+		log_message('>\tadd plan to frontier: {} with cost {} and heuristic {}\n'.format(plan.name, plan.cost, plan.heuristic))
 		self._frontier.insert(plan)
 
+	# @clock
 	def solve(self, k=4):
 		# find k solutions to problem
 
 		completed = []
 		expanded = 0
+		leaves = 0
+		tclf_visits = 0
+		success_message = 'solution {} found at {} nodes expanded and {} nodes visited and {} branches terminated'
+
+		t0 = time.time()
 
 		while len(self) > 0:
 			plan = self.pop()
-			expanded += 1
+
 			if not plan.isInternallyConsistent():
+				if plan.name[-3] == 'a':
+					print('stop')
 				log_message('prune {}'.format(plan.name))
+				leaves += 1
 				continue
 
+			# debugging:
+			# plan_schemata = Counter(step.schema for step in plan.steps)
+			# Counter(plan_schemata)
+			# for item, value in plan_schemata.items():
+			# 	if value > 3:
+			# 		print('check here')
+			# if len(plan_schemata) > len(set(plan_schemata)):
+			# 	print('check here')
+
 			log_message('Plan {} selected cost={} heuristic={}'.format(plan.name, plan.cost, plan.heuristic))
+			for step in plan.OrderingGraph.topoSort():
+				log_message('\t\t {}\n'.format(str(step)))
 
 			if len(plan.flaws) == 0:
-				print('solution {} found at {} nodes expanded and {} nodes visited'.format(plan.name, expanded, len(self)+expanded))
+				# success
+				elapsed = time.time() - t0
+				delay = str('%0.8f' % elapsed)
 				completed.append(plan)
-				for step in plan.OrderingGraph.topoSort():
-					print(step)
-				print('\n')
+				max_height = 0
+				for step in plan.steps:
+					if str(step.schema)[:5] == 'begin':
+						max_height += 1
+						if max_height >= self.max_height:
+							break
+
+				print('{}\t{}\t{}\t{}\t{}\t{}'.format(delay, expanded, len(self) + expanded, leaves, max_height, plan.name))
+				if REPORT:
+					print(success_message.format(plan.name, expanded, len(self)+expanded, leaves))
+
+					for step in plan.OrderingGraph.topoSort():
+						print(step)
+					print('\n')
+
 				if len(completed) == k:
 					return completed
+				# if len(completed) == 6:
+				# 	print('check here')
 				continue
 
 			# Select Flaw
 			flaw = plan.flaws.next()
+			plan.name += '[' + str(flaw.flaw_type)[0] + ']'
 			log_message('{} selected : {}\n'.format(flaw.name, flaw))
 
 			self.plan_num = 0
 
 			if isinstance(flaw, TCLF):
+				tclf_visits += 1
 				self.resolve_threat(plan, flaw)
 			else:
+				# only count expanded nodes as those that resolve open conditions
+				expanded += 1
 				self.add_step(plan, flaw)
 				self.reuse_step(plan, flaw)
 
@@ -133,7 +177,7 @@ class GPlanner:
 				continue
 			# clone plan and new step
 
-			new_plan = plan.instantiate(str(self.plan_num))
+			new_plan = plan.instantiate(str(self.plan_num) + '[a] ')
 			self.plan_num += 1
 
 			# use indices befoer inserting new steps
@@ -149,15 +193,25 @@ class GPlanner:
 
 			# resolve s_need with the new step
 			new_plan.resolve(new_step, mutable_s_need, mutable_p)
+
+			# new_plan.cost += ((self.max_height*self.max_height)+1) - (new_step.height*new_step.height)
+			# new_plan.cost += self.max_height + 1 - new_step.height
 			new_plan.cost += 1
+			# self.max_height + 1 - new_step.height
 
 			# insert our new mutated plan into the frontier
 			self.insert(new_plan)
 
+
 	def reuse_step(self, plan, flaw):
 		s_need, p = flaw.flaw
 
-		choices = [step for step in plan.steps if step.stepnum in s_need.cndt_map[p.ID] and not plan.OrderingGraph.isPath(s_need, step)]
+		choices = [step for step in plan.steps
+		           if step.stepnum in s_need.cndt_map[p.ID]
+		           and not s_need.ID == step.ID
+		           and not plan.OrderingGraph.isPath(s_need, step)]
+		           # and not plan.CausalLinkGraph.isPath(s_need, step)]
+		           # and plan.HierarchyGraph.satisfies_hierarchy(step, p, s_need)]
 		if len(choices) == 0:
 			return
 
@@ -166,10 +220,10 @@ class GPlanner:
 		p_index = s_need.preconds.index(p)
 		for choice in choices:
 			# clone plan and new step
-			new_plan = plan.instantiate(str(self.plan_num))
+			new_plan = plan.instantiate(str(self.plan_num) + '[r] ')
 			self.plan_num += 1
 
-			# use indices befoer inserting new steps
+			# use indices before inserting new steps
 			mutable_s_need = new_plan[s_index]
 			mutable_p = mutable_s_need.preconds[p_index]
 
@@ -189,7 +243,7 @@ class GPlanner:
 		snk_index = plan.index(tclf.link.sink)
 
 		# Promotion
-		new_plan = plan.instantiate(str(self.plan_num))
+		new_plan = plan.instantiate(str(self.plan_num)+ '[tp] ')
 		self.plan_num += 1
 		threat = new_plan[threat_index]
 		sink = new_plan[snk_index]
@@ -202,8 +256,9 @@ class GPlanner:
 		self.insert(new_plan)
 		log_message('promote {} in front of {} in plan {}'.format(threat, sink, new_plan.name))
 
+
 		# Demotion
-		new_plan = plan.instantiate(str(self.plan_num))
+		new_plan = plan.instantiate(str(self.plan_num) + '[td] ')
 		self.plan_num += 1
 		threat = new_plan[threat_index]
 		source = new_plan[src_index]
@@ -238,6 +293,8 @@ class GPlanner:
 		for cndt in self.gsteps[stepnum].cndt_map[precond.ID]:
 			if not self.gsteps[cndt].instantiable:
 				continue
+			if not self.gsteps[cndt].height == 0:
+				continue
 			cndt_heuristic = self.h_step(plan, cndt)
 			if cndt_heuristic < min_so_far:
 				min_so_far = cndt_heuristic
@@ -268,12 +325,16 @@ class GPlanner:
 		sumo = 0
 
 		self._h_visited = []
-		for flaw in plan.flaws.OCs():
-			exists_choice = False
-			if len(flaw.s_need.choices) > 0:
-				exists_choice = True
+		self.h_lit_dict = dict()
+		# flaw_gen = plan.flaws.OC_gen()
+		for flaw in plan.flaws.OC_gen():
+			# num_flaws += 1
+			# exists_choice = False
+			# if len(flaw.s_need.choices) > 0:
+			# 	exists_choice = True
 
-			if len(flaw.s_need.choices) == 0 or not exists_choice:
+
+			if len(flaw.s_need.choices) == 0:
 				sumo += self.h_condition(plan, flaw.s_need.stepnum, flaw.p)
 
 		return sumo
@@ -293,7 +354,8 @@ class GPlanner:
 
 import sys
 import pickle
-import Ground_Compiler_Library
+# import Ground_Compiler_Library
+from Ground_Compiler_Library import Ground, precompile
 # import json
 # import jsonpickle
 #
@@ -309,9 +371,12 @@ def upload(GL, name):
 	with open(name, 'wb') as afile:
 		pickle.dump(GL, afile)
 
+# def just_compile_no_saving_steps(domain_file, problem_file):
+# 	GL = Ground.GLib(domain_file, problem_file)
+# 	ground_step_list = precompile.deelementize_ground_library(GL)
 
-def just_compile(domain_file, problem_file):
-	GL = Ground_Compiler_Library.Ground.GLib(domain_file, problem_file)
+def just_compile(domain_file, problem_file, pickle_names):
+	GL = Ground.GLib(domain_file, problem_file)
 	with open('ground_steps.txt', 'w') as gs:
 		for step in GL:
 			gs.write(str(step))
@@ -322,7 +387,7 @@ def just_compile(domain_file, problem_file):
 			for eff in step.Effects:
 				gs.write('\n\t\t' + str(eff))
 			gs.write('\n\n')
-	ground_step_list = Ground_Compiler_Library.deelementize_ground_library(GL)
+	ground_step_list = precompile.deelementize_ground_library(GL)
 	with open('ground_steps_stripped.txt', 'w') as gs:
 		# gs.write('\n\n')
 		for i, step in enumerate(ground_step_list):
@@ -351,9 +416,9 @@ def just_compile(domain_file, problem_file):
 			gs.write('\n\n')
 
 	for i, gstep in enumerate(ground_step_list):
-		with open(uploadable_ground_step_library_name + str(i), 'wb') as ugly:
+		with open(pickle_names + str(i), 'wb') as ugly:
 			pickle.dump(gstep, ugly)
-	return GL
+	return ground_step_list
 
 if __name__ == '__main__':
 	num_args = len(sys.argv)
@@ -362,6 +427,7 @@ if __name__ == '__main__':
 		if num_args > 2:
 			problem_file = sys.argv[2]
 	else:
+		# domain_file = 'Ground_Compiler_Library//domains/travel_domain_primitive_only.pddl'
 		domain_file = 'Ground_Compiler_Library//domains/travel_domain.pddl'
 		problem_file = 'Ground_Compiler_Library//domains/travel-to-la.pddl'
 		# problem_file = 'Ground_Compiler_Library//domains/travel-to-la.pddl'
@@ -370,12 +436,11 @@ if __name__ == '__main__':
 	uploadable_ground_step_library_name = 'Ground_Compiler_Library//' + d_name + '.' + p_name
 
 
-	RELOAD = 1
+	RELOAD = 0
 	if RELOAD:
-		GL = just_compile(domain_file, problem_file)
+		ground_steps = just_compile(domain_file, problem_file, uploadable_ground_step_library_name)
 
-
-	PLAN = 0
+	PLAN = 1
 	if PLAN:
 		ground_steps = []
 		i = 0
@@ -389,5 +454,12 @@ if __name__ == '__main__':
 				break
 		print('finished uploading')
 
+
+
 		planner = GPlanner(ground_steps)
 		planner.solve(k=1)
+
+
+
+		# planner2 = GPlanner()
+		# planner2.solve(k=1)

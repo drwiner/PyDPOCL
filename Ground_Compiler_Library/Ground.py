@@ -9,7 +9,7 @@ from Ground_Compiler_Library.Plannify import Plannify
 from Ground_Compiler_Library.Element import Argument, Actor, Operator, Literal
 from Ground_Compiler_Library.pddlToGraphs import parseDomAndProb
 from Ground_Compiler_Library.Graph import Edge
-from Ground_Compiler_Library.Flaws import FlawLib
+from Ground_Compiler_Library.Flaws_unused import FlawLib
 import hashlib
 
 #GStep = namedtuple('GStep', 'action pre_dict pre_link')

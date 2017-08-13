@@ -17,6 +17,7 @@ class GPlan:
 		self.ID = uuid4()
 		self.OrderingGraph = OrderingGraph()
 		self.CausalLinkGraph = CausalLinkGraph()
+		# self.HierarchyGraph = HierarchyGraph()
 		self.flaws = FlawLib()
 		self.solved = False
 		self.dummy = dummyTuple(dummy_init_constructor.instantiate(), dummy_goal_constructor.instantiate())
@@ -35,7 +36,7 @@ class GPlan:
 		# self.h_step_dict = dict()
 
 		self.heuristic = float('inf')
-		self.name = '0'
+		self.name = ''
 		self.cost = 0
 
 	def __len__(self):
@@ -73,10 +74,14 @@ class GPlan:
 	# Insert Methods #
 
 	def insert(self, step):
+		# baseline condition:
+		# self.cost += 1
+		# self.cost += (2 * 2 + 1) - (step.height * step.height)
 		if step.height > 0:
 			self.insert_decomp(step)
 		else:
 			self.insert_primitive(step)
+
 
 	def insert_primitive(self, new_step):
 		self.steps.append(new_step)
@@ -88,6 +93,20 @@ class GPlan:
 		# add open conditions for new step
 		for pre in new_step.open_preconds:
 			self.flaws.insert(self, OPF(new_step, pre))
+
+		# check for causal link threats
+		for edge in self.CausalLinkGraph.edges:
+			# source, sink, condition = edge
+			if edge.source.ID == new_step.ID:
+				continue
+			if edge.sink.ID == new_step.ID:
+				continue
+			if self.OrderingGraph.isPath(new_step, edge.source):
+				continue
+			if self.OrderingGraph.isPath(edge.sink, new_step):
+				continue
+			if new_step.stepnum in edge.sink.threat_map[edge.label.ID]:
+				self.flaws.insert(self, TCLF(new_step, edge))
 
 	def insert_decomp(self, new_step):
 		# magic happens here
@@ -108,10 +127,22 @@ class GPlan:
 		self.OrderingGraph.addEdge(self.dummy.init, d_i)
 		self.OrderingGraph.addEdge(d_i, self.dummy.final)
 
+
 		# sub dummy final
 		d_f = new_step.dummy.final.instantiate(default_None_is_to_refresh_open_preconds=False)
 		swap_dict[new_step.dummy.final.ID] = d_f
 		self.insert(d_f)
+
+		# added this 2017-08-09
+		self.OrderingGraph.addEdge(d_i, d_f)
+		self.OrderingGraph.addEdge(d_f, self.dummy.final)
+		self.OrderingGraph.addEdge(self.dummy.init, d_f)
+
+		# decomposition links
+		# self.HierarchyGraph.addOrdering(new_step, d_i)
+		# self.HierarchyGraph.addOrdering(new_step, d_f)
+		# for sb_step in new_step.sub_steps:
+		# 	self.HierarchyGraph.addOrdering(new_step, sb_step)
 
 		# log who your family is
 		new_step.dummy = dummyTuple(d_i, d_f)
@@ -123,6 +154,11 @@ class GPlan:
 			new_substep = substep.instantiate(default_None_is_to_refresh_open_preconds=False)
 			swap_dict[substep.ID] = new_substep
 			self.insert(new_substep)
+
+			# if your substeps have children, make those children fit between your init and
+			if new_substep.height > 0:
+				self.OrderingGraph.addEdge(new_substep.dummy.final, d_f)
+				self.OrderingGraph.addEdge(d_i, new_substep.dummy.init)
 
 		# sub orderings
 		for edge in new_step.sub_orderings.edges:
@@ -188,10 +224,11 @@ class GPlan:
 
 		# check if this link is threatened
 		ignore_these = {mutable_s_need.ID, new_step.ID}
+		# ignore_these = {mutable_s_need.stepnum, new_step.stepnum}
 		for step in self.steps:
 			if step.ID in ignore_these:
 				continue
-			if step.stepnum not in mutable_s_need.threats:
+			if step.stepnum not in mutable_s_need.threat_map[mutable_p.ID]:
 				continue
 			if self.OrderingGraph.isPath(mutable_s_need, step):
 				continue
@@ -200,17 +237,17 @@ class GPlan:
 				continue
 			self.flaws.insert(self, TCLF(step, c_link))
 
-		# check if adding this step threatens other causal links
-		for cl in self.CausalLinkGraph.edges:
-			if cl == c_link:
-				continue
-			if new_step.stepnum not in cl.sink.threat_map[cl.label.ID]:
-				continue
-			if self.OrderingGraph.isPath(new_step, cl.source):
-				continue
-			if self.OrderingGraph.isPath(cl.sink, new_step):
-				continue
-			self.flaws.insert(self, TCLF(new_step, cl))
+		# # check if adding this step threatens other causal links
+		# for cl in self.CausalLinkGraph.edges:
+		# 	if cl == c_link:
+		# 		continue
+		# 	if new_step.stepnum not in cl.sink.threat_map[cl.label.ID]:
+		# 		continue
+		# 	if self.OrderingGraph.isPath(new_step, cl.source):
+		# 		continue
+		# 	if self.OrderingGraph.isPath(cl.sink, new_step):
+		# 		continue
+		# 	self.flaws.insert(self, TCLF(new_step, cl))
 
 	def resolve_with_decomp(self, new_step, mutable_s_need, mutable_p):
 		d_i, d_f = new_step.dummy
@@ -231,10 +268,13 @@ class GPlan:
 		# check if df -> s_need is threatened
 		ignore_these = {mutable_s_need.ID, d_f.ID, d_i.ID}
 		for step in self.steps:
-			# existing steps must be primitive
+			# reminder: existing steps are primitive
+
 			if step.ID in ignore_these:
 				continue
-			if step.stepnum not in mutable_s_need.threats:
+
+			### NOT SUFFICIENT: needs to not be a threat to any sub-step added... ###
+			if step.stepnum not in mutable_s_need.threat_map[mutable_p.ID]:
 				continue
 			# check only for d_f, in case this step occurs between d_i and d_f
 			if self.OrderingGraph.isPath(step, d_f):
@@ -243,26 +283,26 @@ class GPlan:
 				continue
 			self.flaws.insert(self, TCLF(step, c_link))
 
-		# check if adding this step threatens other causal links
-		for cl in self.CausalLinkGraph.edges:
-			# all causal links are between primitive steps
-			if cl == c_link:
-				continue
-			if new_step.stepnum not in cl.sink.threat_map[cl.label.ID]:
-				continue
-			if self.OrderingGraph.isPath(d_f, cl.source):
-				continue
-			if self.OrderingGraph.isPath(cl.sink, d_f):  # LOOK HERE TODO: DECIDE
-				continue
-			self.flaws.insert(self, TCLF(d_f, cl))
+		# # check if adding this step threatens other causal links
+		# for cl in self.CausalLinkGraph.edges:
+		# 	# all causal links are between primitive steps
+		# 	if cl == c_link:
+		# 		continue
+		# 	if new_step.stepnum not in cl.sink.threat_map[cl.label.ID]:
+		# 		continue
+		# 	if self.OrderingGraph.isPath(d_f, cl.source):
+		# 		continue
+		# 	if self.OrderingGraph.isPath(cl.sink, d_f):  # LOOK HERE TODO: DECIDE
+		# 		continue
+		# 	self.flaws.insert(self, TCLF(d_f, cl))
 
 	def __lt__(self, other):
 		if self.cost + self.heuristic != other.cost + other.heuristic:
 			return (self.cost + self.heuristic) < (other.cost + other.heuristic)
-		elif self.heuristic != other.heuristic:
-			return self.heuristic < other.heuristic
 		elif self.cost != other.cost:
 			return self.cost < other.cost
+		elif self.heuristic != other.heuristic:
+			return self.heuristic < other.heuristic
 		elif len(self.flaws) != len(other.flaws):
 			return len(self.flaws) < len(other.flaws)
 		elif len(self.CausalLinkGraph.edges) != len(other.CausalLinkGraph.edges):

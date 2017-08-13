@@ -1,0 +1,75 @@
+
+
+solution 09101101410 found at 12 nodes expanded and 71 nodes visited and 0 branches terminated
+dummy_init[]_0152
+begin:travel-by-plane[]_d9f0
+buy-tickets['bob']_6703
+board-plane['bob', '747', 'raleigh']_b39c
+fly['bob', '747', 'raleigh', 'la']_836c
+deplane['bob', '747', 'la']_cb55
+finish:travel-by-plane[]_d67d
+dummy_goal[]_800d
+
+
+solution 09101111410 found at 19 nodes expanded and 96 nodes visited and 20 branches terminated
+dummy_init[]_0152
+begin:travel-by-plane[]_d9f0
+buy-tickets['bob']_6703
+board-plane['bob', '747', 'raleigh']_b39c
+fly['bob', '747', 'raleigh', 'la']_836c
+deplane['bob', '747', 'la']_cb55
+finish:travel-by-plane[]_d67d
+dummy_goal[]_800d
+
+
+solution 00101101410 found at 29 nodes expanded and 146 nodes visited and 40 branches terminated
+dummy_init[]_0152
+begin:travel-by-car[]_96ec
+get-in-car['bob', 'accord', 'raleigh']_57cf
+drive['bob', 'accord', 'raleigh', 'la']_f236
+get-out-of-car['bob', 'accord', 'la']_7887
+finish:travel-by-car[]_ac3e
+dummy_goal[]_800d
+
+
+
+solution 00101111410 found at 36 nodes expanded and 179 nodes visited and 52 branches terminated
+dummy_init[]_0152
+begin:travel-by-car[]_96ec
+get-in-car['bob', 'accord', 'raleigh']_57cf
+drive['bob', 'accord', 'raleigh', 'la']_f236
+get-out-of-car['bob', 'accord', 'la']_7887
+finish:travel-by-car[]_ac3e
+dummy_goal[]_800d
+
+
+
+solution 01111001002 found at 58 nodes expanded and 222 nodes visited and 104 branches terminated
+dummy_init[]_0152
+get-in-car['bob', 'accord', 'raleigh']_c074
+drive['bob', 'accord', 'raleigh', 'la']_0d43
+get-out-of-car['bob', 'accord', 'la']_7ec8
+dummy_goal[]_800d
+
+
+----- separate run, 6th plan
+solution 05101110001002 found at 345 nodes expanded and 913 nodes visited and 865 branches terminated
+dummy_init[]_f082
+buy-tickets['bob']_e652
+board-plane['bob', '747', 'raleigh']_05b5
+begin:travel[]_f559
+fly['bob', '747', 'raleigh', 'la']_5734
+deplane['bob', '747', 'la']_3425
+finish:travel[]_ff5b
+dummy_goal[]_991c
+
+
+Process finished with exit code 0
+
+TIME:
+k=1, [0.74204278s] solve
+k=2, [1.71209693s] solve
+k=3, [2.89216495s] solve
+k=4, [3.61620688s] solve
+k=5, [5.30830383s] solve
+k=6, [46.32064891s] solve
