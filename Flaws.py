@@ -32,10 +32,11 @@ class Flaw:
 
 class OPF(Flaw):
 
-	def __init__(self, s_need, pre):
+	def __init__(self, s_need, pre, level=0):
 		super(OPF, self).__init__((s_need, pre), 'opf')
 		self.s_need = s_need
 		self.p = pre
+		self.level = level
 		# self.criteria = hash(s_need.stepnum) ^ hash(pre.name) ^ hash(pre.truth)
 		self.criteria = len(str(s_need.schema)) + len(str(pre.name)) + len(str(pre.truth))
 		self.tiebreaker = sum(len(str(arg.name)) for arg in pre.Args)
@@ -66,8 +67,8 @@ class TCLF(Flaw):
 # 		self.criteria = self.anterior.stepnum ^ self.posterior.stepnum ^ self.link.source.stepnum ^ self.link.sink.stepnum
 # 		self.tiebreaker = hash(self.link.label.name) ^ hash(self.link.label.truth) ^ sum(hash(arg) for arg in self.link.label.Args)
 
-	def __hash__(self):
-		return hash(self.anterior.ID) ^ hash(self.posterior.ID) ^ hash(self.link.source.ID) ^ hash(self.link.sink.ID) ^ hash(self.link.label.ID)
+	# def __hash__(self):
+	# 	return hash(self.anterior.ID) ^ hash(self.posterior.ID) ^ hash(self.link.source.ID) ^ hash(self.link.sink.ID) ^ hash(self.link.label.ID)
 
 class DCF(Flaw):
 	def __init__(self, f, name):
@@ -129,8 +130,8 @@ class Flawque:
 
 
 class FlawTypes:
-	def __init__(self, statics, inits, threats, decomps, unsafe, reusable, nonreusable):
-		self._list = [statics, inits, threats, decomps, unsafe, reusable, nonreusable]
+	def __init__(self, statics, inits, threats, unsafe, reusable, nonreusable):
+		self._list = [statics, inits, threats, unsafe, reusable, nonreusable]
 
 	def __len__(self):
 		return len(self._list)
@@ -164,7 +165,7 @@ class FlawLib():
 		#nonreusable = open conditions inconsistent with existing effect sorted by number of cndts
 		self.nonreusable = Flawque('nonreusable')
 
-		self.typs = FlawTypes(self.statics, self.inits, self.threats, self.decomps, self.unsafe, self.reusable, self.nonreusable)
+		self.typs = FlawTypes(self.statics, self.threats, self.inits, self.unsafe, self.reusable, self.nonreusable)
 		self.restricted_names = ['threats', 'decomps']
 
 	def __len__(self):
@@ -239,12 +240,13 @@ class FlawLib():
 			self.threats.add(flaw)
 			return
 
-		if flaw.name == 'dcf':
-			self.decomps.add(flaw)
-			return
+		# if flaw.name == 'dcf':
+		# 	self.decomps.add(flaw)
+		# 	return
 
 		#unpack flaw
 		s_need, pre = flaw.flaw
+		# use height to determine which steps are to be considered
 
 		#if pre.predicate is static
 		if pre.is_static:

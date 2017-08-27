@@ -24,9 +24,9 @@ if __name__ == '__main__':
 	# 8] 4 agents, 1 car, 1 airplane, 4 locations, 2 goals
 	problem_file_8 = 'Ground_Compiler_Library//domains/travel-8.pddl'
 
-	# problems = [problem_file_1, problem_file_2, problem_file_3, problem_file_4,
-	#             problem_file_5, problem_file_6, problem_file_7, problem_file_8]
-	problems = [problem_file_1]
+	problems = [problem_file_1, problem_file_2, problem_file_3, problem_file_4,
+	           problem_file_5, problem_file_6, problem_file_7, problem_file_8]
+	# problems = [problem_file_8]
 
 	d_name = domain_file.split('/')[-1].split('.')[0]
 
@@ -45,7 +45,7 @@ if __name__ == '__main__':
 		i = 0
 		while True:
 			try:
-				print(i)
+				# print(i)
 				with open(uploadable_ground_step_library_name + str(i), 'rb') as ugly:
 					ground_steps.append(pickle.load(ugly))
 				i += 1
@@ -56,4 +56,5 @@ if __name__ == '__main__':
 		print(p_name)
 
 		planner = GPlanner(ground_steps)
-		planner.solve(k=8)
+		planner.solve(k=40, cutoff=1200)
+		# planner.solve(k=40, cutoff=10)

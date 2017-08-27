@@ -1,309 +1,1859 @@
 
 0
-fly['sara', '747', 'raleigh', 'la']_a9a7
+get-in-car['roger', 'accord', 'la']_5e61
 	preconditions:
-		at['747', 'raleigh']
-			cndts:	[1, 26, 3]
-			risks:	[0, 2]
-		in['sara', '747']
-			cndts:	[4, 5]
-			risks:	[8, 9]
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		at['roger', 'la']
+			cndts:	[64, 84]
+			risks:	[0, 148]
 
 
 1
-fly['sara', '747', 'la', 'raleigh']_1455
+get-in-car['roger', 'accord', 'raleigh']_0f9f
 	preconditions:
-		at['747', 'la']
-			cndts:	[0, 2]
-			risks:	[1, 3]
-		in['sara', '747']
-			cndts:	[4, 5]
-			risks:	[8, 9]
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		at['roger', 'raleigh']
+			cndts:	[65, 85]
+			risks:	[1, 149]
 
 
 2
-fly['bob', '747', 'raleigh', 'la']_d737
+get-in-car['roger', 'accord', 'ny']_cc54
 	preconditions:
-		at['747', 'raleigh']
-			cndts:	[1, 26, 3]
-			risks:	[0, 2]
-		in['bob', '747']
-			cndts:	[6, 7]
-			risks:	[10, 11]
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		at['roger', 'ny']
+			cndts:	[66, 86]
+			risks:	[2, 150]
 
 
 3
-fly['bob', '747', 'la', 'raleigh']_793c
+get-in-car['roger', 'accord', 'slc']_3e98
 	preconditions:
-		at['747', 'la']
-			cndts:	[0, 2]
-			risks:	[1, 3]
-		in['bob', '747']
-			cndts:	[6, 7]
-			risks:	[10, 11]
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		at['roger', 'slc']
+			cndts:	[67, 164, 87]
+			risks:	[3, 151]
 
 
 4
-board-plane['sara', '747', 'raleigh']_991c
+get-in-car['bob', 'accord', 'la']_b82c
 	preconditions:
-		at['sara', 'raleigh']
-			cndts:	[8, 22]
-			risks:	[12, 4]
-		at['747', 'raleigh']
-			cndts:	[1, 26, 3]
-			risks:	[0, 2]
-		has-ticket['sara']
-			cndts:	[20]
-			risks:	[26, 4, 5]
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		at['bob', 'la']
+			cndts:	[88, 68]
+			risks:	[152, 4]
 
 
 5
-board-plane['sara', '747', 'la']_f1ac
+get-in-car['bob', 'accord', 'raleigh']_c55c
 	preconditions:
-		at['sara', 'la']
-			cndts:	[9, 26, 23]
-			risks:	[5, 13]
-		at['747', 'la']
-			cndts:	[0, 2]
-			risks:	[1, 3]
-		has-ticket['sara']
-			cndts:	[20]
-			risks:	[26, 4, 5]
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		at['bob', 'raleigh']
+			cndts:	[89, 164, 69]
+			risks:	[153, 5]
 
 
 6
-board-plane['bob', '747', 'raleigh']_f0b3
+get-in-car['bob', 'accord', 'ny']_1372
 	preconditions:
-		at['bob', 'raleigh']
-			cndts:	[24, 10, 26]
-			risks:	[14, 6]
-		at['747', 'raleigh']
-			cndts:	[1, 26, 3]
-			risks:	[0, 2]
-		has-ticket['bob']
-			cndts:	[21]
-			risks:	[26, 6, 7]
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		at['bob', 'ny']
+			cndts:	[90, 70]
+			risks:	[154, 6]
 
 
 7
-board-plane['bob', '747', 'la']_67d3
+get-in-car['bob', 'accord', 'slc']_6ae8
 	preconditions:
-		at['bob', 'la']
-			cndts:	[25, 11]
-			risks:	[15, 7]
-		at['747', 'la']
-			cndts:	[0, 2]
-			risks:	[1, 3]
-		has-ticket['bob']
-			cndts:	[21]
-			risks:	[26, 6, 7]
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		at['bob', 'slc']
+			cndts:	[91, 71]
+			risks:	[155, 7]
 
 
 8
-deplane['sara', '747', 'raleigh']_ca51
+get-in-car['sara', 'accord', 'la']_b2b9
 	preconditions:
-		at['747', 'raleigh']
-			cndts:	[1, 26, 3]
-			risks:	[0, 2]
-		in['sara', '747']
-			cndts:	[4, 5]
-			risks:	[8, 9]
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		at['sara', 'la']
+			cndts:	[72, 92]
+			risks:	[8, 156]
 
 
 9
-deplane['sara', '747', 'la']_1b4d
+get-in-car['sara', 'accord', 'raleigh']_effd
 	preconditions:
-		at['747', 'la']
-			cndts:	[0, 2]
-			risks:	[1, 3]
-		in['sara', '747']
-			cndts:	[4, 5]
-			risks:	[8, 9]
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		at['sara', 'raleigh']
+			cndts:	[73, 164, 93]
+			risks:	[9, 157]
 
 
 10
-deplane['bob', '747', 'raleigh']_9c17
+get-in-car['sara', 'accord', 'ny']_6a2e
 	preconditions:
-		at['747', 'raleigh']
-			cndts:	[1, 26, 3]
-			risks:	[0, 2]
-		in['bob', '747']
-			cndts:	[6, 7]
-			risks:	[10, 11]
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		at['sara', 'ny']
+			cndts:	[74, 94]
+			risks:	[10, 158]
 
 
 11
-deplane['bob', '747', 'la']_b7ec
+get-in-car['sara', 'accord', 'slc']_b8e4
 	preconditions:
-		at['747', 'la']
-			cndts:	[0, 2]
-			risks:	[1, 3]
-		in['bob', '747']
-			cndts:	[6, 7]
-			risks:	[10, 11]
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		at['sara', 'slc']
+			cndts:	[75, 95]
+			risks:	[11, 159]
 
 
 12
-get-in-car['sara', 'accord', 'raleigh']_efd1
+get-in-car['dave', 'accord', 'la']_6917
 	preconditions:
-		at['sara', 'raleigh']
-			cndts:	[8, 22]
-			risks:	[12, 4]
-		at['accord', 'raleigh']
-			cndts:	[17, 26, 19]
-			risks:	[16, 18]
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		at['dave', 'la']
+			cndts:	[96, 76]
+			risks:	[160, 12]
 
 
 13
-get-in-car['sara', 'accord', 'la']_d3ad
+get-in-car['dave', 'accord', 'raleigh']_4bd4
 	preconditions:
-		at['sara', 'la']
-			cndts:	[9, 26, 23]
-			risks:	[5, 13]
-		at['accord', 'la']
-			cndts:	[16, 18]
-			risks:	[17, 19]
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		at['dave', 'raleigh']
+			cndts:	[97, 77]
+			risks:	[161, 13]
 
 
 14
-get-in-car['bob', 'accord', 'raleigh']_6d05
+get-in-car['dave', 'accord', 'ny']_bb5d
 	preconditions:
-		at['bob', 'raleigh']
-			cndts:	[24, 10, 26]
-			risks:	[14, 6]
-		at['accord', 'raleigh']
-			cndts:	[17, 26, 19]
-			risks:	[16, 18]
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		at['dave', 'ny']
+			cndts:	[98, 78]
+			risks:	[162, 14]
 
 
 15
-get-in-car['bob', 'accord', 'la']_ee09
+get-in-car['dave', 'accord', 'slc']_f7b8
 	preconditions:
-		at['bob', 'la']
-			cndts:	[25, 11]
-			risks:	[15, 7]
-		at['accord', 'la']
-			cndts:	[16, 18]
-			risks:	[17, 19]
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		at['dave', 'slc']
+			cndts:	[99, 164, 79]
+			risks:	[163, 15]
 
 
 16
-drive['sara', 'accord', 'raleigh', 'la']_219c
+drive['roger', 'accord', 'la', 'raleigh']_236d
 	preconditions:
-		at['accord', 'raleigh']
-			cndts:	[17, 26, 19]
-			risks:	[16, 18]
-		in['sara', 'accord']
-			cndts:	[12, 13]
-			risks:	[22, 23]
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 17
-drive['sara', 'accord', 'la', 'raleigh']_76b2
+drive['roger', 'accord', 'la', 'ny']_91ac
 	preconditions:
 		at['accord', 'la']
-			cndts:	[16, 18]
-			risks:	[17, 19]
-		in['sara', 'accord']
-			cndts:	[12, 13]
-			risks:	[22, 23]
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 18
-drive['bob', 'accord', 'raleigh', 'la']_87f7
+drive['roger', 'accord', 'la', 'slc']_1f74
 	preconditions:
-		at['accord', 'raleigh']
-			cndts:	[17, 26, 19]
-			risks:	[16, 18]
-		in['bob', 'accord']
-			cndts:	[14, 15]
-			risks:	[24, 25]
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 19
-drive['bob', 'accord', 'la', 'raleigh']_d6aa
+drive['roger', 'accord', 'raleigh', 'la']_7538
 	preconditions:
-		at['accord', 'la']
-			cndts:	[16, 18]
-			risks:	[17, 19]
-		in['bob', 'accord']
-			cndts:	[14, 15]
-			risks:	[24, 25]
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 20
-buy-tickets['sara']_ca54
+drive['roger', 'accord', 'raleigh', 'ny']_adda
 	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 21
-buy-tickets['bob']_cd73
+drive['roger', 'accord', 'raleigh', 'slc']_56c2
 	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 22
-get-out-of-car['sara', 'accord', 'raleigh']_96b1
+drive['roger', 'accord', 'ny', 'la']_0962
 	preconditions:
-		in['sara', 'accord']
-			cndts:	[12, 13]
-			risks:	[22, 23]
-		at['accord', 'raleigh']
-			cndts:	[17, 26, 19]
-			risks:	[16, 18]
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 23
-get-out-of-car['sara', 'accord', 'la']_c5aa
+drive['roger', 'accord', 'ny', 'raleigh']_a5c3
 	preconditions:
-		in['sara', 'accord']
-			cndts:	[12, 13]
-			risks:	[22, 23]
-		at['accord', 'la']
-			cndts:	[16, 18]
-			risks:	[17, 19]
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 24
-get-out-of-car['bob', 'accord', 'raleigh']_7b04
+drive['roger', 'accord', 'ny', 'slc']_9ff4
 	preconditions:
-		in['bob', 'accord']
-			cndts:	[14, 15]
-			risks:	[24, 25]
-		at['accord', 'raleigh']
-			cndts:	[17, 26, 19]
-			risks:	[16, 18]
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 25
-get-out-of-car['bob', 'accord', 'la']_b954
+drive['roger', 'accord', 'slc', 'la']_0f50
 	preconditions:
-		in['bob', 'accord']
-			cndts:	[14, 15]
-			risks:	[24, 25]
-		at['accord', 'la']
-			cndts:	[16, 18]
-			risks:	[17, 19]
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 26
-dummy_init[]_39c1
+drive['roger', 'accord', 'slc', 'raleigh']_12d6
 	preconditions:
-		at['accord', 'raleigh']
-		not-person['sara']
-		not-place['la']
-		at['sara', 'la']
-		not-has-ticket['bob']
-		at['bob', 'raleigh']
-		not-has-ticket['sara']
-		at['747', 'raleigh']
-		not-person['bob']
-		not-place['raleigh']
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
 
 
 27
-dummy_goal[]_450a
+drive['roger', 'accord', 'slc', 'ny']_4ace
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
+
+
+28
+drive['bob', 'accord', 'la', 'raleigh']_df29
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+29
+drive['bob', 'accord', 'la', 'ny']_eeab
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+30
+drive['bob', 'accord', 'la', 'slc']_d2de
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+31
+drive['bob', 'accord', 'raleigh', 'la']_7da4
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+32
+drive['bob', 'accord', 'raleigh', 'ny']_34ee
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+33
+drive['bob', 'accord', 'raleigh', 'slc']_febb
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+34
+drive['bob', 'accord', 'ny', 'la']_0933
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+35
+drive['bob', 'accord', 'ny', 'raleigh']_3fac
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+36
+drive['bob', 'accord', 'ny', 'slc']_adaa
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+37
+drive['bob', 'accord', 'slc', 'la']_ef8d
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+38
+drive['bob', 'accord', 'slc', 'raleigh']_4c81
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+39
+drive['bob', 'accord', 'slc', 'ny']_4c53
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+40
+drive['sara', 'accord', 'la', 'raleigh']_7492
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+41
+drive['sara', 'accord', 'la', 'ny']_f959
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+42
+drive['sara', 'accord', 'la', 'slc']_573b
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+43
+drive['sara', 'accord', 'raleigh', 'la']_002d
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+44
+drive['sara', 'accord', 'raleigh', 'ny']_10e6
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+45
+drive['sara', 'accord', 'raleigh', 'slc']_2713
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+46
+drive['sara', 'accord', 'ny', 'la']_1aa0
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+47
+drive['sara', 'accord', 'ny', 'raleigh']_e78d
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+48
+drive['sara', 'accord', 'ny', 'slc']_b3e5
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+49
+drive['sara', 'accord', 'slc', 'la']_9814
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+50
+drive['sara', 'accord', 'slc', 'raleigh']_7add
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+51
+drive['sara', 'accord', 'slc', 'ny']_a795
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+52
+drive['dave', 'accord', 'la', 'raleigh']_5b9b
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+53
+drive['dave', 'accord', 'la', 'ny']_b32a
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+54
+drive['dave', 'accord', 'la', 'slc']_f2b4
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+55
+drive['dave', 'accord', 'raleigh', 'la']_314b
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+56
+drive['dave', 'accord', 'raleigh', 'ny']_93e8
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+57
+drive['dave', 'accord', 'raleigh', 'slc']_8de7
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+58
+drive['dave', 'accord', 'ny', 'la']_9a88
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+59
+drive['dave', 'accord', 'ny', 'raleigh']_bed7
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+60
+drive['dave', 'accord', 'ny', 'slc']_44ad
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+61
+drive['dave', 'accord', 'slc', 'la']_00eb
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+62
+drive['dave', 'accord', 'slc', 'raleigh']_dd0a
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+63
+drive['dave', 'accord', 'slc', 'ny']_ae60
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+64
+deplane['roger', '747', 'la']_737b
+	preconditions:
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+
+
+65
+deplane['roger', '747', 'raleigh']_4d0a
+	preconditions:
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+
+
+66
+deplane['roger', '747', 'ny']_c791
+	preconditions:
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+
+
+67
+deplane['roger', '747', 'slc']_4e55
+	preconditions:
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+
+
+68
+deplane['bob', '747', 'la']_c9a2
+	preconditions:
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+
+
+69
+deplane['bob', '747', 'raleigh']_37cd
+	preconditions:
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+
+
+70
+deplane['bob', '747', 'ny']_68aa
+	preconditions:
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+
+
+71
+deplane['bob', '747', 'slc']_c47b
+	preconditions:
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+
+
+72
+deplane['sara', '747', 'la']_5057
+	preconditions:
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+
+
+73
+deplane['sara', '747', 'raleigh']_8082
+	preconditions:
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+
+
+74
+deplane['sara', '747', 'ny']_daba
+	preconditions:
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+
+
+75
+deplane['sara', '747', 'slc']_636f
+	preconditions:
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+
+
+76
+deplane['dave', '747', 'la']_13e7
+	preconditions:
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+
+
+77
+deplane['dave', '747', 'raleigh']_db6b
+	preconditions:
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+
+
+78
+deplane['dave', '747', 'ny']_29d3
+	preconditions:
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+
+
+79
+deplane['dave', '747', 'slc']_d716
+	preconditions:
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+
+
+80
+buy-tickets['roger']_1d73
+	preconditions:
+
+
+81
+buy-tickets['bob']_b849
+	preconditions:
+
+
+82
+buy-tickets['sara']_4426
+	preconditions:
+
+
+83
+buy-tickets['dave']_527c
+	preconditions:
+
+
+84
+get-out-of-car['roger', 'accord', 'la']_34dd
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
+
+
+85
+get-out-of-car['roger', 'accord', 'raleigh']_c77a
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
+
+
+86
+get-out-of-car['roger', 'accord', 'ny']_c616
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
+
+
+87
+get-out-of-car['roger', 'accord', 'slc']_4420
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['roger', 'accord']
+			cndts:	[0, 1, 2, 3]
+			risks:	[84, 85, 86, 87]
+
+
+88
+get-out-of-car['bob', 'accord', 'la']_8938
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+89
+get-out-of-car['bob', 'accord', 'raleigh']_f731
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+90
+get-out-of-car['bob', 'accord', 'ny']_d635
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+91
+get-out-of-car['bob', 'accord', 'slc']_c6a5
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['bob', 'accord']
+			cndts:	[4, 5, 6, 7]
+			risks:	[88, 89, 90, 91]
+
+
+92
+get-out-of-car['sara', 'accord', 'la']_5845
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+93
+get-out-of-car['sara', 'accord', 'raleigh']_2816
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+94
+get-out-of-car['sara', 'accord', 'ny']_8f3d
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+95
+get-out-of-car['sara', 'accord', 'slc']_ad48
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['sara', 'accord']
+			cndts:	[8, 9, 10, 11]
+			risks:	[92, 93, 94, 95]
+
+
+96
+get-out-of-car['dave', 'accord', 'la']_c8af
+	preconditions:
+		at['accord', 'la']
+			cndts:	[34, 37, 43, 46, 49, 19, 22, 55, 25, 58, 61, 31]
+			risks:	[40, 41, 42, 16, 17, 18, 52, 53, 54, 28, 29, 30]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+97
+get-out-of-car['dave', 'accord', 'raleigh']_aece
+	preconditions:
+		at['accord', 'raleigh']
+			cndts:	[35, 164, 38, 40, 47, 16, 50, 52, 23, 26, 59, 28, 62]
+			risks:	[32, 33, 43, 44, 45, 19, 20, 21, 55, 56, 57, 31]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+98
+get-out-of-car['dave', 'accord', 'ny']_9ce7
+	preconditions:
+		at['accord', 'ny']
+			cndts:	[32, 39, 41, 44, 17, 51, 20, 53, 56, 27, 29, 63]
+			risks:	[34, 35, 36, 46, 47, 48, 22, 23, 24, 58, 59, 60]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+99
+get-out-of-car['dave', 'accord', 'slc']_5a83
+	preconditions:
+		at['accord', 'slc']
+			cndts:	[33, 36, 42, 45, 48, 18, 21, 54, 24, 57, 60, 30]
+			risks:	[37, 38, 39, 49, 50, 51, 25, 26, 27, 61, 62, 63]
+		in['dave', 'accord']
+			cndts:	[12, 13, 14, 15]
+			risks:	[96, 97, 98, 99]
+
+
+100
+fly['roger', '747', 'la', 'raleigh']_e83e
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+101
+fly['roger', '747', 'la', 'ny']_f182
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+102
+fly['roger', '747', 'la', 'slc']_2532
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+103
+fly['roger', '747', 'raleigh', 'la']_b597
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+104
+fly['roger', '747', 'raleigh', 'ny']_5204
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+105
+fly['roger', '747', 'raleigh', 'slc']_6f63
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+106
+fly['roger', '747', 'ny', 'la']_d35a
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+107
+fly['roger', '747', 'ny', 'raleigh']_c336
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+108
+fly['roger', '747', 'ny', 'slc']_3c06
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+109
+fly['roger', '747', 'slc', 'la']_b530
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+110
+fly['roger', '747', 'slc', 'raleigh']_f375
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+111
+fly['roger', '747', 'slc', 'ny']_0e49
+	preconditions:
+		in['roger', '747']
+			cndts:	[148, 149, 150, 151]
+			risks:	[64, 65, 66, 67]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+112
+fly['bob', '747', 'la', 'raleigh']_9771
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+113
+fly['bob', '747', 'la', 'ny']_0af7
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+114
+fly['bob', '747', 'la', 'slc']_d587
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+115
+fly['bob', '747', 'raleigh', 'la']_8c96
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+116
+fly['bob', '747', 'raleigh', 'ny']_e432
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+117
+fly['bob', '747', 'raleigh', 'slc']_2cfd
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+118
+fly['bob', '747', 'ny', 'la']_6818
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+119
+fly['bob', '747', 'ny', 'raleigh']_2f1f
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+120
+fly['bob', '747', 'ny', 'slc']_ad08
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+121
+fly['bob', '747', 'slc', 'la']_dda6
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+122
+fly['bob', '747', 'slc', 'raleigh']_c4a4
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+123
+fly['bob', '747', 'slc', 'ny']_71c1
+	preconditions:
+		in['bob', '747']
+			cndts:	[152, 153, 154, 155]
+			risks:	[68, 69, 70, 71]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+124
+fly['sara', '747', 'la', 'raleigh']_1864
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+125
+fly['sara', '747', 'la', 'ny']_8ffe
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+126
+fly['sara', '747', 'la', 'slc']_a091
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+127
+fly['sara', '747', 'raleigh', 'la']_32f4
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+128
+fly['sara', '747', 'raleigh', 'ny']_3d7a
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+129
+fly['sara', '747', 'raleigh', 'slc']_5f9f
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+130
+fly['sara', '747', 'ny', 'la']_8515
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+131
+fly['sara', '747', 'ny', 'raleigh']_bf62
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+132
+fly['sara', '747', 'ny', 'slc']_94af
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+133
+fly['sara', '747', 'slc', 'la']_4eee
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+134
+fly['sara', '747', 'slc', 'raleigh']_be04
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+135
+fly['sara', '747', 'slc', 'ny']_8493
+	preconditions:
+		in['sara', '747']
+			cndts:	[156, 157, 158, 159]
+			risks:	[72, 73, 74, 75]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+136
+fly['dave', '747', 'la', 'raleigh']_9a48
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+137
+fly['dave', '747', 'la', 'ny']_eb11
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+138
+fly['dave', '747', 'la', 'slc']_6104
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+139
+fly['dave', '747', 'raleigh', 'la']_329a
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+140
+fly['dave', '747', 'raleigh', 'ny']_dacf
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+141
+fly['dave', '747', 'raleigh', 'slc']_e15b
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+142
+fly['dave', '747', 'ny', 'la']_651c
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+143
+fly['dave', '747', 'ny', 'raleigh']_f990
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+144
+fly['dave', '747', 'ny', 'slc']_8586
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+145
+fly['dave', '747', 'slc', 'la']_ba88
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+146
+fly['dave', '747', 'slc', 'raleigh']_5a12
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+147
+fly['dave', '747', 'slc', 'ny']_105e
+	preconditions:
+		in['dave', '747']
+			cndts:	[160, 161, 162, 163]
+			risks:	[76, 77, 78, 79]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+148
+board-plane['roger', '747', 'la']_8a0b
+	preconditions:
+		at['roger', 'la']
+			cndts:	[64, 84]
+			risks:	[0, 148]
+		has-ticket['roger']
+			cndts:	[80]
+			risks:	[164, 148, 149, 150, 151]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+149
+board-plane['roger', '747', 'raleigh']_3666
+	preconditions:
+		at['roger', 'raleigh']
+			cndts:	[65, 85]
+			risks:	[1, 149]
+		has-ticket['roger']
+			cndts:	[80]
+			risks:	[164, 148, 149, 150, 151]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+150
+board-plane['roger', '747', 'ny']_fd51
+	preconditions:
+		at['roger', 'ny']
+			cndts:	[66, 86]
+			risks:	[2, 150]
+		has-ticket['roger']
+			cndts:	[80]
+			risks:	[164, 148, 149, 150, 151]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+151
+board-plane['roger', '747', 'slc']_c315
+	preconditions:
+		at['roger', 'slc']
+			cndts:	[67, 164, 87]
+			risks:	[3, 151]
+		has-ticket['roger']
+			cndts:	[80]
+			risks:	[164, 148, 149, 150, 151]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+152
+board-plane['bob', '747', 'la']_2867
+	preconditions:
+		at['bob', 'la']
+			cndts:	[88, 68]
+			risks:	[152, 4]
+		has-ticket['bob']
+			cndts:	[81]
+			risks:	[152, 153, 154, 155, 164]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+153
+board-plane['bob', '747', 'raleigh']_9a25
+	preconditions:
+		at['bob', 'raleigh']
+			cndts:	[89, 164, 69]
+			risks:	[153, 5]
+		has-ticket['bob']
+			cndts:	[81]
+			risks:	[152, 153, 154, 155, 164]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+154
+board-plane['bob', '747', 'ny']_24b4
+	preconditions:
+		at['bob', 'ny']
+			cndts:	[90, 70]
+			risks:	[154, 6]
+		has-ticket['bob']
+			cndts:	[81]
+			risks:	[152, 153, 154, 155, 164]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+155
+board-plane['bob', '747', 'slc']_f427
+	preconditions:
+		at['bob', 'slc']
+			cndts:	[91, 71]
+			risks:	[155, 7]
+		has-ticket['bob']
+			cndts:	[81]
+			risks:	[152, 153, 154, 155, 164]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+156
+board-plane['sara', '747', 'la']_3285
+	preconditions:
+		at['sara', 'la']
+			cndts:	[72, 92]
+			risks:	[8, 156]
+		has-ticket['sara']
+			cndts:	[82]
+			risks:	[164, 156, 157, 158, 159]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+157
+board-plane['sara', '747', 'raleigh']_841f
 	preconditions:
 		at['sara', 'raleigh']
-			cndts:	[8, 22]
-			risks:	[12, 4]
+			cndts:	[73, 164, 93]
+			risks:	[9, 157]
+		has-ticket['sara']
+			cndts:	[82]
+			risks:	[164, 156, 157, 158, 159]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+158
+board-plane['sara', '747', 'ny']_9e67
+	preconditions:
+		at['sara', 'ny']
+			cndts:	[74, 94]
+			risks:	[10, 158]
+		has-ticket['sara']
+			cndts:	[82]
+			risks:	[164, 156, 157, 158, 159]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+159
+board-plane['sara', '747', 'slc']_ac97
+	preconditions:
+		at['sara', 'slc']
+			cndts:	[75, 95]
+			risks:	[11, 159]
+		has-ticket['sara']
+			cndts:	[82]
+			risks:	[164, 156, 157, 158, 159]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+160
+board-plane['dave', '747', 'la']_98d9
+	preconditions:
+		at['dave', 'la']
+			cndts:	[96, 76]
+			risks:	[160, 12]
+		has-ticket['dave']
+			cndts:	[83]
+			risks:	[160, 161, 162, 163, 164]
+		at['747', 'la']
+			cndts:	[130, 133, 103, 106, 139, 109, 142, 145, 115, 118, 121, 127]
+			risks:	[100, 101, 102, 136, 137, 138, 112, 113, 114, 124, 125, 126]
+
+
+161
+board-plane['dave', '747', 'raleigh']_f5f6
+	preconditions:
+		at['dave', 'raleigh']
+			cndts:	[97, 77]
+			risks:	[161, 13]
+		has-ticket['dave']
+			cndts:	[83]
+			risks:	[160, 161, 162, 163, 164]
+		at['747', 'raleigh']
+			cndts:	[131, 100, 134, 136, 107, 110, 143, 112, 146, 119, 164, 122, 124]
+			risks:	[128, 129, 103, 104, 105, 139, 140, 141, 115, 116, 117, 127]
+
+
+162
+board-plane['dave', '747', 'ny']_7e21
+	preconditions:
+		at['dave', 'ny']
+			cndts:	[98, 78]
+			risks:	[162, 14]
+		has-ticket['dave']
+			cndts:	[83]
+			risks:	[160, 161, 162, 163, 164]
+		at['747', 'ny']
+			cndts:	[128, 101, 135, 104, 137, 140, 111, 113, 147, 116, 123, 125]
+			risks:	[130, 131, 132, 106, 107, 108, 142, 143, 144, 118, 119, 120]
+
+
+163
+board-plane['dave', '747', 'slc']_1d64
+	preconditions:
+		at['dave', 'slc']
+			cndts:	[99, 164, 79]
+			risks:	[163, 15]
+		has-ticket['dave']
+			cndts:	[83]
+			risks:	[160, 161, 162, 163, 164]
+		at['747', 'slc']
+			cndts:	[129, 132, 102, 105, 138, 108, 141, 144, 114, 117, 120, 126]
+			risks:	[133, 134, 135, 109, 110, 111, 145, 146, 147, 121, 122, 123]
+
+
+164
+dummy_init[]_f965
+	preconditions:
+		at['dave', 'slc']
+		not-person['sara']
+		at['accord', 'raleigh']
+		not-has-ticket['dave']
+		at['sara', 'raleigh']
+		not-person['bob']
+		not-place['slc']
+		not-place['ny']
+		not-has-ticket['roger']
+		not-place['la']
+		not-has-ticket['sara']
+		not-has-ticket['bob']
+		at['747', 'raleigh']
+		not-person['roger']
+		at['roger', 'slc']
+		not-person['dave']
+		at['bob', 'raleigh']
+		not-place['raleigh']
+
+
+165
+dummy_goal[]_e979
+	preconditions:
+		at['dave', 'ny']
+			cndts:	[98, 78]
+			risks:	[162, 14]
 

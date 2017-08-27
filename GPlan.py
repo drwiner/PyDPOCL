@@ -4,7 +4,7 @@ from Flaws import FlawLib, OPF, TCLF
 from Ground_Compiler_Library.OrderingGraph import OrderingGraph, CausalLinkGraph
 import copy
 from collections import namedtuple, defaultdict
-
+import math
 dummyTuple = namedtuple('dummyTuple', ['init', 'final'])
 # class dummyTuple:
 # 	def __init__(self, init, final):
@@ -38,6 +38,7 @@ class GPlan:
 		self.heuristic = float('inf')
 		self.name = ''
 		self.cost = 0
+		self.depth = 0
 
 	def __len__(self):
 		return len(self.steps)
@@ -114,12 +115,13 @@ class GPlan:
 
 		# sub dummy init
 		d_i = new_step.dummy.init.instantiate()
+		d_i.depth = new_step.depth
 		swap_dict[new_step.dummy.init.ID] = d_i
 		self.steps.append(d_i)
 		# add flaws for each new_step precondition, but make s_need d_i and update cndt_map/ threat_map
 		d_i.swap_setup(new_step.cndts, new_step.cndt_map, new_step.threats, new_step.threat_map)
 		for pre in new_step.open_preconds:
-			self.flaws.insert(self, OPF(d_i, pre))
+			self.flaws.insert(self, OPF(d_i, pre, new_step.height))
 		preconds = list(new_step.open_preconds)
 		d_i.preconds = preconds
 		d_i.open_preconds = preconds
@@ -130,7 +132,9 @@ class GPlan:
 
 		# sub dummy final
 		d_f = new_step.dummy.final.instantiate(default_None_is_to_refresh_open_preconds=False)
+		d_f.depth = new_step.depth
 		swap_dict[new_step.dummy.final.ID] = d_f
+		# d_f will be primitive, to allow any heighted applicable steps
 		self.insert(d_f)
 
 		# added this 2017-08-09
@@ -153,6 +157,12 @@ class GPlan:
 		for substep in new_step.sub_steps:
 			new_substep = substep.instantiate(default_None_is_to_refresh_open_preconds=False)
 			swap_dict[substep.ID] = new_substep
+
+			# INCREMENT DEPTH
+			new_substep.depth = new_step.depth + 1
+			if new_substep.depth > self.depth:
+				self.depth = new_substep.depth
+
 			self.insert(new_substep)
 
 			# if your substeps have children, make those children fit between your init and
@@ -297,6 +307,12 @@ class GPlan:
 		# 	self.flaws.insert(self, TCLF(d_f, cl))
 
 	def __lt__(self, other):
+		# if self.cost / (1 + math.log2(self.depth+1)) + self.heuristic != other.cost / (1 + math.log2(other.depth+1)) + other.heuristic:
+		# 	return self.cost / (1 + math.log2(self.depth+1)) + self.heuristic < other.cost / (1 + math.log2(other.depth+1)) + other.heuristic
+		# if self.cost - math.log2(self.depth+1) + self.heuristic != other.cost - math.log2(other.depth+1) + other.heuristic:
+		# 	return self.cost - math.log2(self.depth+1) + self.heuristic < other.cost - math.log2(other.depth+1) + other.heuristic
+		# if self.cost - self.depth + self.heuristic != other.cost - other.depth + other.heuristic:
+		# 	return self.cost - self.depth + self.heuristic < other.cost - other.depth + other.heuristic
 		if self.cost + self.heuristic != other.cost + other.heuristic:
 			return (self.cost + self.heuristic) < (other.cost + other.heuristic)
 		elif self.cost != other.cost:

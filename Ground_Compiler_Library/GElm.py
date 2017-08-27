@@ -39,11 +39,15 @@ class GStep:
 		self.stepnumber = stepnum
 		# height is 0 when primitive
 		self.height = height
+
 		if height > 0:
 			self.sub_steps = []
 			self.sub_orderings = OrderingGraph()
 			self.sub_links = CausalLinkGraph()
 			self.dummy = dummyTuple(None, None)
+
+		# depth starts at 0 and takes on value during planning
+		self.depth = 0
 
 		self.cndts = None
 		self.cndt_map = None

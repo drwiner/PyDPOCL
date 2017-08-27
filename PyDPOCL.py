@@ -1,12 +1,13 @@
-from GPlan import GPlan
+from GPlan import GPlan, math
 from Flaws import OPF, TCLF
 from uuid import uuid4
 import copy
 from heapq import heappush, heappop
 from clockdeco import clock
 import time
-LOG = 1
-REPORT = 1
+LOG = 0
+REPORT = 0
+RRP = 0
 from collections import Counter
 
 def log_message(message):
@@ -56,7 +57,7 @@ class GPlanner:
 		root_plan = GPlan(gsteps[-2], gsteps[-1])
 		root_plan.OrderingGraph.addOrdering(root_plan.dummy.init, root_plan.dummy.final)
 		for p in root_plan.dummy.final.open_preconds:
-			root_plan.flaws.insert(root_plan, OPF(root_plan.dummy.final, p))
+			root_plan.flaws.insert(root_plan, OPF(root_plan.dummy.final, p, 100000))
 
 		self._frontier = Frontier()
 		self.insert(root_plan)
@@ -83,7 +84,7 @@ class GPlanner:
 		self._frontier.insert(plan)
 
 	# @clock
-	def solve(self, k=4):
+	def solve(self, k=4, cutoff=6000):
 		# find k solutions to problem
 
 		completed = []
@@ -93,13 +94,14 @@ class GPlanner:
 		success_message = 'solution {} found at {} nodes expanded and {} nodes visited and {} branches terminated'
 
 		t0 = time.time()
-
+		print('k={}'.format(str(k)))
+		print('time\texpanded\tvisited\tterminated\tdepth\tcost\ttrace')
 		while len(self) > 0:
 			plan = self.pop()
 
 			if not plan.isInternallyConsistent():
-				if plan.name[-3] == 'a':
-					print('stop')
+				# if plan.name[-3] == 'a':
+				# 	print('stop')
 				log_message('prune {}'.format(plan.name))
 				leaves += 1
 				continue
@@ -117,19 +119,15 @@ class GPlanner:
 			for step in plan.OrderingGraph.topoSort():
 				log_message('\t\t {}\n'.format(str(step)))
 
+
 			if len(plan.flaws) == 0:
 				# success
 				elapsed = time.time() - t0
 				delay = str('%0.8f' % elapsed)
 				completed.append(plan)
-				max_height = 0
-				for step in plan.steps:
-					if str(step.schema)[:5] == 'begin':
-						max_height += 1
-						if max_height >= self.max_height:
-							break
 
-				print('{}\t{}\t{}\t{}\t{}\t{}'.format(delay, expanded, len(self) + expanded, leaves, max_height, plan.name))
+				trace = math.floor(len(plan.name.split('['))/2)
+				print('{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(delay, expanded, len(self) + expanded, leaves, str(plan.depth), plan.cost, trace))
 				if REPORT:
 					print(success_message.format(plan.name, expanded, len(self)+expanded, leaves))
 
@@ -142,6 +140,10 @@ class GPlanner:
 				# if len(completed) == 6:
 				# 	print('check here')
 				continue
+
+			if time.time() - t0 > cutoff:
+				print('timedout: {}\t{}\t{}'.format(expanded, len(self) + expanded, leaves))
+				return
 
 			# Select Flaw
 			flaw = plan.flaws.next()
@@ -172,6 +174,12 @@ class GPlanner:
 		s_index = plan.index(s_need)
 		p_index = s_need.preconds.index(p)
 		for cndt in cndts:
+
+			if RRP:
+				# the Recursive Repair Policty: only let steps with <= height repair open conditions.
+				if self.gsteps[cndt].height > flaw.level:
+					continue
+
 			# cannot add a step which is the inital step
 			if not self.gsteps[cndt].instantiable:
 				continue
@@ -187,6 +195,9 @@ class GPlanner:
 			# instantiate new step
 			new_step = self.gsteps[cndt].instantiate()
 
+			# pass depth to new Added step.
+			new_step.depth = mutable_s_need.depth
+
 			# recursively insert new step and substeps into plan, adding orderings and flaws
 			new_plan.insert(new_step)
 			log_message('Add step {} to plan {}\n'.format(str(new_step), new_plan.name))
@@ -194,9 +205,9 @@ class GPlanner:
 			# resolve s_need with the new step
 			new_plan.resolve(new_step, mutable_s_need, mutable_p)
 
-			# new_plan.cost += ((self.max_height*self.max_height)+1) - (new_step.height*new_step.height)
+			new_plan.cost += ((self.max_height*self.max_height)+1) - (new_step.height*new_step.height)
 			# new_plan.cost += self.max_height + 1 - new_step.height
-			new_plan.cost += 1
+			# new_plan.cost += 1
 			# self.max_height + 1 - new_step.height
 
 			# insert our new mutated plan into the frontier
