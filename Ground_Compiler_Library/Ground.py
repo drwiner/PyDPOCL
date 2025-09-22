@@ -296,7 +296,7 @@ class GLib:
 
 	def getPotentialEffectLinkConditions(self, src, snk):
 		"""
-		Given source and sink steps, return {eff(src) \cap pre(snk)}
+		Given source and sink steps, return {eff(src) \\cap pre(snk)}
 		But, let those conditions be those of the src.
 		"""
 		cndts = []
