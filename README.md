@@ -136,7 +136,7 @@ This implementation is based on research in plan-space planning and hierarchical
 
 ## Author
 
-David Winer - drwiner@cs.utah.edu
+David Winer 
 
 ---
 
