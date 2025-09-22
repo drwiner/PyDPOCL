@@ -273,6 +273,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 **Original Implementation:**
 - David Winer - drwiner@cs.utah.edu
 
+
 **2.0 Reimplementation:**
 - Modern Python architecture and best practices
 - Performance optimizations and type safety
@@ -281,3 +282,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ---
 
 **Note**: This is a complete reimplementation of the PyDPOCL planning system with modern Python practices. The legacy implementation remains available in the `src/` directory for reference and compatibility during the transition period.
+
